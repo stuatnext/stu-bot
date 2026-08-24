@@ -1,54 +1,77 @@
 # stu-bot
 
-## Before Four
+## Daylight
 
-A personal time app built around one constraint: the working day starts at **16:00 SGT**, so
-all the discretionary time sits *before* it. The app treats that window as a real, finite
-resource with a hard deadline, rather than as "free time".
+A day planner for a shift that is fixed to London and lived in Asia.
 
-Live prototype: `app/index.html` — a single self-contained file, no build step.
-Open it in a browser or serve it with `npx serve app`.
+**Live:** https://stuatnext.github.io/stu-bot/ (once Pages is switched on — see below)
+**Design brief:** [`docs/design-brief.html`](docs/design-brief.html)
 
-### The model
+### The idea
 
-A weekday is three named blocks, shaped by when the shift starts:
+Work runs 08:00–15:00 UTC. That is fixed to head office, not to where you are sitting, so the
+same shift lands at a different local hour in every country:
 
-| Block | Default | Purpose |
-|---|---|---|
-| Warm-up | 08:00–10:30 | Movement, food, small stuff. Nothing that needs your best brain. |
-| **Peak** | **10:30–14:30** | Sharpest hours, and the last before work. **One thing only.** |
-| Runway | 14:30–16:00 | Land the plane. Food, reset, into the shift. |
+| | Local work hours | Free morning | Evening |
+|---|---|---|---|
+| Dubai | 12:00–19:00 | 4h | 4h |
+| Colombo, Delhi | 13:30–20:30 | 5.5h | 2.5h |
+| Bangkok, Hanoi, Jakarta | 15:00–22:00 | 7h | 1h |
+| **Singapore** | **16:00–23:00** | **8h** | **none** |
+| Tokyo | 17:00–00:00 | 9h | none |
+| Sydney | 18:00–01:00 | 10h | none |
 
-Free days get a looser three-block shape (Morning / Afternoon / Evening) with the peak
-carrying into the afternoon.
+Two lines describe the whole thing: **free morning equals your UTC offset, and evening equals
+eight hours minus it.** Flying west trades one for the other, hour for hour. Set your basecamp in
+the header and the day bar, the countdown and the suggestions all reshape around it.
 
-Everything you might spend time on is a **thing**, tagged with one of four categories —
-Health, Craft, People, Life — plus how long it usually takes, how much brain it needs
-(low / steady / deep), and a target of how many times a week it should happen. That target
-is what makes neglect measurable.
+### The four views
 
-### The five views
+- **Today** — a fixed four-step morning sequence, one suggestion sized to the hours actually left,
+  and the week's guaranteed slots.
+- **Ideas** — 131 of them across Singapore, the region, and things needing no travel. Filter by
+  time available, whether it is raining, and whether someone else is coming. Roll for another.
+- **Where** — every basecamp in range with its local working hours and a verdict.
+- **Review** — routine held as a rolling share rather than a streak, so one bad morning costs a
+  fraction; category balance against weekly targets; places been.
 
-- **Today** — the day bar, the one thing claiming your Peak block, and each block's contents.
-- **Now** — the anti-drift screen. Say how long you've got and how your head feels; it ranks
-  what to do. Ranking weighs fit, energy match, and how overdue something is; inside the Peak
-  block it promotes deep work and buries admin.
-- **Week** — set the one thing for each day ahead, and see weekly targets vs. actuals.
-- **Things** — the pool, plus the times that define your day shape.
-- **Review** — the honest number: what share of your free window you actually claimed, where
-  the hours went by category, and what's slipping.
+### Editing the ideas library
+
+It is a plain array near the top of the script in `app/index.html`, marked `LIB_ROWS`. Each row is:
+
+```js
+["Title", "Where", hours, "category", "scope", "flags", "One line on why."]
+```
+
+`category` is one of `build`, `move`, `enjoy`, `discover`, `campaign`. `scope` is `sg`, `reg`
+(the region) or `home`. `flags` is a string containing `i` for indoors — meaning it works in the
+rain — and `p` for good with someone else. Regional trips use `10` hours for a day trip and `48`
+for a weekend. Add a row and it appears immediately; no build step.
+
+### GitHub Pages
+
+The repository is already laid out for it: `index.html` at the root redirects to `app/`,
+`.nojekyll` stops Jekyll processing, and `.github/workflows/pages.yml` deploys the root on every
+push to `main`.
+
+To switch it on: **Settings → Pages → Source → GitHub Actions**. Merge this branch to `main`
+first, or point Pages at this branch directly under *Deploy from a branch* if you would rather not
+merge yet.
+
+> A note on that workflow file. The previous scheduling bot in `stuatnext/stu-time-bot` never ran
+> a single time, because `.github/workflows` there is a *file* rather than a directory. Actions
+> only reads YAML inside that folder, so nothing was ever registered. It was never abandoned.
 
 ### Storage
 
-Prototype state lives in `localStorage` on the device, with JSON export/import in
-**Things → Your data**. Export before clearing browser data. All reads and writes go
-through the `STORE` object at the top of the script, so swapping in a backend is a
-single-object change.
+State lives in `localStorage` under `daylight.v2`, with export and import in **Review**. Export
+before clearing browser data, and treat phone and laptop as separate copies. Everything goes
+through the `STORE` object at the top of the script, so a backend is a single-object change.
 
 ### Not yet built
 
-- **Telegram bot.** The message content already exists — *Copy today's brief* on the Today
-  screen generates exactly what the morning nudge will say. What's missing is the sender.
-- **Calendar sync.** Blocks are currently derived from fixed times rather than read from a
-  real calendar, so a meeting landing at 11:00 doesn't yet dent the Peak block.
-- **Shared state across devices.** Follows from having a backend.
+- **The Telegram check-in** — a morning message that asks what the first block is and expects a
+  reply. The mechanic that actually works on you, and the main thing still missing.
+- **Calendar awareness** — the day shape is derived from fixed times rather than read from
+  Outlook, so a meeting landing at 11:00 does not yet dent the free window.
+- **Shared state across devices**, which follows from having a backend.

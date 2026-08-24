@@ -10,7 +10,7 @@
   --ink:#141B18; --ink-2:#4A5551; --ink-3:#79847F;
   --accent:#1F4FE0; --accent-soft:#DDE4FB; --on-accent:#FFFFFF;
   --signal:#B35C0C; --signal-soft:#F7E6D4;
-  --good:#2C7A51; --good-soft:#DCEDE3; --warn:#916510; --crit:#A03830; --crit-soft:#F3DEDC;
+  --good:#2C7A51; --good-soft:#DCEDE3; --crit:#A03830; --crit-soft:#F3DEDC;
   --build:#3D4CBE; --move:#2C7A51; --enjoy:#A0447E; --discover:#B35C0C; --campaign:#0F6E70;
   --r:14px; --r-s:9px;
   --shadow:0 1px 2px rgba(20,27,24,.06), 0 6px 18px -10px rgba(20,27,24,.22);
@@ -22,7 +22,7 @@
     --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
     --accent:#7C9BFF; --accent-soft:#1C2647; --on-accent:#0D1211;
     --signal:#E09453; --signal-soft:#2E2317;
-    --good:#5CB585; --good-soft:#16261D; --warn:#D6A44E; --crit:#E08A82; --crit-soft:#2C1C1C;
+    --good:#5CB585; --good-soft:#16261D; --crit:#E08A82; --crit-soft:#2C1C1C;
     --build:#8B96EE; --move:#5CB585; --enjoy:#DE86BC; --discover:#E09453; --campaign:#4FB3B5;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -12px rgba(0,0,0,.7);
   }
@@ -33,7 +33,7 @@
   --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
   --accent:#7C9BFF; --accent-soft:#1C2647; --on-accent:#0D1211;
   --signal:#E09453; --signal-soft:#2E2317;
-  --good:#5CB585; --good-soft:#16261D; --warn:#D6A44E; --crit:#E08A82; --crit-soft:#2C1C1C;
+  --good:#5CB585; --good-soft:#16261D; --crit:#E08A82; --crit-soft:#2C1C1C;
   --build:#8B96EE; --move:#5CB585; --enjoy:#DE86BC; --discover:#E09453; --campaign:#4FB3B5;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -12px rgba(0,0,0,.7);
 }
@@ -42,7 +42,7 @@
 body{margin:0; background:var(--ground); color:var(--ink);
   font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;}
-#root{max-width:600px; margin:0 auto; padding:0 16px 110px;}
+#root{max-width:600px; margin:0 auto; padding:0 16px 112px;}
 h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif; margin:0; text-wrap:balance; font-weight:600; letter-spacing:-.015em;}
 button{font:inherit; color:inherit; background:none; border:none; cursor:pointer; padding:0;}
 input,select,textarea{font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--r-s); padding:9px 10px; width:100%;}
@@ -96,8 +96,17 @@ section{margin-top:20px;}
 .done .itemtitle{text-decoration:line-through; color:var(--ink-3);}
 .itembody{flex:1; min-width:0;}
 .itemtitle{font-weight:500; letter-spacing:-.005em;}
-.itemmeta{display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:3px; font-size:12px; color:var(--ink-3);}
+.itemnote{font-size:12.5px; color:var(--ink-2); margin-top:3px; line-height:1.45;}
+.itemmeta{display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:4px; font-size:12px; color:var(--ink-3);}
 .dot{width:8px; height:8px; border-radius:50%; flex:none;}
+
+/* The inspiration card - the one thing this app is for. */
+.pitch{border-radius:var(--r); border:1px solid var(--signal); background:var(--signal-soft); padding:17px; position:relative; overflow:hidden;}
+.pitch .eyebrow{color:var(--signal);}
+.pitch h3{font-size:23px; margin:8px 0 0; letter-spacing:-.025em; line-height:1.15;}
+.pitch .p-note{font-size:14px; color:var(--ink-2); margin:8px 0 0; max-width:44ch;}
+.pitch .p-meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; font-size:12px; color:var(--ink-3); align-items:center;}
+.pitch .p-act{display:flex; gap:9px; margin-top:15px; flex-wrap:wrap;}
 
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:10px 15px; border-radius:var(--r-s); background:var(--accent); color:var(--on-accent); font-weight:600; font-size:14px;}
 .btn.ghost{background:transparent; color:var(--ink); border:1px solid var(--line-strong); font-weight:500;}
@@ -108,8 +117,13 @@ section{margin-top:20px;}
 .chip.warn{background:var(--crit-soft); color:var(--crit);}
 .chip.sig{background:var(--signal-soft); color:var(--signal);}
 
+.pills{display:flex; gap:6px; flex-wrap:wrap;}
+.pill{padding:7px 12px; border-radius:99px; border:1px solid var(--line-strong); font-size:12.5px; font-family:"JetBrains Mono",monospace; color:var(--ink-2);}
+.pill.on{background:var(--ink); color:var(--ground); border-color:var(--ink);}
+.pill.tiny{padding:5px 10px; font-size:11.5px;}
+
 .slots{display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); gap:9px;}
-.slot{padding:11px 12px; border-radius:var(--r-s); border:1px solid var(--line); background:var(--surface);}
+.slot{padding:11px 12px; border-radius:var(--r-s); border:1px solid var(--line); background:var(--surface); text-align:left;}
 .slot .n{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-size:19px; font-weight:700; letter-spacing:-.02em;}
 .slot .n s{text-decoration:none; color:var(--ink-3); font-size:13px; font-weight:400;}
 .slot .lbl{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-2); margin-top:2px;}
@@ -118,9 +132,6 @@ section{margin-top:20px;}
 
 .bar{height:7px; border-radius:99px; background:var(--sunk); overflow:hidden;}
 .bar i{display:block; height:100%; border-radius:99px;}
-.pills{display:flex; gap:7px; flex-wrap:wrap;}
-.pill{padding:7px 12px; border-radius:99px; border:1px solid var(--line-strong); font-size:13px; font-family:"JetBrains Mono",monospace; color:var(--ink-2);}
-.pill.on{background:var(--ink); color:var(--ground); border-color:var(--ink);}
 
 table{width:100%; border-collapse:collapse; font-size:13.5px;}
 .scroll{overflow-x:auto; border-radius:0 0 var(--r) var(--r);}
@@ -138,7 +149,7 @@ tr.here{background:var(--accent-soft);}
 .field{margin-bottom:12px;} .field label{display:block; margin-bottom:5px;}
 .grid2{display:grid; grid-template-columns:1fr 1fr; gap:11px;}
 .empty-note{padding:18px 14px; text-align:center; color:var(--ink-3); font-size:13.5px;}
-.toast{position:fixed; bottom:86px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--ground); padding:10px 16px; border-radius:99px; font-size:13.5px; z-index:60; box-shadow:var(--shadow);}
+.toast{position:fixed; bottom:88px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--ground); padding:10px 16px; border-radius:99px; font-size:13.5px; z-index:60; box-shadow:var(--shadow);}
 hr.rule{border:none; border-top:1px solid var(--line); margin:18px 0;}
 </style>
 
@@ -147,12 +158,173 @@ hr.rule{border:none; border-top:1px solid var(--line); margin:18px 0;}
 <script>
 "use strict";
 /* =====================================================================
-   Daylight - your work is fixed to London (08:00-15:00 UTC), so where you
-   sit decides the shape of your day, not the amount of it.
-   Free morning == your UTC offset.  Evening == 8h minus it.
+   Daylight
+   Work is fixed to London (08:00-15:00 UTC), so where you sit decides the
+   SHAPE of the day, not the amount of it: free morning equals your UTC
+   offset, evening equals eight hours minus it. Flying west trades one for
+   the other, hour for hour.
    ===================================================================== */
 
-const KEY = "daylight.v1";
+/* =====================================================================
+   The library. Every row: title, where, hours, category, scope, flags, note.
+   flags: i = indoors (works in rain), p = good with someone else.
+   scope: sg = Singapore, reg = the region, home = no travel needed.
+   Hours for regional trips are 10 for a day trip, 48 for a weekend.
+   ===================================================================== */
+const LIB_ROWS = [
+
+/* --- Singapore: green and outdoors --- */
+["MacRitchie TreeTop Walk","Central catchment",5,"move","sg","p","Suspension bridge over the canopy. Go early, before the heat and the crowds."],
+["Southern Ridges, end to end","Mount Faber to Kent Ridge",3,"move","sg","p","Henderson Waves at dusk is the best twenty minutes of it."],
+["Bukit Timah summit","Bukit Timah",2,"move","sg","","The highest point in Singapore, and it is 164 metres."],
+["Sungei Buloh Wetlands","Kranji",3,"discover","sg","p","Mangroves, monitor lizards, and migratory birds between September and March."],
+["Pulau Ubin by bike","Changi Point ferry",6,"discover","sg","p","Bumboat over, rent a bike, ride to Chek Jawa at low tide."],
+["Coney Island","Punggol",3,"move","sg","p","Flat, shaded, and quiet on a weekday morning."],
+["The Rail Corridor","Bukit Timah to Tanjong Pagar",3,"move","sg","","The old KTM line. Do one segment or the whole spine."],
+["Labrador Nature Reserve","Labrador Park",2,"discover","sg","","WWII gun batteries and a stretch of coast most people miss."],
+["Fort Canning tree tunnel","Fort Canning",2,"discover","sg","p","Get there before nine if you want the tunnel to yourself."],
+["Botanic Gardens and the orchids","Tanglin",3,"discover","sg","p","The Orchid Garden earns its entry fee. The rest is free."],
+["Cloud Forest","Gardens by the Bay",3,"enjoy","sg","ip","Cold, indoors, and the best thing to do in Singapore in the rain."],
+["OCBC Skyway after dark","Gardens by the Bay",1,"enjoy","sg","p","Time it for the 19:45 light show and look down on it."],
+["Cycle East Coast to Changi Village","East Coast",4,"move","sg","p","Finish with nasi lemak at Changi Village and take the bus back."],
+["St John's and Lazarus Islands","Marina South Pier",6,"discover","sg","p","Ferry out, walk between them, and have the beach to yourself midweek."],
+["Sisters' Islands","Marina South Pier",5,"discover","sg","p","Singapore's only marine park. Snorkelling on a good day."],
+["Kranji Marshes","Kranji",3,"discover","sg","","Raptors, kingfishers, and almost nobody else."],
+["Windsor Nature Park","Upper Thomson",2,"move","sg","","The quiet way into MacRitchie, on a boardwalk."],
+["Wallace Trail, Dairy Farm","Bukit Panjang",2,"move","sg","","Short, steep, and named after the man who nearly beat Darwin to it."],
+["Chestnut Nature Park","Upper Bukit Timah",3,"move","sg","","The only proper mountain bike trails on the island."],
+["Pasir Ris mangrove boardwalk","Pasir Ris",2,"discover","sg","p","Herons at dawn, and a boardwalk straight through the mangrove."],
+["Changi Point Coastal Walk","Changi",2,"move","sg","p","Ends at the ferry terminal, which is how Ubin days start."],
+["Jurong Lake Gardens","Jurong",2,"move","sg","p","The best of the newer parks, and rarely busy."],
+["Cable car from Mount Faber","Harbourfront",3,"enjoy","sg","p","Worth it once for the view, and once more at night."],
+["Sembawang Hot Spring Park","Sembawang",2,"discover","sg","p","Boil an egg in the spring water. Genuinely, that is the activity."],
+["Lorong Buangkok","Hougang",1,"discover","sg","","The last surviving kampong on the island. Go quietly, people live there."],
+["Haw Par Villa","Pasir Panjang",2,"discover","sg","p","The Ten Courts of Hell. Not a gentle way to spend a morning."],
+["Thow Kwang dragon kiln","Jurong",2,"discover","sg","p","One of two surviving dragon kilns. Open days only, so check first."],
+["Fly a kite at Marina Barrage","Marina",2,"enjoy","sg","p","The rooftop is the only reliable wind in central Singapore."],
+["Henderson Waves at sunrise","Mount Faber",1,"move","sg","p","Empty at six. Completely different place than in the evening."],
+["Punggol Waterway","Punggol",2,"move","sg","p","Flat loop, good for a slow run or a first ride."],
+
+/* --- Singapore: neighbourhoods --- */
+["Tiong Bahru on foot","Tiong Bahru",2,"discover","sg","p","Art deco estate, the wet market upstairs, and two good bookshops."],
+["Kampong Glam and Haji Lane","Bugis",2,"discover","sg","p","Sultan Mosque, then the lanes behind it, then a long coffee."],
+["Little India and Tekka","Little India",2,"discover","sg","p","Loudest, densest, best-smelling two hours available."],
+["Chinatown and the Tooth Relic","Chinatown",2,"discover","sg","p","The temple is free and the fourth floor is worth the stairs."],
+["Joo Chiat and Katong","East Coast",3,"discover","sg","p","Peranakan shophouses, then laksa, in that order."],
+["Geylang Serai market","Geylang",2,"discover","sg","p","Best in the run-up to Hari Raya, good the rest of the year."],
+["Balestier heritage trail","Balestier",2,"discover","sg","","Shophouses, a Sun Yat Sen villa, and the bak kut teh afterwards."],
+["Everton Park and Duxton","Tanjong Pagar",2,"discover","sg","p","Old estate, new cafes, murals worth the detour."],
+["Dempsey Hill","Holland",3,"enjoy","sg","p","Old barracks turned into somewhere to spend a slow afternoon."],
+["Holland Village","Holland",2,"enjoy","sg","p","Still the easiest place to lose two hours over lunch."],
+["Jalan Besar","Jalan Besar",2,"discover","sg","p","Coffee, football history, and the last of the old trades."],
+["Emerald Hill shophouses","Orchard",1,"discover","sg","p","Two minutes off Orchard Road and a century away from it."],
+["Bukit Pasoh","Outram",2,"discover","sg","p","Clan associations by day, small restaurants by night."],
+["Kallang Riverside","Kallang",2,"move","sg","p","Run the river, then watch whoever is training on the water."],
+
+/* --- Singapore: food --- */
+["Old Airport Road Food Centre","Mountbatten",2,"enjoy","sg","ip","Arguably the best hawker centre on the island. Go hungry."],
+["Maxwell Food Centre","Chinatown",1,"enjoy","sg","ip","Famous, busy, and still good. Get there before noon."],
+["Chomp Chomp","Serangoon Gardens",2,"enjoy","sg","p","Night only. Satay, sting ray, and sugar cane juice."],
+["Tiong Bahru Market","Tiong Bahru",1,"enjoy","sg","ip","Breakfast upstairs, then walk the estate below."],
+["Golden Mile Complex","Beach Road",2,"enjoy","sg","ip","Thai food and a building worth seeing while it is still there."],
+["Zion Riverside Food Centre","River Valley",1,"enjoy","sg","ip","Small, riverside, and quietly one of the better ones."],
+["Amoy Street Food Centre","Telok Ayer",1,"enjoy","sg","i","Office-lunch chaos at noon. Calm and excellent at two."],
+["Adam Road Food Centre","Bukit Timah",1,"enjoy","sg","i","Worth the trip for the nasi lemak alone."],
+["Newton Food Centre","Newton",1,"enjoy","sg","ip","Touristy and everyone says so. The satay is still the satay."],
+["Tekka Centre","Little India",1,"enjoy","sg","i","Biryani downstairs, fabric upstairs."],
+["Katong laksa, properly","Katong",2,"enjoy","sg","p","Try two rival shops in one sitting and pick a side."],
+["Balestier bak kut teh","Balestier",1,"enjoy","sg","i","Peppery Teochew style. Free soup refills, always."],
+["Geylang after midnight","Geylang",2,"enjoy","sg","","Frog porridge at one in the morning is a local rite."],
+["Three hawker centres on foot","Anywhere central",3,"enjoy","sg","p","One dish each, walk between them. The best cheap day out here."],
+
+/* --- Singapore: indoors and culture --- */
+["National Gallery Singapore","City Hall",3,"enjoy","sg","ip","Two old buildings, one great collection, and a rooftop bar."],
+["ArtScience Museum","Marina Bay",2,"enjoy","sg","ip","Hit and miss by exhibition. Check what is on before going."],
+["National Museum of Singapore","Bras Basah",3,"enjoy","sg","i","The history gallery is genuinely well done."],
+["Peranakan Museum","Armenian Street",2,"enjoy","sg","ip","Small, sharp, and the best context for Katong afterwards."],
+["Asian Civilisations Museum","Empress Place",2,"enjoy","sg","i","The shipwreck gallery alone is worth the visit."],
+["Singapore Art Museum","Tanjong Pagar Distripark",2,"enjoy","sg","ip","Contemporary, in a working port warehouse."],
+["NUS Baba House","Neil Road",2,"discover","sg","p","A Peranakan house kept exactly as it was. Book the tour ahead."],
+["Malay Heritage Centre","Kampong Glam",2,"enjoy","sg","i","The istana at the centre of the quarter you have walked past."],
+["Gillman Barracks","Alexandra",3,"enjoy","sg","ip","Galleries in old army blocks. Quiet, free, and good on a hot day."],
+["The Projector","Golden Mile",3,"enjoy","sg","ip","Independent cinema in an old hall. Worth going for the room."],
+["Free show at the Esplanade","Marina",2,"enjoy","sg","ip","Something free on the outdoor stage most evenings."],
+["Singapore Symphony","Victoria Concert Hall",3,"enjoy","sg","ip","Cheap seats are good seats in a hall this size."],
+["Thian Hock Keng Temple","Telok Ayer",1,"discover","sg","i","Built for sailors who had survived the crossing."],
+["An afternoon in the National Library","Bugis",3,"build","sg","i","Floors ten and eleven, no wifi excuses, nothing else to do."],
+
+/* --- Singapore: active --- */
+["Bouldering session","Various",2,"move","sg","ip","Better than a gym when it is thirty-four degrees outside."],
+["Kayak the Kallang Basin","Kallang",3,"move","sg","p","Flat water, city skyline, and you can rent by the hour."],
+["Laps at a pool you have never used","Various",1,"move","sg","i","Public pools are two dollars and always empty at ten in the morning."],
+["Jurong East wave pool","Jurong",3,"enjoy","sg","p","A wave pool and slides, for the price of a coffee."],
+["One segment of the Round Island Route","Various",4,"move","sg","","The full loop is 150km. Do a tenth of it and see."],
+["Dragon boat taster session","Kallang",3,"move","sg","p","Harder than it looks and a fast way to meet people."],
+["Padel","Various",2,"move","sg","p","Easier to start than tennis and the courts are everywhere now."],
+["Night run around Marina Bay","Marina",1,"move","sg","p","Cooler, flat, lit, and the view does the work for you."],
+["Stair climb, any HDB block","Anywhere",1,"move","sg","i","Free, brutal, weatherproof, and always available."],
+["Sailing at Changi","Changi",4,"move","sg","p","Taster sessions run most weekends out of the sailing club."],
+
+/* --- The region --- */
+["Bintan","Indonesia, ferry 1h",10,"discover","reg","p","Close enough for a day, good enough for a weekend."],
+["Batam","Indonesia, ferry 1h",10,"discover","reg","p","An hour on the ferry and a completely different price level."],
+["Desaru Coast","Malaysia, ferry 1h30",48,"discover","reg","p","Beach weekend without getting on a plane."],
+["Melaka","Malaysia, 4h by road",48,"discover","reg","p","UNESCO old town, Nyonya food, and a very easy weekend."],
+["Kuala Lumpur","Malaysia, 1h flight",48,"discover","reg","p","Close enough to leave after work on Friday."],
+["Penang","Malaysia, 1h40",48,"discover","reg","p","The best food weekend within two hours of Singapore."],
+["Langkawi","Malaysia, 1h30",48,"discover","reg","p","Cable car, beaches, and duty-free everything."],
+["Bangkok","Thailand, 2h20",48,"discover","reg","p","Your shift finishes at 22:00 there. Work a week from it."],
+["Phuket","Thailand, 1h50",48,"discover","reg","p","Skip Patong, go north. Still a 22:00 finish."],
+["Krabi and Railay","Thailand, 2h",48,"discover","reg","p","Limestone cliffs and boats instead of roads."],
+["Koh Samui","Thailand, 1h50",48,"discover","reg","p","Direct flights, and quiet if you stay away from Chaweng."],
+["Chiang Mai","Thailand, 3h20",48,"discover","reg","p","Cooler, cheaper, mountains, and a 22:00 finish to the day."],
+["Bali","Indonesia, 2h35",48,"discover","reg","p","Same timezone as home, so nothing about work changes."],
+["Lombok and the Gilis","Indonesia, 3h",48,"discover","reg","p","What Bali was, roughly two decades ago."],
+["Yogyakarta and Borobudur","Indonesia, 2h30",48,"discover","reg","p","Sunrise at Borobudur is worth the early alarm."],
+["Ho Chi Minh City","Vietnam, 2h",48,"discover","reg","p","Coffee, motorbikes, and a 22:00 finish."],
+["Da Nang and Hoi An","Vietnam, 2h50",48,"discover","reg","p","Beach and old town twenty minutes apart."],
+["Hanoi and Ha Long","Vietnam, 3h15",48,"discover","reg","p","Colder, older, and better food than the south. Fight about it."],
+["Siem Reap and Angkor","Cambodia, 2h15",48,"discover","reg","p","Three days of temples is enough. Two is not."],
+["Phnom Penh","Cambodia, 2h10",48,"discover","reg","p","Riverside, and a serious hour at Tuol Sleng."],
+["Luang Prabang","Laos, 3h30",48,"discover","reg","p","Slow, quiet, and the alms round at dawn."],
+["Kota Kinabalu","Malaysia, 2h35",48,"discover","reg","p","Climb Kinabalu, or just take the islands and the sunsets."],
+["Brunei","2h05",48,"discover","reg","","Small, strange, and easy to see in a weekend."],
+["Hong Kong","4h",48,"discover","reg","p","Hiking above the harbour is the underrated half of it."],
+["Taipei","4h40",48,"discover","reg","p","Night markets, hot springs, and mountains behind the city."],
+["Colombo and the hill country","Sri Lanka, 4h",48,"discover","reg","p","Your shift ends at 20:30 there. A genuine evening, every day."],
+["The Maldives","4h30",48,"enjoy","reg","p","Shift ends at 20:00. Expensive, but the maths works."],
+["Manila and Palawan","Philippines, 3h40",48,"discover","reg","p","Get through Manila and out to the islands quickly."],
+["Seoul","6h20",48,"discover","reg","p","A long way for a weekend. Take days around it."],
+["Tokyo","7h",48,"discover","reg","p","Your shift would finish at midnight there. Use leave, not remote work."],
+
+/* --- No travel needed --- */
+["Ship a tiny tool in one sitting","Home",3,"build","home","i","One problem, one session, finished. And no new repository afterwards."],
+["Automate one recurring annoyance","Home",2,"build","home","i","Pick the thing you have done manually three times this month."],
+["Rewrite something you use badly","Home",3,"build","home","i","Not a new project. A better version of one that exists."],
+["A film from wherever you are going next","Home",2,"enjoy","home","ip","Best possible preparation, and it counts as a night in."],
+["The video essay you keep saving","Home",1,"enjoy","home","i","You have the tab open. Watch it or close it."],
+["Mandarin drama with the subtitles on","Home",2,"enjoy","home","ip","Twenty minutes in you stop reading them quite so hard."],
+["A LEGO architecture set","Home",3,"enjoy","home","ip","Three hours that feel like none, and something on the shelf after."],
+["Calligraphy on water cloth","Home",1,"enjoy","home","i","It dries and disappears, which is most of the appeal."],
+["One corner of a 1000-piece puzzle","Home",2,"enjoy","home","ip","Edges first. It is a two-person job and a good excuse."],
+["Cook the hawker dish you order most","Home",3,"enjoy","home","ip","You will not match it. You will understand it."],
+["A film photography walk","Anywhere",3,"discover","home","p","Thirty-six frames forces you to actually look at the place."],
+["Civ VI, one long session","Home",3,"enjoy","home","i","Set an alarm before you start. You know why."],
+["A retro console evening","Home",2,"enjoy","home","ip","The good kind of nostalgia, and it ends when you stop."],
+["Co-op with someone back home","Home",2,"enjoy","home","i","Their evening is your early morning. That window actually works."],
+["Read properly on prediction markets","Home",2,"build","home","i","It is your job and you never get an uninterrupted run at it."],
+["Write one post and publish it","Home",3,"build","home","i","Published, not drafted. The drafts folder does not count."],
+["Twenty words of Malay","Home",1,"build","home","i","Enough to be polite at a hawker centre is a low, worthwhile bar."],
+["Plan the next trip properly","Home",2,"discover","home","ip","Flights, dates, and one booking. Not another browsing session."],
+["Call someone you have been meaning to","Home",1,"enjoy","home","i","UK evening is your early morning. That is the only window there is."]
+];
+
+const LIB = LIB_ROWS.map((r,i) => ({
+  id:"L"+i, t:r[0], w:r[1], h:r[2], c:r[3], s:r[4],
+  indoor:r[5].indexOf("i") >= 0, pair:r[5].indexOf("p") >= 0, n:r[6]
+}));
+
+const KEY = "daylight.v2";
 const STORE = {
   read(){ try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }catch(e){ return null; } },
   write(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); return true; }catch(e){ return false; } }
@@ -161,7 +333,7 @@ const STORE = {
 /* Basecamps: offset in minutes from UTC, flight time from Singapore in minutes. */
 const CAMPS = [
   {code:"DXB", city:"Dubai",            country:"UAE",         off:240, fly:450},
-  {code:"MLE", city:"Mal\u00e9",        country:"Maldives",    off:300, fly:270},
+  {code:"MLE", city:"Male",             country:"Maldives",    off:300, fly:270},
   {code:"CMB", city:"Colombo",          country:"Sri Lanka",   off:330, fly:240},
   {code:"DEL", city:"Delhi",            country:"India",       off:330, fly:340},
   {code:"BOM", city:"Mumbai",           country:"India",       off:330, fly:330},
@@ -188,23 +360,22 @@ const CAMPS = [
   {code:"PER", city:"Perth",            country:"Australia",   off:480, fly:320},
   {code:"ICN", city:"Seoul",            country:"South Korea", off:540, fly:380},
   {code:"NRT", city:"Tokyo",            country:"Japan",       off:540, fly:420},
-  {code:"SYD", city:"Sydney",           country:"Australia",   off:600, fly:480, dst:true}
+  {code:"SYD", city:"Sydney",           country:"Australia",   off:600, fly:480}
 ];
 
 const CATS = {
   build:    {label:"Build",    color:"var(--build)",    blurb:"The one project"},
   move:     {label:"Move",     color:"var(--move)",     blurb:"Training, walking, swimming"},
-  enjoy:    {label:"Enjoy",    color:"var(--enjoy)",    blurb:"Watch, make, play"},
+  enjoy:    {label:"Enjoy",    color:"var(--enjoy)",    blurb:"Watch, make, play, eat"},
   discover: {label:"Discover", color:"var(--discover)", blurb:"Somewhere new"},
   campaign: {label:"Campaign", color:"var(--campaign)", blurb:"The December ask"}
 };
+const SCOPES = { sg:"Singapore", reg:"The region", home:"No travel" };
 
 function seed(){
   return {
-    v:1,
+    v:2,
     profile:{ workStartUTC:480, workEndUTC:900, wake:"08:00", camp:"SIN" },
-    /* The routine: the same short sequence every morning. Being routined is
-       mostly about the start being identical, not the day being planned. */
     routine:[
       {id:"r1", label:"Up, no phone in bed"},
       {id:"r2", label:"Outside for ten minutes"},
@@ -212,31 +383,43 @@ function seed(){
       {id:"r4", label:"Name today's first block"}
     ],
     targets:{ build:2, move:3, enjoy:3, discover:1, campaign:2 },
-    places:[
-      {id:"p1", name:"MacRitchie treetop walk", where:"Singapore", hours:3},
-      {id:"p2", name:"Southern Ridges walk",    where:"Singapore", hours:3},
-      {id:"p3", name:"Pulau Ubin by bike",      where:"Singapore", hours:5},
-      {id:"p4", name:"Tiong Bahru, on foot",    where:"Singapore", hours:2},
-      {id:"p5", name:"Sungei Buloh wetlands",   where:"Singapore", hours:3},
-      {id:"p6", name:"Kampong Glam + Rochor",   where:"Singapore", hours:2},
-      {id:"p7", name:"Batam or Bintan day trip",where:"Indonesia", hours:9},
-      {id:"p8", name:"Melaka weekend",          where:"Malaysia",  hours:36}
-    ],
+    saved:[],        /* library ids kept for later */
+    been:{},         /* library id -> date done */
+    custom:[],       /* his own additions, same shape as library items */
     log:[],          /* {id, cat, label, date} */
-    routineLog:{},   /* date -> [routine ids done] */
-    ui:{ view:"today" }
+    routineLog:{},
+    ui:{ view:"today", roll:0, fHours:0, fScope:"sg", fPair:false, fIndoor:false }
   };
 }
 
-let S = STORE.read() || seed();
-S.ui = S.ui || {view:"today"};
-S.ui.view = S.ui.view || "today";
-if(!Array.isArray(S.log)) S.log = [];
-if(!Array.isArray(S.places)) S.places = seed().places;
-if(!Array.isArray(S.routine)) S.routine = seed().routine;
-if(!S.routineLog || typeof S.routineLog !== "object") S.routineLog = {};
+/* Carry across anything worth keeping from the first version. */
+function migrate(){
+  let old = null;
+  try{ const r = localStorage.getItem("daylight.v1"); if(r) old = JSON.parse(r); }catch(e){}
+  if(!old) return null;
+  const s = seed();
+  if(old.profile) s.profile = Object.assign(s.profile, old.profile);
+  if(old.targets) s.targets = Object.assign(s.targets, old.targets);
+  if(Array.isArray(old.routine) && old.routine.length) s.routine = old.routine;
+  if(Array.isArray(old.log)) s.log = old.log;
+  if(old.routineLog) s.routineLog = old.routineLog;
+  if(Array.isArray(old.places)){
+    old.places.forEach(p => {
+      s.custom.push({id:"C"+Math.random().toString(36).slice(2,8), t:p.name, w:p.where,
+                     h:p.hours || 3, c:"discover", s:"sg", indoor:false, pair:true, n:"",
+                     done:!!p.done});
+    });
+  }
+  return s;
+}
+
+let S = STORE.read() || migrate() || seed();
+S.ui = Object.assign(seed().ui, S.ui || {});
 S.profile = Object.assign(seed().profile, S.profile || {});
 S.targets = Object.assign(seed().targets, S.targets || {});
+["saved","custom","log"].forEach(k => { if(!Array.isArray(S[k])) S[k] = []; });
+["been","routineLog"].forEach(k => { if(!S[k] || typeof S[k] !== "object") S[k] = {}; });
+if(!Array.isArray(S.routine) || !S.routine.length) S.routine = seed().routine;
 
 function save(){ STORE.write(S); }
 function uid(){ return Math.random().toString(36).slice(2,10); }
@@ -250,28 +433,21 @@ function dur(m){
   const h = Math.floor(m/60), r = m%60;
   return h ? (r ? h+"h "+pad(r)+"m" : h+"h") : r+"m";
 }
-function hrs(m){ const h = m/60; return (Math.round(h*10)/10) + "h"; }
+function hrs(m){ return (Math.round(m/6)/10) + "h"; }
+function span(h){ return h >= 24 ? Math.round(h/24)+" days" : h+"h"; }
 const DAYNAME = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 function key(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
 function weekStart(d){ const x = new Date(d); return addDays(x, -((x.getDay()+6)%7)); }
-function daysBetween(a,b){ return Math.round((new Date(b) - new Date(a)) / 86400000); }
 
 const camp = code => CAMPS.find(c => c.code === code) || CAMPS.find(c => c.code === "SIN");
 
-/* The whole model in four lines: work is fixed in UTC, so local shape
-   follows directly from the offset. */
 function shape(c){
-  const start = S.profile.workStartUTC + c.off;   /* local minutes, may exceed 1440 */
+  const start = S.profile.workStartUTC + c.off;
   const end   = S.profile.workEndUTC   + c.off;
   const wake  = t2m(S.profile.wake);
-  return {
-    start, end,
-    startT: hhmm(start), endT: hhmm(end),
-    morning: Math.max(0, start - wake),
-    evening: Math.max(0, 1380 - end),        /* usable until 23:00 local */
-    late: end >= 1440                         /* finishes at or after midnight */
-  };
+  return { start, end, startT:hhmm(start), endT:hhmm(end),
+           morning:Math.max(0, start - wake), evening:Math.max(0, 1380 - end), late:end >= 1440 };
 }
 function verdict(c){
   const s = shape(c);
@@ -281,47 +457,80 @@ function verdict(c){
   if(s.evening >= 60) return {t:"Gains a PM", k:"sig"};
   return {t:"Marginal", k:""};
 }
-/* Country plus flight time, or "home" - a bare country reads oddly for city states. */
-function sub(c){
-  if(!c.fly) return "home";
-  return (c.country ? c.country + " \u00b7 " : "") + dur(c.fly);
-}
-
-/* Local "now" at the basecamp, derived from real UTC. */
+function sub(c){ return c.fly ? (c.country ? c.country + " \u00b7 " : "") + dur(c.fly) : "home"; }
 function nowLocal(){
   const d = new Date();
   return (d.getUTCHours()*60 + d.getUTCMinutes() + camp(S.profile.camp).off + 1440) % 1440;
 }
 
-/* ---------------------------- data ---------------------------- */
-function logsIn(fromDate, toDate){
-  const a = key(fromDate), b = key(toDate);
-  return S.log.filter(l => l.date >= a && l.date <= b);
+/* ---------------------------- ideas ---------------------------- */
+function allIdeas(){ return LIB.concat(S.custom); }
+function isBeen(id){ return !!S.been[id]; }
+function isSaved(id){ return S.saved.indexOf(id) >= 0; }
+
+/* Free hours left today at the current basecamp - used to pre-filter suggestions. */
+function hoursLeftToday(){
+  const c = camp(S.profile.camp), s = shape(c), n = nowLocal();
+  if(n < s.start) return (s.start - n)/60 + s.evening/60;
+  if(n < s.end) return s.evening/60;
+  return Math.max(0, (1380 - n)/60);
 }
+
+function filtered(){
+  const u = S.ui;
+  return allIdeas().filter(x => {
+    if(u.fScope !== "all" && x.s !== u.fScope) return false;
+    if(u.fHours && x.h > u.fHours) return false;
+    if(u.fPair && !x.pair) return false;
+    if(u.fIndoor && !x.indoor) return false;
+    return true;
+  });
+}
+
+/* Deterministic pick so a re-render doesn't reshuffle under your thumb. */
+function pickFrom(pool){
+  if(!pool.length) return null;
+  let h = (S.ui.roll * 2654435761) % 4294967296;
+  h = (h ^ (h >>> 15)) >>> 0;
+  return pool[h % pool.length];
+}
+function rollPick(){ return pickFrom(filtered().filter(x => !isBeen(x.id))); }
+
+/* Today's suggestion ignores the browse filters and obeys one rule instead:
+   it has to actually fit in the hours left before the day runs out. */
+function todayPick(){
+  const cap = hoursLeftToday();
+  let pool = allIdeas().filter(x => !isBeen(x.id) && x.h <= cap);
+  if(!pool.length) pool = allIdeas().filter(x => !isBeen(x.id) && x.h <= Math.max(1, cap));
+  return pickFrom(pool);
+}
+
+function markBeen(x){
+  S.been[x.id] = key(new Date());
+  S.saved = S.saved.filter(i => i !== x.id);
+  S.log.push({id:uid(), cat:x.c, label:x.t, date:key(new Date())});
+  save();
+}
+
+/* ---------------------------- data ---------------------------- */
 function weekCount(cat){
   const ws = key(weekStart(new Date()));
   return S.log.filter(l => l.cat === cat && l.date >= ws).length;
 }
-function addLog(cat, label){
-  S.log.push({id:uid(), cat, label, date:key(new Date())});
-  save();
-}
+function logsIn(a,b){ const x = key(a), y = key(b); return S.log.filter(l => l.date >= x && l.date <= y); }
 function routineToday(){ return S.routineLog[key(new Date())] || []; }
-function routineStreakless(){
-  /* Share of routine steps completed over the last 14 days - deliberately a
-     rolling share, not a chain, so one bad morning costs 1/14 rather than all. */
+function routineShare(){
   let done = 0, poss = 0;
   for(let i=0;i<14;i++){
-    const k = key(addDays(new Date(), -i));
     poss += S.routine.length;
-    done += (S.routineLog[k] || []).length;
+    done += (S.routineLog[key(addDays(new Date(), -i))] || []).length;
   }
   return poss ? Math.round(done/poss*100) : 0;
 }
 
-/* ---------------------------- view helpers ---------------------------- */
+/* ---------------------------- helpers ---------------------------- */
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const catDot = c => '<span class="dot" style="background:'+CATS[c].color+'"></span>';
+const catDot = c => '<span class="dot" style="background:'+(CATS[c]?CATS[c].color:"var(--ink-3)")+'"></span>';
 let sheetEl = null, toastT = null;
 
 function toast(msg){
@@ -346,27 +555,22 @@ function openSheet(html, wire){
 function header(){
   const c = camp(S.profile.camp), s = shape(c), n = nowLocal();
   const wake = t2m(S.profile.wake);
-  const spanStart = wake, spanEnd = Math.max(s.end, 1380);
-  const span = spanEnd - spanStart;
+  const a = wake, b = Math.max(s.end, 1380), width = b - a;
 
   const segs = [];
-  const push = (k, a, b, label) => {
-    if(b <= a) return;
-    segs.push({k, w:(b-a)/span*100, a, b, label});
-  };
-  push("free", spanStart, s.start, "Free \u00b7 " + hrs(s.morning));
+  const push = (k, x, y, label) => { if(y > x) segs.push({k, w:(y-x)/width*100, x, y, label}); };
+  push("free", a, s.start, "Free \u00b7 " + hrs(s.morning));
   push("work", s.start, s.end, "Work");
-  push("eve", s.end, spanEnd, s.evening >= 60 ? "Evening \u00b7 " + hrs(s.evening) : "");
+  push("eve", s.end, b, s.evening >= 60 ? "Evening \u00b7 " + hrs(s.evening) : "");
 
   const bar = segs.map(g => {
-    const passed = Math.min(1, Math.max(0, (n - g.a)/(g.b - g.a)));
+    const passed = Math.min(1, Math.max(0, (n - g.x)/(g.y - g.x)));
     return '<div class="seg seg-'+g.k+'" style="flex:0 0 '+g.w.toFixed(3)+'%">'
       + '<div class="fill" style="width:'+(passed*100).toFixed(1)+'%"></div>'
       + (g.w >= 15 && g.label ? "<em>"+g.label+"</em>" : "") + "</div>";
   }).join("");
-
-  const pos = Math.min(100, Math.max(0, (n - spanStart)/span*100));
-  const marker = (n >= spanStart && n <= spanEnd) ? '<div class="nowline" style="left:'+pos.toFixed(2)+'%"></div>' : "";
+  const pos = Math.min(100, Math.max(0, (n - a)/width*100));
+  const marker = (n >= a && n <= b) ? '<div class="nowline" style="left:'+pos.toFixed(2)+'%"></div>' : "";
 
   let big, small;
   if(n < s.start){ big = dur(s.start - n); small = "until work at " + s.startT; }
@@ -380,44 +584,56 @@ function header(){
     + " \u00b7 " + DAYNAME[d.getDay()] + "</button></div>"
     + '<div class="countdown"><b>'+big+"</b><span>"+small+"</span></div></div>"
     + '<div class="daybar">'+bar+marker+"</div>"
-    + '<div class="scale"><span>'+hhmm(spanStart)+"</span><span>"+hhmm(spanEnd)+"</span></div></header>";
+    + '<div class="scale"><span>'+hhmm(a)+"</span><span>"+hhmm(b)+"</span></div></header>";
 }
 
 const ICONS = {
   today:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
-  week:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
-  places:'<path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  ideas:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>',
+  where:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
   review:'<path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/>'
 };
 function nav(){
-  const items = [["today","Today"],["week","Week"],["places","Places"],["review","Review"]];
-  return '<nav><div class="navinner">' + items.map(([k,l]) =>
-    '<button class="navbtn '+(S.ui.view===k?"on":"")+'" data-go="'+k+'">'
-    + '<svg viewBox="0 0 24 24">'+ICONS[k]+"</svg><span>"+l+"</span></button>").join("") + "</div></nav>";
+  return '<nav><div class="navinner">' + [["today","Today"],["ideas","Ideas"],["where","Where"],["review","Review"]]
+    .map(([k,l]) => '<button class="navbtn '+(S.ui.view===k?"on":"")+'" data-go="'+k+'">'
+      + '<svg viewBox="0 0 24 24">'+ICONS[k]+"</svg><span>"+l+"</span></button>").join("") + "</div></nav>";
 }
 
 /* ============================ TODAY ============================ */
 function viewToday(){
-  const doneR = routineToday(), c = camp(S.profile.camp), s = shape(c), n = nowLocal();
+  const doneR = routineToday();
   let html = "";
 
-  /* 1. Routine - the fixed start. */
   html += '<section><div class="sechead"><h2>The start</h2>'
-    + '<span class="eyebrow">'+doneR.length+" / "+S.routine.length+"</span></div>"
-    + '<div class="card">'
+    + '<span class="eyebrow">'+doneR.length+" / "+S.routine.length+"</span></div><div class=\"card\">"
     + S.routine.map(r => {
-        const on = doneR.includes(r.id);
+        const on = doneR.indexOf(r.id) >= 0;
         return '<button class="item'+(on?" done":"")+'" data-rt="'+r.id+'">'
           + '<span class="tick sq'+(on?" on":"")+'"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>'
           + '<span class="itembody"><span class="itemtitle">'+esc(r.label)+"</span></span></button>";
       }).join("")
-    + "</div>"
-    + '<p class="dim" style="font-size:12px; margin:8px 0 0">Same four things every morning, wherever you are. '
-    + "Missing one costs you a fraction, not a streak.</p></section>";
+    + '</div><p class="dim" style="font-size:12px; margin:8px 0 0">Same four things every morning, wherever you are.</p></section>';
 
-  /* 2. This week's guaranteed slots. */
-  html += '<section><div class="sechead"><h2>Owed this week</h2>'
-    + '<span class="eyebrow">tap to log</span></div><div class="slots">'
+  /* One suggestion, sized to the time actually left today. */
+  const left = hoursLeftToday();
+  const pick = todayPick();
+  if(pick){
+    html += '<section><div class="pitch">'
+      + '<div class="eyebrow">'+(left < 0.5 ? "For tomorrow" : "Today &middot; " + dur(left*60) + " free")+"</div>"
+      + "<h3>"+esc(pick.t)+"</h3>"
+      + (pick.n ? '<p class="p-note">'+esc(pick.n)+"</p>" : "")
+      + '<div class="p-meta">'+catDot(pick.c)+"<span>"+esc(pick.w)+"</span><span>&middot;</span>"
+      + '<span class="mono">'+span(pick.h)+"</span>"
+      + (pick.indoor ? '<span class="chip">indoors</span>' : "")
+      + (pick.pair ? '<span class="chip">with someone</span>' : "") + "</div>"
+      + '<div class="p-act"><button class="btn sm" data-been="'+pick.id+'">Did it</button>'
+      + '<button class="btn sm ghost" data-save="'+pick.id+'">'+(isSaved(pick.id)?"Saved":"Save")+"</button>"
+      + '<button class="btn sm ghost" data-roll="1">Something else</button></div>'
+      + "</div></section>";
+  }
+
+  html += '<section><div class="sechead"><h2>Owed this week</h2><span class="eyebrow">tap to log</span></div>'
+    + '<div class="slots">'
     + Object.keys(CATS).map(k => {
         const have = weekCount(k), want = S.targets[k] || 0;
         if(!want) return "";
@@ -429,162 +645,146 @@ function viewToday(){
       }).join("")
     + "</div></section>";
 
-  /* 3. Where the day stands. */
-  if(n < s.start){
-    html += '<section><div class="card" style="padding:15px">'
-      + '<div class="eyebrow" style="margin-bottom:6px">Today\u2019s window</div>'
-      + '<p class="muted" style="margin:0; font-size:13.5px">You have <strong style="color:var(--ink)">'
-      + dur(s.start - n) + '</strong> before work'
-      + (s.evening >= 60 ? ", and " + hrs(s.evening) + " after it." : ", and no evening once it starts.")
-      + "</p></div></section>";
-  }
-
-  /* 4. Today's logged items. */
   const today = S.log.filter(l => l.date === key(new Date()));
   if(today.length){
     html += '<section><div class="sechead"><h2>Logged today</h2></div><div class="card">'
       + today.map(l => '<div class="item"><div class="itembody"><div class="itemtitle">'
-          + esc(l.label || CATS[l.cat].label) + "</div>"
-          + '<div class="itemmeta">'+catDot(l.cat)+"<span>"+CATS[l.cat].label+"</span></div></div>"
+          + esc(l.label || (CATS[l.cat]||{}).label || "\u2014") + "</div>"
+          + '<div class="itemmeta">'+catDot(l.cat)+"<span>"+((CATS[l.cat]||{}).label||"")+"</span></div></div>"
           + '<button class="dim" data-rmlog="'+l.id+'" style="font-size:18px; line-height:1; padding:2px 4px">&times;</button></div>').join("")
       + "</div></section>";
   }
   return html;
 }
 
-/* ============================ WEEK ============================ */
-function viewWeek(){
-  const ws = weekStart(new Date());
-  let html = '<section><div class="sechead"><h2>This week</h2>'
-    + '<span class="eyebrow">'+DAYNAME[ws.getDay()]+" "+pad(ws.getDate())+"</span></div><div class=\"card\">";
+/* ============================ IDEAS ============================ */
+function viewIdeas(){
+  const u = S.ui;
+  const pick = rollPick();
+  const pool = filtered();
 
-  Object.keys(CATS).forEach(k => {
-    const want = S.targets[k] || 0, have = weekCount(k);
-    const pct = want ? Math.min(100, have/want*100) : 0;
-    html += '<div class="item" style="display:block">'
-      + '<div class="row" style="justify-content:space-between; gap:10px">'
-      + '<span class="row" style="gap:8px"><span class="dot" style="background:'+CATS[k].color+'"></span>'
-      + '<strong style="font-weight:500">'+CATS[k].label+"</strong>"
-      + '<span class="dim" style="font-size:12px">'+CATS[k].blurb+"</span></span>"
-      + '<span class="mono dim" style="font-size:12px">'+have+" / "+want+"</span></div>"
-      + '<div class="bar" style="margin-top:8px"><i style="width:'+pct+"%; background:"+CATS[k].color+'"></i></div>'
-      + "</div>";
-  });
-  html += "</div>";
+  let html = '<section><div class="sechead"><h2>Something to do</h2>'
+    + '<span class="eyebrow">'+pool.length+" ideas</span></div>";
 
-  const short = Object.keys(CATS).filter(k => weekCount(k) < (S.targets[k]||0));
-  html += '<p class="dim" style="font-size:12.5px; margin-top:10px">'
-    + (short.length
-        ? "Still owed: " + short.map(k => CATS[k].label).join(", ") + "."
-        : "Everything owed this week has been done.")
-    + " Slots roll over as a share, never as a streak.</p></section>";
+  if(pick){
+    html += '<div class="pitch" style="margin-bottom:14px">'
+      + '<div class="eyebrow">'+SCOPES[pick.s]+"</div>"
+      + "<h3>"+esc(pick.t)+"</h3>"
+      + (pick.n ? '<p class="p-note">'+esc(pick.n)+"</p>" : "")
+      + '<div class="p-meta">'+catDot(pick.c)+"<span>"+esc(pick.w)+"</span><span>&middot;</span>"
+      + '<span class="mono">'+span(pick.h)+"</span>"
+      + (pick.indoor ? '<span class="chip">indoors</span>' : "")
+      + (pick.pair ? '<span class="chip">with someone</span>' : "") + "</div>"
+      + '<div class="p-act"><button class="btn sm" data-been="'+pick.id+'">Did it</button>'
+      + '<button class="btn sm ghost" data-save="'+pick.id+'">'+(isSaved(pick.id)?"Saved":"Save")+"</button>"
+      + '<button class="btn sm ghost" data-roll="1">Something else</button></div></div>';
+  } else {
+    html += '<div class="card empty-note">Nothing matches those filters. Loosen one.</div>';
+  }
 
-  /* Four-week share - the honest longer view. */
-  const from = addDays(new Date(), -27);
-  const recent = logsIn(from, new Date());
-  const byCat = {}; Object.keys(CATS).forEach(k => byCat[k] = 0);
-  recent.forEach(l => { if(byCat[l.cat] !== undefined) byCat[l.cat]++; });
-  const tot = recent.length || 1;
+  /* Filters */
+  html += '<div class="card" style="padding:14px">'
+    + '<div class="eyebrow" style="margin-bottom:7px">Where</div><div class="pills">'
+    + Object.keys(SCOPES).concat("all").map(k =>
+        '<button class="pill tiny'+(u.fScope===k?" on":"")+'" data-fs="'+k+'">'+(k==="all"?"Anything":SCOPES[k])+"</button>").join("")
+    + '</div><div class="eyebrow" style="margin:14px 0 7px">Time I have</div><div class="pills">'
+    + [[0,"Any"],[1,"1h"],[2,"2h"],[4,"Half day"],[10,"A day"],[48,"A weekend"]].map(([v,l]) =>
+        '<button class="pill tiny'+(u.fHours===v?" on":"")+'" data-fh="'+v+'">'+l+"</button>").join("")
+    + '</div><div class="pills" style="margin-top:14px">'
+    + '<button class="pill tiny'+(u.fPair?" on":"")+'" data-fp="1">With someone</button>'
+    + '<button class="pill tiny'+(u.fIndoor?" on":"")+'" data-fi="1">Indoors, it\u2019s raining</button>'
+    + "</div></div>";
 
-  html += '<section><div class="sechead"><h2>Last four weeks</h2>'
-    + '<span class="eyebrow">'+recent.length+" logged</span></div><div class=\"card\" style=\"padding:15px\">";
-  Object.keys(CATS).forEach(k => {
-    const want4 = (S.targets[k]||0) * 4, p = want4 ? Math.min(100, byCat[k]/want4*100) : 0;
-    html += '<div style="margin-bottom:12px"><div class="row" style="justify-content:space-between; margin-bottom:5px">'
-      + '<span class="row" style="gap:7px; font-size:13.5px">'+catDot(k)+CATS[k].label+"</span>"
-      + '<span class="mono dim" style="font-size:12px">'+byCat[k]+" / "+want4+"</span></div>"
-      + '<div class="bar"><i style="width:'+p+"%; background:"+CATS[k].color+'"></i></div></div>';
-  });
-  html += "</div></section>";
+  /* Saved */
+  if(S.saved.length){
+    html += '<div class="sechead" style="margin-top:20px"><h2>Saved</h2></div><div class="card">'
+      + S.saved.map(id => {
+          const x = allIdeas().find(y => y.id === id); if(!x) return "";
+          return '<div class="item"><button class="tick" data-been="'+x.id+'" aria-label="Did it">'
+            + '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
+            + '<div class="itembody"><div class="itemtitle">'+esc(x.t)+"</div>"
+            + '<div class="itemmeta">'+catDot(x.c)+"<span>"+esc(x.w)+"</span><span>&middot;</span>"
+            + '<span class="mono">'+span(x.h)+"</span></div></div>"
+            + '<button class="dim" data-unsave="'+x.id+'" style="font-size:18px; line-height:1; padding:2px 4px">&times;</button></div>';
+        }).join("") + "</div>";
+  }
 
-  html += '<section><div class="sechead"><h2>Targets</h2></div><div class="card" style="padding:15px"><div class="grid2">'
-    + Object.keys(CATS).map(k =>
-        '<div class="field"><label class="eyebrow">'+CATS[k].label+" / week</label>"
-        + '<input type="number" min="0" max="14" class="mono" value="'+(S.targets[k]||0)+'" data-tgt="'+k+'"></div>').join("")
-    + "</div></div></section>";
-  return html;
+  /* Browse everything that matches */
+  html += '<div class="sechead" style="margin-top:20px"><h2>All of them</h2>'
+    + '<button class="btn sm ghost" data-newidea="1">Add your own</button></div><div class="card">'
+    + (pool.length ? pool.map(x =>
+        '<div class="item'+(isBeen(x.id)?" done":"")+'">'
+        + '<button class="tick'+(isBeen(x.id)?" on":"")+'" data-been="'+x.id+'" aria-label="Did it">'
+        + '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
+        + '<div class="itembody"><div class="itemtitle">'+esc(x.t)+"</div>"
+        + (x.n ? '<div class="itemnote">'+esc(x.n)+"</div>" : "")
+        + '<div class="itemmeta">'+catDot(x.c)+"<span>"+esc(x.w)+"</span><span>&middot;</span>"
+        + '<span class="mono">'+span(x.h)+"</span>"
+        + (isBeen(x.id) ? '<span class="chip good">'+S.been[x.id]+"</span>" : "")+"</div></div>"
+        + (isBeen(x.id) ? '<button class="dim" data-unbeen="'+x.id+'" style="font-size:12px; padding:2px 6px">undo</button>'
+                        : '<button class="dim mono" data-save="'+x.id+'" style="font-size:11px; padding:2px 6px">'+(isSaved(x.id)?"saved":"save")+"</button>")
+        + "</div>").join("")
+      : '<div class="empty-note">Nothing matches. Loosen a filter.</div>')
+    + "</div>";
+
+  return html + "</section>";
 }
 
-/* ============================ PLACES ============================ */
-function viewPlaces(){
+/* ============================ WHERE ============================ */
+function viewWhere(){
   const cur = camp(S.profile.camp);
-  S.ui.placeTab = S.ui.placeTab || "camp";
-  let html = '<section><div class="pills" style="margin-bottom:12px">'
-    + '<button class="pill'+(S.ui.placeTab==="camp"?" on":"")+'" data-ptab="camp">Work from</button>'
-    + '<button class="pill'+(S.ui.placeTab==="go"?" on":"")+'" data-ptab="go">Go to</button></div>';
+  let html = '<section><div class="card" style="padding:15px; margin-bottom:14px">'
+    + '<div class="eyebrow" style="margin-bottom:7px">The trade</div>'
+    + '<p class="muted" style="margin:0; font-size:13.5px">Your shift is fixed to London \u2014 '
+    + hhmm(S.profile.workStartUTC)+"\u2013"+hhmm(S.profile.workEndUTC)+" UTC \u2014 so it lands at a different "
+    + "local hour everywhere. Your free morning is exactly your UTC offset, and your evening is what is left of eight hours. "
+    + '<strong style="color:var(--ink)">Flying west trades morning for evening, hour for hour.</strong></p></div>';
 
-  if(S.ui.placeTab === "camp"){
-    html += '<div class="card" style="padding:15px; margin-bottom:14px">'
-      + '<div class="eyebrow" style="margin-bottom:7px">The trade</div>'
-      + '<p class="muted" style="margin:0; font-size:13.5px">Your shift is fixed to London \u2014 '
-      + hhmm(S.profile.workStartUTC)+"\u2013"+hhmm(S.profile.workEndUTC)+" UTC \u2014 so it lands at a different "
-      + "local hour everywhere. Your free morning is exactly your UTC offset, and your evening is what\u2019s left of eight hours. "
-      + "<strong style=\"color:var(--ink)\">Flying west trades morning for evening, hour for hour.</strong></p></div>";
-
-    const rows = CAMPS.slice().sort((a,b) => a.off - b.off || a.fly - b.fly);
-    html += '<div class="card"><div class="cardhead"><strong>Every hour, everywhere</strong>'
-      + '<span class="dim mono" style="font-size:11px">local time</span></div><div class="scroll"><table>'
-      + "<tr><th>Place</th><th>Work</th><th>AM</th><th>PM</th><th></th></tr>"
-      + rows.map(c => {
-          const s = shape(c), v = verdict(c);
-          return '<tr'+(c.code===cur.code?' class="here"':"")+'>'
-            + '<td class="city"><b>'+esc(c.city)+"</b><span>"+esc(sub(c))+"</span></td>"
-            + '<td class="mono">'+s.startT+"\u2013"+s.endT+"</td>"
-            + '<td class="mono">'+hrs(s.morning)+"</td>"
-            + '<td class="mono"'+(s.evening<60?' style="color:var(--ink-3)"':"")+">"+hrs(s.evening)+"</td>"
-            + '<td><span class="chip '+v.k+'">'+v.t+"</span></td></tr>";
-        }).join("")
-      + "</table></div></div>";
-    html += '<p class="dim" style="font-size:12px; margin-top:10px">Offsets are standard time; Sydney shifts an hour '
-      + "in its summer. Flight times are direct from Singapore.</p>";
-  } else {
-    const todo = S.places.filter(p => !p.done), done = S.places.filter(p => p.done);
-    html += '<div class="sechead"><h2>Not been yet</h2><button class="btn sm" data-newplace="1">Add</button></div>'
-      + '<div class="card">'
-      + (todo.length ? todo.map(p =>
-          '<div class="item"><button class="tick" data-place="'+p.id+'" aria-label="Been"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
-          + '<div class="itembody"><div class="itemtitle">'+esc(p.name)+"</div>"
-          + '<div class="itemmeta"><span>'+esc(p.where)+"</span><span>&middot;</span>"
-          + '<span class="mono">'+(p.hours >= 24 ? Math.round(p.hours/24)+"d" : p.hours+"h")+"</span></div></div>"
-          + '<button class="dim" data-rmplace="'+p.id+'" style="font-size:18px; line-height:1; padding:2px 4px">&times;</button></div>').join("")
-        : '<div class="empty-note">Nothing on the list. Add somewhere you keep meaning to go.</div>')
-      + "</div>";
-    if(done.length){
-      html += '<div class="sechead" style="margin-top:20px"><h2>Been</h2>'
-        + '<span class="eyebrow">'+done.length+"</span></div><div class=\"card\">"
-        + done.map(p => '<div class="item done"><span class="tick on"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>'
-          + '<div class="itembody"><div class="itemtitle">'+esc(p.name)+"</div>"
-          + '<div class="itemmeta"><span>'+esc(p.where)+"</span>"
-          + (p.doneDate ? "<span>&middot;</span><span class='mono'>"+p.doneDate+"</span>" : "")+"</div></div>"
-          + '<button class="dim" data-unplace="'+p.id+'" style="font-size:12px; padding:2px 6px">undo</button></div>').join("")
-        + "</div>";
-    }
-  }
-  return html + "</section>";
+  const rows = CAMPS.slice().sort((a,b) => a.off - b.off || a.fly - b.fly);
+  html += '<div class="card"><div class="cardhead"><strong>Every hour, everywhere</strong>'
+    + '<span class="dim mono" style="font-size:11px">local time</span></div><div class="scroll"><table>'
+    + "<tr><th>Place</th><th>Work</th><th>AM</th><th>PM</th><th></th></tr>"
+    + rows.map(c => {
+        const s = shape(c), v = verdict(c);
+        return '<tr'+(c.code===cur.code?' class="here"':"")+'>'
+          + '<td class="city"><b>'+esc(c.city)+"</b><span>"+esc(sub(c))+"</span></td>"
+          + '<td class="mono">'+s.startT+"\u2013"+s.endT+"</td>"
+          + '<td class="mono">'+hrs(s.morning)+"</td>"
+          + '<td class="mono"'+(s.evening<60?' style="color:var(--ink-3)"':"")+">"+hrs(s.evening)+"</td>"
+          + '<td><span class="chip '+v.k+'">'+v.t+"</span></td></tr>";
+      }).join("")
+    + "</table></div></div>"
+    + '<p class="dim" style="font-size:12px; margin-top:10px">Standard time offsets; Sydney shifts an hour in its summer. '
+    + "Flight times are direct from Singapore.</p></section>";
+  return html;
 }
 
 /* ============================ REVIEW ============================ */
 function viewReview(){
-  const days = []; for(let i=27;i>=0;i--) days.push(addDays(new Date(), -i));
-  const recent = logsIn(days[0], new Date());
-  const rp = routineStreakless();
-  const been = S.places.filter(p => p.done).length;
+  const rp = routineShare();
+  const been = Object.keys(S.been).length;
+  const from = addDays(new Date(), -27);
+  const recent = logsIn(from, new Date());
 
   let html = '<section><div class="sechead"><h2>Last four weeks</h2></div>'
     + '<div class="card" style="padding:16px; margin-bottom:12px">'
     + '<div class="row" style="justify-content:space-between; align-items:baseline">'
     + '<div><div class="eyebrow">Routine held</div>'
     + '<div class="mono" style="font-size:32px; font-weight:700; letter-spacing:-.03em; line-height:1.1">'+rp+"%</div></div>"
-    + '<div class="dim" style="font-size:12px; text-align:right; max-width:170px">of your morning steps<br>over the last 14 days</div></div>'
+    + '<div class="dim" style="font-size:12px; text-align:right; max-width:160px">of morning steps<br>over the last 14 days</div></div>'
     + '<div class="bar" style="margin-top:11px"><i style="width:'+rp+'%; background:var(--accent)"></i></div>'
-    + '<p class="dim" style="font-size:12px; margin:10px 0 0">A share, not a streak. One rough morning moves this a little; '
-    + "a rough fortnight moves it a lot.</p></div>";
+    + '<p class="dim" style="font-size:12px; margin:10px 0 0">A share, not a streak. One rough morning barely moves it.</p></div>';
 
-  /* Weekly totals over four weeks, stacked by category. */
+  html += '<div class="card" style="padding:16px; margin-bottom:12px">'
+    + '<div class="row" style="justify-content:space-between; align-items:baseline">'
+    + '<div><div class="eyebrow">Been to</div>'
+    + '<div class="mono" style="font-size:32px; font-weight:700; letter-spacing:-.03em; line-height:1.1">'+been+"</div></div>"
+    + '<div class="dim" style="font-size:12px; text-align:right">of '+allIdeas().length+" ideas<br>on the list</div></div>"
+    + '<div class="bar" style="margin-top:11px"><i style="width:'+(been/allIdeas().length*100).toFixed(1)+'%; background:var(--discover)"></i></div></div>';
+
   const weeks = [];
   for(let w=3; w>=0; w--){
-    const ws = weekStart(addDays(new Date(), -7*w));
-    const we = addDays(ws, 6);
+    const ws = weekStart(addDays(new Date(), -7*w)), we = addDays(ws, 6);
     const by = {}; Object.keys(CATS).forEach(k => by[k]=0);
     logsIn(ws, we).forEach(l => { if(by[l.cat] !== undefined) by[l.cat]++; });
     weeks.push({ws, by, sum:Object.values(by).reduce((a,b)=>a+b,0)});
@@ -592,29 +792,29 @@ function viewReview(){
   const peak = Math.max(4, ...weeks.map(w => w.sum));
   html += '<div class="card" style="padding:16px; margin-bottom:12px"><div class="eyebrow" style="margin-bottom:12px">By week</div>'
     + '<div style="display:flex; gap:10px; align-items:flex-end; height:96px">'
-    + weeks.map(w =>
-        '<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end">'
+    + weeks.map(w => '<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end">'
         + '<div style="width:100%; height:'+Math.max(3, w.sum/peak*100)+'%; border-radius:5px 5px 0 0; overflow:hidden; display:flex; flex-direction:column-reverse">'
         + Object.keys(CATS).map(k => w.by[k] ? '<div style="height:'+(w.by[k]/w.sum*100)+"%; background:"+CATS[k].color+'"></div>' : "").join("")
         + '</div><span class="mono dim" style="font-size:10px">'+pad(w.ws.getDate())+"."+pad(w.ws.getMonth()+1)+"</span></div>").join("")
     + "</div></div>";
 
-  /* Balance. */
   html += '<div class="card" style="padding:16px; margin-bottom:12px"><div class="eyebrow" style="margin-bottom:12px">Where it went</div>';
   const tot = recent.length || 1;
   Object.keys(CATS).forEach(k => {
     const n = recent.filter(l => l.cat === k).length, p = Math.round(n/tot*100);
+    const want4 = (S.targets[k]||0)*4;
     html += '<div style="margin-bottom:11px"><div class="row" style="justify-content:space-between; margin-bottom:5px">'
       + '<span class="row" style="gap:7px; font-size:13.5px">'+catDot(k)+CATS[k].label+"</span>"
-      + '<span class="mono dim" style="font-size:12px">'+n+" \u00b7 "+p+"%</span></div>"
-      + '<div class="bar"><i style="width:'+p+"%; background:"+CATS[k].color+'"></i></div></div>';
+      + '<span class="mono dim" style="font-size:12px">'+n+" / "+want4+" \u00b7 "+p+"%</span></div>"
+      + '<div class="bar"><i style="width:'+(want4?Math.min(100,n/want4*100):0)+"%; background:"+CATS[k].color+'"></i></div></div>';
   });
   html += "</div>";
 
-  html += '<div class="card" style="padding:16px"><div class="row" style="justify-content:space-between; align-items:baseline">'
-    + '<div><div class="eyebrow">Places been</div>'
-    + '<div class="mono" style="font-size:32px; font-weight:700; letter-spacing:-.03em; line-height:1.1">'+been+"</div></div>"
-    + '<div class="dim" style="font-size:12px; text-align:right">'+S.places.filter(p=>!p.done).length+" still on the list</div></div></div>";
+  html += '<div class="sechead" style="margin-top:20px"><h2>Weekly targets</h2></div>'
+    + '<div class="card" style="padding:15px"><div class="grid2">'
+    + Object.keys(CATS).map(k => '<div class="field"><label class="eyebrow">'+CATS[k].label+"</label>"
+        + '<input type="number" min="0" max="14" class="mono" value="'+(S.targets[k]||0)+'" data-tgt="'+k+'"></div>').join("")
+    + "</div></div>";
 
   html += '<hr class="rule"><div class="row" style="gap:9px">'
     + '<button class="btn ghost" data-export="1">Export</button>'
@@ -648,36 +848,41 @@ function campSheet(){
 function logSheet(cat){
   openSheet("<h2 style='font-size:17px; margin-bottom:6px'>Log "+CATS[cat].label+"</h2>"
     + '<p class="muted" style="font-size:13.5px; margin:0 0 14px">'+CATS[cat].blurb+"</p>"
-    + '<div class="field"><label class="eyebrow">What was it? (optional)</label>'
-    + '<input id="lg" placeholder="e.g. gym, Civ VI, Pulau Ubin"></div>'
-    + '<button class="btn block" data-save="1">Log it</button>'
+    + '<div class="field"><label class="eyebrow">What was it? (optional)</label><input id="lg"></div>'
+    + '<button class="btn block" data-submit="1">Log it</button>'
     + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
     el => {
       const go = () => {
-        addLog(cat, el.querySelector("#lg").value.trim());
-        closeSheet(); render(); toast(CATS[cat].label + " logged");
+        S.log.push({id:uid(), cat, label:el.querySelector("#lg").value.trim(), date:key(new Date())});
+        save(); closeSheet(); render(); toast(CATS[cat].label + " logged");
       };
-      el.querySelector("[data-save]").addEventListener("click", go);
+      el.querySelector("[data-submit]").addEventListener("click", go);
       el.querySelector("#lg").addEventListener("keydown", e => { if(e.key === "Enter") go(); });
       el.querySelector("[data-close]").addEventListener("click", closeSheet);
     });
 }
 
-function placeSheet(){
-  openSheet("<h2 style='font-size:17px; margin-bottom:14px'>Somewhere to go</h2>"
-    + '<div class="field"><label class="eyebrow">Where</label><input id="pn" placeholder="e.g. Coney Island"></div>'
-    + '<div class="grid2"><div class="field"><label class="eyebrow">Country or area</label>'
-    + '<input id="pw" value="Singapore"></div>'
-    + '<div class="field"><label class="eyebrow">Hours needed</label>'
-    + '<input id="ph" type="number" min="1" max="200" class="mono" value="3"></div></div>'
-    + '<button class="btn block" data-save="1">Add</button>'
+function ideaSheet(){
+  openSheet("<h2 style='font-size:17px; margin-bottom:14px'>Add an idea</h2>"
+    + '<div class="field"><label class="eyebrow">What</label><input id="it" placeholder="e.g. Kayak to Pulau Ubin"></div>'
+    + '<div class="field"><label class="eyebrow">Why, in a line (optional)</label><input id="in"></div>'
+    + '<div class="grid2"><div class="field"><label class="eyebrow">Where</label><input id="iw" value="Singapore"></div>'
+    + '<div class="field"><label class="eyebrow">Hours</label><input id="ih" type="number" min="1" max="200" class="mono" value="3"></div></div>'
+    + '<div class="grid2"><div class="field"><label class="eyebrow">Kind</label><select id="ic">'
+    + Object.keys(CATS).map(k => '<option value="'+k+'">'+CATS[k].label+"</option>").join("") + "</select></div>"
+    + '<div class="field"><label class="eyebrow">Scope</label><select id="is">'
+    + Object.keys(SCOPES).map(k => '<option value="'+k+'">'+SCOPES[k]+"</option>").join("") + "</select></div></div>"
+    + '<button class="btn block" data-submit="1">Add</button>'
     + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
     el => {
-      el.querySelector("[data-save]").addEventListener("click", () => {
-        const name = el.querySelector("#pn").value.trim();
-        if(!name){ toast("Needs a name"); return; }
-        S.places.push({id:uid(), name, where:el.querySelector("#pw").value.trim() || "Singapore",
-                       hours:Math.max(1, +el.querySelector("#ph").value || 3)});
+      el.querySelector("[data-submit]").addEventListener("click", () => {
+        const t = el.querySelector("#it").value.trim();
+        if(!t){ toast("Needs a name"); return; }
+        S.custom.push({ id:"C"+uid(), t, n:el.querySelector("#in").value.trim(),
+          w:el.querySelector("#iw").value.trim() || "Singapore",
+          h:Math.max(1, +el.querySelector("#ih").value || 3),
+          c:el.querySelector("#ic").value, s:el.querySelector("#is").value,
+          indoor:false, pair:true });
         save(); closeSheet(); render(); toast("Added");
       });
       el.querySelector("[data-close]").addEventListener("click", closeSheet);
@@ -690,7 +895,7 @@ function exportData(){
     const dl = window.claude && claude.use ? await claude.use("downloads") : null;
     if(dl){
       try{ await dl.save({filename:"daylight-"+key(new Date())+".json", data:json}); toast("Exported"); return; }
-      catch(e){ /* declined or unavailable - fall through */ }
+      catch(e){ /* declined - fall through to copy */ }
     }
     openSheet("<h2 style='font-size:17px; margin-bottom:12px'>Copy your data</h2>"
       + '<textarea rows="12" class="mono" style="font-size:11px">'+esc(json)+"</textarea>"
@@ -709,7 +914,7 @@ function importData(){
         try{
           const next = JSON.parse(el.querySelector("#imp").value);
           if(!next || !Array.isArray(next.log)) throw new Error("bad shape");
-          S = next; S.ui = S.ui || {view:"today"}; save(); closeSheet(); render(); toast("Imported");
+          S = next; S.ui = Object.assign(seed().ui, S.ui || {}); save(); closeSheet(); render(); toast("Imported");
         }catch(e){ toast("That isn't a valid export"); }
       });
       el.querySelector("[data-close]").addEventListener("click", closeSheet);
@@ -717,7 +922,7 @@ function importData(){
 }
 
 /* ============================ render ============================ */
-const VIEWS = {today:viewToday, week:viewWeek, places:viewPlaces, review:viewReview};
+const VIEWS = {today:viewToday, ideas:viewIdeas, where:viewWhere, review:viewReview};
 
 function render(){
   document.getElementById("root").innerHTML = header() + (VIEWS[S.ui.view] || viewToday)();
@@ -740,28 +945,35 @@ function wire(){
   on("[data-log]", el => logSheet(el.dataset.log));
   on("[data-rmlog]", el => { S.log = S.log.filter(l => l.id !== el.dataset.rmlog); save(); render(); });
 
-  on("[data-ptab]", el => { S.ui.placeTab = el.dataset.ptab; save(); render(); });
-  on("[data-newplace]", placeSheet);
-  on("[data-place]", el => {
-    const p = S.places.find(x => x.id === el.dataset.place);
-    if(!p) return;
-    p.done = true; p.doneDate = key(new Date());
-    addLog("discover", p.name);
-    render(); toast("Been \u2014 logged as Discover");
+  on("[data-roll]", () => { S.ui.roll++; save(); render(); });
+  on("[data-been]", el => {
+    const x = allIdeas().find(y => y.id === el.dataset.been);
+    if(!x) return;
+    markBeen(x); render(); toast("Logged as " + CATS[x.c].label);
   });
-  on("[data-unplace]", el => {
-    const p = S.places.find(x => x.id === el.dataset.unplace);
-    if(p){ p.done = false; delete p.doneDate; save(); render(); }
+  on("[data-unbeen]", el => {
+    delete S.been[el.dataset.unbeen];
+    const x = allIdeas().find(y => y.id === el.dataset.unbeen);
+    if(x){ const i = S.log.map(l => l.label).lastIndexOf(x.t); if(i >= 0) S.log.splice(i,1); }
+    save(); render();
   });
-  on("[data-rmplace]", el => { S.places = S.places.filter(p => p.id !== el.dataset.rmplace); save(); render(); });
+  on("[data-save]", el => {
+    const id = el.dataset.save;
+    if(isSaved(id)) S.saved = S.saved.filter(i => i !== id); else S.saved.push(id);
+    save(); render();
+  });
+  on("[data-unsave]", el => { S.saved = S.saved.filter(i => i !== el.dataset.unsave); save(); render(); });
+  on("[data-newidea]", ideaSheet);
+
+  on("[data-fs]", el => { S.ui.fScope = el.dataset.fs; S.ui.roll++; save(); render(); });
+  on("[data-fh]", el => { S.ui.fHours = +el.dataset.fh; S.ui.roll++; save(); render(); });
+  on("[data-fp]", () => { S.ui.fPair = !S.ui.fPair; S.ui.roll++; save(); render(); });
+  on("[data-fi]", () => { S.ui.fIndoor = !S.ui.fIndoor; S.ui.roll++; save(); render(); });
 
   on("[data-export]", exportData);
   on("[data-import]", importData);
-
   document.querySelectorAll("[data-tgt]").forEach(el =>
-    el.addEventListener("change", () => {
-      S.targets[el.dataset.tgt] = Math.max(0, +el.value || 0); save(); render();
-    }));
+    el.addEventListener("change", () => { S.targets[el.dataset.tgt] = Math.max(0, +el.value || 0); save(); render(); }));
 }
 
 render();
@@ -770,7 +982,6 @@ setInterval(() => {
   const h = document.querySelector("header");
   if(!h) return;
   h.outerHTML = header();
-  /* outerHTML swap drops listeners - reattach the one control the header owns. */
   on("[data-camp]", campSheet);
 }, 60000);
 </script>
