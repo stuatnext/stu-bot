@@ -1,0 +1,333 @@
+<title>Two Days a Week</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --ground:#EDEFEC; --surface:#FBFCFA; --surface-2:#E4E8E3; --sunk:#E0E4DF;
+  --line:#D4D9D3; --line-strong:#B7BFB9;
+  --ink:#141B18; --ink-2:#4A5551; --ink-3:#79847F;
+  --accent:#1F4FE0; --accent-soft:#DDE4FB;
+  --signal:#B35C0C; --signal-soft:#F7E6D4;
+  --crit:#A03830; --crit-soft:#F3DEDC;
+  --good:#2C7A51;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1211; --surface:#151D1B; --surface-2:#1D2724; --sunk:#111917;
+    --line:#293430; --line-strong:#3C4945;
+    --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
+    --accent:#7C9BFF; --accent-soft:#1C2647;
+    --signal:#E09453; --signal-soft:#2E2317;
+    --crit:#E08A82; --crit-soft:#2C1C1C;
+    --good:#5CB585;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1211; --surface:#151D1B; --surface-2:#1D2724; --sunk:#111917;
+  --line:#293430; --line-strong:#3C4945;
+  --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
+  --accent:#7C9BFF; --accent-soft:#1C2647;
+  --signal:#E09453; --signal-soft:#2E2317;
+  --crit:#E08A82; --crit-soft:#2C1C1C;
+  --good:#5CB585;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;}
+.wrap{max-width:720px; margin:0 auto; padding:44px 20px 80px;}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif; margin:0; text-wrap:balance; letter-spacing:-.02em;}
+h1{font-size:clamp(30px,7vw,42px); font-weight:800; line-height:1.08;}
+h2{font-size:22px; font-weight:600; margin:44px 0 4px;}
+h3{font-size:16px; font-weight:600; margin:26px 0 4px;}
+p{margin:11px 0; max-width:62ch;}
+.eyebrow{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);}
+.mono{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;}
+.lede{font-size:18px; color:var(--ink-2); max-width:60ch;}
+.rule{border:none; border-top:1px solid var(--line); margin:38px 0 0;}
+strong{font-weight:600;}
+a{color:var(--accent);}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px 20px; margin:16px 0;}
+.card.flag{background:var(--crit-soft); border-color:var(--crit);}
+.card.note{background:var(--signal-soft); border-color:var(--signal);}
+.card h3{margin-top:0;}
+.card p:last-child{margin-bottom:0;}
+
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14.5px;}
+.scroll{overflow-x:auto;}
+th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+th{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:400; white-space:nowrap;}
+td.mono{white-space:nowrap;}
+
+ul,ol{margin:11px 0; padding-left:22px; max-width:62ch;}
+li{margin:7px 0;}
+li::marker{color:var(--ink-3);}
+
+figure{margin:24px 0; padding:18px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r);}
+figure svg{display:block; width:100%; max-width:100%; height:auto; color:var(--ink-2);}
+figcaption{margin-top:14px; font-size:13.5px; color:var(--ink-3); line-height:1.5;}
+
+.kill{display:flex; gap:13px; align-items:flex-start; padding:13px 0; border-bottom:1px solid var(--line);}
+.kill:last-child{border-bottom:none;}
+.kill b{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--crit); flex:none; width:74px; padding-top:3px;}
+.tag{display:inline-block; font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:5px; background:var(--sunk); color:var(--ink-2);}
+.tag.a{background:var(--accent-soft); color:var(--accent);}
+.tag.s{background:var(--signal-soft); color:var(--signal);}
+.q{padding:15px 0; border-bottom:1px solid var(--line);}
+.q:last-child{border-bottom:none;}
+.q p{margin:5px 0 0; font-size:14.5px; color:var(--ink-2);}
+.qn{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3); letter-spacing:.1em;}
+</style>
+
+<div class="wrap">
+
+<div class="eyebrow">Design brief &middot; v2 &middot; supersedes the first prototype</div>
+<h1>Two Days a Week</h1>
+<p class="lede">An app that runs a campaign to win two Singapore-hours days at your year-end review &mdash;
+and, in the meantime, makes the eight free hours you already have every weekday count.</p>
+
+<hr class="rule">
+
+<h2>What I got wrong the first time</h2>
+<p>I built a planner: block out the day, set weekly targets, tick things off. Then you told me
+<strong>calendar blocking and streak trackers are both things you have already tried and abandoned.</strong>
+The prototype was a competent version of two mechanics with a proven track record of failing you.</p>
+<p>The deeper miss: I treated your evening shift as a fixed constraint to optimise around. It isn't.
+It's the thing you most want to change, you have a specific ask, and you have a date to make it.</p>
+
+<div class="card flag">
+<h3>Three mechanics are now off the table</h3>
+<div class="kill"><b>Cut</b><div><strong>Booking intentions as calendar events.</strong> You did this and started ignoring the alerts. An event you wrote yourself carries no authority.</div></div>
+<div class="kill"><b>Cut</b><div><strong>Streaks.</strong> They work until you break one, then the whole structure loses its grip. Anything I build has to survive a bad week without collapsing.</div></div>
+<div class="kill"><b>Cut</b><div><strong>Policing early work creep.</strong> You called it a symptom of an unclaimed morning rather than a cause. Fill the window and it stops on its own.</div></div>
+</div>
+
+<h2>The thing worth noticing</h2>
+<p>You currently have <strong>about eight free hours every weekday</strong> &mdash; substantially more discretionary
+time than someone on normal hours. The ask you want to make would <em>reduce</em> that. Nine-to-six leaves you
+roughly one free hour before work and an evening.</p>
+<p>So the two days aren't really about getting more time. They're about getting time
+<strong>that is synchronised with everybody else</strong> &mdash; when gyms have classes, friends are free, shops and
+clinics are open, and a Friday flight to Bangkok is a weekend rather than a logistical problem.</p>
+
+<div class="card note">
+<h3>Which means the daily half is not just a stopgap</h3>
+<p>It is the test of your own hypothesis. If eight unsynchronised hours a day can't be made to feel
+worthwhile, that's worth knowing before you reorganise your career around getting fewer, better-timed ones.
+And if you <em>do</em> make them count, the log of that is the single most persuasive thing you can put in
+front of your manager in December.</p>
+</div>
+
+<h2>The case: two objections, one strategy</h2>
+<p>You named the blockers precisely: <strong>no precedent</strong>, and <strong>output might drop</strong>.
+They need different answers.</p>
+
+<div class="scroll">
+<table>
+<tr><th>Objection</th><th>Why it bites</th><th>The answer</th></tr>
+<tr>
+  <td><strong>No precedent</strong></td>
+  <td>Your manager isn't judging you, they're setting policy. A yes creates a rule for everyone.</td>
+  <td><strong>Ask for a pilot, not a change.</strong> A bounded eight-week trial with a review date isn't a precedent, it's an experiment. It is a far smaller thing to say yes to, and it converts the question from "should this be allowed" to "did it work".</td>
+</tr>
+<tr>
+  <td><strong>Output might drop</strong></td>
+  <td>It's a forecast about the future, and forecasts can't be argued with &mdash; only pre-empted.</td>
+  <td><strong>Baseline it now.</strong> Start measuring before you ask, so you arrive with months of data rather than a promise. Without a baseline you cannot prove a non-drop, because there's nothing to compare against.</td>
+</tr>
+</table>
+</div>
+
+<p>The baseline is the part that has a deadline attached, and it's the reason not to wait.
+Every week you don't measure is a week missing from the before-and-after.</p>
+
+<h3>The three strands you said are measurable</h3>
+<div class="scroll">
+<table>
+<tr><th>Strand</th><th>What to capture</th><th>What it answers</th></tr>
+<tr><td><strong>Response time</strong></td><td>How quickly you pick things up, and the longest gap anyone waited.</td><td>The real fear: "will you be there when we need you?"</td></tr>
+<tr><td><strong>Delivered work</strong></td><td>Countable units shipped per week, tagged to the day pattern you were on.</td><td>Whether volume moves when hours move.</td></tr>
+<tr><td><strong>Meetings</strong></td><td>Every meeting, its UK time, and whether you were genuinely needed live.</td><td>The strongest strand &mdash; almost certainly proves fewer meetings need you than the calendar implies.</td></tr>
+</table>
+</div>
+
+<h2>The overlap question</h2>
+<p>You chose to ask for standard Singapore hours with a promise to be reachable if something urgent lands.
+That's your call and the design assumes it. But you should walk into the conversation knowing exactly what
+you're asking London to give up, because they will do this arithmetic even if you don't.</p>
+
+<figure>
+<svg viewBox="0 0 720 278" role="img" aria-label="Three working patterns compared against the London working day in UK time. The current evening shift overlaps London for six hours; standard Singapore hours overlap for one hour; a shifted eleven-to-eight Singapore day overlaps for three hours.">
+  <defs>
+    <pattern id="hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="7" stroke="currentColor" stroke-width="4" opacity=".13"/>
+    </pattern>
+  </defs>
+
+  <!-- London working day band -->
+  <rect x="390" y="30" width="283" height="212" fill="url(#hatch)"/>
+  <line x1="390" y1="30" x2="390" y2="242" stroke="currentColor" stroke-width="1" opacity=".45"/>
+  <line x1="673" y1="30" x2="673" y2="242" stroke="currentColor" stroke-width="1" opacity=".45"/>
+  <text x="531" y="22" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">London works 09:00&ndash;17:30</text>
+
+  <!-- axis -->
+  <line x1="90" y1="252" x2="690" y2="252" stroke="currentColor" stroke-width="1" opacity=".4"/>
+  <g font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity=".7" text-anchor="middle">
+    <text x="90"  y="266">00:00</text>
+    <text x="190" y="266">03:00</text>
+    <text x="290" y="266">06:00</text>
+    <text x="390" y="266">09:00</text>
+    <text x="490" y="266">12:00</text>
+    <text x="590" y="266">15:00</text>
+    <text x="690" y="266">18:00</text>
+  </g>
+
+  <!-- row 1: current shift -->
+  <text x="82" y="58" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">Now</text>
+  <text x="82" y="72" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity=".6">16&ndash;23 SGT</text>
+  <rect x="357" y="44" width="233" height="26" rx="4" fill="currentColor" opacity=".14"/>
+  <rect x="390" y="44" width="200" height="26" rx="4" fill="var(--signal)"/>
+  <text x="490" y="61" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="700" fill="var(--signal-soft)">6h together</text>
+
+  <!-- row 2: standard SG -->
+  <text x="82" y="116" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">Your ask</text>
+  <text x="82" y="130" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity=".6">09&ndash;18 SGT</text>
+  <rect x="123" y="102" width="300" height="26" rx="4" fill="currentColor" opacity=".14"/>
+  <rect x="390" y="102" width="33" height="26" rx="4" fill="var(--signal)"/>
+  <text x="437" y="119" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="700" fill="var(--signal)">1h together</text>
+
+  <!-- row 3: shifted -->
+  <text x="82" y="174" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" fill="currentColor">Fallback</text>
+  <text x="82" y="188" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="9.5" fill="currentColor" opacity=".6">11&ndash;20 SGT</text>
+  <rect x="190" y="160" width="300" height="26" rx="4" fill="currentColor" opacity=".14"/>
+  <rect x="390" y="160" width="100" height="26" rx="4" fill="var(--signal)"/>
+  <text x="504" y="177" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="700" fill="var(--signal)">3h together</text>
+
+</svg>
+<figcaption>All times UK, in December (GMT, eight hours behind Singapore). The pale bar is your working
+day; the solid section is the hours you and London are both online. Standard Singapore hours cut shared
+time from six hours to one &mdash; that is the concession you are asking for, and it is the number your
+manager will react to. An 11:00&ndash;20:00 day still hands you a Singapore morning and evening while
+keeping three hours with London.</figcaption>
+</figure>
+
+<div class="card">
+<h3>So: open where you want to land, but bring the fallback</h3>
+<p>Open with 09:00&ndash;18:00 and reachable-if-urgent, as you chose. Keep 11:00&ndash;20:00 in your pocket
+as the concession you make if coverage is the sticking point &mdash; it costs you the late evening but keeps
+almost everything you actually want, and conceding it makes the yes easier to give.</p>
+<p>One warning on <em>reachable if urgent</em>: undefined, it quietly becomes always-on and you end up
+working both patterns. Define it &mdash; a channel, a response window, what counts as urgent &mdash; and put
+that definition in the proposal rather than leaving it to be discovered.</p>
+</div>
+
+<h2>Why one app and not two</h2>
+<p>The campaign and the daily half aren't neighbours, they feed each other. That loop is the reason
+this is a single product.</p>
+
+<figure>
+<svg viewBox="0 0 700 208" role="img" aria-label="A three stage loop: using the free window well produces an evidence log, the evidence log wins a pilot at the review, and the pilot returns synchronised hours which make the window easier to use well.">
+  <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><polygon points="0,0 10,5 0,10" fill="currentColor"/></marker></defs>
+
+  <rect x="14" y="52" width="180" height="66" rx="10" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/>
+  <text x="104" y="79" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="13.5" font-weight="600" fill="currentColor">Use the window</text>
+  <text x="104" y="97" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity=".65">08:00&ndash;15:30 daily</text>
+
+  <rect x="260" y="52" width="180" height="66" rx="10" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/>
+  <text x="350" y="79" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="13.5" font-weight="600" fill="currentColor">Evidence log</text>
+  <text x="350" y="97" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="currentColor" opacity=".65">baseline from today</text>
+
+  <rect x="506" y="52" width="180" height="66" rx="10" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="596" y="79" text-anchor="middle" font-family="Instrument Sans, sans-serif" font-size="13.5" font-weight="600" fill="var(--accent)">The pilot</text>
+  <text x="596" y="97" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="var(--accent)">asked for at review</text>
+
+  <line x1="196" y1="85" x2="256" y2="85" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
+  <text x="226" y="76" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor" opacity=".75">proves</text>
+
+  <line x1="442" y1="85" x2="502" y2="85" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar2)"/>
+  <text x="472" y="76" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor" opacity=".75">arms</text>
+
+  <path d="M596 122 C596 168 300 178 104 152 L104 124" fill="none" stroke="var(--accent)" stroke-width="1.4" marker-end="url(#ar2)" opacity=".85"/>
+  <text x="350" y="196" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10.5" fill="var(--accent)">returns hours everyone else is awake for</text>
+</svg>
+<figcaption>The daily half generates the campaign's evidence; the campaign returns time the daily half can
+actually use. Build either alone and you get half a product.</figcaption>
+</figure>
+
+<h2>The campaign half</h2>
+<ul>
+<li><strong>A countdown to the review date.</strong> Not decoration &mdash; the milestone plan runs backwards from it, so every week has a job.</li>
+<li><strong>An evidence log</strong> across your three strands, capturable in seconds. If logging costs more than a few taps it won't happen, and the baseline is worthless with gaps.</li>
+<li><strong>A meeting audit.</strong> Every meeting, its UK time, and a one-tap "did I need to be live?" This is the strand most likely to win the argument, because it converts a feeling into a percentage.</li>
+<li><strong>The proposal document, assembled as you go</strong> rather than written the night before. It grows from the log: the pilot terms, the coverage answer, the urgent-contact definition, the baseline numbers.</li>
+<li><strong>Objection rehearsal.</strong> The two you named, plus the ones that surface later, each with your current best answer. You want to have said these sentences before you say them to your manager.</li>
+</ul>
+
+<h2>The daily half</h2>
+<p>Same day shape as the prototype &mdash; Warm-up, Peak, Runway against the 16:00 wall &mdash; because that
+part was sound. What changes is the mechanics underneath.</p>
+
+<h3>Peak rotation, not a plan</h3>
+<p>You asked for a deliberate, enforced split. Five Peak blocks a week, assigned by pattern rather than
+by you deciding each morning:</p>
+<div class="scroll">
+<table>
+<tr><th>Peaks</th><th>Goes to</th><th>Why</th></tr>
+<tr><td class="mono">2 &times;/wk</td><td><span class="tag a">Campaign</span></td><td>Your top priority, with a fixed deadline. It gets the largest share.</td></tr>
+<tr><td class="mono">2 &times;/wk</td><td><span class="tag s">Project choice</span></td><td>Time-boxed exploration, not open-ended pondering. See below.</td></tr>
+<tr><td class="mono">1 &times;/wk</td><td><span class="tag">Singapore</span></td><td>Something that only works because you live here. Protects the reason you want the two days at all.</td></tr>
+</table>
+</div>
+<p>Rotation is the anti-streak: miss a Monday and the pattern simply continues. Nothing breaks, so
+nothing is abandoned. What the app tracks is <em>share over four weeks</em>, which tolerates a bad week and
+still tells the truth about a bad month.</p>
+
+<h3>The slow start is the actual leak</h3>
+<p>You sleep nine hours and go straight to bed, so the morning isn't an energy problem &mdash; it's an
+undefended one. Waking, phone, coffee, and it's midday. The intervention is small and specific:
+<strong>the first action of the day is decided before the day starts</strong>, and the app asks you to name
+it rather than offering a menu at 09:00 when you're least able to choose.</p>
+
+<h3>Accountability, split the way you split it</h3>
+<p>You said a real person works for some things but you wouldn't report your whole life to them. So:</p>
+<ul>
+<li><strong>The bot handles the daily loop</strong> &mdash; a morning message that asks what your first action is and expects a reply, and an afternoon one that asks whether it happened. The grip comes from it noticing silence, not from a streak counter.</li>
+<li><strong>The person gets a weekly summary</strong>, and only for the domains you nominate. One message, once a week, that you send &mdash; not an integration that reports on you.</li>
+</ul>
+
+<h3>Choosing the project, as a time-boxed decision</h3>
+<p>You have several candidates and none chosen, so there is nothing to schedule. Scheduling an unchosen
+project is how it stays unchosen. Instead the app treats the decision as the work: list the candidates,
+give each a cheap test that fits one Peak block, run them, and hold a <strong>commit date</strong>. After that
+date one candidate takes the Peak slots and the others are explicitly parked.</p>
+
+<h2>What I'd build first</h2>
+<ol>
+<li><strong>The evidence log and meeting audit.</strong> These have a deadline the others don't &mdash; every unmeasured week is permanently missing from your baseline. Nothing else is worth building first.</li>
+<li><strong>The morning check-in loop</strong>, in whatever channel is quickest to stand up. The daily half is worthless without the thing that expects an answer.</li>
+<li><strong>The day view and Peak rotation</strong>, largely as prototyped.</li>
+<li><strong>The project decision tool</strong>, with its commit date.</li>
+<li><strong>The proposal assembler</strong>, which only becomes useful once the log has months in it.</li>
+</ol>
+
+<h2>What I still need from you</h2>
+<div class="card">
+  <div class="q"><span class="qn">01</span>
+    <p><strong>When is the review, actually?</strong> The whole plan hangs off this date. A month is enough to start; a specific week is better.</p></div>
+  <div class="q"><span class="qn">02</span>
+    <p><strong>Does a pilot framing work at your company, or would it read as not serious?</strong> It's the strongest answer to "no precedent", but you know the culture and I don't.</p></div>
+  <div class="q"><span class="qn">03</span>
+    <p><strong>What is the countable unit of delivered work in your job?</strong> I need the actual noun to design the log around.</p></div>
+  <div class="q"><span class="qn">04</span>
+    <p><strong>Where does the morning check-in reach you?</strong> Telegram is a day's work; anything else costs more. It needs to be somewhere you'd genuinely reply.</p></div>
+  <div class="q"><span class="qn">05</span>
+    <p><strong>Who is the person, and which domains do they cover?</strong> You said some things but not everything &mdash; I need to know which.</p></div>
+  <div class="q"><span class="qn">06</span>
+    <p><strong>Is anything here wrong?</strong> Particularly the claim that this is really about synchronised time rather than more time. If that's off, most of the brief moves.</p></div>
+</div>
+
+</div>
