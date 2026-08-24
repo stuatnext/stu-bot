@@ -1,4 +1,4 @@
-<title>Before Four</title>
+<title>Daylight</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
@@ -10,9 +10,8 @@
   --ink:#141B18; --ink-2:#4A5551; --ink-3:#79847F;
   --accent:#1F4FE0; --accent-soft:#DDE4FB; --on-accent:#FFFFFF;
   --signal:#B35C0C; --signal-soft:#F7E6D4;
-  --wall:#8C3F3F; --wall-soft:#EEDCDC;
-  --health:#2C7A51; --craft:#3D4CBE; --people:#AB5238; --life:#68746F;
-  --good:#2C7A51; --warn:#916510; --crit:#A03830;
+  --good:#2C7A51; --good-soft:#DCEDE3; --warn:#916510; --crit:#A03830; --crit-soft:#F3DEDC;
+  --build:#3D4CBE; --move:#2C7A51; --enjoy:#A0447E; --discover:#B35C0C; --campaign:#0F6E70;
   --r:14px; --r-s:9px;
   --shadow:0 1px 2px rgba(20,27,24,.06), 0 6px 18px -10px rgba(20,27,24,.22);
 }
@@ -23,9 +22,8 @@
     --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
     --accent:#7C9BFF; --accent-soft:#1C2647; --on-accent:#0D1211;
     --signal:#E09453; --signal-soft:#2E2317;
-    --wall:#D28585; --wall-soft:#2C1C1C;
-    --health:#5CB585; --craft:#8B96EE; --people:#DC8A6F; --life:#96A29D;
-    --good:#5CB585; --warn:#D6A44E; --crit:#E08A82;
+    --good:#5CB585; --good-soft:#16261D; --warn:#D6A44E; --crit:#E08A82; --crit-soft:#2C1C1C;
+    --build:#8B96EE; --move:#5CB585; --enjoy:#DE86BC; --discover:#E09453; --campaign:#4FB3B5;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -12px rgba(0,0,0,.7);
   }
 }
@@ -35,116 +33,112 @@
   --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
   --accent:#7C9BFF; --accent-soft:#1C2647; --on-accent:#0D1211;
   --signal:#E09453; --signal-soft:#2E2317;
-  --wall:#D28585; --wall-soft:#2C1C1C;
-  --health:#5CB585; --craft:#8B96EE; --people:#DC8A6F; --life:#96A29D;
-  --good:#5CB585; --warn:#D6A44E; --crit:#E08A82;
+  --good:#5CB585; --good-soft:#16261D; --warn:#D6A44E; --crit:#E08A82; --crit-soft:#2C1C1C;
+  --build:#8B96EE; --move:#5CB585; --enjoy:#DE86BC; --discover:#E09453; --campaign:#4FB3B5;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -12px rgba(0,0,0,.7);
 }
 
 *{box-sizing:border-box}
-body{
-  margin:0; background:var(--ground); color:var(--ink);
+body{margin:0; background:var(--ground); color:var(--ink);
   font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
-}
-#root{max-width:580px; margin:0 auto; padding:0 16px 108px;}
-h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif; margin:0; text-wrap:balance; font-weight:600; letter-spacing:-.01em;}
+  font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;}
+#root{max-width:600px; margin:0 auto; padding:0 16px 110px;}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif; margin:0; text-wrap:balance; font-weight:600; letter-spacing:-.015em;}
 button{font:inherit; color:inherit; background:none; border:none; cursor:pointer; padding:0;}
 input,select,textarea{font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--r-s); padding:9px 10px; width:100%;}
 input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
 .mono{font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;}
 .eyebrow{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);}
-.stack{display:flex; flex-direction:column;}
 .row{display:flex; align-items:center;}
 .muted{color:var(--ink-2);} .dim{color:var(--ink-3);}
 
-/* ---------- header / day bar ---------- */
 header{position:sticky; top:0; z-index:20; background:var(--ground); padding:14px 0 10px; border-bottom:1px solid var(--line);}
-.brandrow{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px;}
+.brandrow{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:11px;}
 .brand{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:19px; letter-spacing:-.03em;}
-.brand span{color:var(--accent);}
-.countdown{display:flex; flex-direction:column; align-items:flex-end; line-height:1.15;}
-.countdown b{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-size:21px; font-weight:700; letter-spacing:-.02em;}
-.daybar{position:relative; height:34px; border-radius:8px; overflow:hidden; display:flex; background:var(--sunk); border:1px solid var(--line);}
-.seg{position:relative; display:flex; align-items:center; justify-content:center; min-width:0; border-right:1px solid var(--line);}
-.seg:last-child{border-right:none;}
-.seg-warmup{background:var(--surface-2);}
-.seg-peak{background:var(--signal-soft);}
-.seg-runway{background:var(--surface-2);}
-.seg-shift{background:repeating-linear-gradient(135deg,var(--sunk),var(--sunk) 5px,var(--surface-2) 5px,var(--surface-2) 10px);}
-.seg-morning{background:var(--surface-2);} .seg-afternoon{background:var(--signal-soft);} .seg-evening{background:var(--surface-2);}
-.seg em{font-style:normal; font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 5px;}
-.seg-peak em,.seg-afternoon em{color:var(--signal);}
-.fill{position:absolute; inset:0 auto 0 0; background:color-mix(in srgb, var(--ink) 7%, transparent); pointer-events:none;}
+.brand em{font-style:normal; color:var(--signal);}
+.where{display:flex; align-items:center; gap:5px; margin-top:2px; font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);}
+.where b{color:var(--ink-2); font-weight:500;}
+.countdown{text-align:right; line-height:1.15;}
+.countdown b{display:block; font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-size:22px; font-weight:700; letter-spacing:-.02em;}
+.countdown span{font-size:11.5px; color:var(--ink-3);}
+
+.daybar{position:relative; height:32px; border-radius:8px; overflow:hidden; display:flex; background:var(--sunk); border:1px solid var(--line);}
+.seg{position:relative; display:flex; align-items:center; justify-content:center; min-width:0;}
+.seg em{font-style:normal; font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 6px;}
+.seg-free{background:var(--good-soft);} .seg-free em{color:var(--good);}
+.seg-work{background:repeating-linear-gradient(135deg,var(--sunk),var(--sunk) 5px,var(--surface-2) 5px,var(--surface-2) 10px);} .seg-work em{color:var(--ink-3);}
+.seg-eve{background:var(--signal-soft);} .seg-eve em{color:var(--signal);}
+.fill{position:absolute; inset:0 auto 0 0; background:color-mix(in srgb, var(--ink) 8%, transparent);}
 .nowline{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--accent); z-index:3;}
 .nowline::before{content:""; position:absolute; top:-1px; left:-3px; width:8px; height:8px; border-radius:50%; background:var(--accent);}
 .scale{display:flex; justify-content:space-between; margin-top:5px; font-family:"JetBrains Mono",monospace; font-size:10px; color:var(--ink-3);}
 
-/* ---------- nav ---------- */
-nav{position:fixed; left:0; right:0; bottom:0; z-index:30; background:color-mix(in srgb, var(--ground) 92%, transparent); backdrop-filter:blur(10px); border-top:1px solid var(--line);}
-.navinner{max-width:580px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr); padding:7px 8px calc(7px + env(safe-area-inset-bottom));}
-.navbtn{display:flex; flex-direction:column; align-items:center; gap:4px; padding:6px 2px; border-radius:var(--r-s); color:var(--ink-3);}
+nav{position:fixed; left:0; right:0; bottom:0; z-index:30; background:color-mix(in srgb, var(--ground) 93%, transparent); backdrop-filter:blur(10px); border-top:1px solid var(--line);}
+.navinner{max-width:600px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); padding:7px 8px calc(7px + env(safe-area-inset-bottom));}
+.navbtn{display:flex; flex-direction:column; align-items:center; gap:4px; padding:7px 2px; border-radius:var(--r-s); color:var(--ink-3);}
 .navbtn span{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase;}
 .navbtn svg{width:19px; height:19px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;}
 .navbtn.on{color:var(--accent); background:var(--accent-soft);}
 
-/* ---------- cards ---------- */
 .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow);}
-section{margin-top:22px;}
+section{margin-top:20px;}
 .sechead{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:9px;}
 .sechead h2{font-size:15px;}
+.cardhead{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:11px 13px; background:var(--surface-2); border-bottom:1px solid var(--line); border-radius:var(--r) var(--r) 0 0;}
+.cardhead strong{font-size:13.5px;}
 
-.onething{padding:16px; border-radius:var(--r); border:1px solid var(--signal); background:var(--signal-soft); position:relative; overflow:hidden;}
-.onething .eyebrow{color:var(--signal);}
-.onething h3{font-size:21px; margin:7px 0 3px; letter-spacing:-.02em;}
-.onething.empty{border-style:dashed; background:transparent;}
-
-.item{display:flex; align-items:flex-start; gap:11px; padding:12px 13px; border-bottom:1px solid var(--line);}
+.item{display:flex; align-items:flex-start; gap:11px; padding:11px 13px; border-bottom:1px solid var(--line); width:100%; text-align:left;}
 .item:last-child{border-bottom:none;}
-.tick{flex:none; width:22px; height:22px; border-radius:50%; border:1.6px solid var(--line-strong); margin-top:1px; display:grid; place-items:center; transition:.13s;}
-.tick svg{width:12px; height:12px; stroke:var(--on-accent); fill:none; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; opacity:0;}
+.tick{flex:none; width:22px; height:22px; border-radius:50%; border:1.6px solid var(--line-strong); margin-top:1px; display:grid; place-items:center;}
+.tick svg{width:12px; height:12px; stroke:var(--on-accent); fill:none; stroke-width:2.8; stroke-linecap:round; stroke-linejoin:round; opacity:0;}
 .tick.on{background:var(--accent); border-color:var(--accent);} .tick.on svg{opacity:1;}
-.item.done .itemtitle{text-decoration:line-through; color:var(--ink-3);}
+.tick.sq{border-radius:6px;}
+.done .itemtitle{text-decoration:line-through; color:var(--ink-3);}
 .itembody{flex:1; min-width:0;}
 .itemtitle{font-weight:500; letter-spacing:-.005em;}
 .itemmeta{display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:3px; font-size:12px; color:var(--ink-3);}
-.dot{width:7px; height:7px; border-radius:50%; flex:none;}
-.blockhead{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 13px; background:var(--surface-2); border-bottom:1px solid var(--line);}
-.blockhead:first-child{border-radius:var(--r) var(--r) 0 0;}
-.chip{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.06em; padding:3px 7px; border-radius:5px; background:var(--sunk); color:var(--ink-2); white-space:nowrap;}
-.chip.peak{background:var(--signal-soft); color:var(--signal);}
-.chip.warn{background:var(--wall-soft); color:var(--crit);}
-.chip.ok{color:var(--good);}
+.dot{width:8px; height:8px; border-radius:50%; flex:none;}
 
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:10px 15px; border-radius:var(--r-s); background:var(--accent); color:var(--on-accent); font-weight:600; font-size:14px;}
 .btn.ghost{background:transparent; color:var(--ink); border:1px solid var(--line-strong); font-weight:500;}
 .btn.sm{padding:6px 11px; font-size:12.5px;}
 .btn.block{width:100%;}
-.btn:disabled{opacity:.4; cursor:not-allowed;}
+.chip{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.06em; padding:3px 7px; border-radius:5px; background:var(--sunk); color:var(--ink-2); white-space:nowrap;}
+.chip.good{background:var(--good-soft); color:var(--good);}
+.chip.warn{background:var(--crit-soft); color:var(--crit);}
+.chip.sig{background:var(--signal-soft); color:var(--signal);}
 
-.pills{display:flex; gap:7px; flex-wrap:wrap;}
-.pill{padding:8px 13px; border-radius:99px; border:1px solid var(--line-strong); font-size:13.5px; font-family:"JetBrains Mono",monospace; color:var(--ink-2);}
-.pill.on{background:var(--ink); color:var(--ground); border-color:var(--ink);}
-
-.sugg{padding:13px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:center;}
-.sugg:last-child{border-bottom:none;}
-.rank{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3); width:16px; flex:none;}
+.slots{display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); gap:9px;}
+.slot{padding:11px 12px; border-radius:var(--r-s); border:1px solid var(--line); background:var(--surface);}
+.slot .n{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-size:19px; font-weight:700; letter-spacing:-.02em;}
+.slot .n s{text-decoration:none; color:var(--ink-3); font-size:13px; font-weight:400;}
+.slot .lbl{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-2); margin-top:2px;}
+.pips{display:flex; gap:3px; margin-top:7px;}
+.pips i{height:4px; flex:1; border-radius:2px; background:var(--sunk);}
 
 .bar{height:7px; border-radius:99px; background:var(--sunk); overflow:hidden;}
 .bar i{display:block; height:100%; border-radius:99px;}
-.week{display:flex; gap:5px; align-items:flex-end; height:74px;}
-.week>div{flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; height:100%; justify-content:flex-end;}
-.wbar{width:100%; background:var(--sunk); border-radius:4px 4px 0 0; position:relative; overflow:hidden; display:flex; flex-direction:column-reverse;}
-.wlabel{font-family:"JetBrains Mono",monospace; font-size:9.5px; color:var(--ink-3);}
+.pills{display:flex; gap:7px; flex-wrap:wrap;}
+.pill{padding:7px 12px; border-radius:99px; border:1px solid var(--line-strong); font-size:13px; font-family:"JetBrains Mono",monospace; color:var(--ink-2);}
+.pill.on{background:var(--ink); color:var(--ground); border-color:var(--ink);}
 
-.sheet{position:fixed; inset:0; z-index:50; display:flex; align-items:flex-end; justify-content:center; background:rgba(10,14,13,.45); backdrop-filter:blur(2px);}
-.sheetbox{width:100%; max-width:580px; max-height:86vh; overflow:auto; background:var(--surface); border-radius:18px 18px 0 0; border:1px solid var(--line); padding:18px 16px calc(22px + env(safe-area-inset-bottom));}
-@media(min-width:600px){ .sheet{align-items:center;} .sheetbox{border-radius:18px; max-height:80vh;} }
-.field{margin-bottom:13px;} .field label{display:block; margin-bottom:5px;}
+table{width:100%; border-collapse:collapse; font-size:13.5px;}
+.scroll{overflow-x:auto; border-radius:0 0 var(--r) var(--r);}
+th,td{text-align:left; padding:9px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
+th:first-child,td:first-child{padding-left:12px;} th:last-child,td:last-child{padding-right:12px;}
+th{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:400;}
+tr:last-child td{border-bottom:none;}
+td.city{white-space:normal; min-width:104px;}
+td.city b{font-weight:600;} td.city span{display:block; font-size:11.5px; color:var(--ink-3);}
+tr.here{background:var(--accent-soft);}
+
+.sheet{position:fixed; inset:0; z-index:50; display:flex; align-items:flex-end; justify-content:center; background:rgba(10,14,13,.45);}
+.sheetbox{width:100%; max-width:600px; max-height:88vh; overflow:auto; background:var(--surface); border-radius:18px 18px 0 0; border:1px solid var(--line); padding:18px 16px calc(22px + env(safe-area-inset-bottom));}
+@media(min-width:640px){ .sheet{align-items:center;} .sheetbox{border-radius:18px; max-height:80vh;} }
+.field{margin-bottom:12px;} .field label{display:block; margin-bottom:5px;}
 .grid2{display:grid; grid-template-columns:1fr 1fr; gap:11px;}
-.empty-note{padding:20px 14px; text-align:center; color:var(--ink-3); font-size:13.5px;}
-.toast{position:fixed; bottom:84px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--ground); padding:10px 16px; border-radius:99px; font-size:13.5px; z-index:60; box-shadow:var(--shadow);}
-@media (prefers-reduced-motion:no-preference){ .toast{animation:rise .22s ease-out;} @keyframes rise{from{opacity:0; transform:translate(-50%,8px);}} }
+.empty-note{padding:18px 14px; text-align:center; color:var(--ink-3); font-size:13.5px;}
+.toast{position:fixed; bottom:86px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--ground); padding:10px 16px; border-radius:99px; font-size:13.5px; z-index:60; box-shadow:var(--shadow);}
 hr.rule{border:none; border-top:1px solid var(--line); margin:18px 0;}
 </style>
 
@@ -152,179 +146,180 @@ hr.rule{border:none; border-top:1px solid var(--line); margin:18px 0;}
 
 <script>
 "use strict";
-/* ============================ storage ============================
-   Prototype store: on-device (localStorage) + JSON export/import.
-   Swap STORE for a network adapter to move to a real backend.        */
-const KEY = "beforefour.v1";
+/* =====================================================================
+   Daylight - your work is fixed to London (08:00-15:00 UTC), so where you
+   sit decides the shape of your day, not the amount of it.
+   Free morning == your UTC offset.  Evening == 8h minus it.
+   ===================================================================== */
+
+const KEY = "daylight.v1";
 const STORE = {
   read(){ try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }catch(e){ return null; } },
   write(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); return true; }catch(e){ return false; } }
 };
 
+/* Basecamps: offset in minutes from UTC, flight time from Singapore in minutes. */
+const CAMPS = [
+  {code:"DXB", city:"Dubai",            country:"UAE",         off:240, fly:450},
+  {code:"MLE", city:"Mal\u00e9",        country:"Maldives",    off:300, fly:270},
+  {code:"CMB", city:"Colombo",          country:"Sri Lanka",   off:330, fly:240},
+  {code:"DEL", city:"Delhi",            country:"India",       off:330, fly:340},
+  {code:"BOM", city:"Mumbai",           country:"India",       off:330, fly:330},
+  {code:"KTM", city:"Kathmandu",        country:"Nepal",       off:345, fly:300},
+  {code:"RGN", city:"Yangon",           country:"Myanmar",     off:390, fly:190},
+  {code:"BKK", city:"Bangkok",          country:"Thailand",    off:420, fly:140},
+  {code:"HKT", city:"Phuket",           country:"Thailand",    off:420, fly:110},
+  {code:"CNX", city:"Chiang Mai",       country:"Thailand",    off:420, fly:200},
+  {code:"SGN", city:"Ho Chi Minh City", country:"Vietnam",     off:420, fly:120},
+  {code:"DAD", city:"Da Nang",          country:"Vietnam",     off:420, fly:170},
+  {code:"HAN", city:"Hanoi",            country:"Vietnam",     off:420, fly:195},
+  {code:"PNH", city:"Phnom Penh",       country:"Cambodia",    off:420, fly:130},
+  {code:"REP", city:"Siem Reap",        country:"Cambodia",    off:420, fly:135},
+  {code:"VTE", city:"Vientiane",        country:"Laos",        off:420, fly:180},
+  {code:"CGK", city:"Jakarta",          country:"Indonesia",   off:420, fly:110},
+  {code:"SIN", city:"Singapore",        country:"",            off:480, fly:0},
+  {code:"KUL", city:"Kuala Lumpur",     country:"Malaysia",    off:480, fly:60},
+  {code:"BWN", city:"Bandar Seri Begawan", country:"Brunei",   off:480, fly:125},
+  {code:"BKI", city:"Kota Kinabalu",    country:"Malaysia",    off:480, fly:155},
+  {code:"DPS", city:"Bali",             country:"Indonesia",   off:480, fly:155},
+  {code:"MNL", city:"Manila",           country:"Philippines", off:480, fly:220},
+  {code:"HKG", city:"Hong Kong",        country:"",            off:480, fly:240},
+  {code:"TPE", city:"Taipei",           country:"Taiwan",      off:480, fly:280},
+  {code:"PER", city:"Perth",            country:"Australia",   off:480, fly:320},
+  {code:"ICN", city:"Seoul",            country:"South Korea", off:540, fly:380},
+  {code:"NRT", city:"Tokyo",            country:"Japan",       off:540, fly:420},
+  {code:"SYD", city:"Sydney",           country:"Australia",   off:600, fly:480, dst:true}
+];
+
 const CATS = {
-  health:{label:"Health",  color:"var(--health)", blurb:"Training, movement, sleep"},
-  craft: {label:"Craft",   color:"var(--craft)",  blurb:"Projects, study, building"},
-  people:{label:"People",  color:"var(--people)", blurb:"Friends, family, dating"},
-  life:  {label:"Life",    color:"var(--life)",   blurb:"Admin, errands, recovery"}
+  build:    {label:"Build",    color:"var(--build)",    blurb:"The one project"},
+  move:     {label:"Move",     color:"var(--move)",     blurb:"Training, walking, swimming"},
+  enjoy:    {label:"Enjoy",    color:"var(--enjoy)",    blurb:"Watch, make, play"},
+  discover: {label:"Discover", color:"var(--discover)", blurb:"Somewhere new"},
+  campaign: {label:"Campaign", color:"var(--campaign)", blurb:"The December ask"}
 };
-const ENERGY = { low:"Low", mid:"Steady", deep:"Deep" };
 
 function seed(){
-  const t = (title,cat,minutes,energy,times) => ({id:uid(), title, cat, minutes, energy, times, active:true});
   return {
     v:1,
-    profile:{ wake:"08:00", shiftStart:"16:00", shiftEnd:"23:00", shiftDays:[1,2,3,4,5],
-              peakStart:"10:30", peakEnd:"14:30", weekendWake:"09:00" },
-    things:[
-      t("Gym session","health",60,"mid",3),
-      t("Run","health",40,"mid",2),
-      t("Side project \u2014 deep block","craft",120,"deep",4),
-      t("Reading / study","craft",45,"mid",3),
-      t("Call home","people",30,"low",1),
-      t("See a friend","people",120,"low",1),
-      t("Life admin batch","life",45,"low",2),
-      t("Proper lunch, no screen","life",30,"low",5)
+    profile:{ workStartUTC:480, workEndUTC:900, wake:"08:00", camp:"SIN" },
+    /* The routine: the same short sequence every morning. Being routined is
+       mostly about the start being identical, not the day being planned. */
+    routine:[
+      {id:"r1", label:"Up, no phone in bed"},
+      {id:"r2", label:"Outside for ten minutes"},
+      {id:"r3", label:"Breakfast, sitting down"},
+      {id:"r4", label:"Name today's first block"}
     ],
-    plan:{}, log:[],
+    targets:{ build:2, move:3, enjoy:3, discover:1, campaign:2 },
+    places:[
+      {id:"p1", name:"MacRitchie treetop walk", where:"Singapore", hours:3},
+      {id:"p2", name:"Southern Ridges walk",    where:"Singapore", hours:3},
+      {id:"p3", name:"Pulau Ubin by bike",      where:"Singapore", hours:5},
+      {id:"p4", name:"Tiong Bahru, on foot",    where:"Singapore", hours:2},
+      {id:"p5", name:"Sungei Buloh wetlands",   where:"Singapore", hours:3},
+      {id:"p6", name:"Kampong Glam + Rochor",   where:"Singapore", hours:2},
+      {id:"p7", name:"Batam or Bintan day trip",where:"Indonesia", hours:9},
+      {id:"p8", name:"Melaka weekend",          where:"Malaysia",  hours:36}
+    ],
+    log:[],          /* {id, cat, label, date} */
+    routineLog:{},   /* date -> [routine ids done] */
     ui:{ view:"today" }
   };
 }
 
 let S = STORE.read() || seed();
-if(!S.ui) S.ui = {view:"today"};
+S.ui = S.ui || {view:"today"};
 S.ui.view = S.ui.view || "today";
-if(!Array.isArray(S.things)) S.things = seed().things;
 if(!Array.isArray(S.log)) S.log = [];
-if(!S.plan || typeof S.plan !== "object") S.plan = {};
+if(!Array.isArray(S.places)) S.places = seed().places;
+if(!Array.isArray(S.routine)) S.routine = seed().routine;
+if(!S.routineLog || typeof S.routineLog !== "object") S.routineLog = {};
 S.profile = Object.assign(seed().profile, S.profile || {});
+S.targets = Object.assign(seed().targets, S.targets || {});
+
 function save(){ STORE.write(S); }
 function uid(){ return Math.random().toString(36).slice(2,10); }
 
-/* ============================ time helpers ============================ */
+/* ---------------------------- time ---------------------------- */
 const pad = n => String(n).padStart(2,"0");
 const t2m = t => { const [h,m] = t.split(":").map(Number); return h*60+m; };
-const m2t = m => pad(Math.floor(m/60)%24) + ":" + pad(Math.round(m)%60);
+function hhmm(m){ const x = ((m % 1440) + 1440) % 1440; return pad(Math.floor(x/60))+":"+pad(x%60); }
 function dur(m){
   m = Math.max(0, Math.round(m));
   const h = Math.floor(m/60), r = m%60;
   return h ? (r ? h+"h "+pad(r)+"m" : h+"h") : r+"m";
 }
-function key(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
-function fromKey(k){ const [y,m,d] = k.split("-").map(Number); return new Date(y,m-1,d); }
-function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
-function nowMin(){ const d = new Date(); return d.getHours()*60 + d.getMinutes(); }
+function hrs(m){ const h = m/60; return (Math.round(h*10)/10) + "h"; }
 const DAYNAME = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-function daysBetween(a,b){ return Math.round((fromKey(b) - fromKey(a)) / 86400000); }
+function key(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function weekStart(d){ const x = new Date(d); return addDays(x, -((x.getDay()+6)%7)); }
+function daysBetween(a,b){ return Math.round((new Date(b) - new Date(a)) / 86400000); }
 
-function isShiftDay(d){ return S.profile.shiftDays.includes(d.getDay()); }
+const camp = code => CAMPS.find(c => c.code === code) || CAMPS.find(c => c.code === "SIN");
 
-/* Blocks: the named shape of a day. */
-function blocksFor(d){
-  const p = S.profile;
-  if(isShiftDay(d)){
-    return [
-      {k:"warmup", label:"Warm-up", start:t2m(p.wake),      end:t2m(p.peakStart), energy:"low",
-       hint:"Move, eat, clear the small stuff. Don't start anything that needs your best brain."},
-      {k:"peak",   label:"Peak",    start:t2m(p.peakStart), end:t2m(p.peakEnd),   energy:"deep",
-       hint:"Your sharpest hours, and the last ones before work. One thing only."},
-      {k:"runway", label:"Runway",  start:t2m(p.peakEnd),   end:t2m(p.shiftStart),energy:"low",
-       hint:"Land the plane. Food, reset, into the shift."},
-      {k:"shift",  label:"Shift",   start:t2m(p.shiftStart),end:t2m(p.shiftEnd),  energy:"work", hint:"Work."}
-    ];
+/* The whole model in four lines: work is fixed in UTC, so local shape
+   follows directly from the offset. */
+function shape(c){
+  const start = S.profile.workStartUTC + c.off;   /* local minutes, may exceed 1440 */
+  const end   = S.profile.workEndUTC   + c.off;
+  const wake  = t2m(S.profile.wake);
+  return {
+    start, end,
+    startT: hhmm(start), endT: hhmm(end),
+    morning: Math.max(0, start - wake),
+    evening: Math.max(0, 1380 - end),        /* usable until 23:00 local */
+    late: end >= 1440                         /* finishes at or after midnight */
+  };
+}
+function verdict(c){
+  const s = shape(c);
+  if(s.late) return {t:s.endT+" finish", k:"warn"};
+  if(c.off === 480) return {t:"Same", k:""};
+  if(s.evening >= 210) return {t:"Best shape", k:"good"};
+  if(s.evening >= 60) return {t:"Gains a PM", k:"sig"};
+  return {t:"Marginal", k:""};
+}
+/* Country plus flight time, or "home" - a bare country reads oddly for city states. */
+function sub(c){
+  if(!c.fly) return "home";
+  return (c.country ? c.country + " \u00b7 " : "") + dur(c.fly);
+}
+
+/* Local "now" at the basecamp, derived from real UTC. */
+function nowLocal(){
+  const d = new Date();
+  return (d.getUTCHours()*60 + d.getUTCMinutes() + camp(S.profile.camp).off + 1440) % 1440;
+}
+
+/* ---------------------------- data ---------------------------- */
+function logsIn(fromDate, toDate){
+  const a = key(fromDate), b = key(toDate);
+  return S.log.filter(l => l.date >= a && l.date <= b);
+}
+function weekCount(cat){
+  const ws = key(weekStart(new Date()));
+  return S.log.filter(l => l.cat === cat && l.date >= ws).length;
+}
+function addLog(cat, label){
+  S.log.push({id:uid(), cat, label, date:key(new Date())});
+  save();
+}
+function routineToday(){ return S.routineLog[key(new Date())] || []; }
+function routineStreakless(){
+  /* Share of routine steps completed over the last 14 days - deliberately a
+     rolling share, not a chain, so one bad morning costs 1/14 rather than all. */
+  let done = 0, poss = 0;
+  for(let i=0;i<14;i++){
+    const k = key(addDays(new Date(), -i));
+    poss += S.routine.length;
+    done += (S.routineLog[k] || []).length;
   }
-  return [
-    {k:"morning",   label:"Morning",   start:t2m(p.weekendWake), end:13*60, energy:"mid",
-     hint:"Slow start is fine \u2014 but decide what the day is for before it decides for you."},
-    {k:"afternoon", label:"Afternoon", start:13*60, end:18*60, energy:"deep",
-     hint:"Your peak carries over on free days. Spend it on something you'd be glad you did."},
-    {k:"evening",   label:"Evening",   start:18*60, end:22*60, energy:"low",
-     hint:"People, food, wind down. This is the slot your weekdays never get."}
-  ];
-}
-const freeBlocks = d => blocksFor(d).filter(b => b.k !== "shift");
-function blockAt(d, mins){ return freeBlocks(d).find(b => mins >= b.start && mins < b.end) || null; }
-
-/* Free minutes available in a day, and how much is left from now. */
-function windowTotal(d){ return freeBlocks(d).reduce((s,b) => s + (b.end - b.start), 0); }
-function windowLeft(d){
-  const n = nowMin();
-  return freeBlocks(d).reduce((s,b) => s + Math.max(0, b.end - Math.max(b.start, n)), 0);
+  return poss ? Math.round(done/poss*100) : 0;
 }
 
-/* ============================ data accessors ============================ */
-const thing = id => S.things.find(t => t.id === id);
-function planFor(k){ return S.plan[k] || (S.plan[k] = []); }
-function logsOn(k){ return S.log.filter(l => l.date === k); }
-function lastDone(thingId){
-  const ls = S.log.filter(l => l.thingId === thingId).map(l => l.date).sort();
-  return ls.length ? ls[ls.length-1] : null;
-}
-function doneCountThisWeek(thingId){
-  const start = key(weekStart(new Date()));
-  return S.log.filter(l => l.thingId === thingId && l.date >= start).length;
-}
-function weekStart(d){ const x = new Date(d); const off = (x.getDay()+6)%7; return addDays(x, -off); }
-
-/* How overdue is a thing, in units of its own expected interval. 0 = on track. */
-function overdue(t){
-  if(!t.times) return 0;
-  const interval = 7 / t.times;
-  const last = lastDone(t.id);
-  if(!last) return 2;
-  const since = daysBetween(last, key(new Date()));
-  return Math.max(0, since/interval - 1);
-}
-function neglect(t){
-  const last = lastDone(t.id);
-  if(!last) return {days:null, level:"never"};
-  const since = daysBetween(last, key(new Date()));
-  const interval = t.times ? 7/t.times : 7;
-  return {days:since, level: since > interval*2 ? "crit" : since > interval ? "warn" : "ok"};
-}
-
-function logThing(t, minutes, srcDate){
-  const entry = {id:uid(), thingId:t.id, date: srcDate || key(new Date()), minutes, at: nowMin()};
-  S.log.push(entry); save();
-  return entry;
-}
-
-/* ============================ suggestion engine ============================ */
-/* Ranks things for a free slot: must fit, should match energy,
-   overdue things rise, and Peak actively suppresses shallow work. */
-function suggest(available, energy, d){
-  const b = blockAt(d || new Date(), nowMin());
-  const inPeak = b && (b.k === "peak" || b.k === "afternoon");
-  const doneToday = new Set(logsOn(key(new Date())).map(l => l.thingId));
-  const eRank = {low:0, mid:1, deep:2};
-
-  return S.things.filter(t => t.active !== false).map(t => {
-    let score = 1, why = [];
-    const fits = t.minutes <= available;
-    if(!fits && t.minutes > available * 1.4) return null;
-    if(!fits){ score *= 0.55; why.push("tight fit"); }
-
-    const gap = eRank[t.energy] - eRank[energy];
-    if(gap > 0){ score *= (gap === 1 ? 0.35 : 0.12); }
-    else if(gap < 0){ score *= 0.75; }
-    else { score *= 1.15; why.push("matches your energy"); }
-
-    /* Neglect matters, but capped - it must never outbid deep work for the Peak block. */
-    const od = overdue(t);
-    if(od > 0){ score *= 1 + Math.min(od, 1.5); why.push(od >= 1 ? "overdue" : "due"); }
-
-    if(inPeak){
-      if(t.energy === "deep"){ score *= 2.2; why.push("worth your peak"); }
-      if(t.energy === "low"){ score *= 0.3; }
-    } else if(t.energy === "deep"){ score *= 0.8; }
-
-    if(doneToday.has(t.id)) score *= 0.15;
-    if(t.times && doneCountThisWeek(t.id) >= t.times){ score *= 0.35; why.push("target already hit"); }
-
-    return {t, score, why: why.slice(0,2), fits};
-  }).filter(Boolean).sort((a,b) => b.score - a.score);
-}
-
-/* ============================ view helpers ============================ */
+/* ---------------------------- view helpers ---------------------------- */
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const catDot = c => '<span class="dot" style="background:'+CATS[c].color+'"></span>';
 let sheetEl = null, toastT = null;
@@ -347,55 +342,55 @@ function openSheet(html, wire){
   if(wire) wire(sheetEl);
 }
 
-/* ============================ header ============================ */
+/* ---------------------------- header ---------------------------- */
 function header(){
-  const d = new Date(), n = nowMin(), bs = blocksFor(d), free = freeBlocks(d);
-  const start = bs[0].start, end = bs[bs.length-1].end, span = end - start;
-  const shift = bs.find(b => b.k === "shift");
+  const c = camp(S.profile.camp), s = shape(c), n = nowLocal();
+  const wake = t2m(S.profile.wake);
+  const spanStart = wake, spanEnd = Math.max(s.end, 1380);
+  const span = spanEnd - spanStart;
 
-  let big, small;
-  if(shift && n < shift.start){
-    big = dur(shift.start - n); small = "until the wall at " + S.profile.shiftStart;
-  } else if(shift && n < shift.end){
-    big = dur(shift.end - n); small = "left on shift";
-  } else {
-    const lastFree = free[free.length-1];
-    big = n < lastFree.end ? dur(lastFree.end - n) : "\u2014";
-    small = n < lastFree.end ? "left in the day" : "day's done";
-  }
+  const segs = [];
+  const push = (k, a, b, label) => {
+    if(b <= a) return;
+    segs.push({k, w:(b-a)/span*100, a, b, label});
+  };
+  push("free", spanStart, s.start, "Free \u00b7 " + hrs(s.morning));
+  push("work", s.start, s.end, "Work");
+  push("eve", s.end, spanEnd, s.evening >= 60 ? "Evening \u00b7 " + hrs(s.evening) : "");
 
-  const segs = bs.map(b => {
-    const w = (b.end - b.start)/span*100;
-    const passed = Math.min(1, Math.max(0, (n - b.start)/(b.end - b.start)));
-    /* A clipped label is worse than no label - drop it when the segment is too thin. */
-    const label = w >= 13 ? "<em>"+b.label+"</em>" : "";
-    return '<div class="seg seg-'+b.k+'" style="flex:0 0 '+w.toFixed(3)+'%" title="'+b.label+" "+m2t(b.start)+"\u2013"+m2t(b.end)+'">'
-         + '<div class="fill" style="width:'+(passed*100).toFixed(1)+'%"></div>'
-         + label + "</div>";
+  const bar = segs.map(g => {
+    const passed = Math.min(1, Math.max(0, (n - g.a)/(g.b - g.a)));
+    return '<div class="seg seg-'+g.k+'" style="flex:0 0 '+g.w.toFixed(3)+'%">'
+      + '<div class="fill" style="width:'+(passed*100).toFixed(1)+'%"></div>'
+      + (g.w >= 15 && g.label ? "<em>"+g.label+"</em>" : "") + "</div>";
   }).join("");
 
-  const pos = Math.min(100, Math.max(0, (n - start)/span*100));
-  const marker = (n >= start && n <= end) ? '<div class="nowline" style="left:'+pos.toFixed(2)+'%"></div>' : "";
+  const pos = Math.min(100, Math.max(0, (n - spanStart)/span*100));
+  const marker = (n >= spanStart && n <= spanEnd) ? '<div class="nowline" style="left:'+pos.toFixed(2)+'%"></div>' : "";
 
-  return '<header><div class="brandrow">'
-    + '<div><div class="brand">Before<span>Four</span></div>'
-    + '<div class="eyebrow" style="margin-top:2px">'+DAYNAME[d.getDay()]+" "+pad(d.getDate())+"."+pad(d.getMonth()+1)
-    + (isShiftDay(d) ? " &middot; shift day" : " &middot; free day") + "</div></div>"
-    + '<div class="countdown"><b>'+big+"</b><span class='dim' style='font-size:11.5px'>"+small+"</span></div>"
-    + "</div>"
-    + '<div class="daybar">'+segs+marker+"</div>"
-    + '<div class="scale"><span>'+m2t(start)+"</span><span>"+m2t(end)+"</span></div></header>";
+  let big, small;
+  if(n < s.start){ big = dur(s.start - n); small = "until work at " + s.startT; }
+  else if(n < s.end){ big = dur(s.end - n); small = "left of the shift"; }
+  else { big = s.evening >= 60 ? dur(Math.max(0, 1380 - n)) : "\u2014"; small = s.evening >= 60 ? "of evening left" : "day's done"; }
+
+  const d = new Date();
+  return '<header><div class="brandrow"><div>'
+    + '<div class="brand">Day<em>light</em></div>'
+    + '<button class="where" data-camp="1"><b>'+esc(c.city)+"</b> \u00b7 UTC+"+(c.off/60)
+    + " \u00b7 " + DAYNAME[d.getDay()] + "</button></div>"
+    + '<div class="countdown"><b>'+big+"</b><span>"+small+"</span></div></div>"
+    + '<div class="daybar">'+bar+marker+"</div>"
+    + '<div class="scale"><span>'+hhmm(spanStart)+"</span><span>"+hhmm(spanEnd)+"</span></div></header>";
 }
 
 const ICONS = {
-  today:'<path d="M3 8h18M7 3v3M17 3v3"/><rect x="3" y="5" width="18" height="16" rx="2"/>',
-  now:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  week:'<path d="M4 6h16M4 12h16M4 18h10"/>',
-  things:'<path d="M5 6h14M5 12h14M5 18h14"/><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="7" cy="18" r="1.6"/>',
+  today:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+  week:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  places:'<path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
   review:'<path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/>'
 };
 function nav(){
-  const items = [["today","Today"],["now","Now"],["week","Week"],["things","Things"],["review","Review"]];
+  const items = [["today","Today"],["week","Week"],["places","Places"],["review","Review"]];
   return '<nav><div class="navinner">' + items.map(([k,l]) =>
     '<button class="navbtn '+(S.ui.view===k?"on":"")+'" data-go="'+k+'">'
     + '<svg viewBox="0 0 24 24">'+ICONS[k]+"</svg><span>"+l+"</span></button>").join("") + "</div></nav>";
@@ -403,435 +398,301 @@ function nav(){
 
 /* ============================ TODAY ============================ */
 function viewToday(){
-  const d = new Date(), k = key(d), plan = planFor(k), n = nowMin();
-  const blocks = freeBlocks(d);
-  const peakKey = isShiftDay(d) ? "peak" : "afternoon";
-  const one = plan.find(p => p.block === peakKey);
-  const oneT = one && thing(one.thingId);
-  const peakBlock = blocks.find(b => b.k === peakKey);
-
+  const doneR = routineToday(), c = camp(S.profile.camp), s = shape(c), n = nowLocal();
   let html = "";
 
-  /* The one thing - the whole point of the app. */
-  if(oneT){
-    html += '<section><div class="onething'+(one.done?" done":"")+'">'
-      + '<div class="eyebrow">The one thing &middot; '+m2t(peakBlock.start)+"\u2013"+m2t(peakBlock.end)+"</div>"
-      + "<h3>"+esc(oneT.title)+"</h3>"
-      + '<div class="itemmeta">'+catDot(oneT.cat)+"<span>"+CATS[oneT.cat].label+"</span><span>&middot;</span>"
-      + '<span class="mono">'+dur(one.minutes)+"</span></div>"
-      + '<div class="row" style="gap:9px; margin-top:13px">'
-      + (one.done
-          ? '<span class="chip ok">Done &middot; that was the day well spent</span>'
-          : '<button class="btn sm" data-done="'+one.id+'">Mark done</button>'
-            + '<button class="btn sm ghost" data-swap="'+peakKey+'">Swap</button>')
-      + "</div></div></section>";
-  } else {
-    html += '<section><div class="onething empty">'
-      + '<div class="eyebrow">The one thing &middot; not set</div>'
-      + '<h3 style="font-size:17px">Your Peak block is unclaimed</h3>'
-      + '<p class="muted" style="margin:6px 0 13px; font-size:13.5px">'
-      + peakBlock.hint + "</p>"
-      + '<button class="btn sm" data-swap="'+peakKey+'">Choose it now</button>'
-      + "</div></section>";
-  }
-
-  /* Blocks with their planned items. */
-  blocks.forEach(b => {
-    const items = plan.filter(p => p.block === b.k);
-    const live = n >= b.start && n < b.end;
-    const past = n >= b.end;
-    html += '<section><div class="card">'
-      + '<div class="blockhead"><div class="row" style="gap:8px">'
-      + '<strong style="font-size:13.5px">'+b.label+"</strong>"
-      + '<span class="chip'+(b.k===peakKey?" peak":"")+'">'+m2t(b.start)+"\u2013"+m2t(b.end)+"</span>"
-      + (live ? '<span class="chip" style="background:var(--accent-soft); color:var(--accent)">now</span>' : "")
-      + "</div>"
-      + '<span class="dim mono" style="font-size:11px">'+dur(b.end-b.start)+"</span></div>";
-
-    if(!items.length){
-      html += '<div class="empty-note">'+(past ? "Nothing logged." : esc(b.hint))
-        + '<div style="margin-top:11px"><button class="btn sm ghost" data-add="'+b.k+'">Add something</button></div></div>';
-    } else {
-      items.forEach(p => {
-        const t = thing(p.thingId); if(!t) return;
-        html += '<div class="item'+(p.done?" done":"")+'">'
-          + '<button class="tick'+(p.done?" on":"")+'" data-done="'+p.id+'" aria-label="Toggle done">'
-          + '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
-          + '<div class="itembody"><div class="itemtitle">'+esc(t.title)+"</div>"
-          + '<div class="itemmeta">'+catDot(t.cat)+"<span>"+CATS[t.cat].label+"</span><span>&middot;</span>"
-          + '<span class="mono">'+dur(p.minutes)+"</span></div></div>"
-          + '<button class="dim" data-rm="'+p.id+'" aria-label="Remove" style="font-size:18px; line-height:1; padding:2px 4px">&times;</button>'
-          + "</div>";
-      });
-      html += '<div style="padding:11px 13px"><button class="btn sm ghost" data-add="'+b.k+'">Add something</button></div>';
-    }
-    html += "</div></section>";
-  });
-
-  /* Unplanned things logged today (from the Now tab). */
-  const planned = new Set(plan.map(p => p.logId).filter(Boolean));
-  const extra = logsOn(k).filter(l => !planned.has(l.id));
-  if(extra.length){
-    html += '<section><div class="sechead"><h2>Also done today</h2></div><div class="card">'
-      + extra.map(l => {
-          const t = thing(l.thingId);
-          return '<div class="item"><div class="itembody"><div class="itemtitle">'+esc(t?t.title:"\u2014")+"</div>"
-            + '<div class="itemmeta">'+(t?catDot(t.cat):"")+'<span class="mono">'+dur(l.minutes)+" &middot; "+m2t(l.at)+"</span></div></div>"
-            + '<button class="dim" data-rmlog="'+l.id+'" style="font-size:18px; line-height:1; padding:2px 4px">&times;</button></div>';
-        }).join("") + "</div></section>";
-  }
-
-  /* The brief - the message a Telegram bot would send you. */
-  html += '<section><button class="btn ghost block" data-brief="1">Copy today&rsquo;s brief</button>'
-    + '<p class="dim" style="font-size:12px; text-align:center; margin:9px 0 0">'
-    + "This is the message the bot will send you each morning once it&rsquo;s wired up.</p></section>";
-
-  return html;
-}
-
-function todayBrief(){
-  const d = new Date(), k = key(d), plan = planFor(k), blocks = freeBlocks(d);
-  const peakKey = isShiftDay(d) ? "peak" : "afternoon";
-  const one = plan.find(p => p.block === peakKey), oneT = one && thing(one.thingId);
-  const lines = [];
-  lines.push("Before Four \u2014 " + DAYNAME[d.getDay()] + " " + pad(d.getDate()) + "." + pad(d.getMonth()+1));
-  lines.push(dur(windowTotal(d)) + " of free time before " + (isShiftDay(d) ? S.profile.shiftStart : "the day ends") + ".");
-  lines.push("");
-  lines.push(oneT ? "ONE THING: " + oneT.title + " (" + dur(one.minutes) + ", Peak block)"
-                  : "ONE THING: not set \u2014 pick it before you open anything else.");
-  blocks.forEach(b => {
-    const items = plan.filter(p => p.block === b.k && p.block !== peakKey);
-    if(items.length) lines.push(b.label + ": " + items.map(p => (thing(p.thingId)||{}).title).join(", "));
-  });
-  const due = S.things.filter(t => t.active !== false && overdue(t) >= 1)
-    .sort((a,b) => overdue(b) - overdue(a)).slice(0,3);
-  if(due.length){ lines.push(""); lines.push("Slipping: " + due.map(t => t.title).join(", ")); }
-  return lines.join("\n");
-}
-
-/* ============================ NOW ============================ */
-function viewNow(){
-  const u = S.ui;
-  u.avail = u.avail || 60; u.energy = u.energy || "mid";
-  const d = new Date(), n = nowMin(), b = blockAt(d, n);
-  const left = windowLeft(d);
-  const ranked = suggest(u.avail, u.energy, d).slice(0, 6);
-
-  let html = '<section><div class="sechead"><h2>What should I do right now?</h2></div>'
-    + '<div class="card" style="padding:15px">'
-    + (b ? '<p class="muted" style="margin:0 0 14px; font-size:13.5px"><strong style="color:var(--ink)">'
-            + b.label + "</strong> &middot; " + esc(b.hint) + "</p>"
-         : '<p class="muted" style="margin:0 0 14px; font-size:13.5px">You&rsquo;re outside your free window. Anything you do now is borrowed from sleep.</p>')
-    + '<div class="eyebrow" style="margin-bottom:7px">Time I&rsquo;ve got</div><div class="pills">'
-    + [20,45,60,90,150].map(m => '<button class="pill'+(u.avail===m?" on":"")+'" data-avail="'+m+'">'+dur(m)+"</button>").join("")
+  /* 1. Routine - the fixed start. */
+  html += '<section><div class="sechead"><h2>The start</h2>'
+    + '<span class="eyebrow">'+doneR.length+" / "+S.routine.length+"</span></div>"
+    + '<div class="card">'
+    + S.routine.map(r => {
+        const on = doneR.includes(r.id);
+        return '<button class="item'+(on?" done":"")+'" data-rt="'+r.id+'">'
+          + '<span class="tick sq'+(on?" on":"")+'"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>'
+          + '<span class="itembody"><span class="itemtitle">'+esc(r.label)+"</span></span></button>";
+      }).join("")
     + "</div>"
-    + '<div class="eyebrow" style="margin:15px 0 7px">How my head feels</div><div class="pills">'
-    + Object.keys(ENERGY).map(e => '<button class="pill'+(u.energy===e?" on":"")+'" data-energy="'+e+'">'+ENERGY[e]+"</button>").join("")
-    + "</div>"
-    + (left > 0 ? '<p class="dim mono" style="font-size:11.5px; margin:14px 0 0">'+dur(left)+" of free window left today</p>" : "")
+    + '<p class="dim" style="font-size:12px; margin:8px 0 0">Same four things every morning, wherever you are. '
+    + "Missing one costs you a fraction, not a streak.</p></section>";
+
+  /* 2. This week's guaranteed slots. */
+  html += '<section><div class="sechead"><h2>Owed this week</h2>'
+    + '<span class="eyebrow">tap to log</span></div><div class="slots">'
+    + Object.keys(CATS).map(k => {
+        const have = weekCount(k), want = S.targets[k] || 0;
+        if(!want) return "";
+        return '<button class="slot" data-log="'+k+'">'
+          + '<div class="n" style="color:'+CATS[k].color+'">'+have+"<s> / "+want+"</s></div>"
+          + '<div class="lbl">'+catDot(k)+CATS[k].label+"</div>"
+          + '<div class="pips">' + Array.from({length:want}, (_,i) =>
+              '<i style="background:'+(i<have?CATS[k].color:"var(--sunk)")+'"></i>').join("") + "</div></button>";
+      }).join("")
     + "</div></section>";
 
-  html += '<section><div class="sechead"><h2>Pick one</h2><span class="eyebrow">ranked</span></div><div class="card">';
-  if(!ranked.length){
-    /* Never dead-end on an empty slot: offer the shortest things you have. */
-    const closest = S.things.filter(t => t.active !== false)
-      .sort((a,b) => a.minutes - b.minutes).slice(0,3);
-    html += '<div class="empty-note" style="text-align:left; padding:14px 13px">Nothing you\u2019ve listed fits '
-      + dur(u.avail) + ". Either take a real break, or start one of these and stop when you have to:</div>";
-    closest.forEach(t => {
-      html += '<div class="sugg"><span class="rank mono">&middot;</span>'
-        + '<div class="itembody"><div class="itemtitle">'+esc(t.title)+"</div>"
-        + '<div class="itemmeta">'+catDot(t.cat)+'<span class="mono">'+dur(t.minutes)+"</span>"
-        + '<span class="chip">needs '+dur(t.minutes - u.avail)+" more</span></div></div>"
-        + '<button class="btn sm ghost" data-do="'+t.id+'">Did it</button></div>';
-    });
-  } else {
-    ranked.forEach((r,i) => {
-      html += '<div class="sugg"><span class="rank mono">'+(i+1)+"</span>"
-        + '<div class="itembody"><div class="itemtitle">'+esc(r.t.title)+"</div>"
-        + '<div class="itemmeta">'+catDot(r.t.cat)+'<span class="mono">'+dur(r.t.minutes)+"</span>"
-        + "<span>&middot;</span><span>"+ENERGY[r.t.energy]+"</span>"
-        + r.why.map(w => '<span class="chip'+(w==="overdue"?" warn":"")+'">'+w+"</span>").join("")
-        + "</div></div>"
-        + '<button class="btn sm" data-do="'+r.t.id+'">Did it</button></div>';
-    });
+  /* 3. Where the day stands. */
+  if(n < s.start){
+    html += '<section><div class="card" style="padding:15px">'
+      + '<div class="eyebrow" style="margin-bottom:6px">Today\u2019s window</div>'
+      + '<p class="muted" style="margin:0; font-size:13.5px">You have <strong style="color:var(--ink)">'
+      + dur(s.start - n) + '</strong> before work'
+      + (s.evening >= 60 ? ", and " + hrs(s.evening) + " after it." : ", and no evening once it starts.")
+      + "</p></div></section>";
   }
-  html += "</div></section>";
-  html += '<p class="dim" style="font-size:12px; margin-top:12px">Ranking weighs what fits the time you have, '
-    + "what matches your energy, and what you&rsquo;ve been neglecting. In your Peak block it pushes deep work up and buries admin.</p>";
+
+  /* 4. Today's logged items. */
+  const today = S.log.filter(l => l.date === key(new Date()));
+  if(today.length){
+    html += '<section><div class="sechead"><h2>Logged today</h2></div><div class="card">'
+      + today.map(l => '<div class="item"><div class="itembody"><div class="itemtitle">'
+          + esc(l.label || CATS[l.cat].label) + "</div>"
+          + '<div class="itemmeta">'+catDot(l.cat)+"<span>"+CATS[l.cat].label+"</span></div></div>"
+          + '<button class="dim" data-rmlog="'+l.id+'" style="font-size:18px; line-height:1; padding:2px 4px">&times;</button></div>').join("")
+      + "</div></section>";
+  }
   return html;
 }
 
 /* ============================ WEEK ============================ */
 function viewWeek(){
-  const today = new Date(), ws = weekStart(today);
-  let html = '<section><div class="sechead"><h2>The week ahead</h2>'
-    + '<span class="eyebrow">'+DAYNAME[ws.getDay()]+" "+pad(ws.getDate())+" &rarr; "+pad(addDays(ws,6).getDate())+"</span></div>";
+  const ws = weekStart(new Date());
+  let html = '<section><div class="sechead"><h2>This week</h2>'
+    + '<span class="eyebrow">'+DAYNAME[ws.getDay()]+" "+pad(ws.getDate())+"</span></div><div class=\"card\">";
 
-  for(let i=0; i<7; i++){
-    const d = addDays(ws,i), k = key(d), plan = planFor(k);
-    const isToday = k === key(today);
-    const peakKey = isShiftDay(d) ? "peak" : "afternoon";
-    const one = plan.find(p => p.block === peakKey), oneT = one && thing(one.thingId);
-    const others = plan.filter(p => p.block !== peakKey);
-
-    html += '<div class="card" style="margin-bottom:10px'+(isToday?"; border-color:var(--accent)":"")+'">'
-      + '<div class="blockhead" style="border-radius:'+"var(--r) var(--r) 0 0"+'">'
-      + '<div class="row" style="gap:8px"><strong style="font-size:13.5px">'+DAYNAME[d.getDay()]+" "+pad(d.getDate())+"</strong>"
-      + '<span class="chip">'+(isShiftDay(d) ? dur(windowTotal(d))+" free" : "free day")+"</span>"
-      + (isToday ? '<span class="chip" style="background:var(--accent-soft); color:var(--accent)">today</span>' : "")
-      + "</div></div>"
-      + '<div style="padding:12px 13px">'
-      + (oneT
-          ? '<div class="row" style="gap:8px; justify-content:space-between">'
-            + '<div class="itembody"><div class="eyebrow" style="color:var(--signal)">One thing</div>'
-            + '<div class="itemtitle" style="margin-top:2px">'+esc(oneT.title)+"</div></div>"
-            + '<button class="btn sm ghost" data-swapday="'+k+"|"+peakKey+'">Change</button></div>'
-          : '<button class="btn sm ghost block" data-swapday="'+k+"|"+peakKey+'">Set the one thing</button>')
-      + (others.length
-          ? '<div class="itemmeta" style="margin-top:10px">'
-            + others.map(p => { const t = thing(p.thingId); return t ? catDot(t.cat)+"<span>"+esc(t.title)+"</span>" : ""; }).join('<span>&middot;</span>')
-            + "</div>"
-          : "")
-      + "</div></div>";
-  }
-  html += "</section>";
-
-  /* Cadence debt: what you said you'd do weekly vs what's actually happened. */
-  html += '<section><div class="sechead"><h2>Targets this week</h2></div><div class="card">';
-  const withTargets = S.things.filter(t => t.active !== false && t.times);
-  if(!withTargets.length){
-    html += '<div class="empty-note">No weekly targets set. Add them in Things.</div>';
-  } else {
-    withTargets.forEach(t => {
-      const done = doneCountThisWeek(t.id), pct = Math.min(100, done/t.times*100);
-      html += '<div class="item"><div class="itembody">'
-        + '<div class="row" style="justify-content:space-between; gap:10px">'
-        + '<span class="itemtitle">'+esc(t.title)+"</span>"
-        + '<span class="mono dim" style="font-size:12px">'+done+" / "+t.times+"</span></div>"
-        + '<div class="bar" style="margin-top:7px"><i style="width:'+pct+"%; background:"+CATS[t.cat].color+'"></i></div>'
-        + "</div></div>";
-    });
-  }
-  html += "</div></section>";
-  return html;
-}
-
-/* ============================ THINGS ============================ */
-function viewThings(){
-  let html = '<section><div class="sechead"><h2>Things worth your time</h2>'
-    + '<button class="btn sm" data-new="1">New</button></div>';
-
-  Object.keys(CATS).forEach(c => {
-    const ts = S.things.filter(t => t.cat === c);
-    if(!ts.length) return;
-    html += '<div class="card" style="margin-bottom:12px">'
-      + '<div class="blockhead"><div class="row" style="gap:8px">'+catDot(c)
-      + '<strong style="font-size:13.5px">'+CATS[c].label+"</strong>"
-      + '<span class="dim" style="font-size:12px">'+CATS[c].blurb+"</span></div></div>";
-    ts.forEach(t => {
-      const ng = neglect(t);
-      const chip = ng.level === "never" ? '<span class="chip warn">never logged</span>'
-        : ng.level === "ok" ? '<span class="chip ok">'+ng.days+"d ago</span>"
-        : '<span class="chip'+(ng.level==="crit"?" warn":"")+'">'+ng.days+"d ago</span>";
-      html += '<button class="item" style="width:100%; text-align:left" data-edit="'+t.id+'">'
-        + '<div class="itembody"><div class="itemtitle"'+(t.active===false?' style="color:var(--ink-3)"':"")+">"
-        + esc(t.title)+(t.active===false?" (paused)":"")+"</div>"
-        + '<div class="itemmeta"><span class="mono">'+dur(t.minutes)+"</span><span>&middot;</span><span>"+ENERGY[t.energy]+"</span>"
-        + (t.times ? "<span>&middot;</span><span>"+t.times+"&times;/week</span>" : "") + chip + "</div></div></button>";
-    });
-    html += "</div>";
+  Object.keys(CATS).forEach(k => {
+    const want = S.targets[k] || 0, have = weekCount(k);
+    const pct = want ? Math.min(100, have/want*100) : 0;
+    html += '<div class="item" style="display:block">'
+      + '<div class="row" style="justify-content:space-between; gap:10px">'
+      + '<span class="row" style="gap:8px"><span class="dot" style="background:'+CATS[k].color+'"></span>'
+      + '<strong style="font-weight:500">'+CATS[k].label+"</strong>"
+      + '<span class="dim" style="font-size:12px">'+CATS[k].blurb+"</span></span>"
+      + '<span class="mono dim" style="font-size:12px">'+have+" / "+want+"</span></div>"
+      + '<div class="bar" style="margin-top:8px"><i style="width:'+pct+"%; background:"+CATS[k].color+'"></i></div>'
+      + "</div>";
   });
+  html += "</div>";
 
-  html += "</section>";
-  html += '<hr class="rule"><section><div class="sechead"><h2>Your day</h2></div>'
-    + '<div class="card" style="padding:15px">'
-    + '<div class="grid2">'
-    + fieldTime("Wake", "wake") + fieldTime("Shift starts", "shiftStart")
-    + fieldTime("Peak starts", "peakStart") + fieldTime("Peak ends", "peakEnd")
-    + fieldTime("Shift ends", "shiftEnd") + fieldTime("Weekend wake", "weekendWake")
-    + "</div>"
-    + '<p class="dim" style="font-size:12px; margin:4px 0 0">Times are your device&rsquo;s local clock, so the day re-shapes itself if you travel.</p>'
-    + "</div></section>";
+  const short = Object.keys(CATS).filter(k => weekCount(k) < (S.targets[k]||0));
+  html += '<p class="dim" style="font-size:12.5px; margin-top:10px">'
+    + (short.length
+        ? "Still owed: " + short.map(k => CATS[k].label).join(", ") + "."
+        : "Everything owed this week has been done.")
+    + " Slots roll over as a share, never as a streak.</p></section>";
 
-  html += '<section><div class="sechead"><h2>Your data</h2></div>'
-    + '<div class="row" style="gap:9px"><button class="btn ghost" data-export="1">Export</button>'
-    + '<button class="btn ghost" data-import="1">Import</button>'
-    + '<button class="btn ghost" data-reset="1" style="color:var(--crit); border-color:var(--crit)">Reset</button></div>'
-    + '<p class="dim" style="font-size:12px; margin-top:9px">Everything lives on this device only. Export regularly &mdash; '
-    + "clearing your browser data would take your history with it.</p></section>";
+  /* Four-week share - the honest longer view. */
+  const from = addDays(new Date(), -27);
+  const recent = logsIn(from, new Date());
+  const byCat = {}; Object.keys(CATS).forEach(k => byCat[k] = 0);
+  recent.forEach(l => { if(byCat[l.cat] !== undefined) byCat[l.cat]++; });
+  const tot = recent.length || 1;
+
+  html += '<section><div class="sechead"><h2>Last four weeks</h2>'
+    + '<span class="eyebrow">'+recent.length+" logged</span></div><div class=\"card\" style=\"padding:15px\">";
+  Object.keys(CATS).forEach(k => {
+    const want4 = (S.targets[k]||0) * 4, p = want4 ? Math.min(100, byCat[k]/want4*100) : 0;
+    html += '<div style="margin-bottom:12px"><div class="row" style="justify-content:space-between; margin-bottom:5px">'
+      + '<span class="row" style="gap:7px; font-size:13.5px">'+catDot(k)+CATS[k].label+"</span>"
+      + '<span class="mono dim" style="font-size:12px">'+byCat[k]+" / "+want4+"</span></div>"
+      + '<div class="bar"><i style="width:'+p+"%; background:"+CATS[k].color+'"></i></div></div>';
+  });
+  html += "</div></section>";
+
+  html += '<section><div class="sechead"><h2>Targets</h2></div><div class="card" style="padding:15px"><div class="grid2">'
+    + Object.keys(CATS).map(k =>
+        '<div class="field"><label class="eyebrow">'+CATS[k].label+" / week</label>"
+        + '<input type="number" min="0" max="14" class="mono" value="'+(S.targets[k]||0)+'" data-tgt="'+k+'"></div>').join("")
+    + "</div></div></section>";
   return html;
 }
-function fieldTime(label, k){
-  return '<div class="field"><label class="eyebrow">'+label+"</label>"
-    + '<input type="time" class="mono" value="'+S.profile[k]+'" data-prof="'+k+'"></div>';
+
+/* ============================ PLACES ============================ */
+function viewPlaces(){
+  const cur = camp(S.profile.camp);
+  S.ui.placeTab = S.ui.placeTab || "camp";
+  let html = '<section><div class="pills" style="margin-bottom:12px">'
+    + '<button class="pill'+(S.ui.placeTab==="camp"?" on":"")+'" data-ptab="camp">Work from</button>'
+    + '<button class="pill'+(S.ui.placeTab==="go"?" on":"")+'" data-ptab="go">Go to</button></div>';
+
+  if(S.ui.placeTab === "camp"){
+    html += '<div class="card" style="padding:15px; margin-bottom:14px">'
+      + '<div class="eyebrow" style="margin-bottom:7px">The trade</div>'
+      + '<p class="muted" style="margin:0; font-size:13.5px">Your shift is fixed to London \u2014 '
+      + hhmm(S.profile.workStartUTC)+"\u2013"+hhmm(S.profile.workEndUTC)+" UTC \u2014 so it lands at a different "
+      + "local hour everywhere. Your free morning is exactly your UTC offset, and your evening is what\u2019s left of eight hours. "
+      + "<strong style=\"color:var(--ink)\">Flying west trades morning for evening, hour for hour.</strong></p></div>";
+
+    const rows = CAMPS.slice().sort((a,b) => a.off - b.off || a.fly - b.fly);
+    html += '<div class="card"><div class="cardhead"><strong>Every hour, everywhere</strong>'
+      + '<span class="dim mono" style="font-size:11px">local time</span></div><div class="scroll"><table>'
+      + "<tr><th>Place</th><th>Work</th><th>AM</th><th>PM</th><th></th></tr>"
+      + rows.map(c => {
+          const s = shape(c), v = verdict(c);
+          return '<tr'+(c.code===cur.code?' class="here"':"")+'>'
+            + '<td class="city"><b>'+esc(c.city)+"</b><span>"+esc(sub(c))+"</span></td>"
+            + '<td class="mono">'+s.startT+"\u2013"+s.endT+"</td>"
+            + '<td class="mono">'+hrs(s.morning)+"</td>"
+            + '<td class="mono"'+(s.evening<60?' style="color:var(--ink-3)"':"")+">"+hrs(s.evening)+"</td>"
+            + '<td><span class="chip '+v.k+'">'+v.t+"</span></td></tr>";
+        }).join("")
+      + "</table></div></div>";
+    html += '<p class="dim" style="font-size:12px; margin-top:10px">Offsets are standard time; Sydney shifts an hour '
+      + "in its summer. Flight times are direct from Singapore.</p>";
+  } else {
+    const todo = S.places.filter(p => !p.done), done = S.places.filter(p => p.done);
+    html += '<div class="sechead"><h2>Not been yet</h2><button class="btn sm" data-newplace="1">Add</button></div>'
+      + '<div class="card">'
+      + (todo.length ? todo.map(p =>
+          '<div class="item"><button class="tick" data-place="'+p.id+'" aria-label="Been"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
+          + '<div class="itembody"><div class="itemtitle">'+esc(p.name)+"</div>"
+          + '<div class="itemmeta"><span>'+esc(p.where)+"</span><span>&middot;</span>"
+          + '<span class="mono">'+(p.hours >= 24 ? Math.round(p.hours/24)+"d" : p.hours+"h")+"</span></div></div>"
+          + '<button class="dim" data-rmplace="'+p.id+'" style="font-size:18px; line-height:1; padding:2px 4px">&times;</button></div>').join("")
+        : '<div class="empty-note">Nothing on the list. Add somewhere you keep meaning to go.</div>')
+      + "</div>";
+    if(done.length){
+      html += '<div class="sechead" style="margin-top:20px"><h2>Been</h2>'
+        + '<span class="eyebrow">'+done.length+"</span></div><div class=\"card\">"
+        + done.map(p => '<div class="item done"><span class="tick on"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>'
+          + '<div class="itembody"><div class="itemtitle">'+esc(p.name)+"</div>"
+          + '<div class="itemmeta"><span>'+esc(p.where)+"</span>"
+          + (p.doneDate ? "<span>&middot;</span><span class='mono'>"+p.doneDate+"</span>" : "")+"</div></div>"
+          + '<button class="dim" data-unplace="'+p.id+'" style="font-size:12px; padding:2px 6px">undo</button></div>').join("")
+        + "</div>";
+    }
+  }
+  return html + "</section>";
 }
 
 /* ============================ REVIEW ============================ */
 function viewReview(){
-  const today = new Date();
-  const days = []; for(let i=6; i>=0; i--) days.push(addDays(today,-i));
+  const days = []; for(let i=27;i>=0;i--) days.push(addDays(new Date(), -i));
+  const recent = logsIn(days[0], new Date());
+  const rp = routineStreakless();
+  const been = S.places.filter(p => p.done).length;
 
-  const mins = {health:0, craft:0, people:0, life:0};
-  let total = 0;
-  days.forEach(d => logsOn(key(d)).forEach(l => {
-    const t = thing(l.thingId); if(!t) return;
-    mins[t.cat] += l.minutes; total += l.minutes;
-  }));
-
-  let html = '<section><div class="sechead"><h2>Last 7 days</h2>'
-    + '<span class="eyebrow">'+dur(total)+" logged</span></div>";
-
-  /* Window utilisation - the honest number. */
-  const capacity = days.reduce((s,d) => s + windowTotal(d), 0);
-  const pct = capacity ? Math.round(total/capacity*100) : 0;
-  html += '<div class="card" style="padding:15px; margin-bottom:12px">'
+  let html = '<section><div class="sechead"><h2>Last four weeks</h2></div>'
+    + '<div class="card" style="padding:16px; margin-bottom:12px">'
     + '<div class="row" style="justify-content:space-between; align-items:baseline">'
-    + '<div><div class="eyebrow">Free window used</div>'
-    + '<div class="mono" style="font-size:30px; font-weight:700; letter-spacing:-.03em; line-height:1.1">'+pct+"%</div></div>"
-    + '<div class="dim mono" style="font-size:12px; text-align:right">'+dur(total)+"<br>of "+dur(capacity)+"</div></div>"
-    + '<div class="bar" style="margin-top:11px"><i style="width:'+pct+'%; background:var(--accent)"></i></div>'
-    + '<p class="dim" style="font-size:12px; margin:10px 0 0">Nobody hits 100% &mdash; rest is real. But this is how much of '
-    + "your second day you actually claimed.</p></div>";
+    + '<div><div class="eyebrow">Routine held</div>'
+    + '<div class="mono" style="font-size:32px; font-weight:700; letter-spacing:-.03em; line-height:1.1">'+rp+"%</div></div>"
+    + '<div class="dim" style="font-size:12px; text-align:right; max-width:170px">of your morning steps<br>over the last 14 days</div></div>'
+    + '<div class="bar" style="margin-top:11px"><i style="width:'+rp+'%; background:var(--accent)"></i></div>'
+    + '<p class="dim" style="font-size:12px; margin:10px 0 0">A share, not a streak. One rough morning moves this a little; '
+    + "a rough fortnight moves it a lot.</p></div>";
 
-  /* Per-day bars, stacked by category. */
-  const perDay = days.map(d => {
-    const by = {health:0, craft:0, people:0, life:0};
-    logsOn(key(d)).forEach(l => { const t = thing(l.thingId); if(t) by[t.cat] += l.minutes; });
-    return {d, by, sum: Object.values(by).reduce((a,b) => a+b, 0)};
-  });
-  const peak = Math.max(60, ...perDay.map(x => x.sum));
-  html += '<div class="card" style="padding:15px; margin-bottom:12px"><div class="eyebrow" style="margin-bottom:11px">By day</div>'
-    + '<div class="week">' + perDay.map(x =>
-        '<div><div class="wbar" style="height:'+Math.max(3, x.sum/peak*100)+'%">'
-        + Object.keys(CATS).map(c => x.by[c] ? '<div style="height:'+(x.by[c]/x.sum*100)+"%; background:"+CATS[c].color+'"></div>' : "").join("")
-        + '</div><span class="wlabel">'+DAYNAME[x.d.getDay()][0]+"</span></div>").join("")
+  /* Weekly totals over four weeks, stacked by category. */
+  const weeks = [];
+  for(let w=3; w>=0; w--){
+    const ws = weekStart(addDays(new Date(), -7*w));
+    const we = addDays(ws, 6);
+    const by = {}; Object.keys(CATS).forEach(k => by[k]=0);
+    logsIn(ws, we).forEach(l => { if(by[l.cat] !== undefined) by[l.cat]++; });
+    weeks.push({ws, by, sum:Object.values(by).reduce((a,b)=>a+b,0)});
+  }
+  const peak = Math.max(4, ...weeks.map(w => w.sum));
+  html += '<div class="card" style="padding:16px; margin-bottom:12px"><div class="eyebrow" style="margin-bottom:12px">By week</div>'
+    + '<div style="display:flex; gap:10px; align-items:flex-end; height:96px">'
+    + weeks.map(w =>
+        '<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end">'
+        + '<div style="width:100%; height:'+Math.max(3, w.sum/peak*100)+'%; border-radius:5px 5px 0 0; overflow:hidden; display:flex; flex-direction:column-reverse">'
+        + Object.keys(CATS).map(k => w.by[k] ? '<div style="height:'+(w.by[k]/w.sum*100)+"%; background:"+CATS[k].color+'"></div>' : "").join("")
+        + '</div><span class="mono dim" style="font-size:10px">'+pad(w.ws.getDate())+"."+pad(w.ws.getMonth()+1)+"</span></div>").join("")
     + "</div></div>";
 
-  /* Balance across the four. */
-  html += '<div class="card" style="padding:15px; margin-bottom:12px"><div class="eyebrow" style="margin-bottom:12px">Balance</div>';
-  Object.keys(CATS).forEach(c => {
-    const p = total ? Math.round(mins[c]/total*100) : 0;
-    html += '<div style="margin-bottom:11px"><div class="row" style="justify-content:space-between; gap:10px; margin-bottom:5px">'
-      + '<span class="row" style="gap:7px; font-size:13.5px">'+catDot(c)+CATS[c].label+"</span>"
-      + '<span class="mono dim" style="font-size:12px">'+dur(mins[c])+" &middot; "+p+"%</span></div>"
-      + '<div class="bar"><i style="width:'+p+"%; background:"+CATS[c].color+'"></i></div></div>';
+  /* Balance. */
+  html += '<div class="card" style="padding:16px; margin-bottom:12px"><div class="eyebrow" style="margin-bottom:12px">Where it went</div>';
+  const tot = recent.length || 1;
+  Object.keys(CATS).forEach(k => {
+    const n = recent.filter(l => l.cat === k).length, p = Math.round(n/tot*100);
+    html += '<div style="margin-bottom:11px"><div class="row" style="justify-content:space-between; margin-bottom:5px">'
+      + '<span class="row" style="gap:7px; font-size:13.5px">'+catDot(k)+CATS[k].label+"</span>"
+      + '<span class="mono dim" style="font-size:12px">'+n+" \u00b7 "+p+"%</span></div>"
+      + '<div class="bar"><i style="width:'+p+"%; background:"+CATS[k].color+'"></i></div></div>';
   });
   html += "</div>";
 
-  /* What's slipping. */
-  const slipping = S.things.filter(t => t.active !== false).map(t => ({t, o: overdue(t), n: neglect(t)}))
-    .filter(x => x.o >= 0.5).sort((a,b) => b.o - a.o).slice(0,5);
-  html += '<div class="sechead" style="margin-top:20px"><h2>Slipping</h2></div><div class="card">';
-  if(!slipping.length){
-    html += '<div class="empty-note">Nothing overdue. Everything you said mattered has had time this week.</div>';
-  } else {
-    slipping.forEach(x => {
-      html += '<div class="item"><div class="itembody"><div class="itemtitle">'+esc(x.t.title)+"</div>"
-        + '<div class="itemmeta">'+catDot(x.t.cat)
-        + "<span>"+(x.n.days === null ? "never logged" : x.n.days+" days ago")+"</span>"
-        + (x.t.times ? '<span>&middot;</span><span>target '+x.t.times+"&times;/week</span>" : "")
-        + "</div></div>"
-        + '<button class="btn sm ghost" data-do="'+x.t.id+'">Did it</button></div>';
-    });
-  }
-  html += "</div></section>";
-  return html;
+  html += '<div class="card" style="padding:16px"><div class="row" style="justify-content:space-between; align-items:baseline">'
+    + '<div><div class="eyebrow">Places been</div>'
+    + '<div class="mono" style="font-size:32px; font-weight:700; letter-spacing:-.03em; line-height:1.1">'+been+"</div></div>"
+    + '<div class="dim" style="font-size:12px; text-align:right">'+S.places.filter(p=>!p.done).length+" still on the list</div></div></div>";
+
+  html += '<hr class="rule"><div class="row" style="gap:9px">'
+    + '<button class="btn ghost" data-export="1">Export</button>'
+    + '<button class="btn ghost" data-import="1">Import</button></div>'
+    + '<p class="dim" style="font-size:12px; margin-top:9px">Stored on this device only. Export before clearing browser data.</p>';
+  return html + "</section>";
 }
 
 /* ============================ sheets ============================ */
-function pickerSheet(title, onPick, filter){
-  const list = S.things.filter(t => t.active !== false).filter(filter || (() => true));
-  const html = "<h2 style='font-size:17px; margin-bottom:14px'>"+title+"</h2>"
-    + '<div class="card">' + (list.length ? list.map(t =>
-        '<button class="item" style="width:100%; text-align:left" data-pick="'+t.id+'">'
-        + '<div class="itembody"><div class="itemtitle">'+esc(t.title)+"</div>"
-        + '<div class="itemmeta">'+catDot(t.cat)+'<span class="mono">'+dur(t.minutes)+"</span>"
-        + "<span>&middot;</span><span>"+ENERGY[t.energy]+"</span></div></div></button>").join("")
-      : '<div class="empty-note">No things yet. Add some first.</div>') + "</div>"
-    + '<button class="btn ghost block" style="margin-top:13px" data-close="1">Cancel</button>';
-  openSheet(html, el => {
-    el.querySelectorAll("[data-pick]").forEach(b =>
-      b.addEventListener("click", () => { const t = thing(b.dataset.pick); closeSheet(); onPick(t); }));
-    el.querySelector("[data-close]").addEventListener("click", closeSheet);
-  });
+function campSheet(){
+  const rows = CAMPS.slice().sort((a,b) => a.off - b.off || a.fly - b.fly);
+  openSheet("<h2 style='font-size:17px; margin-bottom:6px'>Where are you working from?</h2>"
+    + '<p class="muted" style="font-size:13.5px; margin:0 0 14px">Everything reshapes around the local hours.</p>'
+    + '<div class="card">' + rows.map(c => {
+        const s = shape(c), v = verdict(c);
+        return '<button class="item" data-setcamp="'+c.code+'">'
+          + '<div class="itembody"><div class="itemtitle">'+esc(c.city)
+          + ' <span class="dim" style="font-weight:400">'+esc(sub(c))+"</span></div>"
+          + '<div class="itemmeta"><span class="mono">'+s.startT+"\u2013"+s.endT+'</span><span class="chip '+v.k+'">'+v.t+"</span></div></div></button>";
+      }).join("") + "</div>"
+    + '<button class="btn ghost block" style="margin-top:13px" data-close="1">Cancel</button>',
+    el => {
+      el.querySelectorAll("[data-setcamp]").forEach(b => b.addEventListener("click", () => {
+        S.profile.camp = b.dataset.setcamp; save(); closeSheet(); render();
+        toast("Now in " + camp(S.profile.camp).city);
+      }));
+      el.querySelector("[data-close]").addEventListener("click", closeSheet);
+    });
 }
 
-function editSheet(t){
-  const isNew = !t;
-  const v = t || {title:"", cat:"craft", minutes:60, energy:"mid", times:2, active:true};
-  const html = "<h2 style='font-size:17px; margin-bottom:15px'>"+(isNew?"New thing":"Edit")+"</h2>"
-    + '<div class="field"><label class="eyebrow">What is it</label>'
-    + '<input id="f-title" value="'+esc(v.title)+'" placeholder="e.g. Swim before work"></div>'
-    + '<div class="field"><label class="eyebrow">Kind</label><select id="f-cat">'
-    + Object.keys(CATS).map(c => '<option value="'+c+'"'+(v.cat===c?" selected":"")+">"+CATS[c].label+" \u2014 "+CATS[c].blurb+"</option>").join("")
-    + "</select></div>"
-    + '<div class="grid2"><div class="field"><label class="eyebrow">Usually takes (min)</label>'
-    + '<input id="f-min" type="number" min="5" step="5" class="mono" value="'+v.minutes+'"></div>'
-    + '<div class="field"><label class="eyebrow">Times per week</label>'
-    + '<input id="f-times" type="number" min="0" max="14" class="mono" value="'+(v.times||0)+'"></div></div>'
-    + '<div class="field"><label class="eyebrow">Needs what kind of head</label><select id="f-energy">'
-    + Object.keys(ENERGY).map(e => '<option value="'+e+'"'+(v.energy===e?" selected":"")+">"+ENERGY[e]+"</option>").join("")
-    + "</select>"
-    + '<p class="dim" style="font-size:12px; margin:6px 0 0">Deep things get pushed into your Peak block and kept out of Warm-up.</p></div>'
-    + '<div class="row" style="gap:9px; margin-top:16px"><button class="btn" style="flex:1" data-save="1">Save</button>'
-    + (isNew ? "" : '<button class="btn ghost" data-pause="1">'+(v.active===false?"Resume":"Pause")+"</button>"
-        + '<button class="btn ghost" data-del="1" style="color:var(--crit); border-color:var(--crit)">Delete</button>')
-    + "</div>"
-    + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>';
-
-  openSheet(html, el => {
-    el.querySelector("[data-save]").addEventListener("click", () => {
-      const title = el.querySelector("#f-title").value.trim();
-      if(!title){ toast("Give it a name"); return; }
-      const next = {
-        title, cat: el.querySelector("#f-cat").value,
-        minutes: Math.max(5, +el.querySelector("#f-min").value || 30),
-        times: Math.max(0, +el.querySelector("#f-times").value || 0),
-        energy: el.querySelector("#f-energy").value
+function logSheet(cat){
+  openSheet("<h2 style='font-size:17px; margin-bottom:6px'>Log "+CATS[cat].label+"</h2>"
+    + '<p class="muted" style="font-size:13.5px; margin:0 0 14px">'+CATS[cat].blurb+"</p>"
+    + '<div class="field"><label class="eyebrow">What was it? (optional)</label>'
+    + '<input id="lg" placeholder="e.g. gym, Civ VI, Pulau Ubin"></div>'
+    + '<button class="btn block" data-save="1">Log it</button>'
+    + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
+    el => {
+      const go = () => {
+        addLog(cat, el.querySelector("#lg").value.trim());
+        closeSheet(); render(); toast(CATS[cat].label + " logged");
       };
-      if(isNew) S.things.push(Object.assign({id:uid(), active:true}, next));
-      else Object.assign(t, next);
-      save(); closeSheet(); render(); toast(isNew ? "Added" : "Saved");
+      el.querySelector("[data-save]").addEventListener("click", go);
+      el.querySelector("#lg").addEventListener("keydown", e => { if(e.key === "Enter") go(); });
+      el.querySelector("[data-close]").addEventListener("click", closeSheet);
     });
-    const pause = el.querySelector("[data-pause]");
-    if(pause) pause.addEventListener("click", () => {
-      t.active = t.active === false; save(); closeSheet(); render();
-      toast(t.active === false ? "Paused" : "Resumed");
-    });
-    const del = el.querySelector("[data-del]");
-    if(del) del.addEventListener("click", () => {
-      S.things = S.things.filter(x => x.id !== t.id);
-      Object.keys(S.plan).forEach(k => S.plan[k] = S.plan[k].filter(p => p.thingId !== t.id));
-      save(); closeSheet(); render(); toast("Deleted");
-    });
-    el.querySelector("[data-close]").addEventListener("click", closeSheet);
-  });
 }
 
-function assignTo(dateKey, blockK, t){
-  const plan = planFor(dateKey);
-  const peakKey = isShiftDay(fromKey(dateKey)) ? "peak" : "afternoon";
-  if(blockK === peakKey){
-    /* Only one thing may hold the Peak block. That is the whole idea. */
-    const i = plan.findIndex(p => p.block === peakKey);
-    if(i >= 0) plan.splice(i,1);
-  }
-  plan.push({id:uid(), thingId:t.id, block:blockK, minutes:t.minutes, done:false});
-  save(); render();
+function placeSheet(){
+  openSheet("<h2 style='font-size:17px; margin-bottom:14px'>Somewhere to go</h2>"
+    + '<div class="field"><label class="eyebrow">Where</label><input id="pn" placeholder="e.g. Coney Island"></div>'
+    + '<div class="grid2"><div class="field"><label class="eyebrow">Country or area</label>'
+    + '<input id="pw" value="Singapore"></div>'
+    + '<div class="field"><label class="eyebrow">Hours needed</label>'
+    + '<input id="ph" type="number" min="1" max="200" class="mono" value="3"></div></div>'
+    + '<button class="btn block" data-save="1">Add</button>'
+    + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
+    el => {
+      el.querySelector("[data-save]").addEventListener("click", () => {
+        const name = el.querySelector("#pn").value.trim();
+        if(!name){ toast("Needs a name"); return; }
+        S.places.push({id:uid(), name, where:el.querySelector("#pw").value.trim() || "Singapore",
+                       hours:Math.max(1, +el.querySelector("#ph").value || 3)});
+        save(); closeSheet(); render(); toast("Added");
+      });
+      el.querySelector("[data-close]").addEventListener("click", closeSheet);
+    });
 }
 
 function exportData(){
   const json = JSON.stringify(S, null, 2);
-  const fname = "before-four-" + key(new Date()) + ".json";
   (async () => {
     const dl = window.claude && claude.use ? await claude.use("downloads") : null;
     if(dl){
-      try{ await dl.save({filename:fname, data:json}); toast("Exported"); return; }
-      catch(e){ /* viewer declined or unavailable - fall through to copy */ }
+      try{ await dl.save({filename:"daylight-"+key(new Date())+".json", data:json}); toast("Exported"); return; }
+      catch(e){ /* declined or unavailable - fall through */ }
     }
     openSheet("<h2 style='font-size:17px; margin-bottom:12px'>Copy your data</h2>"
-      + '<p class="muted" style="font-size:13.5px; margin:0 0 11px">Select all and copy this somewhere safe.</p>'
       + '<textarea rows="12" class="mono" style="font-size:11px">'+esc(json)+"</textarea>"
       + '<button class="btn ghost block" style="margin-top:12px" data-close="1">Done</button>',
       el => el.querySelector("[data-close]").addEventListener("click", closeSheet));
@@ -839,7 +700,7 @@ function exportData(){
 }
 function importData(){
   openSheet("<h2 style='font-size:17px; margin-bottom:12px'>Import</h2>"
-    + '<p class="muted" style="font-size:13.5px; margin:0 0 11px">Paste an export. This replaces everything currently on this device.</p>'
+    + '<p class="muted" style="font-size:13.5px; margin:0 0 11px">Replaces everything on this device.</p>'
     + '<textarea id="imp" rows="10" class="mono" style="font-size:11px" placeholder="{ ... }"></textarea>'
     + '<button class="btn block" style="margin-top:12px" data-impgo="1">Replace my data</button>'
     + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
@@ -847,7 +708,7 @@ function importData(){
       el.querySelector("[data-impgo]").addEventListener("click", () => {
         try{
           const next = JSON.parse(el.querySelector("#imp").value);
-          if(!next || !Array.isArray(next.things)) throw new Error("bad shape");
+          if(!next || !Array.isArray(next.log)) throw new Error("bad shape");
           S = next; S.ui = S.ui || {view:"today"}; save(); closeSheet(); render(); toast("Imported");
         }catch(e){ toast("That isn't a valid export"); }
       });
@@ -855,98 +716,61 @@ function importData(){
     });
 }
 
-/* ============================ render + wiring ============================ */
-const VIEWS = {today:viewToday, now:viewNow, week:viewWeek, things:viewThings, review:viewReview};
+/* ============================ render ============================ */
+const VIEWS = {today:viewToday, week:viewWeek, places:viewPlaces, review:viewReview};
 
 function render(){
-  const root = document.getElementById("root");
-  root.innerHTML = header() + (VIEWS[S.ui.view] || viewToday)();
+  document.getElementById("root").innerHTML = header() + (VIEWS[S.ui.view] || viewToday)();
   document.querySelectorAll("nav").forEach(n => n.remove());
   document.body.insertAdjacentHTML("beforeend", nav());
   wire();
 }
-
 function on(sel, fn){ document.querySelectorAll(sel).forEach(el => el.addEventListener("click", () => fn(el))); }
 
 function wire(){
   on("[data-go]", el => { S.ui.view = el.dataset.go; save(); render(); window.scrollTo(0,0); });
+  on("[data-camp]", campSheet);
 
-  /* Today */
-  on("[data-done]", el => {
-    const k = key(new Date()), p = planFor(k).find(x => x.id === el.dataset.done);
-    if(!p) return;
-    if(p.done){
-      S.log = S.log.filter(l => l.id !== p.logId);
-      p.done = false; p.logId = null;
-    } else {
-      p.done = true; p.logId = logThing(thing(p.thingId), p.minutes, k).id;
-    }
-    save(); render();
+  on("[data-rt]", el => {
+    const k = key(new Date()), list = S.routineLog[k] || [];
+    const i = list.indexOf(el.dataset.rt);
+    if(i >= 0) list.splice(i,1); else list.push(el.dataset.rt);
+    S.routineLog[k] = list; save(); render();
   });
-  on("[data-rm]", el => {
-    const k = key(new Date()), plan = planFor(k), i = plan.findIndex(x => x.id === el.dataset.rm);
-    if(i < 0) return;
-    if(plan[i].logId) S.log = S.log.filter(l => l.id !== plan[i].logId);
-    plan.splice(i,1); save(); render();
-  });
+  on("[data-log]", el => logSheet(el.dataset.log));
   on("[data-rmlog]", el => { S.log = S.log.filter(l => l.id !== el.dataset.rmlog); save(); render(); });
-  on("[data-add]", el => {
-    const b = el.dataset.add;
-    pickerSheet("Add to " + b, t => assignTo(key(new Date()), b, t));
-  });
-  on("[data-swap]", el => {
-    pickerSheet("Your one thing today", t => assignTo(key(new Date()), el.dataset.swap, t));
-  });
-  on("[data-swapday]", el => {
-    const [k, b] = el.dataset.swapday.split("|");
-    pickerSheet("One thing for " + DAYNAME[fromKey(k).getDay()], t => assignTo(k, b, t));
-  });
-  on("[data-brief]", () => {
-    const text = todayBrief();
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(() => toast("Brief copied"), () => showBrief(text));
-    } else showBrief(text);
-  });
 
-  /* Now / Review */
-  on("[data-avail]", el => { S.ui.avail = +el.dataset.avail; save(); render(); });
-  on("[data-energy]", el => { S.ui.energy = el.dataset.energy; save(); render(); });
-  on("[data-do]", el => {
-    const t = thing(el.dataset.do); if(!t) return;
-    logThing(t, Math.min(t.minutes, S.ui.avail || t.minutes));
-    render(); toast("Logged \u2014 " + t.title);
+  on("[data-ptab]", el => { S.ui.placeTab = el.dataset.ptab; save(); render(); });
+  on("[data-newplace]", placeSheet);
+  on("[data-place]", el => {
+    const p = S.places.find(x => x.id === el.dataset.place);
+    if(!p) return;
+    p.done = true; p.doneDate = key(new Date());
+    addLog("discover", p.name);
+    render(); toast("Been \u2014 logged as Discover");
   });
+  on("[data-unplace]", el => {
+    const p = S.places.find(x => x.id === el.dataset.unplace);
+    if(p){ p.done = false; delete p.doneDate; save(); render(); }
+  });
+  on("[data-rmplace]", el => { S.places = S.places.filter(p => p.id !== el.dataset.rmplace); save(); render(); });
 
-  /* Things */
-  on("[data-new]", () => editSheet(null));
-  on("[data-edit]", el => editSheet(thing(el.dataset.edit)));
   on("[data-export]", exportData);
   on("[data-import]", importData);
-  on("[data-reset]", () => {
-    openSheet("<h2 style='font-size:17px; margin-bottom:10px'>Start over?</h2>"
-      + '<p class="muted" style="font-size:13.5px">This wipes your things, plans and history on this device. Export first if you want to keep it.</p>'
-      + '<button class="btn block" style="margin-top:15px; background:var(--crit)" data-yes="1">Wipe everything</button>'
-      + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Keep my data</button>',
-      el => {
-        el.querySelector("[data-yes]").addEventListener("click", () => { S = seed(); save(); closeSheet(); render(); toast("Reset"); });
-        el.querySelector("[data-close]").addEventListener("click", closeSheet);
-      });
-  });
-  document.querySelectorAll("[data-prof]").forEach(el =>
+
+  document.querySelectorAll("[data-tgt]").forEach(el =>
     el.addEventListener("change", () => {
-      if(!el.value) return;
-      S.profile[el.dataset.prof] = el.value; save(); render();
+      S.targets[el.dataset.tgt] = Math.max(0, +el.value || 0); save(); render();
     }));
 }
 
-function showBrief(text){
-  openSheet("<h2 style='font-size:17px; margin-bottom:12px'>Today&rsquo;s brief</h2>"
-    + '<textarea rows="10" class="mono" style="font-size:12px">'+esc(text)+"</textarea>"
-    + '<button class="btn ghost block" style="margin-top:12px" data-close="1">Done</button>',
-    el => el.querySelector("[data-close]").addEventListener("click", closeSheet));
-}
-
 render();
-/* Keep the countdown and now-marker honest without redrawing what you're touching. */
-setInterval(() => { if(!sheetEl && S.ui.view === "today"){ const h = document.querySelector("header"); if(h) h.outerHTML = header(); } }, 60000);
+setInterval(() => {
+  if(sheetEl) return;
+  const h = document.querySelector("header");
+  if(!h) return;
+  h.outerHTML = header();
+  /* outerHTML swap drops listeners - reattach the one control the header owns. */
+  on("[data-camp]", campSheet);
+}, 60000);
 </script>
