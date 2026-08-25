@@ -27,13 +27,31 @@ the header and the day bar, the countdown and the suggestions all reshape around
 
 ### The four views
 
-- **Today** — a fixed four-step morning sequence, one suggestion sized to the hours actually left,
-  and the week's guaranteed slots.
+- **Today** — habits grouped by anchor, one suggestion sized to the hours actually left, and the
+  week's guaranteed slots.
 - **Ideas** — 178 of them across Singapore, the region, and things needing no travel. Filter by
   time available, whether it is raining, and whether someone else is coming. Roll for another.
 - **Where** — every basecamp in range with its local working hours and a verdict.
 - **Review** — routine held as a rolling share rather than a streak, so one bad morning costs a
   fraction; category balance against weekly targets; places been.
+
+### Habits
+
+Habits are anchored to moments that already happen rather than to clock times: **on waking**,
+**mid-morning**, **before the shift**, **after the shift**. Those times are derived from your wake
+time and when the shift lands locally, so they move with you when you change basecamp.
+
+Each habit carries a **bad day version** — the two-minute one you can always manage. What keeps a
+habit alive is doing the small one, not skipping.
+
+Three deliberate choices:
+
+- **No streaks.** Each habit shows fourteen days as squares plus a percentage. One miss costs a
+  fourteenth, not the lot. Faint squares are days it did not apply.
+- **Never miss twice.** The only alarm the app raises. Miss once and nothing happens — that is
+  normal. Miss the next applicable day and it says so, by name, at the top of Today.
+- **New habits do not nag.** Something you have never done is not "at risk", it is just new, so it
+  stays quiet until you have actually started it.
 
 ### The coffee directory
 

@@ -151,6 +151,8 @@ section{margin-top:20px;}
 .pips{display:flex; gap:3px; margin-top:7px;}
 .pips i{height:4px; flex:1; border-radius:2px; background:var(--sunk);}
 
+.dots{display:flex; gap:3px; flex:1; min-width:120px;}
+.dots i{flex:1; height:9px; border-radius:2px; background:var(--sunk);}
 .bar{height:7px; border-radius:99px; background:var(--sunk); overflow:hidden;}
 .bar i{display:block; height:100%; border-radius:99px;}
 
@@ -1107,13 +1109,19 @@ function seed(){
   return {
     v:2,
     profile:{ workStartUTC:480, workEndUTC:900, wake:"08:00", camp:"SIN" },
-    routine:[
-      {id:"r1", label:"Up, no phone in bed"},
-      {id:"r2", label:"Outside for ten minutes"},
-      {id:"r3", label:"Breakfast, sitting down"},
-      {id:"r4", label:"Name today's first block"}
+    /* Anchored to moments that already happen, so there is no new decision
+       to make. Each carries a bad-day version, because the thing that keeps a
+       habit alive is doing a smaller one, not skipping. */
+    habits:[
+      {id:"h1", name:"Up, no phone in bed",     anchor:"wake",    tiny:"Phone stays face down", days:[0,1,2,3,4,5,6]},
+      {id:"h2", name:"Outside for ten minutes", anchor:"wake",    tiny:"Step out, two minutes", days:[0,1,2,3,4,5,6]},
+      {id:"h3", name:"Breakfast, sitting down", anchor:"wake",    tiny:"Sit for one cup",       days:[0,1,2,3,4,5,6]},
+      {id:"h4", name:"Move for twenty minutes", anchor:"mid",     tiny:"Walk round the block",  days:[1,2,3,4,5]},
+      {id:"h5", name:"Eat before the shift",    anchor:"prework", tiny:"Something, anything",   days:[1,2,3,4,5]},
+      {id:"h6", name:"Name tomorrow's first block", anchor:"post", tiny:"One line is enough",   days:[0,1,2,3,4,5]}
     ],
     targets:{ build:2, move:3, enjoy:3, discover:1, campaign:2 },
+    habitLog:{},     /* date -> [habit ids done] */
     saved:[],        /* library ids kept for later */
     been:{},         /* library id -> date done */
     custom:[],       /* his own additions, same shape as library items */
@@ -1131,7 +1139,10 @@ function migrate(){
   const s = seed();
   if(old.profile) s.profile = Object.assign(s.profile, old.profile);
   if(old.targets) s.targets = Object.assign(s.targets, old.targets);
-  if(Array.isArray(old.routine) && old.routine.length) s.routine = old.routine;
+  if(Array.isArray(old.routine) && old.routine.length){
+    s.habits = old.routine.map(r => ({id:r.id, name:r.label, anchor:"wake", tiny:"", days:[0,1,2,3,4,5,6]}));
+  }
+  if(old.routineLog) s.habitLog = old.routineLog;
   if(Array.isArray(old.log)) s.log = old.log;
   if(old.routineLog) s.routineLog = old.routineLog;
   if(Array.isArray(old.places)){
@@ -1149,8 +1160,14 @@ S.ui = Object.assign(seed().ui, S.ui || {});
 S.profile = Object.assign(seed().profile, S.profile || {});
 S.targets = Object.assign(seed().targets, S.targets || {});
 ["saved","custom","log"].forEach(k => { if(!Array.isArray(S[k])) S[k] = []; });
-["been","routineLog"].forEach(k => { if(!S[k] || typeof S[k] !== "object") S[k] = {}; });
-if(!Array.isArray(S.routine) || !S.routine.length) S.routine = seed().routine;
+["been","routineLog","habitLog"].forEach(k => { if(!S[k] || typeof S[k] !== "object") S[k] = {}; });
+/* One-time lift from the old flat routine into anchored habits. */
+if(!Array.isArray(S.habits)){
+  S.habits = Array.isArray(S.routine) && S.routine.length
+    ? S.routine.map(r => ({id:r.id, name:r.label, anchor:"wake", tiny:"", days:[0,1,2,3,4,5,6]}))
+    : seed().habits;
+  if(S.routineLog && !Object.keys(S.habitLog).length) S.habitLog = S.routineLog;
+}
 
 function save(){ STORE.write(S); }
 function uid(){ return Math.random().toString(36).slice(2,10); }
@@ -1261,14 +1278,59 @@ function weekCount(cat){
   return S.log.filter(l => l.cat === cat && l.date >= ws).length;
 }
 function logsIn(a,b){ const x = key(a), y = key(b); return S.log.filter(l => l.date >= x && l.date <= y); }
-function routineToday(){ return S.routineLog[key(new Date())] || []; }
-function routineShare(){
+/* Anchors are real moments, derived from where you are and when the shift
+   starts, so they move with you rather than being clock times you must obey. */
+function anchors(){
+  const s = shape(camp(S.profile.camp)), wake = t2m(S.profile.wake);
+  return [
+    {k:"wake",    label:"On waking",       at:wake},
+    {k:"mid",     label:"Mid-morning",     at:wake + Math.round((s.start - wake) * 0.45)},
+    {k:"prework", label:"Before the shift",at:Math.max(wake, s.start - 60)},
+    {k:"post",    label:"After the shift", at:s.end}
+  ];
+}
+const ANCHORS = {wake:"On waking", mid:"Mid-morning", prework:"Before the shift", post:"After the shift"};
+
+function habitApplies(h, d){ return (h.days || [0,1,2,3,4,5,6]).indexOf(d.getDay()) >= 0; }
+function habitDone(h, d){ return (S.habitLog[key(d)] || []).indexOf(h.id) >= 0; }
+function habitShare(h){
   let done = 0, poss = 0;
   for(let i=0;i<14;i++){
-    poss += S.routine.length;
-    done += (S.routineLog[key(addDays(new Date(), -i))] || []).length;
+    const d = addDays(new Date(), -i);
+    if(!habitApplies(h, d)) continue;
+    poss++; if(habitDone(h, d)) done++;
   }
   return poss ? Math.round(done/poss*100) : 0;
+}
+/* The only alarm worth raising. Missing once is normal and forgiven; missing
+   twice in a row is how a habit actually dies, so that is what gets flagged. */
+function missedLastTime(h){
+  for(let i=1;i<=7;i++){
+    const d = addDays(new Date(), -i);
+    if(!habitApplies(h, d)) continue;
+    return !habitDone(h, d);
+  }
+  return false;
+}
+function everDone(h){
+  for(let i=0;i<14;i++){ if(habitDone(h, addDays(new Date(), -i))) return true; }
+  return false;
+}
+/* A habit you have never started is not "at risk" - it is just new. Only warn
+   about dropping something you were actually doing. */
+function atRisk(h){
+  const t = new Date();
+  return habitApplies(h, t) && !habitDone(h, t) && everDone(h) && missedLastTime(h);
+}
+function habitDots(h){
+  let out = "";
+  for(let i=13;i>=0;i--){
+    const d = addDays(new Date(), -i);
+    out += habitApplies(h, d)
+      ? '<i style="background:'+(habitDone(h,d) ? "var(--good)" : "var(--sunk)")+'"></i>'
+      : '<i style="opacity:.2"></i>';
+  }
+  return '<div class="dots">'+out+"</div>";
 }
 
 /* ---------------------------- helpers ---------------------------- */
@@ -1342,20 +1404,61 @@ function nav(){
       + '<svg viewBox="0 0 24 24">'+ICONS[k]+"</svg><span>"+l+"</span></button>").join("") + "</div></nav>";
 }
 
+/* ============================ habits ============================ */
+function habitsSection(){
+  const t = new Date();
+  const due = S.habits.filter(h => habitApplies(h, t));
+  const done = due.filter(h => habitDone(h, t)).length;
+  const risky = due.filter(atRisk);
+
+  let html = '<section><div class="sechead"><h2>Habits</h2>'
+    + '<span class="eyebrow">'+done+" / "+due.length+" today</span></div>";
+
+  if(risky.length){
+    html += '<div class="card" style="padding:14px 15px; margin-bottom:10px; background:var(--signal-soft); border-color:var(--signal)">'
+      + '<div class="eyebrow" style="color:var(--signal)">Do not miss twice</div>'
+      + '<p style="margin:6px 0 0; font-size:13.5px; color:var(--ink-2)">You missed '
+      + risky.map(h => '<strong style="color:var(--ink)">'+esc(h.name)+"</strong>").join(" and ")
+      + " last time. Missing once is nothing at all. Missing twice is how a habit ends "
+      + "&mdash; so do the small version if that is all today has in it.</p></div>";
+  }
+
+  if(!due.length){
+    html += '<div class="card empty-note">Nothing due today.</div>';
+  } else {
+    html += '<div class="card">';
+    anchors().forEach(a => {
+      const list = due.filter(h => (h.anchor || "wake") === a.k);
+      if(!list.length) return;
+      html += '<div class="cardhead" style="border-radius:0"><div class="row" style="gap:8px">'
+        + '<strong style="font-size:13px">'+a.label+"</strong>"
+        + '<span class="chip mono">'+hhmm(a.at)+"</span></div>"
+        + '<span class="dim mono" style="font-size:11px">'+list.filter(h=>habitDone(h,t)).length+"/"+list.length+"</span></div>";
+      list.forEach(h => {
+        const on = habitDone(h, t), risk = atRisk(h);
+        html += '<div class="item'+(on?" done":"")+'">'
+          + '<button class="tick sq'+(on?" on":"")+'" data-hab="'+h.id+'" aria-label="Done">'
+          + '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
+          + '<div class="itembody"><div class="itemtitle">'+esc(h.name)+"</div>"
+          + (h.tiny && !on ? '<div class="itemnote">Bad day version: '+esc(h.tiny)+"</div>" : "")
+          + '<div class="itemmeta">'+habitDots(h)
+          + '<span class="mono">'+habitShare(h)+"%</span>"
+          + (risk ? '<span class="chip sig">missed last time</span>' : "") + "</div></div>"
+          + '<button class="dim" data-habedit="'+h.id+'" aria-label="Edit" style="font-size:11px; padding:2px 6px">edit</button></div>';
+      });
+    });
+    html += "</div>";
+  }
+  html += '<div class="row" style="gap:9px; margin-top:10px">'
+    + '<button class="btn sm ghost" data-newhab="1">Add a habit</button></div>'
+    + '<p class="dim" style="font-size:12px; margin:9px 0 0">Fourteen days shown per habit. '
+    + "No streaks &mdash; one miss costs a fourteenth, not the lot.</p></section>";
+  return html;
+}
+
 /* ============================ TODAY ============================ */
 function viewToday(){
-  const doneR = routineToday();
-  let html = "";
-
-  html += '<section><div class="sechead"><h2>The start</h2>'
-    + '<span class="eyebrow">'+doneR.length+" / "+S.routine.length+"</span></div><div class=\"card\">"
-    + S.routine.map(r => {
-        const on = doneR.indexOf(r.id) >= 0;
-        return '<button class="item'+(on?" done":"")+'" data-rt="'+r.id+'">'
-          + '<span class="tick sq'+(on?" on":"")+'"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>'
-          + '<span class="itembody"><span class="itemtitle">'+esc(r.label)+"</span></span></button>";
-      }).join("")
-    + '</div><p class="dim" style="font-size:12px; margin:8px 0 0">Same four things every morning, wherever you are.</p></section>';
+  let html = habitsSection();
 
   /* One suggestion, sized to the time actually left today. */
   const left = hoursLeftToday();
@@ -1524,19 +1627,24 @@ function viewWhere(){
 
 /* ============================ REVIEW ============================ */
 function viewReview(){
-  const rp = routineShare();
+  const hs = S.habits || [];
   const been = Object.keys(S.been).length;
   const from = addDays(new Date(), -27);
   const recent = logsIn(from, new Date());
 
   let html = '<section><div class="sechead"><h2>Last four weeks</h2></div>'
     + '<div class="card" style="padding:16px; margin-bottom:12px">'
-    + '<div class="row" style="justify-content:space-between; align-items:baseline">'
-    + '<div><div class="eyebrow">Routine held</div>'
-    + '<div class="mono" style="font-size:32px; font-weight:700; letter-spacing:-.03em; line-height:1.1">'+rp+"%</div></div>"
-    + '<div class="dim" style="font-size:12px; text-align:right; max-width:160px">of morning steps<br>over the last 14 days</div></div>'
-    + '<div class="bar" style="margin-top:11px"><i style="width:'+rp+'%; background:var(--accent)"></i></div>'
-    + '<p class="dim" style="font-size:12px; margin:10px 0 0">A share, not a streak. One rough morning barely moves it.</p></div>';
+    + '<div class="eyebrow" style="margin-bottom:13px">Habits, last 14 days</div>'
+    + (hs.length ? hs.map(h =>
+        '<div style="margin-bottom:14px"><div class="row" style="justify-content:space-between; gap:10px; margin-bottom:6px">'
+        + '<span style="font-size:13.5px">'+esc(h.name)+"</span>"
+        + '<span class="mono dim" style="font-size:12px">'+habitShare(h)+"%</span></div>"
+        + habitDots(h)
+        + '<div class="dim" style="font-size:11.5px; margin-top:5px">'+(ANCHORS[h.anchor]||"On waking")
+        + ((h.days||[]).length === 5 ? " &middot; weekdays" : "") + "</div></div>").join("")
+      : '<div class="empty-note">No habits yet.</div>')
+    + '<p class="dim" style="font-size:12px; margin:2px 0 0">Faint squares are days it did not apply. '
+    + "A share, not a streak: one miss costs a fourteenth.</p></div>";
 
   html += '<div class="card" style="padding:16px; margin-bottom:12px">'
     + '<div class="row" style="justify-content:space-between; align-items:baseline">'
@@ -1652,6 +1760,46 @@ function ideaSheet(){
     });
 }
 
+function habitSheet(h){
+  const isNew = !h;
+  const v = h || {name:"", anchor:"wake", tiny:"", days:[0,1,2,3,4,5,6]};
+  const dayMode = (v.days || []).length === 5 ? "week" : ((v.days || []).length === 2 ? "wend" : "all");
+  openSheet("<h2 style='font-size:17px; margin-bottom:6px'>"+(isNew?"New habit":"Edit habit")+"</h2>"
+    + '<p class="muted" style="font-size:13.5px; margin:0 0 15px">Anchor it to something that already happens. '
+    + "That way there is no new decision to make.</p>"
+    + '<div class="field"><label class="eyebrow">The habit</label>'
+    + '<input id="hn" value="'+esc(v.name)+'" placeholder="e.g. Twenty minutes of Malay"></div>'
+    + '<div class="field"><label class="eyebrow">Bad day version</label>'
+    + '<input id="ht" value="'+esc(v.tiny||"")+'" placeholder="The two-minute one you can always do">'
+    + '<p class="dim" style="font-size:12px; margin:6px 0 0">What keeps a habit alive is doing the small one, not skipping.</p></div>'
+    + '<div class="grid2"><div class="field"><label class="eyebrow">When</label><select id="ha">'
+    + Object.keys(ANCHORS).map(k => '<option value="'+k+'"'+(v.anchor===k?" selected":"")+">"+ANCHORS[k]+"</option>").join("")
+    + '</select></div><div class="field"><label class="eyebrow">Which days</label><select id="hd">'
+    + [["all","Every day"],["week","Weekdays"],["wend","Weekends"]].map(([k,l]) =>
+        '<option value="'+k+'"'+(dayMode===k?" selected":"")+">"+l+"</option>").join("")
+    + "</select></div></div>"
+    + '<button class="btn block" data-submit="1">Save</button>'
+    + (isNew ? "" : '<button class="btn ghost block" style="margin-top:9px; color:var(--crit); border-color:var(--crit)" data-hdel="1">Delete</button>')
+    + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
+    el => {
+      el.querySelector("[data-submit]").addEventListener("click", () => {
+        const name = el.querySelector("#hn").value.trim();
+        if(!name){ toast("Give it a name"); return; }
+        const dm = el.querySelector("#hd").value;
+        const days = dm === "week" ? [1,2,3,4,5] : dm === "wend" ? [0,6] : [0,1,2,3,4,5,6];
+        const next = {name, tiny:el.querySelector("#ht").value.trim(), anchor:el.querySelector("#ha").value, days};
+        if(isNew) S.habits.push(Object.assign({id:uid()}, next)); else Object.assign(h, next);
+        save(); closeSheet(); render(); toast(isNew ? "Added" : "Saved");
+      });
+      const del = el.querySelector("[data-hdel]");
+      if(del) del.addEventListener("click", () => {
+        S.habits = S.habits.filter(x => x.id !== h.id);
+        save(); closeSheet(); render(); toast("Deleted");
+      });
+      el.querySelector("[data-close]").addEventListener("click", closeSheet);
+    });
+}
+
 function exportData(){
   const json = JSON.stringify(S, null, 2);
   (async () => {
@@ -1718,12 +1866,14 @@ function wire(){
   on("[data-go]", el => { S.ui.view = el.dataset.go; save(); render(); window.scrollTo(0,0); });
   on("[data-camp]", campSheet);
 
-  on("[data-rt]", el => {
-    const k = key(new Date()), list = S.routineLog[k] || [];
-    const i = list.indexOf(el.dataset.rt);
-    if(i >= 0) list.splice(i,1); else list.push(el.dataset.rt);
-    S.routineLog[k] = list; save(); render();
+  on("[data-hab]", el => {
+    const k = key(new Date()), list = S.habitLog[k] || [];
+    const i = list.indexOf(el.dataset.hab);
+    if(i >= 0) list.splice(i,1); else list.push(el.dataset.hab);
+    S.habitLog[k] = list; save(); render();
   });
+  on("[data-newhab]", () => habitSheet(null));
+  on("[data-habedit]", el => habitSheet(S.habits.find(h => h.id === el.dataset.habedit)));
   on("[data-log]", el => logSheet(el.dataset.log));
   on("[data-rmlog]", el => { S.log = S.log.filter(l => l.id !== el.dataset.rmlog); save(); render(); });
 
