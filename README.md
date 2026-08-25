@@ -29,11 +29,29 @@ the header and the day bar, the countdown and the suggestions all reshape around
 
 - **Today** — a fixed four-step morning sequence, one suggestion sized to the hours actually left,
   and the week's guaranteed slots.
-- **Ideas** — 131 of them across Singapore, the region, and things needing no travel. Filter by
+- **Ideas** — 178 of them across Singapore, the region, and things needing no travel. Filter by
   time available, whether it is raining, and whether someone else is coming. Roll for another.
 - **Where** — every basecamp in range with its local working hours and a verdict.
 - **Review** — routine held as a rolling share rather than a streak, so one bad morning costs a
   fraction; category balance against weekly targets; places been.
+
+### The coffee directory
+
+Under **Ideas -> Coffee** there are two layers. The curated 47 entries carry notes and take part in
+the suggestion roll. Below them sits the full directory: **608 coffee places** across 38 districts,
+searchable by name, filterable by district, and sortable by distance from where you are. Each row
+links out to Google Maps, and ticking one logs it.
+
+The directory is deliberately kept out of the suggestion pool: 608 unannotated rows would swamp
+every roll and there is nothing useful to say about most of them.
+
+**Provenance.** Extracted from `destroyedbyBrian/SpatiaLynk_recommender`, a public Singapore
+points-of-interest dataset of 5,452 places, filtered to the `cafe` category plus anything whose name
+matches coffee, kopi, kopitiam, roaster, espresso and similar, then de-duplicated by name and
+location. The upstream dataset does not state its own source, so treat it as best-effort: some
+places will have closed, and there are no opening hours. Overpass, data.gov.sg and OneMap are all
+better sources and all blocked from the environment this was built in - a clean OpenStreetMap pull
+would be the right way to refresh it.
 
 ### Editing the ideas library
 
