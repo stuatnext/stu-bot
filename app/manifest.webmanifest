@@ -1,7 +1,7 @@
 {
   "name": "Daylight",
   "short_name": "Daylight",
-  "description": "A day planner for a London shift lived in Asia.",
+  "description": "One place a day, and exactly what to say when you get there.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

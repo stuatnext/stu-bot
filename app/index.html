@@ -4,1995 +4,469 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Daylight</title>
-<meta name="description" content="A day planner for a London shift lived in Asia.">
+<meta name="description" content="One place a day, and exactly what to say when you get there.">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#EDEFEC" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D1211" media="(prefers-color-scheme: dark)">
-<!-- Added to the home screen, this opens without Safari chrome. -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Daylight">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
-<link rel="icon" href="icon-512.png" sizes="512x512" type="image/png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Daylight">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
-
 <style>
 :root{
   --ground:#EDEFEC; --surface:#FBFCFA; --surface-2:#E4E8E3; --sunk:#E0E4DF;
   --line:#D4D9D3; --line-strong:#B7BFB9;
   --ink:#141B18; --ink-2:#4A5551; --ink-3:#79847F;
-  --accent:#1F4FE0; --accent-soft:#DDE4FB; --on-accent:#FFFFFF;
+  --accent:#1F4FE0; --accent-soft:#DDE4FB;
   --signal:#B35C0C; --signal-soft:#F7E6D4;
-  --good:#2C7A51; --good-soft:#DCEDE3; --crit:#A03830; --crit-soft:#F3DEDC;
-  --build:#3D4CBE; --move:#2C7A51; --enjoy:#A0447E; --discover:#B35C0C; --campaign:#0F6E70;
-  --r:14px; --r-s:9px;
-  --shadow:0 1px 2px rgba(20,27,24,.06), 0 6px 18px -10px rgba(20,27,24,.22);
+  --good:#2C7A51; --good-soft:#DCEDE3;
+  --r:14px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --ground:#0D1211; --surface:#151D1B; --surface-2:#1D2724; --sunk:#111917;
     --line:#293430; --line-strong:#3C4945;
     --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
-    --accent:#7C9BFF; --accent-soft:#1C2647; --on-accent:#0D1211;
+    --accent:#7C9BFF; --accent-soft:#1C2647;
     --signal:#E09453; --signal-soft:#2E2317;
-    --good:#5CB585; --good-soft:#16261D; --crit:#E08A82; --crit-soft:#2C1C1C;
-    --build:#8B96EE; --move:#5CB585; --enjoy:#DE86BC; --discover:#E09453; --campaign:#4FB3B5;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -12px rgba(0,0,0,.7);
+    --good:#5CB585; --good-soft:#16261D;
   }
 }
 :root[data-theme="dark"]{
   --ground:#0D1211; --surface:#151D1B; --surface-2:#1D2724; --sunk:#111917;
   --line:#293430; --line-strong:#3C4945;
   --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
-  --accent:#7C9BFF; --accent-soft:#1C2647; --on-accent:#0D1211;
+  --accent:#7C9BFF; --accent-soft:#1C2647;
   --signal:#E09453; --signal-soft:#2E2317;
-  --good:#5CB585; --good-soft:#16261D; --crit:#E08A82; --crit-soft:#2C1C1C;
-  --build:#8B96EE; --move:#5CB585; --enjoy:#DE86BC; --discover:#E09453; --campaign:#4FB3B5;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px -12px rgba(0,0,0,.7);
+  --good:#5CB585; --good-soft:#16261D;
 }
-
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%; text-size-adjust:100%;}
 body{margin:0; background:var(--ground); color:var(--ink);
   font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;}
-/* Respect the notch and the home indicator on iPhone. */
-#root{max-width:600px; margin:0 auto;
-  padding:0 max(16px, env(safe-area-inset-left)) 116px max(16px, env(safe-area-inset-right));}
-h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif; margin:0; text-wrap:balance; font-weight:600; letter-spacing:-.015em;}
-button{font:inherit; color:inherit; background:none; border:none; cursor:pointer; padding:0; touch-action:manipulation;}
-input,select,textarea{font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--r-s); padding:9px 10px; width:100%;}
-input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-.mono{font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;}
-.eyebrow{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);}
-.row{display:flex; align-items:center;}
-.muted{color:var(--ink-2);} .dim{color:var(--ink-3);}
+  font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(72px + env(safe-area-inset-bottom));}
+.wrap{max-width:620px; margin:0 auto;
+  padding:20px max(16px, env(safe-area-inset-left)) 28px max(16px, env(safe-area-inset-right));}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif; margin:0; text-wrap:balance; letter-spacing:-.02em;}
+h1{font-size:clamp(26px,6.5vw,34px); font-weight:800; line-height:1.1;}
+h2{font-size:19px; font-weight:600; margin:26px 0 6px;}
+h3{font-size:15px; font-weight:600; margin:0;}
+p{margin:9px 0;}
+.eyebrow{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);}
+.mono{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;}
+.muted{color:var(--ink-2);}
+.dim{color:var(--ink-3); font-size:14px;}
+strong{font-weight:600;}
+a{color:var(--accent);}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:6px;}
 
-header{position:sticky; top:0; z-index:20; background:var(--ground); padding:14px 0 10px; border-bottom:1px solid var(--line);}
-.brandrow{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:11px;}
-.brand{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:21px; letter-spacing:-.03em;}
-.brand em{font-style:normal; color:var(--signal);}
-.where{display:flex; align-items:center; gap:5px; margin-top:4px; padding:3px 0; font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);}
-.where b{color:var(--ink-2); font-weight:500;}
-.countdown{text-align:right; line-height:1.15;}
-.countdown b{display:block; font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-size:25px; font-weight:700; letter-spacing:-.02em;}
-.countdown span{font-size:12.5px; color:var(--ink-3);}
+header{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px;}
 
-.daybar{position:relative; height:36px; border-radius:8px; overflow:hidden; display:flex; background:var(--sunk); border:1px solid var(--line);}
-.seg{position:relative; display:flex; align-items:center; justify-content:center; min-width:0;}
-.seg em{font-style:normal; font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 6px;}
-.seg-free{background:var(--good-soft);} .seg-free em{color:var(--good);}
-.seg-work{background:repeating-linear-gradient(135deg,var(--sunk),var(--sunk) 5px,var(--surface-2) 5px,var(--surface-2) 10px);} .seg-work em{color:var(--ink-3);}
-.seg-eve{background:var(--signal-soft);} .seg-eve em{color:var(--signal);}
-.fill{position:absolute; inset:0 auto 0 0; background:color-mix(in srgb, var(--ink) 8%, transparent);}
-.nowline{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--accent); z-index:3;}
-.nowline::before{content:""; position:absolute; top:-1px; left:-3px; width:8px; height:8px; border-radius:50%; background:var(--accent);}
-.scale{display:flex; justify-content:space-between; margin-top:6px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3);}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px; margin:14px 0;}
+.card.hero{padding:20px 18px;}
+.card.tip{background:var(--signal-soft); border-color:var(--signal);}
+.card.ok{background:var(--good-soft); border-color:var(--good);}
 
-nav{position:fixed; left:0; right:0; bottom:0; z-index:30; padding:0 env(safe-area-inset-left) 0 env(safe-area-inset-right); background:color-mix(in srgb, var(--ground) 93%, transparent); backdrop-filter:blur(10px); border-top:1px solid var(--line);}
-.navinner{max-width:600px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); padding:6px 8px calc(6px + env(safe-area-inset-bottom));}
-.navbtn{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; min-height:50px; padding:6px 2px; border-radius:var(--r-s); color:var(--ink-3);}
-.navbtn span{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase;}
-.navbtn svg{width:21px; height:21px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;}
-.navbtn.on{color:var(--accent); background:var(--accent-soft);}
+.say{background:var(--accent-soft); border:1px solid var(--accent); border-radius:var(--r);
+  padding:18px 18px 16px; margin:14px 0;}
+.say .lbl{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--accent); display:block; margin-bottom:8px;}
+.say q{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:600;
+  font-size:clamp(23px,6.4vw,30px); line-height:1.2; letter-spacing:-.02em; quotes:none;}
+.say .after{margin:10px 0 0; font-size:14px; color:var(--ink-2);}
 
-.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow);}
-section{margin-top:20px;}
-.sechead{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:9px;}
-.sechead h2{font-size:17px;}
-.cardhead{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:11px 13px; background:var(--surface-2); border-bottom:1px solid var(--line); border-radius:var(--r) var(--r) 0 0;}
-.cardhead strong{font-size:14.5px;}
+.row{display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line);}
+.row:last-child{border-bottom:none;}
+.row b{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); flex:none; width:74px; padding-top:3px;}
+.row div{flex:1; min-width:0;}
 
-.item{display:flex; align-items:flex-start; gap:12px; padding:14px 14px; min-height:52px; border-bottom:1px solid var(--line); width:100%; text-align:left;}
-.item:last-child{border-bottom:none;}
-.tick{flex:none; width:24px; height:24px; border-radius:50%; border:1.6px solid var(--line-strong); margin-top:1px; display:grid; place-items:center;}
-.tick svg{width:13px; height:13px; stroke:var(--on-accent); fill:none; stroke-width:2.8; stroke-linecap:round; stroke-linejoin:round; opacity:0;}
-.tick.on{background:var(--accent); border-color:var(--accent);} .tick.on svg{opacity:1;}
-.tick.sq{border-radius:6px;}
-.done .itemtitle{text-decoration:line-through; color:var(--ink-3);}
-.itembody{flex:1; min-width:0;}
-.itemtitle{font-weight:500; letter-spacing:-.005em;}
-.itemnote{font-size:13.5px; color:var(--ink-2); margin-top:3px; line-height:1.45;}
-.itemmeta{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:5px; font-size:12.5px; color:var(--ink-3);}
-.dot{width:8px; height:8px; border-radius:50%; flex:none;}
+.pill{display:inline-block; font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.08em;
+  text-transform:uppercase; padding:3px 8px; border-radius:5px; background:var(--sunk); color:var(--ink-2);}
+.pill.e{background:var(--good-soft); color:var(--good);}
+.pill.m{background:var(--accent-soft); color:var(--accent);}
+.pill.l{background:var(--signal-soft); color:var(--signal);}
 
-/* The inspiration card - the one thing this app is for. */
-.pitch{border-radius:var(--r); border:1px solid var(--signal); background:var(--signal-soft); padding:17px; position:relative; overflow:hidden;}
-.pitch .eyebrow{color:var(--signal);}
-.pitch h3{font-size:25px; margin:8px 0 0; letter-spacing:-.025em; line-height:1.15;}
-.pitch .p-note{font-size:15px; color:var(--ink-2); margin:8px 0 0; max-width:44ch;}
-.pitch .p-meta{display:flex; flex-wrap:wrap; gap:9px; margin-top:13px; font-size:12.5px; color:var(--ink-3); align-items:center;}
-.pitch .p-act{display:flex; gap:9px; margin-top:15px; flex-wrap:wrap;}
+button{font:inherit; cursor:pointer; border-radius:10px; border:1px solid var(--line-strong);
+  background:var(--surface); color:var(--ink); padding:13px 16px; min-height:46px;}
+button:active{transform:translateY(1px);}
+.btns{display:flex; gap:9px; margin-top:14px; flex-wrap:wrap;}
+.btns button{flex:1; min-width:132px;}
+button.pri{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600;}
+:root[data-theme="dark"] button.pri, :root:not([data-theme="light"]) button.pri{color:#0D1211;}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]) button.pri{color:#fff;} }
 
-.btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:12px 17px; min-height:46px; border-radius:var(--r-s); background:var(--accent); color:var(--on-accent); font-weight:600; font-size:15px;}
-.btn.ghost{background:transparent; color:var(--ink); border:1px solid var(--line-strong); font-weight:500;}
-.btn.sm{padding:9px 14px; min-height:40px; font-size:13.5px;}
-.btn.block{width:100%;}
-.chip{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.06em; padding:3px 7px; border-radius:5px; background:var(--sunk); color:var(--ink-2); white-space:nowrap;}
-.chip.good{background:var(--good-soft); color:var(--good);}
-.chip.warn{background:var(--crit-soft); color:var(--crit);}
-.chip.sig{background:var(--signal-soft); color:var(--signal);}
+nav{position:fixed; left:0; right:0; bottom:0; display:flex; background:var(--surface);
+  border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:20;}
+nav button{flex:1; border:none; border-radius:0; background:none; padding:11px 4px 13px;
+  font-size:11.5px; color:var(--ink-3); min-height:60px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px;}
+nav button[aria-current="true"]{color:var(--accent); font-weight:600;}
+nav .ic{font-size:19px; line-height:1;}
 
-.pills{display:flex; gap:6px; flex-wrap:wrap;}
-.pill{padding:10px 15px; min-height:42px; display:inline-flex; align-items:center; border-radius:99px; border:1px solid var(--line-strong); font-size:13.5px; font-family:"JetBrains Mono",monospace; color:var(--ink-2);}
-.pill.on{background:var(--ink); color:var(--ground); border-color:var(--ink);}
-.pill.tiny{padding:8px 13px; min-height:38px; font-size:12.5px;}
-
-.slots{display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); gap:9px;}
-.slot{padding:13px 13px; border-radius:var(--r-s); border:1px solid var(--line); background:var(--surface); text-align:left;}
-.slot .n{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-size:21px; font-weight:700; letter-spacing:-.02em;}
-.slot .n s{text-decoration:none; color:var(--ink-3); font-size:13px; font-weight:400;}
-.slot .lbl{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--ink-2); margin-top:2px;}
-.pips{display:flex; gap:3px; margin-top:7px;}
-.pips i{height:4px; flex:1; border-radius:2px; background:var(--sunk);}
-
-.dots{display:flex; gap:3px; flex:1; min-width:120px;}
-.dots i{flex:1; height:9px; border-radius:2px; background:var(--sunk);}
-.bar{height:7px; border-radius:99px; background:var(--sunk); overflow:hidden;}
-.bar i{display:block; height:100%; border-radius:99px;}
-
-table{width:100%; border-collapse:collapse; font-size:14px;}
-.scroll{overflow-x:auto; border-radius:0 0 var(--r) var(--r);}
-th,td{text-align:left; padding:11px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
-th:first-child,td:first-child{padding-left:12px;} th:last-child,td:last-child{padding-right:12px;}
-th{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:400;}
-tr:last-child td{border-bottom:none;}
-td.city{white-space:normal; min-width:104px;}
-td.city b{font-weight:600;} td.city span{display:block; font-size:11.5px; color:var(--ink-3);}
-tr.here{background:var(--accent-soft);}
-
-.sheet{position:fixed; inset:0; z-index:50; display:flex; align-items:flex-end; justify-content:center; background:rgba(10,14,13,.45);}
-.sheetbox{width:100%; max-width:600px; max-height:88dvh; overflow:auto; -webkit-overflow-scrolling:touch; background:var(--surface); border-radius:18px 18px 0 0; border:1px solid var(--line); padding:18px max(16px, env(safe-area-inset-left)) calc(24px + env(safe-area-inset-bottom));}
-@media(min-width:640px){ .sheet{align-items:center;} .sheetbox{border-radius:18px; max-height:80vh;} }
-.field{margin-bottom:12px;} .field label{display:block; margin-bottom:5px;}
-.grid2{display:grid; grid-template-columns:1fr 1fr; gap:11px;}
-.empty-note{padding:18px 14px; text-align:center; color:var(--ink-3); font-size:13.5px;}
-.toast{position:fixed; bottom:calc(96px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:var(--ink); color:var(--ground); padding:10px 16px; border-radius:99px; font-size:13.5px; z-index:60; box-shadow:var(--shadow);}
-hr.rule{border:none; border-top:1px solid var(--line); margin:18px 0;}
+table{width:100%; border-collapse:collapse; margin:10px 0; font-size:14.5px;}
+th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
+th{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); font-weight:400;}
+td:first-child{white-space:nowrap; font-family:"JetBrains Mono",monospace; font-weight:500;}
+ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--ink-3);}
+.hide{display:none;}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div id="root"></div>
+<header>
+  <div>
+    <div class="eyebrow" id="eyebrow">Daylight</div>
+    <h1 id="title">Today</h1>
+  </div>
+  <button id="theme" title="Switch theme" style="padding:8px 12px; min-height:44px; min-width:44px;">&#9681;</button>
+</header>
+
+<main id="view"></main>
+
+</div>
+
+<nav>
+  <button data-tab="today" aria-current="true"><span class="ic">&#9737;</span>Today</button>
+  <button data-tab="week"><span class="ic">&#9634;</span>Anchors</button>
+  <button data-tab="say"><span class="ic">&#9786;</span>Phrasebook</button>
+  <button data-tab="been"><span class="ic">&#10003;</span>Been</button>
+</nav>
 
 <script>
 "use strict";
-/* =====================================================================
-   Daylight
-   Work is fixed to London (08:00-15:00 UTC), so where you sit decides the
-   SHAPE of the day, not the amount of it: free morning equals your UTC
-   offset, evening equals eight hours minus it. Flying west trades one for
-   the other, hour for hour.
-   ===================================================================== */
 
-/* =====================================================================
-   The library. Every row: title, where, hours, category, scope, flags, note.
-   flags: i = indoors (works in rain), p = good with someone else.
-   scope: sg = Singapore, reg = the region, home = no travel needed.
-   Hours for regional trips are 10 for a day trip, 48 for a weekend.
-   ===================================================================== */
-const LIB_ROWS = [
+/* Daylight.
+   One place a day, and the exact words to say when you get there.
 
-/* --- Singapore: green and outdoors --- */
-["MacRitchie TreeTop Walk","Central catchment",5,"move","sg","p","Suspension bridge over the canopy. Go early, before the heat and the crowds."],
-["Southern Ridges, end to end","Mount Faber to Kent Ridge",3,"move","sg","p","Henderson Waves at dusk is the best twenty minutes of it."],
-["Bukit Timah summit","Bukit Timah",2,"move","sg","","The highest point in Singapore, and it is 164 metres."],
-["Sungei Buloh Wetlands","Kranji",3,"discover","sg","p","Mangroves, monitor lizards, and migratory birds between September and March."],
-["Pulau Ubin by bike","Changi Point ferry",6,"discover","sg","p","Bumboat over, rent a bike, ride to Chek Jawa at low tide."],
-["Coney Island","Punggol",3,"move","sg","p","Flat, shaded, and quiet on a weekday morning."],
-["The Rail Corridor","Bukit Timah to Tanjong Pagar",3,"move","sg","","The old KTM line. Do one segment or the whole spine."],
-["Labrador Nature Reserve","Labrador Park",2,"discover","sg","","WWII gun batteries and a stretch of coast most people miss."],
-["Fort Canning tree tunnel","Fort Canning",2,"discover","sg","p","Get there before nine if you want the tunnel to yourself."],
-["Botanic Gardens and the orchids","Tanglin",3,"discover","sg","p","The Orchid Garden earns its entry fee. The rest is free."],
-["Cloud Forest","Gardens by the Bay",3,"enjoy","sg","ip","Cold, indoors, and the best thing to do in Singapore in the rain."],
-["OCBC Skyway after dark","Gardens by the Bay",1,"enjoy","sg","p","Time it for the 19:45 light show and look down on it."],
-["Cycle East Coast to Changi Village","East Coast",4,"move","sg","p","Finish with nasi lemak at Changi Village and take the bus back."],
-["St John's and Lazarus Islands","Marina South Pier",6,"discover","sg","p","Ferry out, walk between them, and have the beach to yourself midweek."],
-["Sisters' Islands","Marina South Pier",5,"discover","sg","p","Singapore's only marine park. Snorkelling on a good day."],
-["Kranji Marshes","Kranji",3,"discover","sg","","Raptors, kingfishers, and almost nobody else."],
-["Windsor Nature Park","Upper Thomson",2,"move","sg","","The quiet way into MacRitchie, on a boardwalk."],
-["Wallace Trail, Dairy Farm","Bukit Panjang",2,"move","sg","","Short, steep, and named after the man who nearly beat Darwin to it."],
-["Chestnut Nature Park","Upper Bukit Timah",3,"move","sg","","The only proper mountain bike trails on the island."],
-["Pasir Ris mangrove boardwalk","Pasir Ris",2,"discover","sg","p","Herons at dawn, and a boardwalk straight through the mangrove."],
-["Changi Point Coastal Walk","Changi",2,"move","sg","p","Ends at the ferry terminal, which is how Ubin days start."],
-["Jurong Lake Gardens","Jurong",2,"move","sg","p","The best of the newer parks, and rarely busy."],
-["Cable car from Mount Faber","Harbourfront",3,"enjoy","sg","p","Worth it once for the view, and once more at night."],
-["Sembawang Hot Spring Park","Sembawang",2,"discover","sg","p","Boil an egg in the spring water. Genuinely, that is the activity."],
-["Lorong Buangkok","Hougang",1,"discover","sg","","The last surviving kampong on the island. Go quietly, people live there."],
-["Haw Par Villa","Pasir Panjang",2,"discover","sg","p","The Ten Courts of Hell. Not a gentle way to spend a morning."],
-["Thow Kwang dragon kiln","Jurong",2,"discover","sg","p","One of two surviving dragon kilns. Open days only, so check first."],
-["Fly a kite at Marina Barrage","Marina",2,"enjoy","sg","p","The rooftop is the only reliable wind in central Singapore."],
-["Henderson Waves at sunrise","Mount Faber",1,"move","sg","p","Empty at six. Completely different place than in the evening."],
-["Punggol Waterway","Punggol",2,"move","sg","p","Flat loop, good for a slow run or a first ride."],
+   The whole point of this rewrite: the barrier was never finding somewhere.
+   It was not knowing what to say at the counter. So every place carries a
+   script, and the script is set in the largest type on the page, because it
+   gets read one-handed while standing in a queue. */
 
-/* --- Singapore: neighbourhoods --- */
-["Tiong Bahru on foot","Tiong Bahru",2,"discover","sg","p","Art deco estate, the wet market upstairs, and two good bookshops."],
-["Kampong Glam and Haji Lane","Bugis",2,"discover","sg","p","Sultan Mosque, then the lanes behind it, then a long coffee."],
-["Little India and Tekka","Little India",2,"discover","sg","p","Loudest, densest, best-smelling two hours available."],
-["Chinatown and the Tooth Relic","Chinatown",2,"discover","sg","p","The temple is free and the fourth floor is worth the stairs."],
-["Joo Chiat and Katong","East Coast",3,"discover","sg","p","Peranakan shophouses, then laksa, in that order."],
-["Geylang Serai market","Geylang",2,"discover","sg","p","Best in the run-up to Hari Raya, good the rest of the year."],
-["Balestier heritage trail","Balestier",2,"discover","sg","","Shophouses, a Sun Yat Sen villa, and the bak kut teh afterwards."],
-["Everton Park and Duxton","Tanjong Pagar",2,"discover","sg","p","Old estate, new cafes, murals worth the detour."],
-["Dempsey Hill","Holland",3,"enjoy","sg","p","Old barracks turned into somewhere to spend a slow afternoon."],
-["Holland Village","Holland",2,"enjoy","sg","p","Still the easiest place to lose two hours over lunch."],
-["Jalan Besar","Jalan Besar",2,"discover","sg","p","Coffee, football history, and the last of the old trades."],
-["Emerald Hill shophouses","Orchard",1,"discover","sg","p","Two minutes off Orchard Road and a century away from it."],
-["Bukit Pasoh","Outram",2,"discover","sg","p","Clan associations by day, small restaurants by night."],
-["Kallang Riverside","Kallang",2,"move","sg","p","Run the river, then watch whoever is training on the water."],
+/* nerve: 0 = nothing to order, 1 = order in English at a counter, 2 = hawker stall
+   [ name, area, mrt, nerve, when, why, order, say, after, pay ] */
+var PLACES = [
+["Southern Ridges","Telok Blangah","HarbourFront",0,"Early, before it bakes","Ten kilometres of connected parks and the Henderson Waves bridge. The best long walk on the island and you never have to speak to anyone.","","","","Free"],
+["MacRitchie Reservoir","Central catchment","Caldecott",0,"Open at 07:00","Boardwalk along the water, monkeys, and the TreeTop Walk if you go the whole way round. Properly quiet on a weekday.","","","","Free"],
+["Singapore Botanic Gardens","Tanglin","Botanic Gardens",0,"05:00 to midnight","UNESCO listed, free, and enormous. The rain forest section is six minutes of actual jungle in the middle of a city.","","","","Free, Orchid Garden $15"],
+["Fort Canning Park","Museum quarter","Dhoby Ghaut",0,"Any time","The tree tunnel everyone photographs, plus spice gardens and a lot of history under your feet. Small enough for an hour.","","","","Free"],
+["Labrador Nature Reserve","Southern coast","Labrador Park",0,"07:00 onward","Coastal path, old gun emplacements and wartime tunnels. Views across to the islands. Rarely busy.","","","","Free"],
+["Rail Corridor","Bukit Timah","Beauty World",0,"Morning","The old KTM railway line, now a green spine running most of the length of the island. Start at the restored Bukit Timah station.","","","","Free"],
+["Bukit Brown Cemetery","Toa Payoh fringe","Caldecott",0,"Daylight only","Overgrown Chinese cemetery, enormous and strange, and the most atmospheric place in Singapore. Wear proper shoes.","","","","Free"],
+["Coney Island","Punggol","Punggol",0,"07:00 to 19:00","Rustic, scrubby, and almost empty on a weekday. Cycle it or walk the length in about an hour.","","","","Free"],
+["Sungei Buloh Wetland Reserve","Kranji","Kranji then bus",0,"07:00, mornings best","Mangroves, mudskippers, monitor lizards and migratory birds. Feels a very long way from Tanjong Pagar, which is the point.","","","","Free"],
+["Pulau Ubin","Off Changi","Tanah Merah then bus",0,"Ferry from 06:00","Boat over, hire a bike, and it is Singapore forty years ago. A whole day, and the furthest you can get without a passport.","","","","Ferry $4 each way, cash"],
+["Punggol Waterway Park","Punggol","Punggol",0,"Any time","Long flat water-side path, good bridges, and almost nobody there mid-morning.","","","","Free"],
+["Katong and Joo Chiat","East coast","Marine Parade",0,"Morning light is best","Peranakan shophouses in colours you will not believe, and the best-looking street in the city on Koon Seng Road.","","","","Free"],
+["Tiong Bahru estate","Tiong Bahru","Tiong Bahru",0,"Any time","1930s art deco walk-ups, curved balconies, air raid shelter. Twenty minutes on foot and completely different from where you live.","","","","Free"],
+["Emerald Hill","Orchard","Somerset",0,"Any time","One street of restored Peranakan terraces hiding right behind Orchard Road. Two minutes off the main drag and silent.","","","","Free"],
+["Thian Hock Keng Temple","Telok Ayer","Telok Ayer",0,"09:00 to 17:00","The oldest Hokkien temple in Singapore, built for sailors giving thanks for surviving the crossing. Ten minutes walk from you.","","","","Free"],
+["Sri Mariamman Temple","Chinatown","Chinatown",0,"07:00 to 12:00, 18:00 to 21:00","The oldest Hindu temple here, with a gopuram covered in painted figures. Remove your shoes at the door.","","","","Free"],
+["Kampong Glam and Sultan Mosque","Arab Street","Bugis",0,"Mosque 10:00 to 12:00","Textile shops, Haji Lane, and the golden dome. Wardah Books is worth twenty minutes on its own.","","","","Free"],
+["Haw Par Villa","Pasir Panjang","Haw Par Villa",0,"09:00 to 22:00","A tiger balm millionaire built a theme park of Chinese moral parables including the Ten Courts of Hell. Genuinely unsettling and completely free.","","","","Free"],
+["National Gallery Singapore","City Hall","City Hall",0,"10:00 to 19:00","Two colonial buildings joined together, the best Southeast Asian art collection anywhere, and cold air on a bad day.","","","","Free for residents"],
+["Peranakan Museum","Bras Basah","Bras Basah",0,"10:00 to 19:00","Small, beautifully done, and it explains a lot about the culture you have married into.","","","","Free for residents"],
+["Gardens by the Bay outer gardens","Marina","Bayfront",0,"05:00 to 02:00","The outdoor gardens are free and mostly empty early. Supertrees without the queue.","","","","Free outdoors"],
+["East Coast Park","East coast","Bedok then bus",0,"Any time","Fifteen kilometres of seafront path with actual sea breeze. Where half of Singapore goes to exercise.","","","","Free"],
+["Dairy Farm Nature Park","Bukit Timah","Hillview",0,"07:00","Old quarry with a lake in it, plus the Wallace Trail. Steep enough to feel like exercise.","","","","Free"],
+["Jurong Lake Gardens","West","Lakeside",0,"Any time","Big, new, quiet, and completely across the island from you. The Rasau Walk is on stilts over the water.","","","","Free"],
+["Marina Barrage","Marina","Bayfront then walk",0,"Rooftop always open","Grass roof with the whole skyline in front of it. Everyone flies kites. Sit down for an hour.","","","","Free"],
 
-/* --- Singapore: food --- */
-["Old Airport Road Food Centre","Mountbatten",2,"enjoy","sg","ip","Arguably the best hawker centre on the island. Go hungry."],
-["Maxwell Food Centre","Chinatown",1,"enjoy","sg","ip","Famous, busy, and still good. Get there before noon."],
-["Chomp Chomp","Serangoon Gardens",2,"enjoy","sg","p","Night only. Satay, sting ray, and sugar cane juice."],
-["Tiong Bahru Market","Tiong Bahru",1,"enjoy","sg","ip","Breakfast upstairs, then walk the estate below."],
-["Golden Mile Complex","Beach Road",2,"enjoy","sg","ip","Thai food and a building worth seeing while it is still there."],
-["Zion Riverside Food Centre","River Valley",1,"enjoy","sg","ip","Small, riverside, and quietly one of the better ones."],
-["Amoy Street Food Centre","Telok Ayer",1,"enjoy","sg","i","Office-lunch chaos at noon. Calm and excellent at two."],
-["Adam Road Food Centre","Bukit Timah",1,"enjoy","sg","i","Worth the trip for the nasi lemak alone."],
-["Newton Food Centre","Newton",1,"enjoy","sg","ip","Touristy and everyone says so. The satay is still the satay."],
-["Tekka Centre","Little India",1,"enjoy","sg","i","Biryani downstairs, fabric upstairs."],
-["Katong laksa, properly","Katong",2,"enjoy","sg","p","Try two rival shops in one sitting and pick a side."],
-["Balestier bak kut teh","Balestier",1,"enjoy","sg","i","Peppery Teochew style. Free soup refills, always."],
-["Geylang after midnight","Geylang",2,"enjoy","sg","","Frog porridge at one in the morning is a local rite."],
-["Three hawker centres on foot","Anywhere central",3,"enjoy","sg","p","One dish each, walk between them. The best cheap day out here."],
+["Tiong Bahru Bakery","Tiong Bahru","Tiong Bahru",1,"07:30 to 20:00","The kouign-amann is the thing. Order at the counter, entirely in English, and sit with the estate outside.","A kouign-amann and a flat white","A kouign-amann and a flat white, please","They will ask for a name or a number. Nothing else is required of you.","Card fine, about $12"],
+["Chye Seng Huat Hardware","Jalan Besar","Bendemeer",1,"09:00 to 22:00","An old hardware shop turned into a roastery around a circular bar. Order at the counter, sit at the bar, nobody talks to you.","A long black, or the filter of the day","A long black, please","If they ask which bean, saying whichever you recommend is a completely normal answer.","Card, about $7"],
+["Nylon Coffee Roasters","Everton Park","Outram Park",1,"08:30 to 18:00","A hole in the wall under an HDB block, ten minutes from you, and one of the best roasters in the country.","A piccolo","A piccolo, please","There is nowhere to sit. Standing outside with it is what everyone does.","Card, about $6"],
+["Common Man Coffee Roasters","Robertson Quay","Fort Canning",1,"07:30 to 18:00","Big, busy, Australian in character, and completely unintimidating. Good for a long breakfast alone with a book.","Whatever is on the brunch menu, and a flat white","A flat white, please, and I will order food at the table","You are seated first here, so the ordering happens sitting down. Easiest possible version.","Card, about $30"],
+["Atlas Coffeehouse","Duke's Road","Botanic Gardens",1,"08:00 to 19:00","Five minutes from the Botanic Gardens, so you can walk first and sit afterwards. Bright, easy, English throughout.","A cortado","A cortado, please","Pair it with the Gardens and you have a whole morning that requires almost no talking.","Card, about $7"],
+["Kurasu Singapore","Tanjong Pagar","Tanjong Pagar",1,"08:00 to 18:00","Japanese roaster, precise and quiet, and it is on your doorstep. A good one for a first attempt because the staff explain everything.","A hand drip, whichever bean they suggest","A hand drip, please, whichever you would recommend","Asking for a recommendation is normal here rather than a confession. They enjoy it.","Card, about $8"],
+["Apartment Coffee","Jalan Besar","Jalan Besar",1,"09:00 to 18:00","Set back off the road, small, calm, and the sort of place where nobody hurries you. Good on a low day.","A white coffee","A white coffee, please","Small enough that you may end up talking to whoever made it. That is allowed.","Card, about $7"],
+["Wardah Books","Kampong Glam","Bugis",1,"11:00 to 18:00","An independent bookshop specialising in the Muslim world and Southeast Asia. Nobody will bother you and nothing has to be ordered.","Nothing. Browse.","Just browsing, thanks","Then Sultan Mosque is a hundred metres away.","Free to look"],
+["Kinokuniya, Ngee Ann City","Orchard","Orchard",1,"10:00 to 21:30","One of the largest bookshops in Southeast Asia. An hour in here on a bad afternoon is a legitimate use of a day.","Nothing, unless you want to","Do you have this in stock?","Staff are used to being asked and it is all in English.","Card"],
 
-/* --- Singapore: indoors and culture --- */
-["National Gallery Singapore","City Hall",3,"enjoy","sg","ip","Two old buildings, one great collection, and a rooftop bar."],
-["ArtScience Museum","Marina Bay",2,"enjoy","sg","ip","Hit and miss by exhibition. Check what is on before going."],
-["National Museum of Singapore","Bras Basah",3,"enjoy","sg","i","The history gallery is genuinely well done."],
-["Peranakan Museum","Armenian Street",2,"enjoy","sg","ip","Small, sharp, and the best context for Katong afterwards."],
-["Asian Civilisations Museum","Empress Place",2,"enjoy","sg","i","The shipwreck gallery alone is worth the visit."],
-["Singapore Art Museum","Tanjong Pagar Distripark",2,"enjoy","sg","ip","Contemporary, in a working port warehouse."],
-["NUS Baba House","Neil Road",2,"discover","sg","p","A Peranakan house kept exactly as it was. Book the tour ahead."],
-["Malay Heritage Centre","Kampong Glam",2,"enjoy","sg","i","The istana at the centre of the quarter you have walked past."],
-["Gillman Barracks","Alexandra",3,"enjoy","sg","ip","Galleries in old army blocks. Quiet, free, and good on a hot day."],
-["The Projector","Golden Mile",3,"enjoy","sg","ip","Independent cinema in an old hall. Worth going for the room."],
-["Free show at the Esplanade","Marina",2,"enjoy","sg","ip","Something free on the outdoor stage most evenings."],
-["Singapore Symphony","Victoria Concert Hall",3,"enjoy","sg","ip","Cheap seats are good seats in a hall this size."],
-["Thian Hock Keng Temple","Telok Ayer",1,"discover","sg","i","Built for sailors who had survived the crossing."],
-["An afternoon in the National Library","Bugis",3,"build","sg","i","Floors ten and eleven, no wifi excuses, nothing else to do."],
-
-/* --- Singapore: active --- */
-["Bouldering session","Various",2,"move","sg","ip","Better than a gym when it is thirty-four degrees outside."],
-["Kayak the Kallang Basin","Kallang",3,"move","sg","p","Flat water, city skyline, and you can rent by the hour."],
-["Laps at a pool you have never used","Various",1,"move","sg","i","Public pools are two dollars and always empty at ten in the morning."],
-["Jurong East wave pool","Jurong",3,"enjoy","sg","p","A wave pool and slides, for the price of a coffee."],
-["One segment of the Round Island Route","Various",4,"move","sg","","The full loop is 150km. Do a tenth of it and see."],
-["Dragon boat taster session","Kallang",3,"move","sg","p","Harder than it looks and a fast way to meet people."],
-["Padel","Various",2,"move","sg","p","Easier to start than tennis and the courts are everywhere now."],
-["Night run around Marina Bay","Marina",1,"move","sg","p","Cooler, flat, lit, and the view does the work for you."],
-["Stair climb, any HDB block","Anywhere",1,"move","sg","i","Free, brutal, weatherproof, and always available."],
-["Sailing at Changi","Changi",4,"move","sg","p","Taster sessions run most weekends out of the sailing club."],
-
-/* --- Coffee: kopitiam institutions and specialty roasters --- */
-["Your nearest kopitiam at 7am","Anywhere",1,"enjoy","cafe","i","Kopi-o kosong and the paper. Costs about two dollars and starts the day properly."],
-["Learn to order in kopitiam code","Anywhere",1,"discover","cafe","i","Kopi-o siew dai, kopi gau, kopi peng. Learn it and the queue moves faster."],
-["Ya Kun Kaya Toast","Far East Square",1,"enjoy","cafe","i","The 1944 original shop. Kaya toast, soft eggs, and kopi as it should be."],
-["Killiney Kopitiam","Killiney Road",1,"enjoy","cafe","i","Trading since 1919. The toast is the whole point."],
-["Chin Mee Chin Confectionery","East Coast Road",1,"discover","cafe","ip","Katong institution: mosaic floors, marble tables, charcoal-baked buns."],
-["Tong Ah Eating House","Keong Saik",1,"enjoy","cafe","i","Kopi and toast on an old shophouse corner, largely unchanged."],
-["Heap Seng Leong","North Bridge Road",1,"discover","cafe","i","Kopi gu you: coffee with a knob of butter stirred in. Nothing has moved in decades."],
-["Nanyang Old Coffee","South Bridge Road",1,"enjoy","cafe","i","Traditional dark roast, with a small coffee museum upstairs."],
-["Ah Seng (Hai Nam) Coffee","Amoy Street Food Centre",1,"enjoy","cafe","i","Get there before nine or the toast is gone."],
-["Coffee Break","Amoy Street Food Centre",1,"enjoy","cafe","i","Third-generation hawkers doing sea salt and pandan coffee."],
-["Lam Yeo Coffee Powder","Balestier",1,"discover","cafe","i","Roasting since 1959. Buy beans and watch the drum turn."],
-["Kim Guan Guan Coffee","Toa Payoh",1,"discover","cafe","i","Third-generation roaster tucked into a housing estate."],
-["Tiong Hoe Specialty Coffee","Stirling Road",2,"enjoy","cafe","i","An old roaster that went specialty and kept both halves."],
-["Chye Seng Huat Hardware","Tyrwhitt Road",3,"build","cafe","i","An old hardware store with long communal tables. Made for a working session."],
-["Common Man Coffee Roasters","Martin Road",3,"build","cafe","ip","Reliable wifi, all-day menu, and nobody minds a laptop."],
-["Homeground Coffee Roasters","Bugis",3,"build","cafe","i","Big room, good light, and space to spread out for hours."],
-["Sarnies","Telok Ayer",2,"build","cafe","i","Three floors of shophouse. Upstairs is the quiet one."],
-["Nylon Coffee Roasters","Everton Park",1,"enjoy","cafe","i","Tiny, serious, mostly standing. Come for the coffee, not to work."],
-["Apartment Coffee","Jalan Klapa",2,"enjoy","cafe","i","Small and considered, and quietly one of the best pours in the city."],
-["Kurasu Singapore","Odeon Towers",1,"enjoy","cafe","i","Japanese precision and a rotating cast of guest roasters."],
-["PPP Coffee","Tyrwhitt Road",2,"enjoy","cafe","i","The roastery that trained half the baristas in Singapore."],
-["Atlas Coffeehouse","Duke's Road",2,"enjoy","cafe","ip","Bukit Timah's living room. Busy at weekends, calm on a weekday morning."],
-["Tiong Bahru Bakery","Yong Siak Street",1,"enjoy","cafe","ip","Croissants, then a walk around the estate to justify them."],
-["Forty Hands","Yong Siak Street",2,"enjoy","cafe","ip","The cafe that started Tiong Bahru's second life."],
-["Plain Vanilla","Tiong Bahru",1,"enjoy","cafe","ip","Known for cupcakes, but the coffee holds its own."],
-["Merci Marcel","Tiong Bahru",2,"enjoy","cafe","ip","French, leafy, and better in the morning than at brunch rush."],
-["Bearded Bella","Tanjong Pagar",2,"enjoy","cafe","ip","Melbourne-style and reliably good, which is rarer than it sounds."],
-["Symmetry","Jalan Kubor",2,"enjoy","cafe","ip","Brunch institution in the lanes behind Kampong Glam."],
-["Kafe Utu","Jiak Chuan Road",2,"discover","cafe","ip","African-inspired cafe with a film room downstairs. Nothing else here is like it."],
-["Ronin","Jalan Pinang",1,"discover","cafe","i","No sign on the door. Dark, industrial, and very good."],
-["The Populus","Neil Road",2,"enjoy","cafe","ip","Corner shophouse, big windows, dependable brunch."],
-["Maxi Coffee Bar","Craig Road",2,"enjoy","cafe","i","Small bar doing careful coffee without any ceremony."],
-["Baristart Coffee","Tras Street",1,"enjoy","cafe","i","Hokkaido milk, and you really can taste the difference."],
-["% Arabica","Arab Street",1,"enjoy","cafe","ip","Kyoto import. Come for the latte, stay for the street outside."],
-["Dutch Colony Coffee Co.","Various",2,"enjoy","cafe","i","Local roaster with outposts across the island. Consistent everywhere."],
-["Alchemist","Khong Guan Building",1,"enjoy","cafe","i","Serious beans, small format, almost nowhere to sit."],
-["Curious Palette","Prinsep Street",2,"enjoy","cafe","ip","Bright corner unit, good for a slow start."],
-["Two Bakers","Horne Road",1,"enjoy","cafe","ip","Pastry-led, and the coffee keeps up."],
-["The Tiramisu Hero","Tyrwhitt Road",1,"enjoy","cafe","ip","Exactly what the name says, done properly."],
-["Chock Full of Beans","Joo Chiat",2,"enjoy","cafe","ip","Neighbourhood cafe worth pairing with a Katong walk."],
-["Lola's Cafe","Kovan",2,"enjoy","cafe","ip","Long-standing east side favourite. Worth the trip out."],
-["Wimbly Lu","Jalan Riang",1,"enjoy","cafe","ip","Chocolate desserts down a quiet Serangoon lane."],
-["Carpenter and Cook","Lorong Kilat",2,"enjoy","cafe","ip","Bakery and cafe with a proper old-fashioned counter."],
-["Nassim Hill Bakery","Tanglin",2,"enjoy","cafe","ip","Bread-forward, and handy either side of the Botanic Gardens."],
-["Oriole Coffee + Bar","Somerset",2,"enjoy","cafe","i","One of the older specialty rooms, and still steady."],
-["Cafe Natsu","Jalan Besar",2,"enjoy","cafe","ip","Japanese-leaning, calm, and good for a long read."],
-["Hatter Street","Bugis",1,"enjoy","cafe","ip","Bakehouse cafe, generous portions, easy stop mid-walk."],
-
-/* --- The region --- */
-["Bintan","Indonesia, ferry 1h",10,"discover","reg","p","Close enough for a day, good enough for a weekend."],
-["Batam","Indonesia, ferry 1h",10,"discover","reg","p","An hour on the ferry and a completely different price level."],
-["Desaru Coast","Malaysia, ferry 1h30",48,"discover","reg","p","Beach weekend without getting on a plane."],
-["Melaka","Malaysia, 4h by road",48,"discover","reg","p","UNESCO old town, Nyonya food, and a very easy weekend."],
-["Kuala Lumpur","Malaysia, 1h flight",48,"discover","reg","p","Close enough to leave after work on Friday."],
-["Penang","Malaysia, 1h40",48,"discover","reg","p","The best food weekend within two hours of Singapore."],
-["Langkawi","Malaysia, 1h30",48,"discover","reg","p","Cable car, beaches, and duty-free everything."],
-["Bangkok","Thailand, 2h20",48,"discover","reg","p","Your shift finishes at 22:00 there. Work a week from it."],
-["Phuket","Thailand, 1h50",48,"discover","reg","p","Skip Patong, go north. Still a 22:00 finish."],
-["Krabi and Railay","Thailand, 2h",48,"discover","reg","p","Limestone cliffs and boats instead of roads."],
-["Koh Samui","Thailand, 1h50",48,"discover","reg","p","Direct flights, and quiet if you stay away from Chaweng."],
-["Chiang Mai","Thailand, 3h20",48,"discover","reg","p","Cooler, cheaper, mountains, and a 22:00 finish to the day."],
-["Bali","Indonesia, 2h35",48,"discover","reg","p","Same timezone as home, so nothing about work changes."],
-["Lombok and the Gilis","Indonesia, 3h",48,"discover","reg","p","What Bali was, roughly two decades ago."],
-["Yogyakarta and Borobudur","Indonesia, 2h30",48,"discover","reg","p","Sunrise at Borobudur is worth the early alarm."],
-["Ho Chi Minh City","Vietnam, 2h",48,"discover","reg","p","Coffee, motorbikes, and a 22:00 finish."],
-["Da Nang and Hoi An","Vietnam, 2h50",48,"discover","reg","p","Beach and old town twenty minutes apart."],
-["Hanoi and Ha Long","Vietnam, 3h15",48,"discover","reg","p","Colder, older, and better food than the south. Fight about it."],
-["Siem Reap and Angkor","Cambodia, 2h15",48,"discover","reg","p","Three days of temples is enough. Two is not."],
-["Phnom Penh","Cambodia, 2h10",48,"discover","reg","p","Riverside, and a serious hour at Tuol Sleng."],
-["Luang Prabang","Laos, 3h30",48,"discover","reg","p","Slow, quiet, and the alms round at dawn."],
-["Kota Kinabalu","Malaysia, 2h35",48,"discover","reg","p","Climb Kinabalu, or just take the islands and the sunsets."],
-["Brunei","2h05",48,"discover","reg","","Small, strange, and easy to see in a weekend."],
-["Hong Kong","4h",48,"discover","reg","p","Hiking above the harbour is the underrated half of it."],
-["Taipei","4h40",48,"discover","reg","p","Night markets, hot springs, and mountains behind the city."],
-["Colombo and the hill country","Sri Lanka, 4h",48,"discover","reg","p","Your shift ends at 20:30 there. A genuine evening, every day."],
-["The Maldives","4h30",48,"enjoy","reg","p","Shift ends at 20:00. Expensive, but the maths works."],
-["Manila and Palawan","Philippines, 3h40",48,"discover","reg","p","Get through Manila and out to the islands quickly."],
-["Seoul","6h20",48,"discover","reg","p","A long way for a weekend. Take days around it."],
-["Tokyo","7h",48,"discover","reg","p","Your shift would finish at midnight there. Use leave, not remote work."],
-
-/* --- No travel needed --- */
-["Ship a tiny tool in one sitting","Home",3,"build","home","i","One problem, one session, finished. And no new repository afterwards."],
-["Automate one recurring annoyance","Home",2,"build","home","i","Pick the thing you have done manually three times this month."],
-["Rewrite something you use badly","Home",3,"build","home","i","Not a new project. A better version of one that exists."],
-["A film from wherever you are going next","Home",2,"enjoy","home","ip","Best possible preparation, and it counts as a night in."],
-["The video essay you keep saving","Home",1,"enjoy","home","i","You have the tab open. Watch it or close it."],
-["Mandarin drama with the subtitles on","Home",2,"enjoy","home","ip","Twenty minutes in you stop reading them quite so hard."],
-["A LEGO architecture set","Home",3,"enjoy","home","ip","Three hours that feel like none, and something on the shelf after."],
-["Calligraphy on water cloth","Home",1,"enjoy","home","i","It dries and disappears, which is most of the appeal."],
-["One corner of a 1000-piece puzzle","Home",2,"enjoy","home","ip","Edges first. It is a two-person job and a good excuse."],
-["Cook the hawker dish you order most","Home",3,"enjoy","home","ip","You will not match it. You will understand it."],
-["A film photography walk","Anywhere",3,"discover","home","p","Thirty-six frames forces you to actually look at the place."],
-["Civ VI, one long session","Home",3,"enjoy","home","i","Set an alarm before you start. You know why."],
-["A retro console evening","Home",2,"enjoy","home","ip","The good kind of nostalgia, and it ends when you stop."],
-["Co-op with someone back home","Home",2,"enjoy","home","i","Their evening is your early morning. That window actually works."],
-["Read properly on prediction markets","Home",2,"build","home","i","It is your job and you never get an uninterrupted run at it."],
-["Write one post and publish it","Home",3,"build","home","i","Published, not drafted. The drafts folder does not count."],
-["Twenty words of Malay","Home",1,"build","home","i","Enough to be polite at a hawker centre is a low, worthwhile bar."],
-["Plan the next trip properly","Home",2,"discover","home","ip","Flights, dates, and one booking. Not another browsing session."],
-["Call someone you have been meaning to","Home",1,"enjoy","home","i","UK evening is your early morning. That is the only window there is."]
+["Maxwell Food Centre","Chinatown","Maxwell",2,"08:00 to 22:00, quieter before 11:30","The famous one, and rightly. Twelve minutes on foot from Tanjong Pagar, so there is no journey to talk yourself out of.","Hainanese chicken rice, steamed","One chicken rice, steamed. Eat here.","They will ask breast or thigh, and whether you want it to go. Thigh is the better answer.","Cash, about $6. Some stalls take PayNow."],
+["Amoy Street Food Centre","Telok Ayer","Telok Ayer",2,"07:00 to 15:00, dead after 14:00","Your nearest proper hawker centre and the best one for a first go, because it empties out after the office lunch rush.","Whichever stall has a queue of five or fewer","One of that, please. Eat here.","Go at 14:00. Half the stalls are closing, nobody is rushing you, and you can look at everything without a queue behind you.","Cash, about $5"],
+["Chinatown Complex Food Centre","Chinatown","Chinatown",2,"08:00 to 20:00","The biggest hawker centre in Singapore, over two hundred stalls, and a Michelin-listed chicken rice stall among them. Overwhelming on purpose.","Anything. Walk a full lap first, then decide.","One of that, please","Two hundred stalls means nobody is watching you. Anonymity is easier than a quiet room.","Cash, about $5"],
+["Tiong Bahru Market","Tiong Bahru","Tiong Bahru",2,"07:00 to 14:00 for breakfast","Wet market below, hawkers upstairs, and the best chwee kueh in the city. Morning is when it is alive.","Chwee kueh, five pieces","Chwee kueh, five, take away","Steamed rice cakes with preserved radish. Two dollars. Almost impossible to get wrong.","Cash, about $2.50"],
+["Old Airport Road Food Centre","Dakota","Dakota",2,"11:00 to 21:00","Widely held to be the best hawker centre in Singapore by people who care a great deal about this. Worth the trip east.","Char kway teow, or lor mee","One char kway teow. Eat here.","They may ask if you want cockles. No cockles is an entirely normal answer.","Cash, about $6"],
+["Tekka Centre","Little India","Little India",2,"07:00 to 22:00","Indian food, and the easiest hawker centre to order in because everything is in English and the stallholders are chatty.","Roti prata, two plain, with curry","Two plain prata, please","The single lowest-risk hawker order in Singapore. It costs about two dollars and nobody has ever got it wrong.","Cash, about $3"],
+["Golden Mile Food Centre","Beach Road","Nicoll Highway",2,"08:00 to 20:00","Thai and local, in a brutalist block that is worth seeing on its own. Less touristed than the famous ones.","Whatever the longest queue is having","One of that, please","Joining the longest queue and copying the person in front is a completely valid strategy and everybody does it.","Cash, about $6"],
+["Hong Lim Market and Food Centre","Chinatown","Chinatown",2,"06:00 to 15:00","Old-school, office-lunch crowd, and several legendary stalls. Go at 14:00 when the rush has gone.","Curry chicken noodle, or wonton mee","One wonton mee, dry","Dry or soup is the only question. Dry is the safer answer.","Cash, about $5"],
+["Zion Riverside Food Centre","Havelock","Havelock",2,"11:00 to 22:00","Small, riverside, and much less frantic than the famous ones. A gentle place to practise.","Char kway teow or fried carrot cake","One fried carrot cake, black","Black is the sweet dark soy version, white is not. Both are correct, black is nicer.","Cash, about $5"],
+["Adam Road Food Centre","Bukit Timah","Botanic Gardens",2,"07:00 to 23:00","Ten minutes from the Botanic Gardens, so walk first and eat after. Famous for nasi lemak and Muslim food.","Nasi lemak with chicken wing","Nasi lemak, chicken wing","Coconut rice, fried chicken, egg, anchovies, sambal. If you have one Malay dish, have this one.","Cash, about $6"],
+["Newton Food Centre","Newton","Newton",2,"16:00 to 02:00","Open late, which almost nothing else useful is when you finish at eleven. Touristy, and that makes it easy.","Satay, ten sticks, chicken","Ten chicken satay, please","Stallholders here will approach you, which removes the hardest part entirely.","Cash, about $10"],
+["ABC Brickworks Food Centre","Bukit Merah","Redhill",2,"08:00 to 22:00","A neighbourhood one rather than a famous one, which means it is calmer and the prices are lower.","Ba chor mee, dry, or the char kway teow","One bak chor mee, dry, small","Minced pork noodles. They will ask about chilli. Saying a little is the safe answer.","Cash, about $5"],
+["Alexandra Village Food Centre","Queenstown","Redhill",2,"07:00 to 22:00","Proper local crowd, no tourists, and a famous chicken wing stall. This is what the ordinary version looks like.","Fried chicken wings, three","Three chicken wings","Three wings and a drink is about six dollars and involves saying five words.","Cash, about $6"],
+["Ghim Moh Market","Buona Vista","Buona Vista",2,"07:00 to 14:00","A morning market centre in the middle of an estate. Breakfast here is what a normal Singaporean Tuesday looks like.","Chwee kueh, or the roasted meats","One kaya toast set","Toast, soft eggs and a kopi. Ordering the set means you say three words and get a whole breakfast.","Cash, about $5"],
+["Berseh Food Centre","Jalan Besar","Jalan Besar",2,"07:00 to 20:00","Quiet, unglamorous and near several good coffee places, so you can chain it with something easy.","Fish soup, or the yong tau foo","One fish soup","Yong tau foo is the one where you point at things in a tray and they cook them. Pointing is the entire mechanic.","Cash, about $6"],
+["Whampoa Makan Place","Balestier","Boon Keng",2,"06:00 to 22:00","Two blocks, open extremely early, and full of people who have been coming for forty years.","Kaya toast and kopi, or the lor mee","Kaya toast set, and one kopi-o siew dai","This is where to try your first proper kopi order. Nobody there is in a hurry at nine in the morning.","Cash, about $4"]
 ];
 
-/* =====================================================================
-   Every coffee place we could source: 608 entries with district and
-   coordinates. Browsed and searched rather than rolled - there are far
-   too many, and no notes, for them to belong in the suggestion pool.
-   ===================================================================== */
-const COFFEE_ROWS = [
-["(Working Title)","Rochor",1.30292,103.85196],
-["(working title)","Rochor",1.30083,103.85967],
-["188 Cafe","Novena",1.32399,103.85148],
-["2050 Coffee","Rochor",1.30063,103.8601],
-["20grams Roastery & Coffee Bar","Geylang",1.32477,103.89174],
-["280 Cafe","Woodlands",1.45056,103.79194],
-["5 The Moments Cafe","Outram",1.27807,103.84381],
-["618 Sim Carrot Cake","Yishun",1.41876,103.83559],
-["Acoustic Coffee Bar","Outram",1.27947,103.84242],
-["Ah Chew Desserts","Downtown Core",1.298,103.85636],
-["Ah Chew Desserts","Orchard",1.30142,103.83628],
-["Al Deen Cafe","Kallang",1.31046,103.85495],
-["Alchemist","Toa Payoh",1.335,103.88597],
-["Alchemy","Rochor",1.30189,103.85175],
-["amps tea","Outram",1.28544,103.84508],
-["An Aai Affair","Jurong East",1.33458,103.74291],
-["An Aai Affair","Changi",1.36028,103.98949],
-["An Aai Affair","Bishan",1.35229,103.83493],
-["Anglo Indian Cafe & Bar","Downtown Core",1.27907,103.85031],
-["Anteroom Coffee Brewers","Bukit Timah",1.31581,103.80434],
-["Apartment","Rochor",1.30276,103.8499],
-["Apoze Coffee Shop","Toa Payoh",1.33806,103.8868],
-["Arabica","Rochor",1.30105,103.8594],
-["Ardents Cafe Bar","Outram",1.27968,103.84235],
-["Artisan Boulangerie Co","Downtown Core",1.27837,103.8508],
-["Asylum","Kallang",1.31135,103.85904],
-["Atlas Coffee House","Bukit Timah",1.32294,103.81201],
-["AtTea","Pasir Ris",1.37356,103.94846],
-["Au Croissant","Kallang",1.31027,103.86398],
-["Aura Loft","Kallang",1.31031,103.8612],
-["Average Service","Kallang",1.31154,103.85918],
-["Avorush","Downtown Core",1.27827,103.85063],
-["Baker & Cook","Bukit Timah",1.33639,103.76813],
-["baker & cook","Bedok",1.32093,103.92431],
-["Baker & Cook","Bukit Timah",1.3239,103.79677],
-["Baker And Cook","Bukit Timah",1.31156,103.79665],
-["Bakery House Cafe","Bishan",1.3529,103.83438],
-["Balance Coffee","Novena",1.3211,103.85273],
-["Banchong Cafe","Kallang",1.31224,103.86439],
-["Bao Er Cafe","Novena",1.32582,103.85038],
-["Baristart Coffee","Southern Islands",1.25417,103.81454],
-["Batter batter","Rochor",1.29992,103.85011],
-["Benches Cafe","Clementi",1.29982,103.76814],
-["Bero Coffee Singapore","Outram",1.27896,103.84014],
-["Best Ah Ma Cafe by Tin Box","Downtown Core",1.29848,103.85539],
-["Better Days Cafe & Bar","Bukit Timah",1.34245,103.77678],
-["BingDorDor","Hougang",1.36138,103.88611],
-["Black & White","Novena",1.32456,103.85151],
-["Black Fairy Coffee","Kallang",1.31134,103.85988],
-["Blk 851 Coffee Shop","Jurong West",1.34671,103.69273],
-["Blue Ocean Kopi & Toast","Western Water Catchment",1.3469,103.68004],
-["Boh Geh Uncle Canteen","Seletar",1.40951,103.87286],
-["bommoi","Museum",1.29435,103.84963],
-["Boost Juice","Pasir Ris",1.37257,103.9494],
-["Borderless Coffee","Outram",1.27828,103.84392],
-["Brawn & Brains Coffee","Kallang",1.31126,103.86098],
-["Brawns & Brains","Marine Parade",1.30742,103.90736],
-["Bread & Hearth","Marine Parade",1.30392,103.90284],
-["Bread & Hearth Artisinal Bakery Cafe","Outram",1.28,103.8416],
-["Breakfast at Fluffys","Marine Parade",1.30937,103.90231],
-["Breakfast Grill","Bukit Timah",1.34083,103.77374],
-["Brewprint Coffee","Tampines",1.34974,103.95234],
-["brill.","Tanglin",1.32253,103.81448],
-["British Indian Curry Hut","Queenstown",1.31168,103.79475],
-["Broadway Kopitiam","Punggol",1.40459,103.90889],
-["Brunches Cafe","Kallang",1.31463,103.85403],
-["brwd / KINN","Singapore River",1.28739,103.84784],
-["Burp","Marine Parade",1.30795,103.89537],
-["Butter Studio","Rochor",1.30716,103.85631],
-["C Patisserie","Rochor",1.30814,103.85666],
-["C&L Cafe","Geylang",1.33351,103.89234],
-["Caf Insadong","Outram",1.28178,103.84513],
-["Caf Nido","Kallang",1.31193,103.8606],
-["Cafe 134","Clementi",1.30242,103.76426],
-["Cafe Etc.","Bishan",1.35194,103.8352],
-["Cafe Football Singapore","Toa Payoh",1.34261,103.86777],
-["Cafe Monochrome","Rochor",1.30153,103.85239],
-["Cafe O","Rochor",1.29987,103.85484],
-["Cafe O","Bukit Timah",1.3107,103.79618],
-["Cafe Wabi Sabi","Geylang",1.31005,103.90206],
-["Cafe3","Outram",1.28026,103.84075],
-["Caffe Fernet","Downtown Core",1.28254,103.85342],
-["Cali Cafe","Queenstown",1.30511,103.78901],
-["Caracara","Outram",1.27916,103.84219],
-["Careshop de Cafe","Kallang",1.31167,103.86123],
-["Carrotsticks and Cravings","Tanglin",1.30196,103.8128],
-["Cat and the Fiddle Cafe","Woodlands",1.43473,103.78563],
-["Cedele","Bedok",1.3142,103.91955],
-["Central 65 Hostel & Cafe","Rochor",1.30669,103.8564],
-["Central Hong Kong Caf","Southern Islands",1.25626,103.82013],
-["Central Hong Kong Caf","Bukit Merah",1.26496,103.82267],
-["Ceres","Singapore River",1.28742,103.84905],
-["Chia Puddies","Singapore River",1.28923,103.84692],
-["CHICHA San Chen","Museum",1.30094,103.84497],
-["CHICHA San Chen","Ang Mo Kio",1.36939,103.84843],
-["Chicha San Chen","Novena",1.31997,103.84333],
-["CHICHA San Chen","Pasir Ris",1.37245,103.94935],
-["Chin Mee Chin Confectionery","Marine Parade",1.30723,103.90707],
-["Chock Full of Beans","Changi",1.38946,103.98731],
-["ChoPSuey Caf","Tanglin",1.30311,103.81047],
-["Chow Cute","Seletar",1.40833,103.86776],
-["Chteaux","Novena",1.32357,103.84205],
-["Chye Seng Huat Hardware","Kallang",1.31157,103.86033],
-["Clap Cafe","Rochor",1.29851,103.85185],
-["Coastal Rhythm","Bedok",1.3056,103.93172],
-["Coffee Bean","Choa Chu Kang",1.39686,103.74675],
-["Coffee Break","Downtown Core",1.27961,103.84668],
-["Coffee Culture","Queenstown",1.30422,103.79239],
-["Coffee Friends","Clementi",1.3224,103.7703],
-["Coffee Hive","Queenstown",1.30228,103.79357],
-["Coffee Lounge","Orchard",1.30843,103.83399],
-["Coffee Near Me","Ang Mo Kio",1.37576,103.82682],
-["Coffee Shop","Bukit Merah",1.28337,103.81567],
-["Coffee Shop - Chicken Rice","Tampines",1.34895,103.93298],
-["Coffee-Hugg","Downtown Core",1.27955,103.84721],
-["Cofreely","Kallang",1.30833,103.85784],
-["Columbus Coffee Co.","Bishan",1.35293,103.83549],
-["Common Man Coffee Roasters","Geylang",1.31206,103.90061],
-["Community Coffee","Orchard",1.30727,103.83373],
-["Connect 71 Cafe","Western Water Catchment",1.34827,103.68163],
-["Cosat Coffee","Downtown Core",1.27986,103.84956],
-["Cottontail Creamery","Serangoon",1.35027,103.86897],
-["Courtyard Cafe","Downtown Core",1.28982,103.85107],
-["Craftsmen Coffee","Bukit Timah",1.33122,103.80715],
-["Craftsmen Coffee","River Valley",1.2923,103.84076],
-["Da Paolo Gastronomia","Tanglin",1.32272,103.81451],
-["Da Paolo Gastronomia","Downtown Core",1.28599,103.85971],
-["Daizu Caf","Kallang",1.31534,103.85343],
-["Dal.Komm Playground","Downtown Core",1.2968,103.85743],
-["Dawn","Singapore River",1.28684,103.84783],
-["De Riya","Geylang",1.31338,103.89948],
-["Delifrance","Bukit Timah",1.31744,103.78581],
-["Dickson Nasi Lemak","Marine Parade",1.30933,103.90236],
-["Dimbulah","Downtown Core",1.27377,103.8446],
-["Dimbulah (Market Street)","Downtown Core",1.28229,103.85047],
-["Dimbulah Mountain Estate Coffee","Downtown Core",1.29561,103.85687],
-["Dlifrance","Tampines",1.35426,103.94509],
-["Douly Coffee","Novena",1.32405,103.8564],
-["Drink Stall","Queenstown",1.30422,103.78236],
-["DRubinah Punggol","Punggol",1.39286,103.91706],
-["Drury Lane","Outram",1.27828,103.84358],
-["Duke Dessert","Rochor",1.30049,103.85196],
-["Dutch Colony Coffee Co.","Bedok",1.31425,103.91953],
-["Dzerts Cafe","Bedok",1.33381,103.94884],
-["Each A Cup","Bedok",1.33286,103.9137],
-["Each a Cup","Bedok",1.33726,103.92131],
-["Each-A-Cup","Western Water Catchment",1.34685,103.68085],
-["Earlybird","Rochor",1.30289,103.85819],
-["ECHO House","Downtown Core",1.28051,103.84527],
-["Eight Cafe & Bar","Outram",1.27877,103.84095],
-["Enak Enak Hong Kong Teahouse","Bedok",1.30499,103.92954],
-["Entre-Nous Creperie","Downtown Core",1.29618,103.85465],
-["Fangko Coffee & Beer","Singapore River",1.28784,103.84709],
-["Fat Po","Punggol",1.39304,103.91724],
-["Feng Shui Tang","Rochor",1.30027,103.85262],
-["fieldnotes","Outram",1.27978,103.84284],
-["Finally Coffee","Rochor",1.30226,103.85844],
-["Five Oars","Outram",1.27892,103.84408],
-["Five Oars Coffee Roasters","Bedok",1.31238,103.92554],
-["Flagwhite","Bukit Timah",1.34087,103.77242],
-["Flock Caf","Bukit Merah",1.28353,103.83021],
-["Foot code","Jurong West",1.32854,103.69408],
-["Foreword Coffee","Downtown Core",1.28968,103.85605],
-["Fresh Fruits Lab","Bedok",1.31865,103.90953],
-["Frienzie Bar & Bistro","Punggol",1.39275,103.9172],
-["Frienzlink Cafeteria","Singapore River",1.28744,103.84817],
-["Fuel X","Toa Payoh",1.32847,103.86956],
-["Fun Toast","Choa Chu Kang",1.37994,103.76051],
-["Fun Toast","Hougang",1.37275,103.89387],
-["Fun Toast","Hougang",1.33631,103.88863],
-["Fun Toast","Pasir Ris",1.37238,103.94962],
-["GeloBuna","Tanglin",1.32277,103.81427],
-["Gelre","Western Water Catchment",1.34697,103.68085],
-["Generation Coffee","Rochor",1.30598,103.8504],
-["Genius Central","Outram",1.28309,103.8485],
-["Ghim Moh (Foodfare Coffee Shop)","Queenstown",1.3085,103.78459],
-["GHK Food House","Bukit Merah",1.27913,103.82835],
-["Glyph Supply Co.","Orchard",1.3004,103.83759],
-["Gong Cha","Hougang",1.33635,103.88872],
-["Gong Cha","Serangoon",1.34997,103.87308],
-["Gong Cha","Queenstown",1.30458,103.7726],
-["Gong Cha","Tampines",1.34069,103.96362],
-["Gong cha","Downtown Core",1.28428,103.8511],
-["Gong Cha","Yishun",1.42925,103.83576],
-["Gong He Guan","Outram",1.28403,103.84516],
-["Good Morning Nanyang Cafe","Outram",1.28367,103.84372],
-["Good Morning Nanyang Cafe","Orchard",1.30711,103.83385],
-["Good Year Coffee Shop","Paya Lebar",1.36663,103.9266],
-["Goodwill Cafeteria","Rochor",1.30199,103.85756],
-["Grain Traders","Downtown Core",1.28178,103.85009],
-["Great Nanyang Heritage Cafe","Orchard",1.30029,103.83773],
-["Grill & Pasta","Ang Mo Kio",1.37229,103.82905],
-["Group therapy","Outram",1.28373,103.84718],
-["Haakon","Downtown Core",1.28396,103.85141],
-["Haakon","Bukit Timah",1.31065,103.79607],
-["Habitat","Kallang",1.30915,103.86115],
-["Habitat Coffee","Bishan",1.35278,103.83451],
-["Han Bing Korean Cafe","Tanglin",1.32266,103.8138],
-["Hard Rock Cafe","Orchard",1.30589,103.82818],
-["Heavenly Wang","Orchard",1.30332,103.83412],
-["Hei Kim Cafe","Bedok",1.31811,103.90681],
-["Hello Arigato","Marine Parade",1.30944,103.90227],
-["Hello Arigato","Bishan",1.35286,103.83444],
-["Hey Long Cha","Novena",1.32676,103.84359],
-["Hey Slow Joe","Kallang",1.31663,103.85774],
-["Heytea","Tampines",1.35389,103.94502],
-["Highlander Coffee","Bukit Merah",1.27676,103.83612],
-["Hoe Lye","Kallang",1.31449,103.85384],
-["Hollin","Museum",1.29929,103.84567],
-["Homeground Coffee","Bukit Timah",1.33352,103.78873],
-["Hong Kee Roasted Chicken/Duck Rice","Geylang",1.31717,103.87854],
-["Hong Kong Stars Cafe","Kallang",1.3128,103.85962],
-["Hong Yun Eating House","Tuas",1.30788,103.63147],
-["Hub & Spoke Cafe","Changi",1.35079,103.98741],
-["Huggs","Downtown Core",1.27862,103.84797],
-["Huggs Coffee","Singapore River",1.289,103.84676],
-["Humble Origins","Queenstown",1.29876,103.77136],
-["Hungrywich","Queenstown",1.30269,103.79254],
-["Ice Edge Cafe","Hougang",1.36214,103.88526],
-["itea","Novena",1.32315,103.85527],
-["iTEA","Bukit Timah",1.34236,103.77616],
-["iTea","Yishun",1.41703,103.83497],
-["Japan Rail Cafe","Downtown Core",1.27664,103.84561],
-["JC Coffee Houzz","Geylang",1.31283,103.90005],
-["JC Don Cafe & Bar","Bedok",1.31211,103.91114],
-["Jewel Coffee","Queenstown",1.29582,103.78171],
-["Jiale Kopitiam","Toa Payoh",1.33866,103.88633],
-["Jimmy Monkey Cafe & Bar","Queenstown",1.3019,103.79026],
-["Jin Biao Coffee Shop","Tampines",1.34777,103.95176],
-["Joan Bowen Cafe","Toa Payoh",1.33023,103.87423],
-["Joe & Dough","Downtown Core",1.2994,103.85837],
-["Junes Breathe Cafe","Western Water Catchment",1.34471,103.67833],
-["Kaffe & Toast","Bukit Merah",1.27885,103.83599],
-["Kampong Glam Cafe","Rochor",1.30128,103.85993],
-["Kazo Caf","Pasir Ris",1.37361,103.94854],
-["Kenangan Coffee","Sengkang",1.39214,103.89483],
-["Keong Saik Bakery","Kallang",1.3164,103.86274],
-["Killiney Kopitiam","River Valley",1.29881,103.83945],
-["Killiney Kopitiam","Downtown Core",1.29911,103.85769],
-["Kings Cart Coffee Factory","Marine Parade",1.3091,103.90239],
-["Kings Kart Coffee","Bishan",1.34981,103.84882],
-["Knead Kopi","Bukit Timah",1.32952,103.80832],
-["Knots Cafe and Living","Geylang",1.32932,103.89011],
-["Koi Cafe","Yishun",1.42984,103.83625],
-["Koi Cafe","Marine Parade",1.30277,103.90585],
-["KOI Express","Downtown Core",1.29357,103.85305],
-["KOI Express","Changi",1.35632,103.98661],
-["KOI Th","Queenstown",1.30722,103.79012],
-["KOI Th","Rochor",1.29918,103.85419],
-["KOI Th","Singapore River",1.29323,103.83215],
-["KOI Th","Geylang",1.31816,103.89236],
-["KOI Th","Geylang",1.31773,103.89262],
-["Koi Th","Pasir Ris",1.37244,103.94934],
-["KOI Th Express","Orchard",1.30326,103.83414],
-["Kopi & Tarts","Pasir Ris",1.37254,103.94939],
-["Kopi & Tarts","Orchard",1.30249,103.83984],
-["Kopi Place","Downtown Core",1.29934,103.85756],
-["Kopifellas","Queenstown",1.28784,103.7905],
-["Kopifellas Cafe","Pasir Ris",1.37423,103.94862],
-["Kopitiam Corner","Clementi",1.32303,103.76392],
-["Kurasu","Rochor",1.29844,103.85194],
-["Kyushu Pancake","Queenstown",1.31028,103.79474],
-["Kyuukei Coffee","Downtown Core",1.2804,103.84529],
-["La Teh","Kallang",1.31217,103.86309],
-["LCafe","Ang Mo Kio",1.3799,103.84947],
-["Le Cafe Confectionary & Pastry","Rochor",1.3047,103.84937],
-["Lelepot","Bedok",1.30863,103.91143],
-["Letoile","Kallang",1.31478,103.85235],
-["Li Fa Yun Tun Noodles","Serangoon",1.35389,103.87023],
-["LiHO","Bukit Timah",1.33704,103.77933],
-["LiHO Tea","Rochor",1.2999,103.85432],
-["LiHO TEA","Pasir Ris",1.37235,103.95001],
-["LiHO TEA","Marine Parade",1.30173,103.90605],
-["LiHo Tea","Choa Chu Kang",1.38003,103.76048],
-["Lim Kopi","Geylang",1.31418,103.88697],
-["Little Glass Stand","Downtown Core",1.28423,103.85185],
-["Little Rogue Coffee","Marine Parade",1.30391,103.89648],
-["Lolas Cafe","Hougang",1.36166,103.88594],
-["Long Black Cafe","Queenstown",1.30362,103.79203],
-["Louisa Coffee","Downtown Core",1.29784,103.85782],
-["Luckin Coffee","Western Water Catchment",1.34239,103.68215],
-["Luckin Coffee","Novena",1.32675,103.84665],
-["Luckin Coffee","Kallang",1.31017,103.86401],
-["Luckin Coffee","Pasir Ris",1.37237,103.94999],
-["Luckin Coffee","Pasir Ris",1.37379,103.94861],
-["Luckin Coffee","Downtown Core",1.29936,103.85748],
-["Mad for Garlic","Downtown Core",1.29349,103.85652],
-["Madnest","Bedok",1.30861,103.91135],
-["Mahmuds Tandoor","Rochor",1.30233,103.8596],
-["Main Street Commissary","Rochor",1.30814,103.85567],
-["Maison Kayser Raffles Place","Downtown Core",1.28493,103.84976],
-["Maxi Coffee Bar","Outram",1.28146,103.84537],
-["May Wongs Cafe","Outram",1.27973,103.84238],
-["Mei Heong Yuen Dessert","Downtown Core",1.29811,103.85645],
-["Mellvin Coffee Shop","Marine Parade",1.30849,103.90296],
-["MEME Bistro Bar","Rochor",1.30661,103.84723],
-["Meomi Cat Cafe","Rochor",1.30161,103.85829],
-["Micro Bread & Co.","Marine Parade",1.30532,103.90377],
-["Mixue","Rochor",1.30031,103.85525],
-["Monday Coffee Bar","Clementi",1.32227,103.76377],
-["MooLooLaBar","Marine Parade",1.30418,103.9025],
-["Mosanco Enchanted Cafe","Kallang",1.31446,103.85412],
-["Mr Bean","Outram",1.28525,103.84504],
-["Mr Teh Tarik Deli","Pasir Ris",1.37257,103.94924],
-["Mustafa Cafe","Kallang",1.30989,103.85548],
-["Nami Caf","Queenstown",1.29434,103.77572],
-["NANO PARTEA","Queenstown",1.30408,103.77352],
-["Nanyang Old Coffee","Outram",1.28181,103.8449],
-["Nanyang Old Coffee","Queenstown",1.3024,103.79258],
-["Nanyang Old Coffee","Outram",1.2801,103.84721],
-["Nature Cafe","Outram",1.28357,103.84783],
-["Nature Cafe","Bukit Merah",1.28646,103.80929],
-["New Green Pasture Cafe ()","Rochor",1.30061,103.85209],
-["Next Door Spanish Cafe","Bedok",1.31202,103.92227],
-["Nine Fresh","Western Water Catchment",1.34701,103.68021],
-["Nine Fresh Desserts Taiwan","Queenstown",1.29653,103.78096],
-["No Strangers Here","Rochor",1.30157,103.86064],
-["NTUC Foodfare","Clementi",1.30967,103.7685],
-["NunSongYee Korean Dessert Cafe","Marine Parade",1.30691,103.89545],
-["Oatberry Cafe","Orchard",1.3058,103.83292],
-["Oh Deli","Bedok",1.3091,103.912],
-["Old Chang Kee Coffee House","Rochor",1.30452,103.84962],
-["Old Rochor Beancurd","Kallang",1.31283,103.85998],
-["Old Street Victoria Cafe","Rochor",1.29702,103.85248],
-["Old Tea Hut","Downtown Core",1.28441,103.85123],
-["Old Town White Coffee","Marine Parade",1.29651,103.89932],
-["Olella Makan House","Kallang",1.31597,103.85805],
-["OLLA","Clementi",1.31847,103.76842],
-["Olsen Bakehouse","Marine Parade",1.30963,103.90232],
-["One 2 Drink","Kallang",1.31071,103.86077],
-["One Kueh At A Time Cafe","Clementi",1.3145,103.74933],
-["One Man Coffee","Queenstown",1.29848,103.78917],
-["One Man Coffee","Bishan",1.35254,103.83475],
-["OnlyCreamery Gelato","Outram",1.28314,103.84384],
-["Orange and Teal","Queenstown",1.30524,103.78862],
-["Original Herbal Shop","Novena",1.32575,103.84965],
-["Otter & Pebbles","Novena",1.32028,103.84498],
-["Pacto by Parchmen","Downtown Core",1.28046,103.84518],
-["Palace Tea","Novena",1.32672,103.84589],
-["Pancake Boss Martabak Manis","Downtown Core",1.29802,103.85545],
-["Paris Baguette","Downtown Core",1.29331,103.85322],
-["Park Holland Village","Queenstown",1.31178,103.79554],
-["Partea","Geylang",1.33204,103.88272],
-["Penny University","Bedok",1.30882,103.91116],
-["Penny University","Bedok",1.3088,103.91214],
-["Peoples Park Centre","Outram",1.28594,103.84423],
-["Perle Noire","Bedok",1.31338,103.92772],
-["Pestle & Mortar Society","Geylang",1.33248,103.88486],
-["Petra Haven","Rochor",1.30269,103.85791],
-["Pies & Coffee","Queenstown",1.30559,103.78804],
-["Pine Tree Cafe ()","Rochor",1.30055,103.85222],
-["Platypus Foodbar (E2A)","Queenstown",1.29874,103.77141],
-["Plus Coffee Joint","Outram",1.28237,103.84492],
-["Por Kee Eating House 1996","Bukit Merah",1.28416,103.83278],
-["PPP Coffee","Downtown Core",1.29152,103.84952],
-["PRAIRIE by Craftsmen","Tanglin",1.32271,103.81407],
-["Prince Coffee House","Rochor",1.3003,103.85971],
-["PS cafe","Tanglin",1.3047,103.81107],
-["PS Cafe","Orchard",1.30685,103.82984],
-["PS Cafe","Outram",1.28065,103.84633],
-["PS. Cafe by the Sea","Bedok",1.30419,103.92433],
-["PS.Cafe","Downtown Core",1.28638,103.85414],
-["Punch","Singapore River",1.2869,103.84729],
-["Qafe by Night","Outram",1.2795,103.84409],
-["Qtech","Kallang",1.30782,103.85768],
-["Rae Cafe","Rochor",1.30823,103.85655],
-["Refuel Cafe","Bedok",1.33742,103.92126],
-["ReStore","Outram",1.27764,103.8434],
-["Revelry","Bukit Timah",1.34085,103.77329],
-["Rise","Toa Payoh",1.33252,103.86813],
-["Rochor Beancurd House","Novena",1.3263,103.84873],
-["Rochor Original Beancurd","Rochor",1.30197,103.85036],
-["Rocky Masters","Queenstown",1.3024,103.79325],
-["Routine Cafe & Bar","Outram",1.27797,103.84317],
-["s(he)brews caf","Queenstown",1.29922,103.80139],
-["Salted Caramel","Queenstown",1.2877,103.7905],
-["Sam Yat Coffee","Bukit Merah",1.28463,103.83499],
-["Samsim Vietnam Cafe","Geylang",1.31104,103.90132],
-["Sarnies Cafe","Outram",1.28161,103.84801],
-["Sedap Nasi Lemak","Novena",1.31857,103.84355],
-["Settlers Cafe","Kallang",1.3143,103.85752],
-["Sexy Coffee","Rochor",1.30044,103.85975],
-["Simply Bread","Bukit Timah",1.33063,103.79575],
-["Simply Bread","Tanglin",1.32252,103.81439],
-["Sisters Cookies","Clementi",1.30829,103.76205],
-["Sloth and Messenger Coffee","Geylang",1.3147,103.88881],
-["So France","Downtown Core",1.29916,103.85798],
-["So Good Char Chan Tang","Bishan",1.35964,103.83384],
-["Soul Kind Cafe","Jurong East",1.34179,103.74276],
-["Soulalife","Tampines",1.33602,103.96404],
-["Sourdough & Brew","Kallang",1.31663,103.85777],
-["Spinelli","Queenstown",1.30025,103.77068],
-["St. Marc","Marine Parade",1.29965,103.9071],
-["St. Marc Cafe","Downtown Core",1.29186,103.85663],
-["Staple Food","Geylang",1.31234,103.90021],
-["Starbucks","Jurong West",1.33889,103.70562],
-["Starbucks","Orchard",1.30645,103.83242],
-["Starbucks","Queenstown",1.30555,103.77285],
-["Starbucks","Rochor",1.30192,103.8498],
-["Starbucks","Woodlands",1.43521,103.78681],
-["Starbucks","Downtown Core",1.27759,103.84728],
-["Starbucks","Bedok",1.31292,103.9255],
-["Starbucks","Downtown Core",1.30153,103.85691],
-["Starbucks","Queenstown",1.3055,103.78774],
-["Starbucks","Downtown Core",1.28115,103.85103],
-["Starbucks","Downtown Core",1.27812,103.85049],
-["Starbucks","Western Water Catchment",1.3469,103.68012],
-["Starbucks","Downtown Core",1.2901,103.8498],
-["Starbucks","Downtown Core",1.29216,103.8557],
-["Starbucks","Orchard",1.30493,103.82335],
-["Starbucks","Downtown Core",1.28072,103.8539],
-["Starbucks","Queenstown",1.27451,103.80026],
-["Starbucks","Bukit Timah",1.32363,103.81032],
-["Starbucks","Downtown Core",1.2851,103.84983],
-["Starbucks","Bishan",1.35509,103.83088],
-["Starbucks","Downtown Core",1.30141,103.86256],
-["Starbucks","Museum",1.29936,103.84736],
-["Starbucks","Orchard",1.30383,103.83303],
-["Starbucks","Ang Mo Kio",1.36917,103.84843],
-["Starbucks","Downtown Core",1.28562,103.85402],
-["Starbucks","Downtown Core",1.291,103.85795],
-["Starbucks","Bukit Merah",1.26465,103.82018],
-["Starbucks","Kallang",1.30977,103.86379],
-["Starbucks","Bishan",1.34968,103.8508],
-["Starbucks","Downtown Core",1.28137,103.84962],
-["Starbucks","Clementi",1.31545,103.76455],
-["Starbucks","Tampines",1.34242,103.95315],
-["Starbucks","Downtown Core",1.28558,103.86011],
-["Starbucks","Jurong East",1.33253,103.74659],
-["Starbucks","Novena",1.32239,103.84428],
-["Starbucks","Jurong East",1.33364,103.74318],
-["Starbucks","Orchard",1.30035,103.83976],
-["Starbucks","Novena",1.31969,103.84426],
-["Starbucks","Downtown Core",1.28607,103.84777],
-["Starbucks","Sengkang",1.39136,103.87596],
-["Starbucks","Geylang",1.31728,103.89319],
-["Starbucks","Downtown Core",1.29464,103.85585],
-["Starbucks","Orchard",1.30341,103.83579],
-["Starbucks","Downtown Core",1.28446,103.85188],
-["Starbucks","Downtown Core",1.28327,103.85073],
-["Starbucks","Downtown Core",1.29352,103.85692],
-["Starbucks","Downtown Core",1.29458,103.85783],
-["Starbucks","Downtown Core",1.27677,103.84504],
-["Starbucks","Singapore River",1.29289,103.84281],
-["Starbucks","Novena",1.32718,103.84685],
-["Starbucks","Pasir Ris",1.37233,103.94949],
-["Starbucks","Marine Parade",1.30202,103.90527],
-["Starbucks","Marine Parade",1.29891,103.90672],
-["Starbucks","Yishun",1.42941,103.83574],
-["Starbucks","Downtown Core",1.29354,103.85344],
-["Starbucks","Singapore River",1.28933,103.83671],
-["Starbucks","Southern Islands",1.25437,103.81908],
-["Starbucks","Downtown Core",1.29358,103.85957],
-["State Of Mind","Yishun",1.42529,103.83665],
-["Station 51","Rochor",1.29823,103.85129],
-["Stokedi","Queenstown",1.28777,103.7905],
-["Strangers Reunion Waffles","Bukit Merah",1.27697,103.83633],
-["Summer Folks Cafe & Steakhouse","Downtown Core",1.29695,103.8577],
-["suns Living Room","Museum",1.29454,103.84943],
-["Suzuki Cafe and Roastery","Jurong West",1.33407,103.71363],
-["SweetSpot Cafe","Downtown Core",1.28637,103.8595],
-["Syed Cafe","Bedok",1.33105,103.94815],
-["Symmetry cafe","Rochor",1.30391,103.85922],
-["TA Community","Kallang",1.31522,103.85826],
-["Tai Cheong Bakery","Queenstown",1.31064,103.79501],
-["Tanamera Coffee","Queenstown",1.30597,103.79159],
-["Tanamera Coffee","Downtown Core",1.2913,103.85737],
-["Tanamera Coffee","Outram",1.28395,103.84915],
-["Tanamera Coffee","Singapore River",1.28996,103.83736],
-["Tanamera Coffee","Orchard",1.30474,103.82365],
-["Tanamera Coffee","Serangoon",1.36496,103.86541],
-["Ten","Western Water Catchment",1.38385,103.72664],
-["Thai Smile Cafe","Singapore River",1.28693,103.84855],
-["Thai Table","Bedok",1.33369,103.94852],
-["That Coffee Place","Sengkang",1.39463,103.90137],
-["The Alley","Novena",1.32494,103.8511],
-["The Audacious Cakery","Bukit Merah",1.27742,103.83958],
-["The Bakery Chef","Bukit Merah",1.28413,103.81603],
-["The Bark Cafe","Changi",1.36224,103.97376],
-["The Black Sheep Cafe","Rochor",1.30785,103.85357],
-["The Cider Pit","Marine Parade",1.30903,103.90245],
-["The Clueless Goat","Novena",1.31866,103.84353],
-["The Coffee Bean & Tea Leaf","Jurong West",1.33956,103.70709],
-["The Coffee Bean & Tea Leaf","Marine Parade",1.3011,103.91296],
-["The Coffee Bean & Tea Leaf","Rochor",1.29959,103.85408],
-["The Coffee Bean & Tea Leaf","Downtown Core",1.29196,103.85648],
-["The Coffee Bean & Tea Leaf","Bukit Merah",1.28632,103.82729],
-["The Coffee Bean & Tea Leaf","Bishan",1.35047,103.84828],
-["The Coffee Bean & Tea Leaf","Queenstown",1.27374,103.80166],
-["The Coffee Bean & Tea Leaf","Downtown Core",1.29001,103.85603],
-["The Coffee Bean & Tea Leaf","Novena",1.32032,103.84371],
-["The Coffee Bean & Tea Leaf","Outram",1.28511,103.84461],
-["The Coffee Bean & Tea Leaf","Southern Islands",1.2515,103.8181],
-["The Coffee Bean & Tea Leaf","Kallang",1.31036,103.84626],
-["The Coffee Bean & Tea Leaf","Orchard",1.30398,103.83274],
-["The Coffee Bean & Tea Leaf","Orchard",1.3049,103.83254],
-["The Coffee Bean & Tea Leaf","Tanglin",1.29533,103.82992],
-["The Coffee Bean & Tea Leaf","Novena",1.32498,103.85105],
-["The Coffee Bean & Tea Leaf","Tampines",1.35325,103.95464],
-["The Coffee Bean & Tea Leaf","Changi",1.3603,103.99016],
-["The Coffee Bean and Tea Leaf - Tampines Mart","Tampines",1.35457,103.96053],
-["The communal place","Marine Parade",1.30669,103.90462],
-["The Community Roastery & Cafe","Kallang",1.31157,103.86143],
-["The Dempsey Cookhouse and Bar","Tanglin",1.30559,103.81038],
-["The Dine & Wine Cafe","Queenstown",1.27979,103.78611],
-["The Expat Club","Rochor",1.30818,103.85337],
-["The Good Boys","Toa Payoh",1.33618,103.88634],
-["The Hainan Story Coffee House","Pasir Ris",1.37386,103.94861],
-["The Hainan Story Coffee House","Outram",1.28507,103.84473],
-["The Jip & Lab","Queenstown",1.27968,103.78607],
-["The Lwef Shack","Yishun",1.40099,103.81762],
-["The New Harbor Cafe And Bar","Outram",1.27785,103.84351],
-["The Nook","Bukit Merah",1.28211,103.81957],
-["the plant story","Kallang",1.29531,103.86692],
-["The Reading Room","Outram",1.27902,103.84055],
-["The Ritual","Tanglin",1.31956,103.82739],
-["The Signature Pattisserie","Bukit Timah",1.34084,103.77338],
-["The Social Space","Downtown Core",1.27715,103.85354],
-["The Tiramisu Hero","Kallang",1.31115,103.85975],
-["Thus Coffee","Ang Mo Kio",1.37265,103.82959],
-["Tiger Sugar","Orchard",1.30331,103.83571],
-["Tim Hortons","Pasir Ris",1.37398,103.9487],
-["Tims Restaurant & Cafe","Toa Payoh",1.33921,103.84901],
-["Tinys Cafe","Novena",1.32129,103.85273],
-["Tiong Bahru Bakery","Orchard",1.30132,103.84001],
-["Tiong Bahru Bakery","Museum",1.29235,103.8457],
-["Toast & Curry","Southern Islands",1.25195,103.81757],
-["Toast Box","Kallang",1.30813,103.86223],
-["Toast Box","Hougang",1.33414,103.88954],
-["Toast Box","Downtown Core",1.27933,103.851],
-["Toast Box","Bukit Merah",1.28621,103.82737],
-["Toast Box","Downtown Core",1.28244,103.85786],
-["Toast Box","Sengkang",1.3924,103.89503],
-["Toast Box","Hougang",1.35965,103.88515],
-["Toast Box","Ang Mo Kio",1.3698,103.84818],
-["Toast Box","Serangoon",1.3505,103.87292],
-["Toast Box","Sengkang",1.39108,103.87604],
-["Toast Box","Kallang",1.30185,103.86235],
-["Toast Box","Downtown Core",1.28981,103.85624],
-["Toast Box","Outram",1.28559,103.84505],
-["Toast Box","Bishan",1.35069,103.84852],
-["Toast Box","Rochor",1.30011,103.85164],
-["Toast Box","Downtown Core",1.28447,103.84999],
-["Toast Box","Bukit Timah",1.33115,103.79505],
-["Toast Box","Novena",1.32678,103.84677],
-["Toast Box","Pasir Ris",1.37372,103.9488],
-["Tobys Estate","Singapore River",1.28993,103.8374],
-["toi.kofihaus","Toa Payoh",1.33218,103.85955],
-["Tolidos Espresso Nook","Kallang",1.30453,103.86087],
-["ToMo Cafe","Bishan",1.35147,103.83539],
-["Ton Coffee","Novena",1.32074,103.84437],
-["Totoi Toast","Marine Parade",1.30511,103.90497],
-["Turkish Cafe","Marine Parade",1.29997,103.90753],
-["Tuxedo","Outram",1.27604,103.84355],
-["Two Bakers","Kallang",1.31093,103.86061],
-["Two Men Bagel House","Novena",1.32076,103.84303],
-["Two Tall Trees","Serangoon",1.36526,103.86615],
-["Udders & Kook","Bedok",1.31336,103.9276],
-["Unicorn Kampung 1200","Geylang",1.31452,103.88992],
-["Vanilla Bar and Cafe","Outram",1.28171,103.84772],
-["Venture Drive Coffee","Western Water Catchment",1.34698,103.68052],
-["Venture Drive Coffee","Western Water Catchment",1.3419,103.68325],
-["Verde","Rochor",1.30168,103.86201],
-["Vernacular Coffee","Geylang",1.31013,103.88188],
-["Wan Mei","Marine Parade",1.3047,103.902],
-["Wanna Cuppa","Singapore River",1.28893,103.84764],
-["Warm Up Cafe","Rochor",1.30648,103.84728],
-["Whampoa Soya Bean & Grass Jelly Drinks","Novena",1.32317,103.85432],
-["Wheelers Market","Seletar",1.4094,103.86792],
-["Whisk & Paddle","Punggol",1.39291,103.91741],
-["Wimbly Lu","Kallang",1.31188,103.86065],
-["with a pinch of salt","Marine Parade",1.30648,103.89591],
-["Woodgrove Cafe","Woodlands",1.42943,103.78236],
-["Woody Family Cafe","Sembawang",1.45815,103.83774],
-["Workspace Expresso Bar Marina One","Downtown Core",1.27719,103.85214],
-["Workspace Expresso Bar Novena Square","Novena",1.31996,103.84384],
-["Workspace Grains Cafe by Cedele","Downtown Core",1.29677,103.85771],
-["Xin Wang Hong Kong Cafe","Bedok",1.31284,103.92478],
-["Xin Wang Hong Kong Cafe","Novena",1.32005,103.84342],
-["Xo Cafe","Queenstown",1.27981,103.78601],
-["Xuji by Quad Cafe","Western Water Catchment",1.3425,103.68026],
-["Ya Kun Family Caf","Sengkang",1.39143,103.87608],
-["Ya Kun Family Cafe","Serangoon",1.35033,103.87275],
-["Ya Kun Kaya Toast","Changi",1.35643,103.98651],
-["Ya Kun Kaya Toast","Sengkang",1.39185,103.8948],
-["Ya Kun Kaya Toast","Outram",1.28369,103.84791],
-["Ya Kun Kaya Toast","Kallang",1.31003,103.86395],
-["Ya Kun Kaya Toast","Changi",1.3616,103.98993],
-["Ya Kun Kaya Toast","Pasir Ris",1.37242,103.95003],
-["Ya Kun Kaya Toast","Queenstown",1.29914,103.78756],
-["Ya Kun Kaya Toast","Jurong East",1.32344,103.72179],
-["Ya Kun Kaya Toast","Rochor",1.30147,103.86166],
-["Ya Kun Kaya Toast","Orchard",1.30337,103.83569],
-["Ya Kun Kaya Toast","Orchard",1.3025,103.83538],
-["Ya Kun Kaya Toast","Orchard",1.30496,103.83272],
-["Ya Kun Kaya Toast","Novena",1.32505,103.85097],
-["Ya Kun Kaya Toast","Outram",1.28503,103.84467],
-["Ya Kun Kaya Toast","Bukit Merah",1.28981,103.81731],
-["Yahava KoffeeWorks","Ang Mo Kio",1.3836,103.82814],
-["Yan Xi Tang","Pasir Ris",1.37242,103.9496],
-["Yat Ka Yan","Rochor",1.30053,103.85199],
-["Yi Fang Tea","Pasir Ris",1.37374,103.94866],
-["Yilin Likes Tea","Western Water Catchment",1.34723,103.6807],
-["Yong Fu Coffee Shop","Toa Payoh",1.33899,103.88605],
-["Yoons Social Kitchen","Toa Payoh",1.33353,103.87916],
-["Yuen Yeung","Outram",1.27976,103.8428],
-["Yugoslavia Bakery & Cafe","Marine Parade",1.30348,103.90312],
-["YY Kafei Dian","Downtown Core",1.29611,103.85582]
+var NERVE = [
+  ["e","Nothing to order"],
+  ["m","Order in English"],
+  ["l","Hawker stall"]
 ];
 
-const COFFEE = COFFEE_ROWS.map((r,i) => ({ id:"X"+i, n:r[0], d:r[1], lat:r[2], lon:r[3] }));
-const DISTRICTS = Array.from(new Set(COFFEE.map(x => x.d).filter(Boolean))).sort();
+/* ---------------------------------------------------------------- storage */
+var KEY = "daylight.v3";
+var S = load();
 
-/* Great-circle distance in km - enough precision for "which is nearest". */
-function distKm(aLat, aLon, bLat, bLon){
-  const R = 6371, p = Math.PI/180;
-  const dLat = (bLat-aLat)*p, dLon = (bLon-aLon)*p;
-  const h = Math.sin(dLat/2)**2 + Math.cos(aLat*p)*Math.cos(bLat*p)*Math.sin(dLon/2)**2;
-  return 2*R*Math.asin(Math.sqrt(h));
+function load(){
+  var d = { done:{}, skip:{}, easyOnly:false, theme:null };
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) { var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
+  } catch(e){}
+  return d;
 }
-function coffeeMatches(){
-  const q = (S.ui.cq || "").trim().toLowerCase();
-  let list = COFFEE.filter(x =>
-    (!q || x.n.toLowerCase().indexOf(q) >= 0) && (!S.ui.cd || x.d === S.ui.cd));
-  const me = S.ui.near;
-  if(me){
-    list = list.map(x => Object.assign({km: distKm(me[0], me[1], x.lat, x.lon)}, x))
-               .sort((a,b) => a.km - b.km);
-  } else {
-    list = list.slice().sort((a,b) => a.n.toLowerCase() < b.n.toLowerCase() ? -1 : 1);
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+/* ---------------------------------------------------------------- dates */
+function iso(d){
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function today(){ return iso(new Date()); }
+function nice(s){
+  var p = s.split("-"), m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return Number(p[2]) + " " + m[Number(p[1])-1];
+}
+
+/* ---------------------------------------------------------------- picking
+   A stable pseudo-random ordering per day, so today's suggestion does not
+   change when you reopen the page, but tomorrow's is different. */
+function seedFor(s){
+  var h = 2166136261;
+  for (var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function shuffled(list, seed){
+  var a = list.slice(), r = seed;
+  for (var i=a.length-1;i>0;i--){
+    r = (Math.imul(r, 1664525) + 1013904223) >>> 0;
+    var j = r % (i+1);
+    var t = a[i]; a[i] = a[j]; a[j] = t;
   }
-  return list;
+  return a;
 }
-const COFFEE_PAGE = 60;
-function coffeeListHTML(){
-  const all = coffeeMatches(), shown = all.slice(0, S.ui.cn || COFFEE_PAGE);
-  if(!all.length) return '<div class="empty-note">Nothing matches. Clear the search or pick another district.</div>';
-  return shown.map(x =>
-      '<div class="item'+(isBeen(x.id)?" done":"")+'">'
-      + '<button class="tick'+(isBeen(x.id)?" on":"")+'" data-cbeen="'+x.id+'" aria-label="Been">'
-      + '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
-      + '<div class="itembody"><div class="itemtitle">'+esc(x.n)+"</div>"
-      + '<div class="itemmeta"><span>'+esc(x.d || "Singapore")+"</span>"
-      + (x.km !== undefined ? '<span>&middot;</span><span class="mono">'+(x.km<1?Math.round(x.km*1000)+"m":x.km.toFixed(1)+"km")+"</span>" : "")
-      + "</div></div>"
-      + '<a class="dim mono" style="font-size:11px; padding:2px 6px; text-decoration:none" target="_blank" rel="noopener"'
-      + ' href="https://www.google.com/maps/search/?api=1&query='+x.lat+","+x.lon+'">map</a></div>').join("")
-    + (all.length > shown.length
-        ? '<div style="padding:13px"><button class="btn sm ghost block" data-cmore="1">Show '
-          + Math.min(COFFEE_PAGE, all.length - shown.length) + " more of " + all.length + "</button></div>"
-        : "");
-}
-
-const LIB = LIB_ROWS.map((r,i) => ({
-  id:"L"+i, t:r[0], w:r[1], h:r[2], c:r[3], s:r[4],
-  indoor:r[5].indexOf("i") >= 0, pair:r[5].indexOf("p") >= 0, n:r[6]
-}));
-
-const KEY = "daylight.v2";
-const STORE = {
-  read(){ try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }catch(e){ return null; } },
-  write(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); return true; }catch(e){ return false; } }
-};
-
-/* Basecamps: offset in minutes from UTC, flight time from Singapore in minutes. */
-const CAMPS = [
-  {code:"DXB", city:"Dubai",            country:"UAE",         off:240, fly:450},
-  {code:"MLE", city:"Male",             country:"Maldives",    off:300, fly:270},
-  {code:"CMB", city:"Colombo",          country:"Sri Lanka",   off:330, fly:240},
-  {code:"DEL", city:"Delhi",            country:"India",       off:330, fly:340},
-  {code:"BOM", city:"Mumbai",           country:"India",       off:330, fly:330},
-  {code:"KTM", city:"Kathmandu",        country:"Nepal",       off:345, fly:300},
-  {code:"RGN", city:"Yangon",           country:"Myanmar",     off:390, fly:190},
-  {code:"BKK", city:"Bangkok",          country:"Thailand",    off:420, fly:140},
-  {code:"HKT", city:"Phuket",           country:"Thailand",    off:420, fly:110},
-  {code:"CNX", city:"Chiang Mai",       country:"Thailand",    off:420, fly:200},
-  {code:"SGN", city:"Ho Chi Minh City", country:"Vietnam",     off:420, fly:120},
-  {code:"DAD", city:"Da Nang",          country:"Vietnam",     off:420, fly:170},
-  {code:"HAN", city:"Hanoi",            country:"Vietnam",     off:420, fly:195},
-  {code:"PNH", city:"Phnom Penh",       country:"Cambodia",    off:420, fly:130},
-  {code:"REP", city:"Siem Reap",        country:"Cambodia",    off:420, fly:135},
-  {code:"VTE", city:"Vientiane",        country:"Laos",        off:420, fly:180},
-  {code:"CGK", city:"Jakarta",          country:"Indonesia",   off:420, fly:110},
-  {code:"SIN", city:"Singapore",        country:"",            off:480, fly:0},
-  {code:"KUL", city:"Kuala Lumpur",     country:"Malaysia",    off:480, fly:60},
-  {code:"BWN", city:"Bandar Seri Begawan", country:"Brunei",   off:480, fly:125},
-  {code:"BKI", city:"Kota Kinabalu",    country:"Malaysia",    off:480, fly:155},
-  {code:"DPS", city:"Bali",             country:"Indonesia",   off:480, fly:155},
-  {code:"MNL", city:"Manila",           country:"Philippines", off:480, fly:220},
-  {code:"HKG", city:"Hong Kong",        country:"",            off:480, fly:240},
-  {code:"TPE", city:"Taipei",           country:"Taiwan",      off:480, fly:280},
-  {code:"PER", city:"Perth",            country:"Australia",   off:480, fly:320},
-  {code:"ICN", city:"Seoul",            country:"South Korea", off:540, fly:380},
-  {code:"NRT", city:"Tokyo",            country:"Japan",       off:540, fly:420},
-  {code:"SYD", city:"Sydney",           country:"Australia",   off:600, fly:480}
-];
-
-const CATS = {
-  build:    {label:"Build",    color:"var(--build)",    blurb:"The one project"},
-  move:     {label:"Move",     color:"var(--move)",     blurb:"Training, walking, swimming"},
-  enjoy:    {label:"Enjoy",    color:"var(--enjoy)",    blurb:"Watch, make, play, eat"},
-  discover: {label:"Discover", color:"var(--discover)", blurb:"Somewhere new"},
-  campaign: {label:"Campaign", color:"var(--campaign)", blurb:"The December ask"}
-};
-const SCOPES = { sg:"Singapore", cafe:"Coffee", reg:"The region", home:"No travel" };
-
-function seed(){
-  return {
-    v:2,
-    profile:{ workStartUTC:480, workEndUTC:900, wake:"08:00", camp:"SIN" },
-    /* Anchored to moments that already happen, so there is no new decision
-       to make. Each carries a bad-day version, because the thing that keeps a
-       habit alive is doing a smaller one, not skipping. */
-    habits:[
-      {id:"h1", name:"Up, no phone in bed",     anchor:"wake",    tiny:"Phone stays face down", days:[0,1,2,3,4,5,6]},
-      {id:"h2", name:"Outside for ten minutes", anchor:"wake",    tiny:"Step out, two minutes", days:[0,1,2,3,4,5,6]},
-      {id:"h3", name:"Breakfast, sitting down", anchor:"wake",    tiny:"Sit for one cup",       days:[0,1,2,3,4,5,6]},
-      {id:"h4", name:"Move for twenty minutes", anchor:"mid",     tiny:"Walk round the block",  days:[1,2,3,4,5]},
-      {id:"h5", name:"Eat before the shift",    anchor:"prework", tiny:"Something, anything",   days:[1,2,3,4,5]},
-      {id:"h6", name:"Name tomorrow's first block", anchor:"post", tiny:"One line is enough",   days:[0,1,2,3,4,5]}
-    ],
-    targets:{ build:2, move:3, enjoy:3, discover:1, campaign:2 },
-    habitLog:{},     /* date -> [habit ids done] */
-    saved:[],        /* library ids kept for later */
-    been:{},         /* library id -> date done */
-    custom:[],       /* his own additions, same shape as library items */
-    log:[],          /* {id, cat, label, date} */
-    routineLog:{},
-    ui:{ view:"today", roll:0, fHours:0, fScope:"sg", fPair:false, fIndoor:false, cq:"", cd:"", cn:60, near:null }
-  };
-}
-
-/* Carry across anything worth keeping from the first version. */
-function migrate(){
-  let old = null;
-  try{ const r = localStorage.getItem("daylight.v1"); if(r) old = JSON.parse(r); }catch(e){}
-  if(!old) return null;
-  const s = seed();
-  if(old.profile) s.profile = Object.assign(s.profile, old.profile);
-  if(old.targets) s.targets = Object.assign(s.targets, old.targets);
-  if(Array.isArray(old.routine) && old.routine.length){
-    s.habits = old.routine.map(r => ({id:r.id, name:r.label, anchor:"wake", tiny:"", days:[0,1,2,3,4,5,6]}));
-  }
-  if(old.routineLog) s.habitLog = old.routineLog;
-  if(Array.isArray(old.log)) s.log = old.log;
-  if(old.routineLog) s.routineLog = old.routineLog;
-  if(Array.isArray(old.places)){
-    old.places.forEach(p => {
-      s.custom.push({id:"C"+Math.random().toString(36).slice(2,8), t:p.name, w:p.where,
-                     h:p.hours || 3, c:"discover", s:"sg", indoor:false, pair:true, n:"",
-                     done:!!p.done});
-    });
-  }
-  return s;
-}
-
-let S = STORE.read() || migrate() || seed();
-S.ui = Object.assign(seed().ui, S.ui || {});
-S.profile = Object.assign(seed().profile, S.profile || {});
-S.targets = Object.assign(seed().targets, S.targets || {});
-["saved","custom","log"].forEach(k => { if(!Array.isArray(S[k])) S[k] = []; });
-["been","routineLog","habitLog"].forEach(k => { if(!S[k] || typeof S[k] !== "object") S[k] = {}; });
-/* One-time lift from the old flat routine into anchored habits. */
-if(!Array.isArray(S.habits)){
-  S.habits = Array.isArray(S.routine) && S.routine.length
-    ? S.routine.map(r => ({id:r.id, name:r.label, anchor:"wake", tiny:"", days:[0,1,2,3,4,5,6]}))
-    : seed().habits;
-  if(S.routineLog && !Object.keys(S.habitLog).length) S.habitLog = S.routineLog;
-}
-
-function save(){ STORE.write(S); }
-function uid(){ return Math.random().toString(36).slice(2,10); }
-
-/* ---------------------------- time ---------------------------- */
-const pad = n => String(n).padStart(2,"0");
-const t2m = t => { const [h,m] = t.split(":").map(Number); return h*60+m; };
-function hhmm(m){ const x = ((m % 1440) + 1440) % 1440; return pad(Math.floor(x/60))+":"+pad(x%60); }
-function dur(m){
-  m = Math.max(0, Math.round(m));
-  const h = Math.floor(m/60), r = m%60;
-  return h ? (r ? h+"h "+pad(r)+"m" : h+"h") : r+"m";
-}
-function hrs(m){ return (Math.round(m/6)/10) + "h"; }
-function span(h){ return h >= 24 ? Math.round(h/24)+" days" : h+"h"; }
-const DAYNAME = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-function key(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
-function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
-function weekStart(d){ const x = new Date(d); return addDays(x, -((x.getDay()+6)%7)); }
-
-const camp = code => CAMPS.find(c => c.code === code) || CAMPS.find(c => c.code === "SIN");
-
-function shape(c){
-  const start = S.profile.workStartUTC + c.off;
-  const end   = S.profile.workEndUTC   + c.off;
-  const wake  = t2m(S.profile.wake);
-  return { start, end, startT:hhmm(start), endT:hhmm(end),
-           morning:Math.max(0, start - wake), evening:Math.max(0, 1380 - end), late:end >= 1440 };
-}
-function verdict(c){
-  const s = shape(c);
-  if(s.late) return {t:s.endT+" finish", k:"warn"};
-  if(c.off === 480) return {t:"Same", k:""};
-  if(s.evening >= 210) return {t:"Best shape", k:"good"};
-  if(s.evening >= 60) return {t:"Gains a PM", k:"sig"};
-  return {t:"Marginal", k:""};
-}
-function sub(c){ return c.fly ? (c.country ? c.country + " \u00b7 " : "") + dur(c.fly) : "home"; }
-function nowLocal(){
-  const d = new Date();
-  return (d.getUTCHours()*60 + d.getUTCMinutes() + camp(S.profile.camp).off + 1440) % 1440;
-}
-
-/* ---------------------------- ideas ---------------------------- */
-function allIdeas(){ return LIB.concat(S.custom); }
-function isBeen(id){ return !!S.been[id]; }
-function isSaved(id){ return S.saved.indexOf(id) >= 0; }
-
-/* Free hours left today at the current basecamp - used to pre-filter suggestions. */
-function hoursLeftToday(){
-  const c = camp(S.profile.camp), s = shape(c), n = nowLocal();
-  if(n < s.start) return (s.start - n)/60 + s.evening/60;
-  if(n < s.end) return s.evening/60;
-  return Math.max(0, (1380 - n)/60);
-}
-
-function filtered(){
-  const u = S.ui;
-  return allIdeas().filter(x => {
-    if(u.fScope !== "all" && x.s !== u.fScope) return false;
-    if(u.fHours && x.h > u.fHours) return false;
-    if(u.fPair && !x.pair) return false;
-    if(u.fIndoor && !x.indoor) return false;
+function eligible(){
+  return PLACES.filter(function(p){
+    if (S.done[p[0]]) return false;
+    if (S.easyOnly && p[3] !== 0) return false;
     return true;
   });
 }
-
-function hash32(str){
-  let h = 2166136261 >>> 0;
-  for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
-  return h >>> 0;
-}
-/* Shuffle the pool into a stable order for the day, then walk it. Deterministic,
-   so a re-render never reshuffles under your thumb, and "something else" cannot
-   hand you the same idea twice until the whole pool is exhausted. */
-function pickFrom(pool){
-  if(!pool.length) return null;
-  const salt = key(new Date());
-  const ordered = pool.slice().sort((a,b) => hash32(a.id + salt) - hash32(b.id + salt));
-  return ordered[((S.ui.roll % ordered.length) + ordered.length) % ordered.length];
-}
-function rollPick(){ return pickFrom(filtered().filter(x => !isBeen(x.id))); }
-
-/* Today's suggestion ignores the browse filters and obeys one rule instead:
-   it has to actually fit in the hours left before the day runs out.
-   Coffee is held back to every third roll - there are enough cafes, and they
-   fit every slot, that they would otherwise crowd out everything else. */
-function todayPick(){
-  const cap = hoursLeftToday();
-  const coffeeTurn = S.ui.roll % 3 === 0;
-  const ok = x => !isBeen(x.id) && (coffeeTurn || x.s !== "cafe");
-  let pool = allIdeas().filter(x => ok(x) && x.h <= cap);
-  if(!pool.length) pool = allIdeas().filter(x => ok(x) && x.h <= Math.max(1, cap));
-  if(!pool.length) pool = allIdeas().filter(x => !isBeen(x.id) && x.h <= Math.max(1, cap));
-  return pickFrom(pool);
-}
-
-function markBeen(x){
-  S.been[x.id] = key(new Date());
-  S.saved = S.saved.filter(i => i !== x.id);
-  S.log.push({id:uid(), cat:x.c, label:x.t, date:key(new Date())});
-  save();
-}
-
-/* ---------------------------- data ---------------------------- */
-function weekCount(cat){
-  const ws = key(weekStart(new Date()));
-  return S.log.filter(l => l.cat === cat && l.date >= ws).length;
-}
-function logsIn(a,b){ const x = key(a), y = key(b); return S.log.filter(l => l.date >= x && l.date <= y); }
-/* Anchors are real moments, derived from where you are and when the shift
-   starts, so they move with you rather than being clock times you must obey. */
-function anchors(){
-  const s = shape(camp(S.profile.camp)), wake = t2m(S.profile.wake);
-  return [
-    {k:"wake",    label:"On waking",       at:wake},
-    {k:"mid",     label:"Mid-morning",     at:wake + Math.round((s.start - wake) * 0.45)},
-    {k:"prework", label:"Before the shift",at:Math.max(wake, s.start - 60)},
-    {k:"post",    label:"After the shift", at:s.end}
-  ];
-}
-const ANCHORS = {wake:"On waking", mid:"Mid-morning", prework:"Before the shift", post:"After the shift"};
-
-function habitApplies(h, d){ return (h.days || [0,1,2,3,4,5,6]).indexOf(d.getDay()) >= 0; }
-function habitDone(h, d){ return (S.habitLog[key(d)] || []).indexOf(h.id) >= 0; }
-function habitShare(h){
-  let done = 0, poss = 0;
-  for(let i=0;i<14;i++){
-    const d = addDays(new Date(), -i);
-    if(!habitApplies(h, d)) continue;
-    poss++; if(habitDone(h, d)) done++;
+function pick(){
+  var pool = eligible();
+  if (!pool.length){
+    // Everything done at this level. Fall back to the full list so it never dead-ends.
+    pool = S.easyOnly ? PLACES.filter(function(p){ return p[3]===0; }) : PLACES.slice();
   }
-  return poss ? Math.round(done/poss*100) : 0;
-}
-/* The only alarm worth raising. Missing once is normal and forgiven; missing
-   twice in a row is how a habit actually dies, so that is what gets flagged. */
-function missedLastTime(h){
-  for(let i=1;i<=7;i++){
-    const d = addDays(new Date(), -i);
-    if(!habitApplies(h, d)) continue;
-    return !habitDone(h, d);
-  }
-  return false;
-}
-function everDone(h){
-  for(let i=0;i<14;i++){ if(habitDone(h, addDays(new Date(), -i))) return true; }
-  return false;
-}
-/* A habit you have never started is not "at risk" - it is just new. Only warn
-   about dropping something you were actually doing. */
-function atRisk(h){
-  const t = new Date();
-  return habitApplies(h, t) && !habitDone(h, t) && everDone(h) && missedLastTime(h);
-}
-function habitDots(h){
-  let out = "";
-  for(let i=13;i>=0;i--){
-    const d = addDays(new Date(), -i);
-    out += habitApplies(h, d)
-      ? '<i style="background:'+(habitDone(h,d) ? "var(--good)" : "var(--sunk)")+'"></i>'
-      : '<i style="opacity:.2"></i>';
-  }
-  return '<div class="dots">'+out+"</div>";
+  if (!pool.length) return null;
+  var order = shuffled(pool, seedFor(today()));
+  var n = S.skip[today()] || 0;
+  return order[n % order.length];
 }
 
-/* ---------------------------- helpers ---------------------------- */
-const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const catDot = c => '<span class="dot" style="background:'+(CATS[c]?CATS[c].color:"var(--ink-3)")+'"></span>';
-let sheetEl = null, toastT = null;
-
-function toast(msg){
-  document.querySelectorAll(".toast").forEach(n => n.remove());
-  const el = document.createElement("div");
-  el.className = "toast"; el.textContent = msg;
-  document.body.appendChild(el);
-  clearTimeout(toastT); toastT = setTimeout(() => el.remove(), 1900);
+/* ---------------------------------------------------------------- helpers */
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
-function closeSheet(){ if(sheetEl){ sheetEl.remove(); sheetEl = null; } }
-function openSheet(html, wire){
-  closeSheet();
-  sheetEl = document.createElement("div");
-  sheetEl.className = "sheet";
-  sheetEl.innerHTML = '<div class="sheetbox">' + html + "</div>";
-  sheetEl.addEventListener("click", e => { if(e.target === sheetEl) closeSheet(); });
-  document.body.appendChild(sheetEl);
-  if(wire) wire(sheetEl);
+function maps(name){
+  return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " Singapore");
 }
 
-/* ---------------------------- header ---------------------------- */
-function header(){
-  const c = camp(S.profile.camp), s = shape(c), n = nowLocal();
-  const wake = t2m(S.profile.wake);
-  const a = wake, b = Math.max(s.end, 1380), width = b - a;
-
-  const segs = [];
-  const push = (k, x, y, label) => { if(y > x) segs.push({k, w:(y-x)/width*100, x, y, label}); };
-  push("free", a, s.start, "Free \u00b7 " + hrs(s.morning));
-  push("work", s.start, s.end, "Work");
-  push("eve", s.end, b, s.evening >= 60 ? "Evening \u00b7 " + hrs(s.evening) : "");
-
-  const bar = segs.map(g => {
-    const passed = Math.min(1, Math.max(0, (n - g.x)/(g.y - g.x)));
-    return '<div class="seg seg-'+g.k+'" style="flex:0 0 '+g.w.toFixed(3)+'%">'
-      + '<div class="fill" style="width:'+(passed*100).toFixed(1)+'%"></div>'
-      + (g.w >= 15 && g.label ? "<em>"+g.label+"</em>" : "") + "</div>";
-  }).join("");
-  const pos = Math.min(100, Math.max(0, (n - a)/width*100));
-  const marker = (n >= a && n <= b) ? '<div class="nowline" style="left:'+pos.toFixed(2)+'%"></div>' : "";
-
-  let big, small;
-  if(n < s.start){ big = dur(s.start - n); small = "until work at " + s.startT; }
-  else if(n < s.end){ big = dur(s.end - n); small = "left of the shift"; }
-  else { big = s.evening >= 60 ? dur(Math.max(0, 1380 - n)) : "\u2014"; small = s.evening >= 60 ? "of evening left" : "day's done"; }
-
-  const d = new Date();
-  return '<header><div class="brandrow"><div>'
-    + '<div class="brand">Day<em>light</em></div>'
-    + '<button class="where" data-camp="1"><b>'+esc(c.city)+"</b> \u00b7 UTC+"+(c.off/60)
-    + " \u00b7 " + DAYNAME[d.getDay()] + "</button></div>"
-    + '<div class="countdown"><b>'+big+"</b><span>"+small+"</span></div></div>"
-    + '<div class="daybar">'+bar+marker+"</div>"
-    + '<div class="scale"><span>'+hhmm(a)+"</span><span>"+hhmm(b)+"</span></div></header>";
-}
-
-const ICONS = {
-  today:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
-  ideas:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>',
-  where:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
-  review:'<path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/>'
-};
-function nav(){
-  return '<nav><div class="navinner">' + [["today","Today"],["ideas","Ideas"],["where","Where"],["review","Review"]]
-    .map(([k,l]) => '<button class="navbtn '+(S.ui.view===k?"on":"")+'" data-go="'+k+'">'
-      + '<svg viewBox="0 0 24 24">'+ICONS[k]+"</svg><span>"+l+"</span></button>").join("") + "</div></nav>";
-}
-
-/* ============================ habits ============================ */
-function habitsSection(){
-  const t = new Date();
-  const due = S.habits.filter(h => habitApplies(h, t));
-  const done = due.filter(h => habitDone(h, t)).length;
-  const risky = due.filter(atRisk);
-
-  let html = '<section><div class="sechead"><h2>Habits</h2>'
-    + '<span class="eyebrow">'+done+" / "+due.length+" today</span></div>";
-
-  if(risky.length){
-    html += '<div class="card" style="padding:14px 15px; margin-bottom:10px; background:var(--signal-soft); border-color:var(--signal)">'
-      + '<div class="eyebrow" style="color:var(--signal)">Do not miss twice</div>'
-      + '<p style="margin:6px 0 0; font-size:13.5px; color:var(--ink-2)">You missed '
-      + risky.map(h => '<strong style="color:var(--ink)">'+esc(h.name)+"</strong>").join(" and ")
-      + " last time. Missing once is nothing at all. Missing twice is how a habit ends "
-      + "&mdash; so do the small version if that is all today has in it.</p></div>";
-  }
-
-  if(!due.length){
-    html += '<div class="card empty-note">Nothing due today.</div>';
-  } else {
-    html += '<div class="card">';
-    anchors().forEach(a => {
-      const list = due.filter(h => (h.anchor || "wake") === a.k);
-      if(!list.length) return;
-      html += '<div class="cardhead" style="border-radius:0"><div class="row" style="gap:8px">'
-        + '<strong style="font-size:13px">'+a.label+"</strong>"
-        + '<span class="chip mono">'+hhmm(a.at)+"</span></div>"
-        + '<span class="dim mono" style="font-size:11px">'+list.filter(h=>habitDone(h,t)).length+"/"+list.length+"</span></div>";
-      list.forEach(h => {
-        const on = habitDone(h, t), risk = atRisk(h);
-        html += '<div class="item'+(on?" done":"")+'">'
-          + '<button class="tick sq'+(on?" on":"")+'" data-hab="'+h.id+'" aria-label="Done">'
-          + '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
-          + '<div class="itembody"><div class="itemtitle">'+esc(h.name)+"</div>"
-          + (h.tiny && !on ? '<div class="itemnote">Bad day version: '+esc(h.tiny)+"</div>" : "")
-          + '<div class="itemmeta">'+habitDots(h)
-          + '<span class="mono">'+habitShare(h)+"%</span>"
-          + (risk ? '<span class="chip sig">missed last time</span>' : "") + "</div></div>"
-          + '<button class="dim" data-habedit="'+h.id+'" aria-label="Edit" style="font-size:11px; padding:2px 6px">edit</button></div>';
-      });
-    });
-    html += "</div>";
-  }
-  html += '<div class="row" style="gap:9px; margin-top:10px">'
-    + '<button class="btn sm ghost" data-newhab="1">Add a habit</button></div>'
-    + '<p class="dim" style="font-size:12px; margin:9px 0 0">Fourteen days shown per habit. '
-    + "No streaks &mdash; one miss costs a fourteenth, not the lot.</p></section>";
-  return html;
-}
-
-/* ============================ TODAY ============================ */
+/* ---------------------------------------------------------------- views */
 function viewToday(){
-  let html = botSection() + habitsSection();
+  var p = pick();
+  if (!p) return "<div class='card'><p>Nothing left. That is a good problem.</p></div>";
 
-  /* One suggestion, sized to the time actually left today. */
-  const left = hoursLeftToday();
-  const pick = todayPick();
-  if(pick){
-    html += '<section><div class="pitch">'
-      + '<div class="eyebrow">'+(left < 0.5 ? "For tomorrow" : "Today &middot; " + dur(left*60) + " free")+"</div>"
-      + "<h3>"+esc(pick.t)+"</h3>"
-      + (pick.n ? '<p class="p-note">'+esc(pick.n)+"</p>" : "")
-      + '<div class="p-meta">'+catDot(pick.c)+"<span>"+esc(pick.w)+"</span><span>&middot;</span>"
-      + '<span class="mono">'+span(pick.h)+"</span>"
-      + (pick.indoor ? '<span class="chip">indoors</span>' : "")
-      + (pick.pair ? '<span class="chip">with someone</span>' : "") + "</div>"
-      + '<div class="p-act"><button class="btn sm" data-been="'+pick.id+'">Did it</button>'
-      + '<button class="btn sm ghost" data-save="'+pick.id+'">'+(isSaved(pick.id)?"Saved":"Save")+"</button>"
-      + '<button class="btn sm ghost" data-roll="1">Something else</button></div>'
-      + "</div></section>";
+  var n = NERVE[p[3]];
+  var h = "";
+
+  h += "<div class='card hero'>";
+  h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>";
+  h += "<div><h2 style='margin:0 0 3px'>" + esc(p[0]) + "</h2>";
+  h += "<div class='dim'>" + esc(p[1]) + " &middot; " + esc(p[2]) + "</div></div>";
+  h += "<span class='pill " + n[0] + "'>" + esc(n[1]) + "</span>";
+  h += "</div>";
+  h += "<p class='muted' style='margin-top:12px'>" + esc(p[5]) + "</p>";
+  h += "<div class='row'><b>When</b><div>" + esc(p[4]) + "</div></div>";
+  h += "<div class='row'><b>Cost</b><div>" + esc(p[9]) + "</div></div>";
+  h += "</div>";
+
+  if (p[7]){
+    h += "<div class='say'>";
+    h += "<span class='lbl'>Say this</span>";
+    h += "<q>" + esc(p[7]) + "</q>";
+    if (p[8]) h += "<p class='after'>" + esc(p[8]) + "</p>";
+    h += "</div>";
+    if (p[6]) h += "<div class='card'><div class='row'><b>Order</b><div>" + esc(p[6]) + "</div></div></div>";
   }
 
-  html += '<section><div class="sechead"><h2>Owed this week</h2><span class="eyebrow">tap to log</span></div>'
-    + '<div class="slots">'
-    + Object.keys(CATS).map(k => {
-        const have = weekCount(k), want = S.targets[k] || 0;
-        if(!want) return "";
-        return '<button class="slot" data-log="'+k+'">'
-          + '<div class="n" style="color:'+CATS[k].color+'">'+have+"<s> / "+want+"</s></div>"
-          + '<div class="lbl">'+catDot(k)+CATS[k].label+"</div>"
-          + '<div class="pips">' + Array.from({length:want}, (_,i) =>
-              '<i style="background:'+(i<have?CATS[k].color:"var(--sunk)")+'"></i>').join("") + "</div></button>";
-      }).join("")
-    + "</div></section>";
+  h += "<div class='btns'>";
+  h += "<button class='pri' data-done='" + esc(p[0]) + "'>I went</button>";
+  h += "<button data-skip='1'>Somewhere else</button>";
+  h += "</div>";
+  h += "<div class='btns'>";
+  h += "<button onclick=\"window.open('" + maps(p[0]) + "','_blank','noopener')\">Open in Maps</button>";
+  h += "<button data-easy='1'>" + (S.easyOnly ? "Show me everything" : "Something easier") + "</button>";
+  h += "</div>";
 
-  const today = S.log.filter(l => l.date === key(new Date()));
-  if(today.length){
-    html += '<section><div class="sechead"><h2>Logged today</h2></div><div class="card">'
-      + today.map(l => '<div class="item"><div class="itembody"><div class="itemtitle">'
-          + esc(l.label || (CATS[l.cat]||{}).label || "\u2014") + "</div>"
-          + '<div class="itemmeta">'+catDot(l.cat)+"<span>"+((CATS[l.cat]||{}).label||"")+"</span></div></div>"
-          + '<button class="dim" data-rmlog="'+l.id+'" style="font-size:18px; line-height:1; padding:2px 4px">&times;</button></div>').join("")
-      + "</div></section>";
+  if (p[3] === 2){
+    h += "<div class='card tip'><h3>If the words go</h3>"
+      + "<p style='margin:8px 0 0'>Point at what you want and hold up one finger. That is what half the queue is doing and "
+      + "nobody has ever minded. <strong>You do not have to get the local phrasing right to be served.</strong></p></div>";
   }
-  return html;
+  return h;
 }
 
-/* ============================ IDEAS ============================ */
-function viewIdeas(){
-  const u = S.ui;
-  const pick = rollPick();
-  const pool = filtered();
+function viewWeek(){
+  var h = "<p class='muted'>The two things that are fixed. Everything else on this page is optional.</p>";
 
-  let html = '<section><div class="sechead"><h2>Something to do</h2>'
-    + '<span class="eyebrow">'+pool.length+" ideas</span></div>";
+  h += "<div class='card'><h3>Saturday, 07:30 &mdash; parkrun</h3>"
+    + "<p class='muted' style='margin:6px 0 0'>Same event every week. Pick the one furthest from Tanjong Pagar, not the nearest, "
+    + "so turning up puts you somewhere else in Singapore with the whole day ahead. Walking is allowed and nobody finishes last.</p>"
+    + "<p class='dim' style='margin:8px 0 0'>Bishan-Ang Mo Kio &middot; East Coast &middot; West Coast &middot; Bay East &middot; Bedok Reservoir</p></div>";
 
-  if(pick){
-    html += '<div class="pitch" style="margin-bottom:14px">'
-      + '<div class="eyebrow">'+SCOPES[pick.s]+"</div>"
-      + "<h3>"+esc(pick.t)+"</h3>"
-      + (pick.n ? '<p class="p-note">'+esc(pick.n)+"</p>" : "")
-      + '<div class="p-meta">'+catDot(pick.c)+"<span>"+esc(pick.w)+"</span><span>&middot;</span>"
-      + '<span class="mono">'+span(pick.h)+"</span>"
-      + (pick.indoor ? '<span class="chip">indoors</span>' : "")
-      + (pick.pair ? '<span class="chip">with someone</span>' : "") + "</div>"
-      + '<div class="p-act"><button class="btn sm" data-been="'+pick.id+'">Did it</button>'
-      + '<button class="btn sm ghost" data-save="'+pick.id+'">'+(isSaved(pick.id)?"Saved":"Save")+"</button>"
-      + '<button class="btn sm ghost" data-roll="1">Something else</button></div></div>';
-  } else {
-    html += '<div class="card empty-note">Nothing matches those filters. Loosen one.</div>';
-  }
+  h += "<div class='card'><h3>Wednesday, 14:30 &mdash; call your mum</h3>"
+    + "<p class='muted' style='margin:6px 0 0'>About seven in the morning for her. Walk while you talk. "
+    + "The thing that moves this off 30% is her expecting it, not you remembering it &mdash; so tell her it is every Wednesday.</p>"
+    + "<p class='dim' style='margin:8px 0 0'>If you are late, call anyway. Ten minutes at 15:20 beats a clean miss.</p></div>";
 
-  /* Filters */
-  html += '<div class="card" style="padding:14px">'
-    + '<div class="eyebrow" style="margin-bottom:7px">Where</div><div class="pills">'
-    + Object.keys(SCOPES).concat("all").map(k =>
-        '<button class="pill tiny'+(u.fScope===k?" on":"")+'" data-fs="'+k+'">'+(k==="all"?"Anything":SCOPES[k])+"</button>").join("")
-    + '</div><div class="eyebrow" style="margin:14px 0 7px">Time I have</div><div class="pills">'
-    + [[0,"Any"],[1,"1h"],[2,"2h"],[4,"Half day"],[10,"A day"],[48,"A weekend"]].map(([v,l]) =>
-        '<button class="pill tiny'+(u.fHours===v?" on":"")+'" data-fh="'+v+'">'+l+"</button>").join("")
-    + '</div><div class="pills" style="margin-top:14px">'
-    + '<button class="pill tiny'+(u.fPair?" on":"")+'" data-fp="1">With someone</button>'
-    + '<button class="pill tiny'+(u.fIndoor?" on":"")+'" data-fi="1">Indoors, it\u2019s raining</button>'
-    + "</div></div>";
+  h += "<div class='card'><h3>Not yet started</h3>"
+    + "<div class='row'><b>Today</b><div>Text Kelvin about the games night. Propose a date rather than asking if he is free.</div></div>"
+    + "<div class='row'><b>22-23 Oct</b><div>NEXTPredict. Negotiate nothing before it.</div></div>"
+    + "<div class='row'><b>27 Oct</b><div>The conversation. Scope and rate in one document.</div></div>"
+    + "</div>";
+  return h;
+}
 
-  /* Saved */
-  if(S.saved.length){
-    html += '<div class="sechead" style="margin-top:20px"><h2>Saved</h2></div><div class="card">'
-      + S.saved.map(id => {
-          const x = allIdeas().find(y => y.id === id); if(!x) return "";
-          return '<div class="item"><button class="tick" data-been="'+x.id+'" aria-label="Did it">'
-            + '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
-            + '<div class="itembody"><div class="itemtitle">'+esc(x.t)+"</div>"
-            + '<div class="itemmeta">'+catDot(x.c)+"<span>"+esc(x.w)+"</span><span>&middot;</span>"
-            + '<span class="mono">'+span(x.h)+"</span></div></div>"
-            + '<button class="dim" data-unsave="'+x.id+'" style="font-size:18px; line-height:1; padding:2px 4px">&times;</button></div>';
-        }).join("") + "</div>";
-  }
+function viewSay(){
+  var h = "<p class='muted'>Here because you will not remember it, and there is no reason you should. "
+        + "Open it in the queue.</p>";
 
-  /* The full directory - only under Coffee, where the numbers justify it. */
-  if(u.fScope === "cafe"){
-    const n = coffeeMatches().length;
-    html += '<div class="sechead" style="margin-top:22px"><h2>Every coffee place</h2>'
-      + '<span class="eyebrow">'+n+" of "+COFFEE.length+"</span></div>"
-      + '<div class="card" style="padding:14px; margin-bottom:12px">'
-      + '<input id="cq" placeholder="Search by name" value="'+esc(u.cq||"")+'" autocomplete="off">'
-      + '<div class="row" style="gap:9px; margin-top:10px">'
-      + '<select id="cd" style="flex:1"><option value="">Every district</option>'
-      + DISTRICTS.map(d => '<option value="'+esc(d)+'"'+(u.cd===d?" selected":"")+">"+esc(d)+"</option>").join("")
-      + "</select>"
-      + '<button class="btn sm '+(u.near?"":"ghost")+'" data-near="1" style="white-space:nowrap">'
-      + (u.near ? "Nearest" : "Near me") + "</button></div>"
-      + (u.near ? '<p class="dim" style="font-size:12px; margin:9px 0 0">Sorted by distance from where you are.</p>' : "")
-      + "</div>"
-      + '<div class="card" id="clist">' + coffeeListHTML() + "</div>"
-      + '<p class="dim" style="font-size:12px; margin-top:10px">Sourced from an open Singapore points-of-interest '
-      + "dataset. Some will have closed, and opening hours are not included.</p>";
-  }
+  h += "<div class='card ok'><h3>The three that always work</h3>"
+    + "<ul style='margin:8px 0 0'>"
+    + "<li><strong>Point, and hold up one finger.</strong> Universally understood, faintly rude to nobody, and extremely common.</li>"
+    + "<li><strong>&ldquo;One of that, please.&rdquo;</strong> English is an official language and every stallholder has heard this a thousand times.</li>"
+    + "<li><strong>Join the longest queue and order what the person in front ordered.</strong> This is a recognised national strategy, not a cop-out.</li>"
+    + "</ul></div>";
 
-  /* Browse everything that matches */
-  html += '<div class="sechead" style="margin-top:20px"><h2>All of them</h2>'
-    + '<button class="btn sm ghost" data-newidea="1">Add your own</button></div><div class="card">'
-    + (pool.length ? pool.map(x =>
-        '<div class="item'+(isBeen(x.id)?" done":"")+'">'
-        + '<button class="tick'+(isBeen(x.id)?" on":"")+'" data-been="'+x.id+'" aria-label="Did it">'
-        + '<svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button>'
-        + '<div class="itembody"><div class="itemtitle">'+esc(x.t)+"</div>"
-        + (x.n ? '<div class="itemnote">'+esc(x.n)+"</div>" : "")
-        + '<div class="itemmeta">'+catDot(x.c)+"<span>"+esc(x.w)+"</span><span>&middot;</span>"
-        + '<span class="mono">'+span(x.h)+"</span>"
-        + (isBeen(x.id) ? '<span class="chip good">'+S.been[x.id]+"</span>" : "")+"</div></div>"
-        + (isBeen(x.id) ? '<button class="dim" data-unbeen="'+x.id+'" style="font-size:12px; padding:2px 6px">undo</button>'
-                        : '<button class="dim mono" data-save="'+x.id+'" style="font-size:11px; padding:2px 6px">'+(isSaved(x.id)?"saved":"save")+"</button>")
-        + "</div>").join("")
-      : '<div class="empty-note">Nothing matches. Loosen a filter.</div>')
+  h += "<h2>Kopi</h2>"
+    + "<p class='muted'>Two or three terms stacked together. <strong>Kopi</strong> on its own is coffee with condensed milk and sugar.</p>";
+  h += "<table><tr><th>Say</th><th>Means</th></tr>"
+    + "<tr><td>kopi</td><td>Coffee, condensed milk, sweet. The default.</td></tr>"
+    + "<tr><td>-o</td><td>No milk. Black, still sweet.</td></tr>"
+    + "<tr><td>-c</td><td>Evaporated milk instead of condensed.</td></tr>"
+    + "<tr><td>kosong</td><td>No sugar at all.</td></tr>"
+    + "<tr><td>siew dai</td><td>Less sweet. The one you want.</td></tr>"
+    + "<tr><td>gah dai</td><td>Sweeter.</td></tr>"
+    + "<tr><td>gao</td><td>Strong.</td></tr>"
+    + "<tr><td>po</td><td>Weak.</td></tr>"
+    + "<tr><td>peng</td><td>Iced.</td></tr>"
+    + "<tr><td>da bao</td><td>Take away. Goes last.</td></tr>"
+    + "<tr><td>teh</td><td>Same system, but tea.</td></tr>"
+    + "</table>";
+  h += "<div class='card'><h3>Three orders that cover most days</h3>"
+    + "<div class='row'><b>Standard</b><div><strong>Kopi-o siew dai.</strong> Black, a bit sweet. The most ordinary thing you can say.</div></div>"
+    + "<div class='row'><b>Milky</b><div><strong>Kopi-c siew dai.</strong> Evaporated milk, less sugar.</div></div>"
+    + "<div class='row'><b>Hot day</b><div><strong>Kopi-o peng.</strong> Iced.</div></div>"
+    + "</div>";
+  h += "<p class='dim'>They will often repeat it back loudly across the stall. That is the order going to the person making it, "
+    + "not a correction of your pronunciation.</p>";
+
+  h += "<h2>Hawker centres</h2>";
+  h += "<div class='card'>"
+    + "<div class='row'><b>Seat first</b><div>Find a table before you queue, and <strong>chope</strong> it with a packet of tissues. That is the accepted signal and everybody uses it.</div></div>"
+    + "<div class='row'><b>Sharing</b><div>Sitting with strangers at a big table is normal. <strong>&ldquo;Can sit?&rdquo;</strong> is the whole phrase.</div></div>"
+    + "<div class='row'><b>Ordering</b><div>Each stall separately, and you usually pay and wait there. Some give you a buzzer.</div></div>"
+    + "<div class='row'><b>Cash</b><div>Still fastest. Bring small notes. Plenty take PayNow now, but do not count on it.</div></div>"
+    + "<div class='row'><b>Trays</b><div>Returning your tray has been required since 2021. Return station is near the exit.</div></div>"
+    + "<div class='row'><b>Timing</b><div>Avoid 12:00 to 13:30 near the CBD. Go at 14:00 instead &mdash; calm, no queue, nobody behind you.</div></div>"
     + "</div>";
 
-  return html + "</section>";
+  h += "<h2>Two words in Hokkien</h2>"
+    + "<p class='muted'>Worth having, given who you are going to be having dinner with.</p>"
+    + "<table><tr><th>Say</th><th>Means</th></tr>"
+    + "<tr><td>chiah pa boe</td><td>Have you eaten? The standard greeting, and the correct answer is yes.</td></tr>"
+    + "<tr><td>ho chiah</td><td>Delicious. Deploy at his mother's table.</td></tr>"
+    + "<tr><td>kam siah</td><td>Thank you.</td></tr>"
+    + "</table>"
+    + "<p class='dim'>Better than any of this: ask his family to teach you. Asking an elder for their Hokkien is a much warmer "
+    + "thing than getting it right off a page.</p>";
+  return h;
 }
 
-/* ============================ WHERE ============================ */
-function viewWhere(){
-  const cur = camp(S.profile.camp);
-  let html = '<section><div class="card" style="padding:15px; margin-bottom:14px">'
-    + '<div class="eyebrow" style="margin-bottom:7px">The trade</div>'
-    + '<p class="muted" style="margin:0; font-size:13.5px">Your shift is fixed to London \u2014 '
-    + hhmm(S.profile.workStartUTC)+"\u2013"+hhmm(S.profile.workEndUTC)+" UTC \u2014 so it lands at a different "
-    + "local hour everywhere. Your free morning is exactly your UTC offset, and your evening is what is left of eight hours. "
-    + '<strong style="color:var(--ink)">Flying west trades morning for evening, hour for hour.</strong></p></div>';
-
-  const rows = CAMPS.slice().sort((a,b) => a.off - b.off || a.fly - b.fly);
-  html += '<div class="card"><div class="cardhead"><strong>Every hour, everywhere</strong>'
-    + '<span class="dim mono" style="font-size:11px">local time</span></div><div class="scroll"><table>'
-    + "<tr><th>Place</th><th>Work</th><th>AM</th><th>PM</th><th></th></tr>"
-    + rows.map(c => {
-        const s = shape(c), v = verdict(c);
-        return '<tr'+(c.code===cur.code?' class="here"':"")+'>'
-          + '<td class="city"><b>'+esc(c.city)+"</b><span>"+esc(sub(c))+"</span></td>"
-          + '<td class="mono">'+s.startT+"\u2013"+s.endT+"</td>"
-          + '<td class="mono">'+hrs(s.morning)+"</td>"
-          + '<td class="mono"'+(s.evening<60?' style="color:var(--ink-3)"':"")+">"+hrs(s.evening)+"</td>"
-          + '<td><span class="chip '+v.k+'">'+v.t+"</span></td></tr>";
-      }).join("")
-    + "</table></div></div>"
-    + '<p class="dim" style="font-size:12px; margin-top:10px">Standard time offsets; Sydney shifts an hour in its summer. '
-    + "Flight times are direct from Singapore.</p></section>";
-  return html;
-}
-
-/* ============================ REVIEW ============================ */
-function viewReview(){
-  const hs = S.habits || [];
-  const been = Object.keys(S.been).length;
-  const from = addDays(new Date(), -27);
-  const recent = logsIn(from, new Date());
-
-  let html = '<section><div class="sechead"><h2>Last four weeks</h2></div>'
-    + '<div class="card" style="padding:16px; margin-bottom:12px">'
-    + '<div class="eyebrow" style="margin-bottom:13px">Habits, last 14 days</div>'
-    + (hs.length ? hs.map(h =>
-        '<div style="margin-bottom:14px"><div class="row" style="justify-content:space-between; gap:10px; margin-bottom:6px">'
-        + '<span style="font-size:13.5px">'+esc(h.name)+"</span>"
-        + '<span class="mono dim" style="font-size:12px">'+habitShare(h)+"%</span></div>"
-        + habitDots(h)
-        + '<div class="dim" style="font-size:11.5px; margin-top:5px">'+(ANCHORS[h.anchor]||"On waking")
-        + ((h.days||[]).length === 5 ? " &middot; weekdays" : "") + "</div></div>").join("")
-      : '<div class="empty-note">No habits yet.</div>')
-    + '<p class="dim" style="font-size:12px; margin:2px 0 0">Faint squares are days it did not apply. '
-    + "A share, not a streak: one miss costs a fourteenth.</p></div>";
-
-  html += '<div class="card" style="padding:16px; margin-bottom:12px">'
-    + '<div class="row" style="justify-content:space-between; align-items:baseline">'
-    + '<div><div class="eyebrow">Been to</div>'
-    + '<div class="mono" style="font-size:32px; font-weight:700; letter-spacing:-.03em; line-height:1.1">'+been+"</div></div>"
-    + '<div class="dim" style="font-size:12px; text-align:right">of '+allIdeas().length+" ideas<br>on the list</div></div>"
-    + '<div class="bar" style="margin-top:11px"><i style="width:'+(been/allIdeas().length*100).toFixed(1)+'%; background:var(--discover)"></i></div></div>';
-
-  const weeks = [];
-  for(let w=3; w>=0; w--){
-    const ws = weekStart(addDays(new Date(), -7*w)), we = addDays(ws, 6);
-    const by = {}; Object.keys(CATS).forEach(k => by[k]=0);
-    logsIn(ws, we).forEach(l => { if(by[l.cat] !== undefined) by[l.cat]++; });
-    weeks.push({ws, by, sum:Object.values(by).reduce((a,b)=>a+b,0)});
+function viewBeen(){
+  var names = Object.keys(S.done);
+  if (!names.length){
+    return "<div class='card'><h3>Nothing here yet</h3>"
+      + "<p class='muted' style='margin:8px 0 0'>Which is exactly right for day one. Go to one place, press <strong>I went</strong>, "
+      + "and this fills up on its own.</p></div>";
   }
-  const peak = Math.max(4, ...weeks.map(w => w.sum));
-  html += '<div class="card" style="padding:16px; margin-bottom:12px"><div class="eyebrow" style="margin-bottom:12px">By week</div>'
-    + '<div style="display:flex; gap:10px; align-items:flex-end; height:96px">'
-    + weeks.map(w => '<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end">'
-        + '<div style="width:100%; height:'+Math.max(3, w.sum/peak*100)+'%; border-radius:5px 5px 0 0; overflow:hidden; display:flex; flex-direction:column-reverse">'
-        + Object.keys(CATS).map(k => w.by[k] ? '<div style="height:'+(w.by[k]/w.sum*100)+"%; background:"+CATS[k].color+'"></div>' : "").join("")
-        + '</div><span class="mono dim" style="font-size:10px">'+pad(w.ws.getDate())+"."+pad(w.ws.getMonth()+1)+"</span></div>").join("")
-    + "</div></div>";
-
-  html += '<div class="card" style="padding:16px; margin-bottom:12px"><div class="eyebrow" style="margin-bottom:12px">Where it went</div>';
-  const tot = recent.length || 1;
-  Object.keys(CATS).forEach(k => {
-    const n = recent.filter(l => l.cat === k).length, p = Math.round(n/tot*100);
-    const want4 = (S.targets[k]||0)*4;
-    html += '<div style="margin-bottom:11px"><div class="row" style="justify-content:space-between; margin-bottom:5px">'
-      + '<span class="row" style="gap:7px; font-size:13.5px">'+catDot(k)+CATS[k].label+"</span>"
-      + '<span class="mono dim" style="font-size:12px">'+n+" / "+want4+" \u00b7 "+p+"%</span></div>"
-      + '<div class="bar"><i style="width:'+(want4?Math.min(100,n/want4*100):0)+"%; background:"+CATS[k].color+'"></i></div></div>';
+  names.sort(function(a,b){ return S.done[b].localeCompare(S.done[a]); });
+  var h = "<div class='card ok'><h3>" + names.length + (names.length===1 ? " place" : " places") + "</h3>"
+        + "<p class='muted' style='margin:8px 0 0'>No streak, no target. Just the list getting longer.</p></div>";
+  h += "<div class='card'>";
+  names.forEach(function(n){
+    h += "<div class='row'><b>" + esc(nice(S.done[n])) + "</b><div>" + esc(n) + "</div></div>";
   });
-  html += "</div>";
-
-  html += '<div class="sechead" style="margin-top:20px"><h2>Weekly targets</h2></div>'
-    + '<div class="card" style="padding:15px"><div class="grid2">'
-    + Object.keys(CATS).map(k => '<div class="field"><label class="eyebrow">'+CATS[k].label+"</label>"
-        + '<input type="number" min="0" max="14" class="mono" value="'+(S.targets[k]||0)+'" data-tgt="'+k+'"></div>').join("")
-    + "</div></div>";
-
-  html += '<hr class="rule"><div class="row" style="gap:9px">'
-    + '<button class="btn ghost" data-export="1">Export</button>'
-    + '<button class="btn ghost" data-import="1">Import</button></div>'
-    + '<p class="dim" style="font-size:12px; margin-top:9px">Stored on this device only. Export before clearing browser data.</p>';
-  return html + "</section>";
+  h += "</div>";
+  h += "<div class='btns'><button data-reset='1'>Clear everything</button></div>";
+  return h;
 }
 
-/* ============================ sheets ============================ */
-function campSheet(){
-  const rows = CAMPS.slice().sort((a,b) => a.off - b.off || a.fly - b.fly);
-  openSheet("<h2 style='font-size:17px; margin-bottom:6px'>Where are you working from?</h2>"
-    + '<p class="muted" style="font-size:13.5px; margin:0 0 14px">Everything reshapes around the local hours.</p>'
-    + '<div class="card">' + rows.map(c => {
-        const s = shape(c), v = verdict(c);
-        return '<button class="item" data-setcamp="'+c.code+'">'
-          + '<div class="itembody"><div class="itemtitle">'+esc(c.city)
-          + ' <span class="dim" style="font-weight:400">'+esc(sub(c))+"</span></div>"
-          + '<div class="itemmeta"><span class="mono">'+s.startT+"\u2013"+s.endT+'</span><span class="chip '+v.k+'">'+v.t+"</span></div></div></button>";
-      }).join("") + "</div>"
-    + '<button class="btn ghost block" style="margin-top:13px" data-close="1">Cancel</button>',
-    el => {
-      el.querySelectorAll("[data-setcamp]").forEach(b => b.addEventListener("click", () => {
-        S.profile.camp = b.dataset.setcamp; save(); closeSheet(); render();
-        toast("Now in " + camp(S.profile.camp).city);
-      }));
-      el.querySelector("[data-close]").addEventListener("click", closeSheet);
-    });
-}
-
-function logSheet(cat){
-  openSheet("<h2 style='font-size:17px; margin-bottom:6px'>Log "+CATS[cat].label+"</h2>"
-    + '<p class="muted" style="font-size:13.5px; margin:0 0 14px">'+CATS[cat].blurb+"</p>"
-    + '<div class="field"><label class="eyebrow">What was it? (optional)</label><input id="lg"></div>'
-    + '<button class="btn block" data-submit="1">Log it</button>'
-    + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
-    el => {
-      const go = () => {
-        S.log.push({id:uid(), cat, label:el.querySelector("#lg").value.trim(), date:key(new Date())});
-        save(); closeSheet(); render(); toast(CATS[cat].label + " logged");
-      };
-      el.querySelector("[data-submit]").addEventListener("click", go);
-      el.querySelector("#lg").addEventListener("keydown", e => { if(e.key === "Enter") go(); });
-      el.querySelector("[data-close]").addEventListener("click", closeSheet);
-    });
-}
-
-function ideaSheet(){
-  openSheet("<h2 style='font-size:17px; margin-bottom:14px'>Add an idea</h2>"
-    + '<div class="field"><label class="eyebrow">What</label><input id="it" placeholder="e.g. Kayak to Pulau Ubin"></div>'
-    + '<div class="field"><label class="eyebrow">Why, in a line (optional)</label><input id="in"></div>'
-    + '<div class="grid2"><div class="field"><label class="eyebrow">Where</label><input id="iw" value="Singapore"></div>'
-    + '<div class="field"><label class="eyebrow">Hours</label><input id="ih" type="number" min="1" max="200" class="mono" value="3"></div></div>'
-    + '<div class="grid2"><div class="field"><label class="eyebrow">Kind</label><select id="ic">'
-    + Object.keys(CATS).map(k => '<option value="'+k+'">'+CATS[k].label+"</option>").join("") + "</select></div>"
-    + '<div class="field"><label class="eyebrow">Scope</label><select id="is">'
-    + Object.keys(SCOPES).map(k => '<option value="'+k+'">'+SCOPES[k]+"</option>").join("") + "</select></div></div>"
-    + '<button class="btn block" data-submit="1">Add</button>'
-    + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
-    el => {
-      el.querySelector("[data-submit]").addEventListener("click", () => {
-        const t = el.querySelector("#it").value.trim();
-        if(!t){ toast("Needs a name"); return; }
-        S.custom.push({ id:"C"+uid(), t, n:el.querySelector("#in").value.trim(),
-          w:el.querySelector("#iw").value.trim() || "Singapore",
-          h:Math.max(1, +el.querySelector("#ih").value || 3),
-          c:el.querySelector("#ic").value, s:el.querySelector("#is").value,
-          indoor:false, pair:true });
-        save(); closeSheet(); render(); toast("Added");
-      });
-      el.querySelector("[data-close]").addEventListener("click", closeSheet);
-    });
-}
-
-function habitSheet(h){
-  const isNew = !h;
-  const v = h || {name:"", anchor:"wake", tiny:"", days:[0,1,2,3,4,5,6]};
-  const dayMode = (v.days || []).length === 5 ? "week" : ((v.days || []).length === 2 ? "wend" : "all");
-  openSheet("<h2 style='font-size:17px; margin-bottom:6px'>"+(isNew?"New habit":"Edit habit")+"</h2>"
-    + '<p class="muted" style="font-size:13.5px; margin:0 0 15px">Anchor it to something that already happens. '
-    + "That way there is no new decision to make.</p>"
-    + '<div class="field"><label class="eyebrow">The habit</label>'
-    + '<input id="hn" value="'+esc(v.name)+'" placeholder="e.g. Twenty minutes of Malay"></div>'
-    + '<div class="field"><label class="eyebrow">Bad day version</label>'
-    + '<input id="ht" value="'+esc(v.tiny||"")+'" placeholder="The two-minute one you can always do">'
-    + '<p class="dim" style="font-size:12px; margin:6px 0 0">What keeps a habit alive is doing the small one, not skipping.</p></div>'
-    + '<div class="grid2"><div class="field"><label class="eyebrow">When</label><select id="ha">'
-    + Object.keys(ANCHORS).map(k => '<option value="'+k+'"'+(v.anchor===k?" selected":"")+">"+ANCHORS[k]+"</option>").join("")
-    + '</select></div><div class="field"><label class="eyebrow">Which days</label><select id="hd">'
-    + [["all","Every day"],["week","Weekdays"],["wend","Weekends"]].map(([k,l]) =>
-        '<option value="'+k+'"'+(dayMode===k?" selected":"")+">"+l+"</option>").join("")
-    + "</select></div></div>"
-    + '<button class="btn block" data-submit="1">Save</button>'
-    + (isNew ? "" : '<button class="btn ghost block" style="margin-top:9px; color:var(--crit); border-color:var(--crit)" data-hdel="1">Delete</button>')
-    + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
-    el => {
-      el.querySelector("[data-submit]").addEventListener("click", () => {
-        const name = el.querySelector("#hn").value.trim();
-        if(!name){ toast("Give it a name"); return; }
-        const dm = el.querySelector("#hd").value;
-        const days = dm === "week" ? [1,2,3,4,5] : dm === "wend" ? [0,6] : [0,1,2,3,4,5,6];
-        const next = {name, tiny:el.querySelector("#ht").value.trim(), anchor:el.querySelector("#ha").value, days};
-        if(isNew) S.habits.push(Object.assign({id:uid()}, next)); else Object.assign(h, next);
-        save(); closeSheet(); render(); toast(isNew ? "Added" : "Saved");
-      });
-      const del = el.querySelector("[data-hdel]");
-      if(del) del.addEventListener("click", () => {
-        S.habits = S.habits.filter(x => x.id !== h.id);
-        save(); closeSheet(); render(); toast("Deleted");
-      });
-      el.querySelector("[data-close]").addEventListener("click", closeSheet);
-    });
-}
-
-function exportData(){
-  const json = JSON.stringify(S, null, 2);
-  (async () => {
-    const dl = window.claude && claude.use ? await claude.use("downloads") : null;
-    if(dl){
-      try{ await dl.save({filename:"daylight-"+key(new Date())+".json", data:json}); toast("Exported"); return; }
-      catch(e){ /* declined - fall through to copy */ }
-    }
-    openSheet("<h2 style='font-size:17px; margin-bottom:12px'>Copy your data</h2>"
-      + '<textarea rows="12" class="mono" style="font-size:11px">'+esc(json)+"</textarea>"
-      + '<button class="btn ghost block" style="margin-top:12px" data-close="1">Done</button>',
-      el => el.querySelector("[data-close]").addEventListener("click", closeSheet));
-  })();
-}
-function importData(){
-  openSheet("<h2 style='font-size:17px; margin-bottom:12px'>Import</h2>"
-    + '<p class="muted" style="font-size:13.5px; margin:0 0 11px">Replaces everything on this device.</p>'
-    + '<textarea id="imp" rows="10" class="mono" style="font-size:11px" placeholder="{ ... }"></textarea>'
-    + '<button class="btn block" style="margin-top:12px" data-impgo="1">Replace my data</button>'
-    + '<button class="btn ghost block" style="margin-top:9px" data-close="1">Cancel</button>',
-    el => {
-      el.querySelector("[data-impgo]").addEventListener("click", () => {
-        try{
-          const next = JSON.parse(el.querySelector("#imp").value);
-          if(!next || !Array.isArray(next.log)) throw new Error("bad shape");
-          S = next; S.ui = Object.assign(seed().ui, S.ui || {}); save(); closeSheet(); render(); toast("Imported");
-        }catch(e){ toast("That isn't a valid export"); }
-      });
-      el.querySelector("[data-close]").addEventListener("click", closeSheet);
-    });
-}
-
-/* ============================ the bot's record ============================
-   The bot asks, you reply in Telegram, it commits the answer to bot/state.json.
-   On GitHub Pages that file is same-origin, so this reads it directly - the app
-   never asks you to log anything. Anywhere else it simply stays hidden. */
-let BOT = null;
-function loadBot(){
-  return fetch("../bot/state.json", {cache:"no-store"})
-    .then(r => r.ok ? r.json() : null)
-    .then(j => { BOT = (j && j.days) ? j : null; })
-    .catch(() => { BOT = null; });
-}
-function botDays(n){
-  if(!BOT) return [];
-  const out = [];
-  for(let i=0;i<n;i++){
-    const k = key(addDays(new Date(), -i)), e = BOT.days[k];
-    if(e && e.commitment) out.push(Object.assign({date:k}, e));
-  }
-  return out;
-}
-function botSection(){
-  if(!BOT) return "";
-  const recent = botDays(14);
-  if(!recent.length) return "";
-  const kept = recent.filter(d => d.done === true).length;
-  const broke = recent.filter(d => d.done === false).length;
-  const silent = recent.length - kept - broke;
-  const today = BOT.days[key(new Date())] || {};
-
-  let html = '<section><div class="sechead"><h2>What you told the bot</h2>'
-    + '<span class="eyebrow">last 14 days</span></div>';
-  if(today.commitment){
-    html += '<div class="pitch" style="margin-bottom:12px">'
-      + '<div class="eyebrow">Today you said</div><h3>'+esc(today.commitment)+"</h3>"
-      + '<div class="p-meta">'
-      + (today.done === true ? '<span class="chip good">done</span>'
-        : today.done === false ? '<span class="chip warn">not done</span>'
-        : '<span class="chip">not answered yet</span>') + "</div></div>";
-  }
-  html += '<div class="card" style="padding:16px">'
-    + '<div class="row" style="gap:18px; flex-wrap:wrap">'
-    + '<div><div class="eyebrow">Kept</div><div class="mono" style="font-size:26px; font-weight:700; color:var(--good)">'+kept+"</div></div>"
-    + '<div><div class="eyebrow">Not done</div><div class="mono" style="font-size:26px; font-weight:700">'+broke+"</div></div>"
-    + '<div><div class="eyebrow">Never answered</div><div class="mono" style="font-size:26px; font-weight:700; color:var(--signal)">'+silent+"</div></div>"
-    + "</div>"
-    + '<p class="dim" style="font-size:12px; margin:12px 0 0">Straight from the bot. You did not type any of this into the app '
-    + "&mdash; which is the point.</p></div></section>";
-  return html;
-}
-
-/* ============================ render ============================ */
-const VIEWS = {today:viewToday, ideas:viewIdeas, where:viewWhere, review:viewReview};
+/* ---------------------------------------------------------------- shell */
+var TABS = {
+  today: ["Today", "One place, and what to say", viewToday],
+  week:  ["Anchors", "The fixed points", viewWeek],
+  say:   ["Phrasebook", "Read it in the queue", viewSay],
+  been:  ["Been", "Where you have got to", viewBeen]
+};
+var tab = "today";
 
 function render(){
-  document.getElementById("root").innerHTML = header() + (VIEWS[S.ui.view] || viewToday)();
-  document.querySelectorAll("nav").forEach(n => n.remove());
-  document.body.insertAdjacentHTML("beforeend", nav());
-  wire();
+  var t = TABS[tab];
+  document.getElementById("title").textContent = t[0];
+  document.getElementById("eyebrow").textContent = t[1];
+  document.getElementById("view").innerHTML = t[2]();
+  var nav = document.querySelectorAll("nav button");
+  for (var i=0;i<nav.length;i++){
+    nav[i].setAttribute("aria-current", nav[i].dataset.tab === tab ? "true" : "false");
+  }
+  window.scrollTo(0,0);
 }
-function on(sel, fn){ document.querySelectorAll(sel).forEach(el => el.addEventListener("click", () => fn(el))); }
 
-function wireCoffeeRows(){
-  document.querySelectorAll("[data-cbeen]").forEach(el => el.addEventListener("click", () => {
-    const x = COFFEE.find(y => y.id === el.dataset.cbeen);
-    if(!x) return;
-    if(isBeen(x.id)){
-      delete S.been[x.id];
-      const i = S.log.map(l => l.label).lastIndexOf(x.n);
-      if(i >= 0) S.log.splice(i,1);
-      save();
-    } else {
-      S.been[x.id] = key(new Date());
-      S.log.push({id:uid(), cat:"enjoy", label:x.n, date:key(new Date())});
-      save(); toast("Logged - " + x.n);
+document.addEventListener("click", function(ev){
+  var b = ev.target.closest ? ev.target.closest("button") : null;
+  if (!b) return;
+  if (b.dataset.tab){ tab = b.dataset.tab; render(); return; }
+  if (b.dataset.done){ S.done[b.dataset.done] = today(); delete S.skip[today()]; save(); tab = "been"; render(); return; }
+  if (b.dataset.skip){ S.skip[today()] = (S.skip[today()] || 0) + 1; save(); render(); return; }
+  if (b.dataset.easy){ S.easyOnly = !S.easyOnly; delete S.skip[today()]; save(); render(); return; }
+  if (b.dataset.reset){
+    if (confirm("Clear every place you have logged? This cannot be undone.")){
+      S.done = {}; S.skip = {}; save(); render();
     }
-    const list = document.getElementById("clist");
-    if(list){ list.innerHTML = coffeeListHTML(); wireCoffeeRows(); }
-  }));
-}
+    return;
+  }
+  if (b.id === "theme"){
+    var cur = document.documentElement.getAttribute("data-theme");
+    var next = cur === "dark" ? "light" : cur === "light" ? null : "dark";
+    if (next) document.documentElement.setAttribute("data-theme", next);
+    else document.documentElement.removeAttribute("data-theme");
+    S.theme = next; save();
+  }
+});
 
-function wire(){
-  on("[data-go]", el => { S.ui.view = el.dataset.go; save(); render(); window.scrollTo(0,0); });
-  on("[data-camp]", campSheet);
-
-  on("[data-hab]", el => {
-    const k = key(new Date()), list = S.habitLog[k] || [];
-    const i = list.indexOf(el.dataset.hab);
-    if(i >= 0) list.splice(i,1); else list.push(el.dataset.hab);
-    S.habitLog[k] = list; save(); render();
-  });
-  on("[data-newhab]", () => habitSheet(null));
-  on("[data-habedit]", el => habitSheet(S.habits.find(h => h.id === el.dataset.habedit)));
-  on("[data-log]", el => logSheet(el.dataset.log));
-  on("[data-rmlog]", el => { S.log = S.log.filter(l => l.id !== el.dataset.rmlog); save(); render(); });
-
-  on("[data-roll]", () => { S.ui.roll++; save(); render(); });
-  on("[data-been]", el => {
-    const x = allIdeas().find(y => y.id === el.dataset.been);
-    if(!x) return;
-    markBeen(x); render(); toast("Logged as " + CATS[x.c].label);
-  });
-  on("[data-unbeen]", el => {
-    delete S.been[el.dataset.unbeen];
-    const x = allIdeas().find(y => y.id === el.dataset.unbeen);
-    if(x){ const i = S.log.map(l => l.label).lastIndexOf(x.t); if(i >= 0) S.log.splice(i,1); }
-    save(); render();
-  });
-  on("[data-save]", el => {
-    const id = el.dataset.save;
-    if(isSaved(id)) S.saved = S.saved.filter(i => i !== id); else S.saved.push(id);
-    save(); render();
-  });
-  on("[data-unsave]", el => { S.saved = S.saved.filter(i => i !== el.dataset.unsave); save(); render(); });
-  on("[data-newidea]", ideaSheet);
-
-  on("[data-fs]", el => { S.ui.fScope = el.dataset.fs; S.ui.roll++; S.ui.cn = COFFEE_PAGE; save(); render(); });
-
-  /* Search updates only the list, so the keyboard and caret stay put. */
-  const cq = document.getElementById("cq");
-  if(cq) cq.addEventListener("input", () => {
-    S.ui.cq = cq.value; S.ui.cn = COFFEE_PAGE; save();
-    const list = document.getElementById("clist");
-    if(list){ list.innerHTML = coffeeListHTML(); wireCoffeeRows(); }
-    const head = document.querySelector(".sechead .eyebrow");
-    void head;
-  });
-  const cd = document.getElementById("cd");
-  if(cd) cd.addEventListener("change", () => { S.ui.cd = cd.value; S.ui.cn = COFFEE_PAGE; save(); render(); });
-  on("[data-cmore]", () => { S.ui.cn = (S.ui.cn || COFFEE_PAGE) + COFFEE_PAGE; save();
-    const list = document.getElementById("clist");
-    if(list){ list.innerHTML = coffeeListHTML(); wireCoffeeRows(); } });
-  on("[data-near]", () => {
-    if(S.ui.near){ S.ui.near = null; save(); render(); return; }
-    if(!navigator.geolocation){ toast("This browser will not share location"); return; }
-    toast("Finding you...");
-    navigator.geolocation.getCurrentPosition(
-      pos => { S.ui.near = [pos.coords.latitude, pos.coords.longitude]; S.ui.cn = COFFEE_PAGE; save(); render(); },
-      ()  => toast("Could not get your location"),
-      {timeout:8000, maximumAge:300000});
-  });
-  wireCoffeeRows();
-  on("[data-fh]", el => { S.ui.fHours = +el.dataset.fh; S.ui.roll++; save(); render(); });
-  on("[data-fp]", () => { S.ui.fPair = !S.ui.fPair; S.ui.roll++; save(); render(); });
-  on("[data-fi]", () => { S.ui.fIndoor = !S.ui.fIndoor; S.ui.roll++; save(); render(); });
-
-  on("[data-export]", exportData);
-  on("[data-import]", importData);
-  document.querySelectorAll("[data-tgt]").forEach(el =>
-    el.addEventListener("change", () => { S.targets[el.dataset.tgt] = Math.max(0, +el.value || 0); save(); render(); }));
-}
-
+if (S.theme) document.documentElement.setAttribute("data-theme", S.theme);
 render();
-loadBot().then(() => { if(BOT) render(); });
-setInterval(() => {
-  if(sheetEl) return;
-  const h = document.querySelector("header");
-  if(!h) return;
-  h.outerHTML = header();
-  on("[data-camp]", campSheet);
-}, 60000);
 </script>
-
 </body>
 </html>
