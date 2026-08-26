@@ -1458,7 +1458,7 @@ function habitsSection(){
 
 /* ============================ TODAY ============================ */
 function viewToday(){
-  let html = habitsSection();
+  let html = botSection() + habitsSection();
 
   /* One suggestion, sized to the time actually left today. */
   const left = hoursLeftToday();
@@ -1832,6 +1832,56 @@ function importData(){
     });
 }
 
+/* ============================ the bot's record ============================
+   The bot asks, you reply in Telegram, it commits the answer to bot/state.json.
+   On GitHub Pages that file is same-origin, so this reads it directly - the app
+   never asks you to log anything. Anywhere else it simply stays hidden. */
+let BOT = null;
+function loadBot(){
+  return fetch("../bot/state.json", {cache:"no-store"})
+    .then(r => r.ok ? r.json() : null)
+    .then(j => { BOT = (j && j.days) ? j : null; })
+    .catch(() => { BOT = null; });
+}
+function botDays(n){
+  if(!BOT) return [];
+  const out = [];
+  for(let i=0;i<n;i++){
+    const k = key(addDays(new Date(), -i)), e = BOT.days[k];
+    if(e && e.commitment) out.push(Object.assign({date:k}, e));
+  }
+  return out;
+}
+function botSection(){
+  if(!BOT) return "";
+  const recent = botDays(14);
+  if(!recent.length) return "";
+  const kept = recent.filter(d => d.done === true).length;
+  const broke = recent.filter(d => d.done === false).length;
+  const silent = recent.length - kept - broke;
+  const today = BOT.days[key(new Date())] || {};
+
+  let html = '<section><div class="sechead"><h2>What you told the bot</h2>'
+    + '<span class="eyebrow">last 14 days</span></div>';
+  if(today.commitment){
+    html += '<div class="pitch" style="margin-bottom:12px">'
+      + '<div class="eyebrow">Today you said</div><h3>'+esc(today.commitment)+"</h3>"
+      + '<div class="p-meta">'
+      + (today.done === true ? '<span class="chip good">done</span>'
+        : today.done === false ? '<span class="chip warn">not done</span>'
+        : '<span class="chip">not answered yet</span>') + "</div></div>";
+  }
+  html += '<div class="card" style="padding:16px">'
+    + '<div class="row" style="gap:18px; flex-wrap:wrap">'
+    + '<div><div class="eyebrow">Kept</div><div class="mono" style="font-size:26px; font-weight:700; color:var(--good)">'+kept+"</div></div>"
+    + '<div><div class="eyebrow">Not done</div><div class="mono" style="font-size:26px; font-weight:700">'+broke+"</div></div>"
+    + '<div><div class="eyebrow">Never answered</div><div class="mono" style="font-size:26px; font-weight:700; color:var(--signal)">'+silent+"</div></div>"
+    + "</div>"
+    + '<p class="dim" style="font-size:12px; margin:12px 0 0">Straight from the bot. You did not type any of this into the app '
+    + "&mdash; which is the point.</p></div></section>";
+  return html;
+}
+
 /* ============================ render ============================ */
 const VIEWS = {today:viewToday, ideas:viewIdeas, where:viewWhere, review:viewReview};
 
@@ -1934,6 +1984,7 @@ function wire(){
 }
 
 render();
+loadBot().then(() => { if(BOT) render(); });
 setInterval(() => {
   if(sheetEl) return;
   const h = document.querySelector("header");

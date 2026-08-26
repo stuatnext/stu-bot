@@ -25,6 +25,40 @@ Two lines describe the whole thing: **free morning equals your UTC offset, and e
 eight hours minus it.** Flying west trades one for the other, hour for hour. Set your basecamp in
 the header and the day bar, the countdown and the suggestions all reshape around it.
 
+### The bot is the point
+
+An app you have to open is a promise you make to yourself, and those have not worked here. The bot
+is the opposite: it reaches out, asks a question, and writes down whether you answered. **The record
+is kept in this repository, not by you.**
+
+It runs on GitHub Actions cron. No server, nothing to host, nothing to maintain.
+
+| Time (SGT) | What it does |
+|---|---|
+| 08:30 | Names today's focus from the rotation and asks for your first action, in one line |
+| 15:00 | Picks up replies, one hour before the shift |
+| 22:00 | Asks whether the thing you named actually happened |
+
+Replies come back through Telegram's `getUpdates`, so no webhook and no public endpoint. The first
+substantive reply of the day becomes the day's commitment; a later "yes" or "no" closes it. Say
+nothing and that is recorded as silence, which is the entire point — and the next morning it says
+so, by name.
+
+`bot/state.json` is committed after every run. On GitHub Pages that file is the same origin as the
+app, so **the app reads it directly** and shows what you actually committed to and kept. You never
+type any of it in.
+
+**Setup, once.** Message `@BotFather` on Telegram to make a bot and get its token, then
+`@userinfobot` for your chat id. Put both in **Settings → Secrets and variables → Actions** as
+`TELEGRAM_TOKEN` and `TELEGRAM_CHAT_ID`. Then Actions → *Daylight bot* → *Run workflow* to test it.
+
+Edit `bot/config.json` to change the weekday rotation or the habits it asks about. Preview any
+message without sending it:
+
+```
+python3 bot/daylight.py --dry-run morning
+```
+
 ### The four views
 
 - **Today** — habits grouped by anchor, one suggestion sized to the hours actually left, and the

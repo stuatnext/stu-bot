@@ -1,0 +1,23 @@
+{
+  "_comment": "Edit this file to change what the bot asks you. It is read on every run.",
+  "timezone_offset_minutes": 480,
+  "work_start_utc": "08:00",
+  "work_end_utc": "15:00",
+  "wake_local": "08:00",
+
+  "_rotation": "One focus per weekday. The bot names it for you so the morning holds no decision.",
+  "rotation": {
+    "Mon": "Campaign - the December ask",
+    "Tue": "Build - the one project",
+    "Wed": "Campaign - the December ask",
+    "Thu": "Build - the one project",
+    "Fri": "Singapore - something only possible here"
+  },
+
+  "_habits": "Asked about in the evening. Keep this short; three is plenty.",
+  "habits": [
+    { "name": "Outside for ten minutes", "tiny": "Step out, two minutes" },
+    { "name": "Move for twenty minutes", "tiny": "Walk round the block" },
+    { "name": "Name tomorrow's first block", "tiny": "One line is enough" }
+  ]
+}
