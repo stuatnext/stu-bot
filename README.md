@@ -27,17 +27,18 @@ and a habit tracker is a promise to yourself.** Neither looks like work, which i
 
 ### One Client
 
-`docs/admin.html` covers Strait Up Growth. The headline is not compliance, it is concentration: NEXT
-pays the company, the company pays the salary, the salary holds the Employment Pass, and the pass is
-the right to live here — four things hanging off one contract, with none of an employee's notice or
-redundancy protection. **A second client is not a Plan B, it is what stops the visa depending on one
-company's budget cycle.**
+`docs/admin.html` covers Strait Up Growth, and it is no longer a housekeeping page. His partner is
+Singaporean and he is here indefinitely — and Singapore recognises neither same-sex partnerships nor
+same-sex marriages performed abroad, so there is no Dependant's Pass or LTVP through him. The chain
+is: **NEXT's contract → the company → the salary → the Employment Pass → permission to live in the
+same country as his partner.** Four links, one client, no floor.
 
-It also corrects two things: the pass is sponsored by his own company, so there is no secondary
-employment restriction and client work needs nobody's consent; and October is a supplier
-renegotiation rather than an HR request, so scope and rate belong in one document rather than being
-split. Plus the filing calendar, the Skills Development Levy that one-person foreign-owned companies
-routinely miss, three insurance gaps, and why the nominee directorship is sitting on a friend.
+So permanent residence is the item that changes the shape of his life rather than tidying it, and
+the compliance work is really the evidence file for that application. The page also covers the
+filing calendar, the Skills Development Levy that one-person foreign-owned companies routinely miss,
+three insurance gaps, the nominee directorship sitting on a friend, and the UK side — non-resident
+landlord status, why ISA contributions have to stop, the US estate-tax trap on US-domiciled ETFs,
+and the fact that with no CPF and no auto-enrolment, nothing is saving for him at all any more.
 
 ### The idea
 
