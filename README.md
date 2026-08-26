@@ -5,7 +5,25 @@
 A day planner for a shift that is fixed to London and lived in Asia.
 
 **Live:** https://stuatnext.github.io/stu-bot/ (once Pages is switched on — see below)
+**The plan:** [`docs/plan.html`](docs/plan.html) — start here
 **Design brief:** [`docs/design-brief.html`](docs/design-brief.html)
+
+### Month Two
+
+`docs/plan.html` is the research and the plan, and it is the thing to read first. It exists because
+of one fact that reframes everything else in this repository: **two months in Singapore.** Research
+on expatriate adjustment puts social integration at twelve to eighteen months, and that is for
+people whose evenings are their own — which yours are not, five days a week, until the hours
+change.
+
+It covers the hours actually available (weekday 08:00–16:00 and weekends, nothing else), the
+family clock and why the UK is unreachable on a weekday, the arithmetic behind the October ask, a
+sequenced plan with one anchor at a time, and an ideas bank sorted by *when things happen* rather
+than by what they are.
+
+The one correction it makes to everything below: **a library of 178 ideas is a decision you have to
+make every day.** The plan replaces that with a single recurring appointment that has other people
+in it.
 
 ### The idea
 
