@@ -1,0 +1,66 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//stu-bot//Daylight//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Daylight - The Year
+X-WR-CALDESC:The shape of the year\, coarse on purpose.
+X-PUBLISHED-TTL:PT12H
+REFRESH-INTERVAL;VALUE=DURATION:PT12H
+BEGIN:VEVENT
+UID:year-nextpredict@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20261022
+DTEND;VALUE=DATE:20261024
+SUMMARY:NEXTPredict
+DESCRIPTION:Negotiate nothing before this.\n\nAlso: 24 October is when the 
+ constraint on what you can post expires. The reason to hold back is needin
+ g Kalshi and Polymarket on a stage. Once they have been on it\, that is sp
+ ent.
+END:VEVENT
+BEGIN:VEVENT
+UID:year-ask@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20261027
+DTEND;VALUE=DATE:20261031
+SUMMARY:The conversation - scope and rate\, one document
+DESCRIPTION:The week after the event\, while your contribution to it is fre
+ sh and measurable. Ask beforehand and it looks like leverage.\n\nYou are a
+  supplier\, not an employee. Write it as a statement of work: scope\, cove
+ rage hours\, response times\, rate. 12:00-19:00 SGT on two days gives Lond
+ on two hours of morning overlap and frees your evening at seven.\n\nBring 
+ the number your channel drove for NEXTPredict.
+END:VEVENT
+BEGIN:VEVENT
+UID:year-linkedin@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20261005
+DTEND;VALUE=DATE:20261006
+SUMMARY:Find what LinkedIn drove for NEXTPredict
+DESCRIPTION:Reach\, inbound\, named connections\, pipeline. Best-evidenced 
+ line in the rate conversation.
+END:VEVENT
+BEGIN:VEVENT
+UID:year-visit-window@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20270201
+DTEND;VALUE=DATE:20270501
+SUMMARY:Window for Mum and your brother
+DESCRIPTION:February is the driest month of the year and there is no haze. 
+ It is also the first window after the hours change.\n\nPick a month and sa
+ y it out loud to her. A visit without a month is a wish.\n\nTwo return far
+ es run roughly GBP 1\,400-1\,900. Waive a few months of her rent and that 
+ is the flight.
+END:VEVENT
+BEGIN:VEVENT
+UID:year-pr@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20280101
+DTEND;VALUE=DATE:20280102
+SUMMARY:PR application window opens up
+DESCRIPTION:PTS scheme. Most successful applicants have one to two years of
+  track record\; processing then takes six to twelve months.\n\nWhat builds
+  the case between now and then: consistent salary\, clean filings\, a comp
+ any with real commercial substance\, and a second client.
+END:VEVENT
+END:VCALENDAR

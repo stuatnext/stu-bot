@@ -1,0 +1,126 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//stu-bot//Daylight//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Daylight - Admin
+X-WR-CALDESC:Filings\, insurance and the UK. Do not subscribe your partner 
+ to this one.
+X-PUBLISHED-TTL:PT12H
+REFRESH-INTERVAL;VALUE=DURATION:PT12H
+BEGIN:VEVENT
+UID:admin-fye@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260901
+DTEND;VALUE=DATE:20260902
+SUMMARY:Find your financial year end
+DESCRIPTION:It is on your ACRA BizFile company profile. Every other deadlin
+ e on this calendar hangs off it\, so nothing below is complete until you h
+ ave it.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Find your financial year end
+TRIGGER:-PT0M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:admin-health@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260828
+DTEND;VALUE=DATE:20260829
+SUMMARY:Health insurance - you have none
+DESCRIPTION:NEXT's cover does not extend to you\, you hold an EP\, and ther
+ e is nothing here. Largest practical exposure in your life and the cheapes
+ t to close.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Health insurance - you have none
+TRIGGER:-PT0M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:admin-pi@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260902
+DTEND;VALUE=DATE:20260903
+SUMMARY:Ask your PI insurer the territorial question
+DESCRIPTION:One email: does this UK policy respond to work performed in Sin
+ gapore by a Singapore entity\, for clients outside the UK? If not\, you ar
+ e uninsured the moment the second client signs.
+END:VEVENT
+BEGIN:VEVENT
+UID:admin-nrl1@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260902
+DTEND;VALUE=DATE:20260903
+SUMMARY:NRL1\, and tell your mortgage lender
+DESCRIPTION:Your mum lives there and pays rent\, so you are a non-resident 
+ landlord. Without NRL1 the tax is withheld at source\, and it takes about 
+ 90 days to process.\n\nSeparately: most residential mortgages need consent
+  to let\, and many lenders will not permit a let to a close relative at al
+ l.
+END:VEVENT
+BEGIN:VEVENT
+UID:admin-ni@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260909
+DTEND;VALUE=DATE:20260910
+SUMMARY:Check your National Insurance record
+DESCRIPTION:Voluntary Class 2 for periods abroad ended on 6 April 2026. Cla
+ ss 3 is now the route at about GBP 18.40 a week. Gaps can normally only be
+  filled six years back\, so every year you leave it\, one falls off the en
+ d.
+END:VEVENT
+BEGIN:VEVENT
+UID:admin-firm@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260909
+DTEND;VALUE=DATE:20260910
+SUMMARY:Two quotes from corporate services firms
+DESCRIPTION:A few hundred a month removes the whole category\, takes the di
+ rector liability off your friend\, and keeps the PR evidence file clean.\n
+ \nDirectors are personally liable for filing failures. That is him\, not y
+ ou.
+END:VEVENT
+BEGIN:VEVENT
+UID:admin-sdl@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART:20260914T090000
+DTEND:20260914T100000
+SUMMARY:SDL - Skills Development Levy
+RRULE:FREQ=MONTHLY;BYMONTHDAY=14
+DESCRIPTION:Payable on Employment Pass holders even though CPF is not. 0.25
+ % of monthly pay\, minimum S$2\, capped at S$11.25. Due by the 14th for th
+ e month before.\n\nRoughly S$135 a year. Trivial money\, real compliance i
+ tem.
+END:VEVENT
+BEGIN:VEVENT
+UID:admin-ir8a@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20270301
+DTEND;VALUE=DATE:20270302
+SUMMARY:IR8A to yourself as employee
+RRULE:FREQ=YEARLY
+DESCRIPTION:Under five employees\, so the Auto-Inclusion Scheme is not mand
+ atory.
+END:VEVENT
+BEGIN:VEVENT
+UID:admin-b1@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20270415
+DTEND;VALUE=DATE:20270416
+SUMMARY:Personal tax - Form B1
+RRULE:FREQ=YEARLY
+DESCRIPTION:18 April if e-filing. Also part of your PR evidence.
+END:VEVENT
+BEGIN:VEVENT
+UID:admin-cs@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20261130
+DTEND;VALUE=DATE:20261201
+SUMMARY:Corporate tax - Form C-S
+RRULE:FREQ=YEARLY
+DESCRIPTION:New companies get 75% off the first S$100\,000 of chargeable in
+ come for the first three years.
+END:VEVENT
+END:VCALENDAR

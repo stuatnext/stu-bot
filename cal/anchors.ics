@@ -1,0 +1,62 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//stu-bot//Daylight//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Daylight - Anchors
+X-WR-CALDESC:The fixed points. Nothing here can be failed.
+X-PUBLISHED-TTL:PT12H
+REFRESH-INTERVAL;VALUE=DURATION:PT12H
+BEGIN:VEVENT
+UID:anchor-parkrun@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART:20260829T073000
+DTEND:20260829T084500
+SUMMARY:parkrun
+LOCATION:Bishan-Ang Mo Kio Park
+RRULE:FREQ=WEEKLY;BYDAY=SA
+DESCRIPTION:Same event every week. Pick the one furthest from Tanjong Pagar
+  rather than the nearest\, so turning up puts you somewhere else in Singap
+ ore with the whole day ahead of you.\n\nWalking is allowed. There is no ti
+ me limit and nobody finishes last.\n\nBishan-Ang Mo Kio / East Coast / Wes
+ t Coast / Bay East / Bedok Reservoir. Register once at parkrun.sg - the ba
+ rcode then works at 2\,000+ events worldwide\, Sheffield included.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:parkrun
+TRIGGER:-PT45M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:anchor-mum@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART:20260826T143000
+DTEND:20260826T151500
+SUMMARY:Call Mum - walk while you talk
+RRULE:FREQ=WEEKLY;BYDAY=WE
+DESCRIPTION:About 07:00 for her. Kettle on\, nobody dressed.\n\nWhat moves 
+ this off 30% is her expecting it\, not you remembering it. So tell her it 
+ is every Wednesday\, and then it is hers to hold rather than yours.\n\nIf 
+ you are late\, call anyway. Ten minutes at 15:20 beats a clean miss.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Call Mum - walk while you talk
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:anchor-kelvin@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART:20260827T100000
+DTEND:20260827T101500
+SUMMARY:Text Kelvin about the games night
+DESCRIPTION:Propose a date rather than asking whether he is free. A date is
+  much easier to answer\, and it does not depend on either of you rememberi
+ ng to follow up.\n\nDelete this event once it is sent.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Text Kelvin about the games night
+TRIGGER:-PT0M
+END:VALARM
+END:VEVENT
+END:VCALENDAR

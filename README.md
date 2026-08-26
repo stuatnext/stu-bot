@@ -6,6 +6,7 @@ A day planner for a shift that is fixed to London and lived in Asia.
 
 **Live:** https://stuatnext.github.io/stu-bot/ (once Pages is switched on — see below)
 **The plan:** [`docs/plan.html`](docs/plan.html) — start here
+**The calendars:** [`cal/`](cal/) — subscribe once, in Apple Calendar
 **The business side:** [`docs/admin.html`](docs/admin.html) — structure, filings, insurance
 **Design brief:** [`docs/design-brief.html`](docs/design-brief.html)
 
@@ -39,6 +40,26 @@ filing calendar, the Skills Development Levy that one-person foreign-owned compa
 three insurance gaps, the nominee directorship sitting on a friend, and the UK side — non-resident
 landlord status, why ISA contributions have to stop, the US estate-tax trap on US-domiciled ETFs,
 and the fact that with no CPF and no auto-enrolment, nothing is saving for him at all any more.
+
+### Three calendars
+
+`cal/build.py` generates three subscribable `.ics` feeds, served from Pages, that Apple Calendar
+subscribes to and refreshes on its own. This is the answer to the real problem with the app: **an app
+you have to open is a promise to yourself, and those fade.** Apple Calendar is already open on his
+phone and his partner's.
+
+| Feed | Holds | Share with partner |
+|---|---|---|
+| **Anchors** | parkrun Sat 07:30, Mum Wed 14:30, text Kelvin | **Yes** |
+| **The Year** | NEXTPredict, the October conversation, the visit window, the PR window | **Yes** |
+| **Admin** | Filings, insurance, NRL1, NI, SDL monthly | No |
+
+Times in Anchors are **floating** — no timezone — so 07:30 stays 07:30 in Sheffield. A routine that
+survives travel is the whole point, given that travel is what has killed every previous one.
+
+Subscribed calendars are read-only on the phone, which is a feature: these are things decided once,
+so they stop being negotiable at eight in the morning. Regenerate with `python3 cal/build.py` and
+every subscriber picks it up.
 
 ### The app
 
