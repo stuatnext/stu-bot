@@ -8,22 +8,21 @@ A day planner for a shift that is fixed to London and lived in Asia.
 **The plan:** [`docs/plan.html`](docs/plan.html) — start here
 **Design brief:** [`docs/design-brief.html`](docs/design-brief.html)
 
-### Month Two
+### Turning Up
 
-`docs/plan.html` is the research and the plan, and it is the thing to read first. It exists because
-of one fact that reframes everything else in this repository: **two months in Singapore.** Research
-on expatriate adjustment puts social integration at twelve to eighteen months, and that is for
-people whose evenings are their own — which yours are not, five days a week, until the hours
-change.
+`docs/plan.html` is the research and the plan, and it is the thing to read first. It is built on one
+sentence: **"the biggest thing I've sustained is consistency with work. Waking up and turning up.
+Everything else has faded away."** Two years of evidence that work sticks and self-directed goals do
+not. So the design rule is that anything given the properties of work — a time you did not choose,
+someone expecting you, a role, no daily decision — will hold, and anything that looks like a personal
+goal will not.
 
-It covers the hours actually available (weekday 08:00–16:00 and weekends, nothing else), the
-family clock and why the UK is unreachable on a weekday, the arithmetic behind the October ask, a
-sequenced plan with one anchor at a time, and an ideas bank sorted by *when things happen* rather
-than by what they are.
+It covers the work-pass question that gates the fallback plan, the arithmetic behind the October ask,
+the walk (protected, not optimised), a sequenced plan with one anchor at a time, why cooking belongs
+in the morning, and an ideas bank sorted by *when things happen* rather than what they are.
 
-The one correction it makes to everything below: **a library of 178 ideas is a decision you have to
-make every day.** The plan replaces that with a single recurring appointment that has other people
-in it.
+The correction it makes to everything below: **178 ideas is a decision you have to make every day,
+and a habit tracker is a promise to yourself.** Neither looks like work, which is why neither held.
 
 ### The idea
 
