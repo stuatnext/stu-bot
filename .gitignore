@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+
+# Playwright/test screenshots
+*.png
+!app/icon-*.png
