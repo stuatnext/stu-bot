@@ -6,6 +6,7 @@ A day planner for a shift that is fixed to London and lived in Asia.
 
 **Live:** https://stuatnext.github.io/stu-bot/ (once Pages is switched on — see below)
 **The plan:** [`docs/plan.html`](docs/plan.html) — start here
+**The business side:** [`docs/admin.html`](docs/admin.html) — structure, filings, insurance
 **Design brief:** [`docs/design-brief.html`](docs/design-brief.html)
 
 ### Turning Up
@@ -23,6 +24,20 @@ in the morning, and an ideas bank sorted by *when things happen* rather than wha
 
 The correction it makes to everything below: **178 ideas is a decision you have to make every day,
 and a habit tracker is a promise to yourself.** Neither looks like work, which is why neither held.
+
+### One Client
+
+`docs/admin.html` covers Strait Up Growth. The headline is not compliance, it is concentration: NEXT
+pays the company, the company pays the salary, the salary holds the Employment Pass, and the pass is
+the right to live here — four things hanging off one contract, with none of an employee's notice or
+redundancy protection. **A second client is not a Plan B, it is what stops the visa depending on one
+company's budget cycle.**
+
+It also corrects two things: the pass is sponsored by his own company, so there is no secondary
+employment restriction and client work needs nobody's consent; and October is a supplier
+renegotiation rather than an HR request, so scope and rate belong in one document rather than being
+split. Plus the filing calendar, the Skills Development Levy that one-person foreign-owned companies
+routinely miss, three insurance gaps, and why the nominee directorship is sitting on a friend.
 
 ### The idea
 
