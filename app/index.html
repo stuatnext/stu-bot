@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Daylight</title>
-<meta name="description" content="A day fixed to London, lived in Singapore.">
+<meta name="description" content="A day fixed to head office, lived in Singapore.">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#EDEFEC" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D1211" media="(prefers-color-scheme: dark)">
@@ -71,7 +71,7 @@ header{display:flex; align-items:baseline; justify-content:space-between; gap:12
 .card.ok{background:var(--good-soft); border-color:var(--good);}
 .card.hot{background:var(--crit-soft); border-color:var(--crit);}
 
-/* The shift bar. The single most bespoke thing here: a day fixed to London. */
+/* The shift bar. The single most bespoke thing here: a day fixed to Malta. */
 .bar{display:flex; height:34px; border-radius:9px; overflow:hidden; margin:12px 0 6px; border:1px solid var(--line);}
 .bar span{display:flex; align-items:center; justify-content:center; font-family:"JetBrains Mono",monospace;
   font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); min-width:0; overflow:hidden;}
@@ -175,11 +175,13 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
    wanting to give something back.
 
    So it is built around the one fact that shapes every day: work is fixed to
-   London, not to where he is standing. Everything else - the threads, the
+   head office in Malta, not to where he is standing. Everything else - the threads, the
    countdowns, the place of the day - hangs off that. */
 
-/* Work is 08:00-15:00 UTC. Local shape follows from the offset, which is why
-   flying west trades morning for evening hour for hour. */
+/* Work is 08:00-15:00 UTC - head office is in Malta, which is CET/CEST, so the
+   window drifts an hour when Europe changes clocks and Singapore does not.
+   Local shape follows from the offset, which is why flying west trades morning
+   for evening hour for hour. */
 var WORK_START_UTC = 8 * 60, WORK_END_UTC = 15 * 60;
 
 /* [ name, minutes offset from UTC ] */
@@ -438,7 +440,7 @@ function barHTML(){
   if (freeW > 0.5) h += "<div class='free' style='width:" + freeW.toFixed(2) + "%;display:flex;align-items:center;justify-content:center'>"
     + (freeW > 16 ? "<span class='free'>Yours</span>" : "") + "</div>";
   if (workW > 0.5) h += "<div class='work' style='width:" + workW.toFixed(2) + "%;display:flex;align-items:center;justify-content:center'>"
-    + (workW > 16 ? "<span class='work'>London</span>" : "") + "</div>";
+    + (workW > 16 ? "<span class='work'>Malta</span>" : "") + "</div>";
   if (restW > 0.5) h += "<div class='rest' style='width:" + restW.toFixed(2) + "%'></div>";
   h += "</div>";
   h += "<div class='legend'><span>" + hhmm(from) + "</span><span class='mono'>" + s.startT
@@ -451,7 +453,7 @@ function viewToday(){
   var s = shape(), t = today(), d = day(t), y = day(shift(-1));
   var h = "";
 
-  /* Where the day actually sits, given that it belongs to London. */
+  /* Where the day actually sits, given that it belongs to head office. */
   h += "<div class='card'>";
   h += barHTML();
   if (s.working){
@@ -461,7 +463,7 @@ function viewToday(){
     h += "<p class='muted' style='margin:10px 0 0'>Early. The free window runs <strong>" + S.wake
       + " to " + s.startT + "</strong> &mdash; " + dur(s.morning) + ", and the rarest thing you have.</p>";
   } else if (s.untilWork > 0){
-    h += "<p class='muted' style='margin:10px 0 0'><strong>" + dur(s.untilWork) + "</strong> before London starts, "
+    h += "<p class='muted' style='margin:10px 0 0'><strong>" + dur(s.untilWork) + "</strong> before HQ starts, "
       + "out of a window that is " + dur(s.morning) + " long. Almost nobody employed has this.</p>";
   } else if (s.evening > 0){
     h += "<p class='muted' style='margin:10px 0 0'>Shift is done. <strong>" + dur(s.evening) + "</strong> of evening left.</p>";
@@ -733,7 +735,7 @@ function viewTrips(){
 
 /* ---------------------------------------------------------------- shell */
 var TABS = {
-  today: ["Today", "A day fixed to London", viewToday],
+  today: ["Today", "A day fixed to head office", viewToday],
   next:  ["Next", "What is actually going on", viewNext],
   trips: ["Trips", "Where you will be, and the UK count", viewTrips],
   say:   ["Say", "Read it in the queue", viewSay],

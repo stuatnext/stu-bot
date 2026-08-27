@@ -141,7 +141,7 @@ def build_year():
                        "measurable. Ask beforehand and it looks like leverage.\n\n"
                        "You are a supplier, not an employee. Write it as a statement of work: "
                        "scope, coverage hours, response times, rate. 12:00-19:00 SGT on two days "
-                       "gives London two hours of morning overlap and frees your evening at seven.\n\n"
+                       "gives HQ two hours of morning overlap and frees your evening at seven.\n\n"
                        "Bring the number your channel drove for NEXTPredict."))
     evs += event("year-linkedin", "Find what LinkedIn drove for NEXTPredict",
                  date(2026, 10, 5), all_day=True,

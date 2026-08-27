@@ -2,7 +2,7 @@
 
 ## Daylight
 
-A day planner for a shift that is fixed to London and lived in Asia.
+A day planner for a shift that is fixed to Malta and lived in Asia.
 
 **Live:** https://stuatnext.github.io/stu-bot/ (once Pages is switched on — see below)
 **The plan:** [`docs/plan.html`](docs/plan.html) — start here
@@ -69,7 +69,7 @@ markets, running a Singapore company that holds his Employment Pass, and wanting
 back. The brief was *keep me accountable, help me plan, help me build a routine, help me make the
 most of my time.*
 
-Everything hangs off the one fact that shapes every day: **work is fixed to London, not to where he
+Everything hangs off the one fact that shapes every day: **work is fixed to Malta, not to where he
 is standing.** So the first thing on the screen is a bar showing where the shift falls today, which
 reshapes when the basecamp changes — flying west trades morning for evening, hour for hour.
 
