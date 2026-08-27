@@ -178,11 +178,27 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
    head office in Malta, not to where he is standing. Everything else - the threads, the
    countdowns, the place of the day - hangs off that. */
 
-/* Work is 08:00-15:00 UTC - head office is in Malta, which is CET/CEST, so the
-   window drifts an hour when Europe changes clocks and Singapore does not.
-   Local shape follows from the offset, which is why flying west trades morning
-   for evening hour for hour. */
-var WORK_START_UTC = 8 * 60, WORK_END_UTC = 15 * 60;
+/* The shift is defined in Malta local time, not UTC and not Singapore time.
+   Malta observes European daylight saving and Singapore does not, so the same
+   contracted hours land an hour later in Singapore every winter - which is a
+   thing that happens TO him rather than something anyone decided. */
+var HQ_START_LOCAL = 10 * 60, HQ_END_LOCAL = 17 * 60;   /* Malta local */
+
+function lastSunday(y, m){            /* m is 1-12 */
+  var d = new Date(Date.UTC(y, m, 0));
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay());
+  return d;
+}
+/* EU summer time: last Sunday in March to last Sunday in October, 01:00 UTC. */
+function euSummer(when){
+  var y = when.getFullYear();
+  return when >= lastSunday(y, 3) && when < lastSunday(y, 10);
+}
+function hqOffset(when){ return euSummer(when || new Date()) ? 120 : 60; }
+function workUTC(when){
+  var o = hqOffset(when);
+  return [HQ_START_LOCAL - o, HQ_END_LOCAL - o];
+}
 
 /* [ name, minutes offset from UTC ] */
 var CAMPS = [
@@ -360,7 +376,8 @@ function offset(){
 }
 function shape(){
   var off = offset(), wake = t2m(S.wake);
-  var start = WORK_START_UTC + off, end = WORK_END_UTC + off;
+  var w = workUTC(new Date());
+  var start = w[0] + off, end = w[1] + off;
   var n = new Date(), nowLocal = n.getHours()*60 + n.getMinutes();
   return {
     start:start, end:end, wake:wake, now:nowLocal,
@@ -471,6 +488,15 @@ function viewToday(){
     h += "<p class='muted' style='margin:10px 0 0'>Shift is done and so is the day. "
       + "In Singapore that is the whole problem in one line &mdash; and what October is for.</p>";
   }
+  var summer = euSummer(new Date());
+  var alt = (function(){
+    var o = summer ? 60 : 120, camp = offset();
+    return hhmm(HQ_START_LOCAL - o + camp) + "-" + hhmm(HQ_END_LOCAL - o + camp);
+  })();
+  h += "<div class='row'><b>HQ</b><div>Malta, " + hhmm(HQ_START_LOCAL) + "-" + hhmm(HQ_END_LOCAL)
+    + " their time &middot; currently " + (summer ? "CEST" : "CET") + ".<br><span class='dim'>"
+    + (summer ? "From 25 October the same hours become " : "In summer the same hours become ")
+    + alt + " here.</span></div></div>";
   h += "<div class='btns'><button data-camp='1'>Basecamp: " + esc(S.camp)
     + " &middot; tap to change</button></div>";
   h += "</div>";
