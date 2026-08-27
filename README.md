@@ -63,38 +63,35 @@ every subscriber picks it up.
 
 ### The app
 
-**Daylight** is one place a day, and the exact words to say when you get there.
+**Daylight** is bespoke to one situation: an expat on European hours, building a name in prediction
+markets, running a Singapore company that holds his Employment Pass, and wanting to give something
+back. The brief was *keep me accountable, help me plan, help me build a routine, help me make the
+most of my time.*
 
-It used to be a day planner with 178 ideas and a directory of 608 cafes. That was wrong, and the
-reason it was wrong only became clear late: *"I get really nervous going to a new place because I get
-scared of ordering."* A directory answers **where**. The actual barrier is **what to say at the
-counter** — which is why 608 cafes went unused.
+Everything hangs off the one fact that shapes every day: **work is fixed to London, not to where he
+is standing.** So the first thing on the screen is a bar showing where the shift falls today, which
+reshapes when the basecamp changes — flying west trades morning for evening, hour for hour.
 
-So the app was rebuilt around that. One suggestion per day, never a list. Each place carries a
-script, and the script is set in the largest type on the page, because it gets read one-handed while
-standing in a queue.
+**Today** — the shift bar, yesterday's commitment and whether it happened, one line for today, the
+four ingredients, and one place to go with the exact words to say when you get there.
 
-Every place has a **nerve level**:
+**Next** — a countdown to the nearest milestone, then the six threads actually running (the October
+ask, a second client, getting family here, knowing anyone here, something he owns, the admin), each
+with exactly one next action. A thread with three next actions has none.
 
-| | What it means |
-|---|---|
-| **Nothing to order** | Parks, trails, temples, museums. No transaction, no talking. |
-| **Order in English** | A counter, a menu, a normal sentence. |
-| **Hawker stall** | Local codes help, and the phrasebook is one tap away. |
+**Say** — the phrasebook. Kopi modifiers, hawker etiquette, three Hokkien phrases. Permanently one
+tap away rather than something to learn, because there is a diagnosed short-term memory difficulty
+in play.
 
-A **Something easier** button drops the whole app to the first level on a bad day, and any hawker
-suggestion carries the escape hatch: *point and hold up one finger — that is what half the queue is
-doing.*
+**Log** — days named and kept, places been. No streak and no target: a record, so it is not being
+held in his head.
 
-**Phrasebook** is permanently one tap away rather than something to learn, because there is a
-diagnosed short-term memory difficulty in play and remembering the kopi grid is not the job. It
-covers the kopi modifiers, hawker etiquette — chope with a tissue packet, return your tray, go at
-14:00 not 12:30 — and three Hokkien phrases worth having at a Singaporean family table.
+Three deliberate refusals: **nothing can be failed** (no streaks, no chains, no resets), **nothing
+depends on remembering**, and **the easy tier is not the consolation tier** — half the places involve
+no talking at all, because the real barrier turned out to be *"I get scared of ordering"* rather than
+not knowing where to go.
 
-**Anchors** holds the two fixed points: parkrun on Saturday at 07:30, and the Wednesday 14:30 call
-home. **Been** is a list that gets longer. No streaks, no targets, nothing to break.
-
-State lives in `localStorage` under `daylight.v3`.
+State lives in `localStorage` under `daylight.v4`.
 
 ### GitHub Pages
 

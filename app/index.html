@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Daylight</title>
-<meta name="description" content="One place a day, and exactly what to say when you get there.">
+<meta name="description" content="A day fixed to London, lived in Singapore.">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#EDEFEC" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D1211" media="(prefers-color-scheme: dark)">
@@ -22,6 +22,7 @@
   --ink:#141B18; --ink-2:#4A5551; --ink-3:#79847F;
   --accent:#1F4FE0; --accent-soft:#DDE4FB;
   --signal:#B35C0C; --signal-soft:#F7E6D4;
+  --crit:#A03830; --crit-soft:#F3DEDC;
   --good:#2C7A51; --good-soft:#DCEDE3;
   --r:14px;
 }
@@ -32,6 +33,7 @@
     --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
     --accent:#7C9BFF; --accent-soft:#1C2647;
     --signal:#E09453; --signal-soft:#2E2317;
+    --crit:#E08A82; --crit-soft:#2C1C1C;
     --good:#5CB585; --good-soft:#16261D;
   }
 }
@@ -41,6 +43,7 @@
   --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
   --accent:#7C9BFF; --accent-soft:#1C2647;
   --signal:#E09453; --signal-soft:#2E2317;
+  --crit:#E08A82; --crit-soft:#2C1C1C;
   --good:#5CB585; --good-soft:#16261D;
 }
 *{box-sizing:border-box}
@@ -48,41 +51,48 @@ html{-webkit-text-size-adjust:100%; text-size-adjust:100%;}
 body{margin:0; background:var(--ground); color:var(--ink);
   font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
-  padding-bottom:calc(72px + env(safe-area-inset-bottom));}
+  padding-bottom:calc(74px + env(safe-area-inset-bottom));}
 .wrap{max-width:620px; margin:0 auto;
-  padding:20px max(16px, env(safe-area-inset-left)) 28px max(16px, env(safe-area-inset-right));}
+  padding:18px max(16px, env(safe-area-inset-left)) 26px max(16px, env(safe-area-inset-right));}
 h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif; margin:0; text-wrap:balance; letter-spacing:-.02em;}
-h1{font-size:clamp(26px,6.5vw,34px); font-weight:800; line-height:1.1;}
-h2{font-size:19px; font-weight:600; margin:26px 0 6px;}
+h1{font-size:clamp(25px,6.2vw,32px); font-weight:800; line-height:1.1;}
+h2{font-size:18px; font-weight:600; margin:24px 0 6px;}
 h3{font-size:15px; font-weight:600; margin:0;}
 p{margin:9px 0;}
 .eyebrow{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);}
 .mono{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;}
-.muted{color:var(--ink-2);}
-.dim{color:var(--ink-3); font-size:14px;}
-strong{font-weight:600;}
-a{color:var(--accent);}
-a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:6px;}
+.muted{color:var(--ink-2);} .dim{color:var(--ink-3); font-size:14px;}
+strong{font-weight:600;} a{color:var(--accent);}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:6px;}
+header{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px;}
 
-header{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px;}
-
-.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px; margin:14px 0;}
-.card.hero{padding:20px 18px;}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:15px 17px; margin:13px 0;}
 .card.tip{background:var(--signal-soft); border-color:var(--signal);}
 .card.ok{background:var(--good-soft); border-color:var(--good);}
+.card.hot{background:var(--crit-soft); border-color:var(--crit);}
 
-.say{background:var(--accent-soft); border:1px solid var(--accent); border-radius:var(--r);
-  padding:18px 18px 16px; margin:14px 0;}
+/* The shift bar. The single most bespoke thing here: a day fixed to London. */
+.bar{display:flex; height:34px; border-radius:9px; overflow:hidden; margin:12px 0 6px; border:1px solid var(--line);}
+.bar span{display:flex; align-items:center; justify-content:center; font-family:"JetBrains Mono",monospace;
+  font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); min-width:0; overflow:hidden;}
+.bar .free{background:var(--good-soft); color:var(--good);}
+.bar .work{background:var(--accent-soft); color:var(--accent);}
+.bar .rest{background:var(--sunk);}
+.bar .now{background:var(--crit); width:3px; min-width:3px; flex:none;}
+.legend{display:flex; justify-content:space-between; font-family:"JetBrains Mono",monospace;
+  font-size:11px; color:var(--ink-3); font-variant-numeric:tabular-nums;}
+
+.say{background:var(--accent-soft); border:1px solid var(--accent); border-radius:var(--r); padding:17px; margin:13px 0;}
 .say .lbl{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.14em;
-  text-transform:uppercase; color:var(--accent); display:block; margin-bottom:8px;}
+  text-transform:uppercase; color:var(--accent); display:block; margin-bottom:7px;}
 .say q{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:600;
-  font-size:clamp(23px,6.4vw,30px); line-height:1.2; letter-spacing:-.02em; quotes:none;}
-.say .after{margin:10px 0 0; font-size:14px; color:var(--ink-2);}
+  font-size:clamp(22px,6.2vw,29px); line-height:1.2; letter-spacing:-.02em; quotes:none;}
+.say .after{margin:9px 0 0; font-size:14px; color:var(--ink-2);}
 
 .row{display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line);}
 .row:last-child{border-bottom:none;}
 .row b{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
-  color:var(--ink-3); flex:none; width:74px; padding-top:3px;}
+  color:var(--ink-3); flex:none; width:76px; padding-top:3px;}
 .row div{flex:1; min-width:0;}
 
 .pill{display:inline-block; font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.08em;
@@ -90,23 +100,35 @@ header{display:flex; align-items:baseline; justify-content:space-between; gap:12
 .pill.e{background:var(--good-soft); color:var(--good);}
 .pill.m{background:var(--accent-soft); color:var(--accent);}
 .pill.l{background:var(--signal-soft); color:var(--signal);}
+.pill.hot{background:var(--crit-soft); color:var(--crit);}
 
 button{font:inherit; cursor:pointer; border-radius:10px; border:1px solid var(--line-strong);
-  background:var(--surface); color:var(--ink); padding:13px 16px; min-height:46px;}
+  background:var(--surface); color:var(--ink); padding:12px 15px; min-height:46px;}
 button:active{transform:translateY(1px);}
-.btns{display:flex; gap:9px; margin-top:14px; flex-wrap:wrap;}
-.btns button{flex:1; min-width:132px;}
+.btns{display:flex; gap:9px; margin-top:12px; flex-wrap:wrap;}
+.btns button{flex:1; min-width:130px;}
 button.pri{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600;}
 :root[data-theme="dark"] button.pri, :root:not([data-theme="light"]) button.pri{color:#0D1211;}
 @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]) button.pri{color:#fff;} }
 
+/* Four ingredients of a day he already said was good. Tappable, never a streak. */
+.ing{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0 0;}
+.ing button{min-height:66px; padding:9px 4px; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:4px; font-size:11.5px; color:var(--ink-3); line-height:1.2;}
+.ing button .g{font-size:17px; line-height:1;}
+.ing button[aria-pressed="true"]{background:var(--good-soft); border-color:var(--good); color:var(--good); font-weight:600;}
+
+textarea,input[type=text]{width:100%; font:inherit; padding:12px 13px; border-radius:10px;
+  border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); resize:vertical;}
+textarea{min-height:62px;}
+
 nav{position:fixed; left:0; right:0; bottom:0; display:flex; background:var(--surface);
   border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:20;}
-nav button{flex:1; border:none; border-radius:0; background:none; padding:11px 4px 13px;
+nav button{flex:1; border:none; border-radius:0; background:none; padding:10px 4px 12px;
   font-size:11.5px; color:var(--ink-3); min-height:60px; display:flex; flex-direction:column;
   align-items:center; justify-content:center; gap:3px;}
 nav button[aria-current="true"]{color:var(--accent); font-weight:600;}
-nav .ic{font-size:19px; line-height:1;}
+nav .ic{font-size:18px; line-height:1;}
 
 table{width:100%; border-collapse:collapse; margin:10px 0; font-size:14.5px;}
 th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
@@ -114,7 +136,8 @@ th{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em; 
   color:var(--ink-3); font-weight:400;}
 td:first-child{white-space:nowrap; font-family:"JetBrains Mono",monospace; font-weight:500;}
 ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--ink-3);}
-.hide{display:none;}
+.count{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-weight:700;
+  font-size:26px; letter-spacing:-.03em; line-height:1;}
 </style>
 </head>
 <body>
@@ -134,24 +157,75 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
 
 <nav>
   <button data-tab="today" aria-current="true"><span class="ic">&#9737;</span>Today</button>
-  <button data-tab="week"><span class="ic">&#9634;</span>Anchors</button>
-  <button data-tab="say"><span class="ic">&#9786;</span>Phrasebook</button>
-  <button data-tab="been"><span class="ic">&#10003;</span>Been</button>
+  <button data-tab="next"><span class="ic">&#9654;</span>Next</button>
+  <button data-tab="say"><span class="ic">&#9786;</span>Say</button>
+  <button data-tab="log"><span class="ic">&#10003;</span>Log</button>
 </nav>
 
 <script>
 "use strict";
 
 /* Daylight.
-   One place a day, and the exact words to say when you get there.
 
-   The whole point of this rewrite: the barrier was never finding somewhere.
-   It was not knowing what to say at the counter. So every place carries a
-   script, and the script is set in the largest type on the page, because it
-   gets read one-handed while standing in a queue. */
+   A bespoke thing, and the brief was specific: keep me accountable, help me
+   plan, help me build a routine, help me make the most of my time - for
+   somebody who is an expat on European hours, building a name in prediction
+   markets, running a Singapore company that holds his Employment Pass, and
+   wanting to give something back.
 
-/* nerve: 0 = nothing to order, 1 = order in English at a counter, 2 = hawker stall
-   [ name, area, mrt, nerve, when, why, order, say, after, pay ] */
+   So it is built around the one fact that shapes every day: work is fixed to
+   London, not to where he is standing. Everything else - the threads, the
+   countdowns, the place of the day - hangs off that. */
+
+/* Work is 08:00-15:00 UTC. Local shape follows from the offset, which is why
+   flying west trades morning for evening hour for hour. */
+var WORK_START_UTC = 8 * 60, WORK_END_UTC = 15 * 60;
+
+/* [ name, minutes offset from UTC ] */
+var CAMPS = [
+  ["Singapore", 480], ["Sheffield / UK", 60], ["Bangkok", 420], ["Jakarta", 420],
+  ["Hanoi", 420], ["Bali", 480], ["Hong Kong", 480], ["Tokyo", 540],
+  ["Sydney", 600], ["Colombo", 330], ["Delhi", 330], ["Dubai", 240], ["Lisbon", 60]
+];
+
+/* The six things actually going on. Each has one next action, because a thread
+   with three next actions has none.
+   [ key, name, why it matters, next action, when, hot ] */
+var THREADS = [
+  ["oct", "The October ask",
+   "You are a supplier renegotiating, not an employee asking. And you will be four days past launching a new event.",
+   "Write the statement of work: scope, coverage hours, response times, rate.", "Week of 27 Oct", true],
+  ["client", "A second client",
+   "One customer funds the salary, which holds the pass, which is your permission to live here. There is no floor under it.",
+   "Follow up with people you meet at NEXTPredict, in November.", "November", true],
+  ["family", "Getting them here",
+   "Your brother needs a date to book leave against and to save toward. Neither works without a month.",
+   "Pick the month and say it out loud to your mum.", "This week", true],
+  ["people", "Knowing anyone here",
+   "Zero people you see without your partner arranging it. He feels short of community too, so it is a shared problem.",
+   "Text Kelvin. Propose a date rather than asking if he is free.", "Today", true],
+  ["write", "Something you own",
+   "LinkedIn is rented and shared with a client. A newsletter is not, and the list leaves with you.",
+   "Start the nostalgia newsletter. One format, not three.", "After 24 Oct", false],
+  ["admin", "The boring load-bearing stuff",
+   "It is the evidence file for a 2028 PR application, not housekeeping. And your friend carries the director liability.",
+   "Health cover. You hold an EP and have none.", "This week", true]
+];
+
+/* Dated things. [ label, ISO date, note ] */
+var MILESTONES = [
+  ["NEXTPredict", "2026-10-22", "Moderating a panel and running it commercially. Negotiate nothing before this."],
+  ["The muzzle lifts", "2026-10-24", "Once Kalshi and Polymarket have been on the stage, you can say what you think."],
+  ["The conversation", "2026-10-27", "Scope and rate in one document. The line is: I launched this."],
+  ["Mum and your brother", "2027-02-01", "February is the driest month and the first window after the hours change."],
+  ["PR window", "2028-01-01", "PTS scheme. One to two years of track record, then six to twelve months to process."]
+];
+
+/* The four things that were in a day he described and liked. Never a streak. */
+var INGREDIENTS = [
+  ["out", "\u25cb", "Out"], ["move", "\u2933", "Moved"],
+  ["make", "\u25a3", "Made"], ["eat", "\u25d1", "Ate early"]
+];
 var PLACES = [
 ["Southern Ridges","Telok Blangah","HarbourFront",0,"Early, before it bakes","Ten kilometres of connected parks and the Henderson Waves bridge. The best long walk on the island and you never have to speak to anyone.","","","","Free"],
 ["MacRitchie Reservoir","Central catchment","Caldecott",0,"Open at 07:00","Boardwalk along the water, monkeys, and the TreeTop Walk if you go the whole way round. Properly quiet on a weekday.","","","","Free"],
@@ -207,39 +281,75 @@ var PLACES = [
 ["Whampoa Makan Place","Balestier","Boon Keng",2,"06:00 to 22:00","Two blocks, open extremely early, and full of people who have been coming for forty years.","Kaya toast and kopi, or the lor mee","Kaya toast set, and one kopi-o siew dai","This is where to try your first proper kopi order. Nobody there is in a hurry at nine in the morning.","Cash, about $4"]
 ];
 
-var NERVE = [
-  ["e","Nothing to order"],
-  ["m","Order in English"],
-  ["l","Hawker stall"]
-];
-
 /* ---------------------------------------------------------------- storage */
-var KEY = "daylight.v3";
+var KEY = "daylight.v4";
 var S = load();
 
 function load(){
-  var d = { done:{}, skip:{}, easyOnly:false, theme:null };
+  var d = { camp:"Singapore", wake:"08:00", done:{}, skip:{}, easyOnly:false,
+            days:{}, threads:{}, theme:null };
   try {
     var raw = localStorage.getItem(KEY);
-    if (raw) { var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
+    if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
   } catch(e){}
   return d;
 }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+/* days[iso] = { said: "...", kept: true|false|undefined, ing: {out:1,...} } */
+function day(iso){
+  var d = S.days[iso];
+  if (!d){ d = S.days[iso] = { ing:{} }; }
+  if (!d.ing) d.ing = {};
+  return d;
+}
 
 /* ---------------------------------------------------------------- dates */
 function iso(d){
   return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
 }
 function today(){ return iso(new Date()); }
+function shift(n){ var d = new Date(); d.setDate(d.getDate()+n); return iso(d); }
 function nice(s){
   var p = s.split("-"), m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   return Number(p[2]) + " " + m[Number(p[1])-1];
 }
+function daysUntil(isoStr){
+  var a = new Date(today() + "T00:00:00"), b = new Date(isoStr + "T00:00:00");
+  return Math.round((b - a) / 86400000);
+}
 
-/* ---------------------------------------------------------------- picking
-   A stable pseudo-random ordering per day, so today's suggestion does not
-   change when you reopen the page, but tomorrow's is different. */
+/* ---------------------------------------------------------------- day shape
+   Free morning equals your UTC offset; the evening is what is left of the
+   eight hours after it. Flying west trades one for the other, hour for hour. */
+function t2m(s){ var p = s.split(":"); return Number(p[0])*60 + Number(p[1]); }
+function hhmm(m){ m = ((m % 1440) + 1440) % 1440; return String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0"); }
+function offset(){
+  for (var i=0;i<CAMPS.length;i++) if (CAMPS[i][0] === S.camp) return CAMPS[i][1];
+  return 480;
+}
+function shape(){
+  var off = offset(), wake = t2m(S.wake);
+  var start = WORK_START_UTC + off, end = WORK_END_UTC + off;
+  var n = new Date(), nowLocal = n.getHours()*60 + n.getMinutes();
+  return {
+    start:start, end:end, wake:wake, now:nowLocal,
+    startT:hhmm(start), endT:hhmm(end),
+    morning:Math.max(0, start - wake),
+    evening:Math.max(0, 1380 - end),
+    untilWork:start - nowLocal,
+    working: nowLocal >= start && nowLocal < end,
+    late: end >= 1440
+  };
+}
+function dur(m){
+  m = Math.max(0, Math.round(m));
+  var h = Math.floor(m/60), r = m%60;
+  if (h && r) return h + "h " + r + "m";
+  return h ? h + "h" : r + "m";
+}
+
+/* ---------------------------------------------------------------- picking */
 function seedFor(s){
   var h = 2166136261;
   for (var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -254,119 +364,200 @@ function shuffled(list, seed){
   }
   return a;
 }
-function eligible(){
-  return PLACES.filter(function(p){
+function pick(){
+  var pool = PLACES.filter(function(p){
     if (S.done[p[0]]) return false;
     if (S.easyOnly && p[3] !== 0) return false;
     return true;
   });
-}
-function pick(){
-  var pool = eligible();
-  if (!pool.length){
-    // Everything done at this level. Fall back to the full list so it never dead-ends.
-    pool = S.easyOnly ? PLACES.filter(function(p){ return p[3]===0; }) : PLACES.slice();
-  }
+  if (!pool.length) pool = S.easyOnly ? PLACES.filter(function(p){ return p[3]===0; }) : PLACES.slice();
   if (!pool.length) return null;
   var order = shuffled(pool, seedFor(today()));
-  var n = S.skip[today()] || 0;
-  return order[n % order.length];
+  return order[(S.skip[today()] || 0) % order.length];
 }
 
 /* ---------------------------------------------------------------- helpers */
 function esc(s){
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+                  .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
 function maps(name){
   return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " Singapore");
 }
+var NERVE = [["e","Nothing to order"],["m","Order in English"],["l","Hawker stall"]];
 
-/* ---------------------------------------------------------------- views */
+/* ---------------------------------------------------------------- the bar */
+function barHTML(){
+  /* The bar always runs wake to midnight, so the proportions mean something.
+     Opening it at 3am should not put the night inside the free segment. */
+  var s = shape(), from = s.wake, to = 1440;
+  var span = to - from;
+  function pct(a, b){ return Math.max(0, Math.min(100, ((b - a) / span) * 100)); }
+  var freeW = pct(from, Math.min(s.start, to));
+  var workW = pct(Math.max(s.start, from), Math.min(s.end, to));
+  var restW = Math.max(0, 100 - freeW - workW);
+  var inDay = s.now >= from && s.now <= to;
+  var nowPos = pct(from, s.now);
+
+  var h = "<div class='bar' style='position:relative'>";
+  if (inDay) h += "<div class='now' style='position:absolute;top:0;bottom:0;left:" + nowPos.toFixed(2) + "%'></div>";
+  if (freeW > 0.5) h += "<div class='free' style='width:" + freeW.toFixed(2) + "%;display:flex;align-items:center;justify-content:center'>"
+    + (freeW > 16 ? "<span class='free'>Yours</span>" : "") + "</div>";
+  if (workW > 0.5) h += "<div class='work' style='width:" + workW.toFixed(2) + "%;display:flex;align-items:center;justify-content:center'>"
+    + (workW > 16 ? "<span class='work'>London</span>" : "") + "</div>";
+  if (restW > 0.5) h += "<div class='rest' style='width:" + restW.toFixed(2) + "%'></div>";
+  h += "</div>";
+  h += "<div class='legend'><span>" + hhmm(from) + "</span><span class='mono'>" + s.startT
+    + " &ndash; " + s.endT + "</span><span>24:00</span></div>";
+  return h;
+}
+
+/* ---------------------------------------------------------------- today */
 function viewToday(){
-  var p = pick();
-  if (!p) return "<div class='card'><p>Nothing left. That is a good problem.</p></div>";
-
-  var n = NERVE[p[3]];
+  var s = shape(), t = today(), d = day(t), y = day(shift(-1));
   var h = "";
 
-  h += "<div class='card hero'>";
-  h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>";
-  h += "<div><h2 style='margin:0 0 3px'>" + esc(p[0]) + "</h2>";
-  h += "<div class='dim'>" + esc(p[1]) + " &middot; " + esc(p[2]) + "</div></div>";
-  h += "<span class='pill " + n[0] + "'>" + esc(n[1]) + "</span>";
-  h += "</div>";
-  h += "<p class='muted' style='margin-top:12px'>" + esc(p[5]) + "</p>";
-  h += "<div class='row'><b>When</b><div>" + esc(p[4]) + "</div></div>";
-  h += "<div class='row'><b>Cost</b><div>" + esc(p[9]) + "</div></div>";
+  /* Where the day actually sits, given that it belongs to London. */
+  h += "<div class='card'>";
+  h += barHTML();
+  if (s.working){
+    h += "<p class='muted' style='margin:10px 0 0'>On shift until <strong>" + s.endT + "</strong>. "
+      + (s.evening > 0 ? dur(s.evening) + " of evening after it." : "No evening after it &mdash; that is the trade you are making.") + "</p>";
+  } else if (s.now < s.wake){
+    h += "<p class='muted' style='margin:10px 0 0'>Early. The free window runs <strong>" + S.wake
+      + " to " + s.startT + "</strong> &mdash; " + dur(s.morning) + ", and the rarest thing you have.</p>";
+  } else if (s.untilWork > 0){
+    h += "<p class='muted' style='margin:10px 0 0'><strong>" + dur(s.untilWork) + "</strong> before London starts, "
+      + "out of a window that is " + dur(s.morning) + " long. Almost nobody employed has this.</p>";
+  } else if (s.evening > 0){
+    h += "<p class='muted' style='margin:10px 0 0'>Shift is done. <strong>" + dur(s.evening) + "</strong> of evening left.</p>";
+  } else {
+    h += "<p class='muted' style='margin:10px 0 0'>Shift is done and so is the day. "
+      + "In Singapore that is the whole problem in one line &mdash; and what October is for.</p>";
+  }
+  h += "<div class='btns'><button data-camp='1'>Basecamp: " + esc(S.camp)
+    + " &middot; tap to change</button></div>";
   h += "</div>";
 
-  if (p[7]){
-    h += "<div class='say'>";
-    h += "<span class='lbl'>Say this</span>";
-    h += "<q>" + esc(p[7]) + "</q>";
-    if (p[8]) h += "<p class='after'>" + esc(p[8]) + "</p>";
+  /* Accountability, and the only shape of it that works on you: a record, not a score. */
+  if (y.said && y.kept === undefined){
+    h += "<div class='card tip'><h3>Yesterday you said</h3>"
+      + "<p style='margin:7px 0 0'><strong>" + esc(y.said) + "</strong></p>"
+      + "<div class='btns'><button class='pri' data-kept='1'>It happened</button>"
+      + "<button data-kept='0'>It did not</button></div></div>";
+  }
+
+  if (!d.said){
+    h += "<div class='card'><h3>One thing today</h3>"
+      + "<p class='dim' style='margin:6px 0 10px'>Decide it now and you do not have to decide it again at eleven.</p>"
+      + "<textarea id='said' placeholder='The one thing that would make today count'></textarea>"
+      + "<div class='btns'><button class='pri' data-say='1'>That is the one</button></div></div>";
+  } else {
+    h += "<div class='card ok'><h3>Today</h3><p style='margin:7px 0 0'><strong>" + esc(d.said) + "</strong></p>"
+      + "<div class='btns'><button data-unsay='1'>Change it</button></div></div>";
+  }
+
+  /* Four ingredients he named himself. No streak, nothing to fail. */
+  h += "<div class='card'><h3>The four</h3>"
+    + "<p class='dim' style='margin:6px 0 0'>From a day you described and liked. Not a target.</p><div class='ing'>";
+  INGREDIENTS.forEach(function(g){
+    h += "<button data-ing='" + g[0] + "' aria-pressed='" + (d.ing[g[0]] ? "true" : "false") + "'>"
+      + "<span class='g'>" + g[1] + "</span>" + g[2] + "</button>";
+  });
+  h += "</div></div>";
+
+  /* Somewhere to go, and the words for when you get there. */
+  var p = pick();
+  if (p){
+    var n = NERVE[p[3]];
+    h += "<h2>Somewhere today</h2>";
+    h += "<div class='card'>";
+    h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>";
+    h += "<div><h3>" + esc(p[0]) + "</h3><div class='dim'>" + esc(p[1]) + " &middot; " + esc(p[2]) + "</div></div>";
+    h += "<span class='pill " + n[0] + "'>" + esc(n[1]) + "</span></div>";
+    h += "<p class='muted' style='margin-top:10px'>" + esc(p[5]) + "</p>";
+    h += "<div class='row'><b>When</b><div>" + esc(p[4]) + "</div></div>";
+    h += "<div class='row'><b>Cost</b><div>" + esc(p[9]) + "</div></div>";
     h += "</div>";
-    if (p[6]) h += "<div class='card'><div class='row'><b>Order</b><div>" + esc(p[6]) + "</div></div></div>";
-  }
-
-  h += "<div class='btns'>";
-  h += "<button class='pri' data-done='" + esc(p[0]) + "'>I went</button>";
-  h += "<button data-skip='1'>Somewhere else</button>";
-  h += "</div>";
-  h += "<div class='btns'>";
-  h += "<button onclick=\"window.open('" + maps(p[0]) + "','_blank','noopener')\">Open in Maps</button>";
-  h += "<button data-easy='1'>" + (S.easyOnly ? "Show me everything" : "Something easier") + "</button>";
-  h += "</div>";
-
-  if (p[3] === 2){
-    h += "<div class='card tip'><h3>If the words go</h3>"
-      + "<p style='margin:8px 0 0'>Point at what you want and hold up one finger. That is what half the queue is doing and "
-      + "nobody has ever minded. <strong>You do not have to get the local phrasing right to be served.</strong></p></div>";
+    if (p[7]){
+      h += "<div class='say'><span class='lbl'>Say this</span><q>" + esc(p[7]) + "</q>";
+      if (p[8]) h += "<p class='after'>" + esc(p[8]) + "</p>";
+      h += "</div>";
+    }
+    h += "<div class='btns'><button class='pri' data-done='" + esc(p[0]) + "'>I went</button>"
+      + "<button data-skip='1'>Somewhere else</button></div>";
+    h += "<div class='btns'><button onclick=\"window.open('" + maps(p[0]) + "','_blank','noopener')\">Maps</button>"
+      + "<button data-easy='1'>" + (S.easyOnly ? "Show everything" : "Something easier") + "</button></div>";
+    if (p[3] === 2){
+      h += "<div class='card tip'><h3>If the words go</h3><p style='margin:7px 0 0'>Point and hold up one finger. "
+        + "That is what half the queue is doing. <strong>You do not have to get the phrasing right to be served.</strong></p></div>";
+    }
   }
   return h;
 }
 
-function viewWeek(){
-  var h = "<p class='muted'>The two things that are fixed. Everything else on this page is optional.</p>";
+/* ---------------------------------------------------------------- next */
+function viewNext(){
+  var h = "";
+  var soon = MILESTONES.map(function(m){ return [m, daysUntil(m[1])]; })
+                       .filter(function(x){ return x[1] >= 0; })
+                       .sort(function(a,b){ return a[1] - b[1]; });
 
-  h += "<div class='card'><h3>Saturday, 07:30 &mdash; parkrun</h3>"
-    + "<p class='muted' style='margin:6px 0 0'>Same event every week. Pick the one furthest from Tanjong Pagar, not the nearest, "
-    + "so turning up puts you somewhere else in Singapore with the whole day ahead. Walking is allowed and nobody finishes last.</p>"
-    + "<p class='dim' style='margin:8px 0 0'>Bishan-Ang Mo Kio &middot; East Coast &middot; West Coast &middot; Bay East &middot; Bedok Reservoir</p></div>";
+  if (soon.length){
+    var m = soon[0];
+    h += "<div class='card ok'><div style='display:flex;align-items:baseline;gap:12px'>"
+      + "<span class='count'>" + m[1] + "</span><div><h3>days to " + esc(m[0][0]) + "</h3>"
+      + "<div class='dim'>" + nice(m[0][1]) + "</div></div></div>"
+      + "<p class='muted' style='margin:10px 0 0'>" + esc(m[0][2]) + "</p></div>";
+  }
 
-  h += "<div class='card'><h3>Wednesday, 14:30 &mdash; call your mum</h3>"
-    + "<p class='muted' style='margin:6px 0 0'>About seven in the morning for her. Walk while you talk. "
-    + "The thing that moves this off 30% is her expecting it, not you remembering it &mdash; so tell her it is every Wednesday.</p>"
-    + "<p class='dim' style='margin:8px 0 0'>If you are late, call anyway. Ten minutes at 15:20 beats a clean miss.</p></div>";
+  h += "<h2>Six things going on</h2>"
+    + "<p class='dim' style='margin:0 0 4px'>One next action each. A thread with three has none.</p>";
+  THREADS.forEach(function(t){
+    var st = S.threads[t[0]] || {};
+    h += "<div class='card" + (st.done ? " ok" : "") + "'>";
+    h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>"
+      + "<h3>" + esc(t[1]) + "</h3>"
+      + "<span class='pill" + (t[5] && !st.done ? " hot" : "") + "'>" + esc(t[4]) + "</span></div>";
+    h += "<p class='dim' style='margin:7px 0 0'>" + esc(t[2]) + "</p>";
+    h += "<div class='row' style='margin-top:8px'><b>Next</b><div>"
+      + (st.done ? "<s>" + esc(t[3]) + "</s> &mdash; done " + nice(st.done) : "<strong>" + esc(t[3]) + "</strong>")
+      + "</div></div>";
+    h += "<div class='btns'><button data-thread='" + t[0] + "'>"
+      + (st.done ? "Not done after all" : "Done") + "</button></div>";
+    h += "</div>";
+  });
 
-  h += "<div class='card ok'><h3>Put these in your actual calendar</h3>"
-    + "<p class='muted' style='margin:8px 0 0'>Three subscribable feeds. Tap once and Apple Calendar "
-    + "keeps them updated, so none of this depends on you opening this app again.</p>"
-    + "<div class='btns'><button class='pri' onclick=\"location.href='../cal/'\">Subscribe</button></div></div>";
+  h += "<h2>The rest of the year</h2><div class='card'>";
+  soon.slice(1).forEach(function(x){
+    h += "<div class='row'><b>" + x[1] + "d</b><div><strong>" + esc(x[0][0]) + "</strong> &middot; "
+      + nice(x[0][1]) + "<br><span class='dim'>" + esc(x[0][2]) + "</span></div></div>";
+  });
+  h += "</div>";
 
-  h += "<div class='card'><h3>Not yet started</h3>"
-    + "<div class='row'><b>Today</b><div>Text Kelvin about the games night. Propose a date rather than asking if he is free.</div></div>"
-    + "<div class='row'><b>22-23 Oct</b><div>NEXTPredict. Negotiate nothing before it.</div></div>"
-    + "<div class='row'><b>27 Oct</b><div>The conversation. Scope and rate in one document.</div></div>"
-    + "</div>";
+  h += "<h2>Every week</h2><div class='card'>"
+    + "<div class='row'><b>Sat 07:30</b><div><strong>parkrun.</strong> Furthest from Tanjong Pagar, not nearest. "
+    + "Walking is allowed. Share it with your partner &mdash; he wants the gym and a community too.</div></div>"
+    + "<div class='row'><b>Wed 14:30</b><div><strong>Call your mum</strong> while you walk. About 07:00 for her. "
+    + "Late is fine; a clean miss is not.</div></div></div>";
+
+  h += "<div class='btns'><button onclick=\"location.href='../cal/'\">Put these in Apple Calendar</button></div>";
   return h;
 }
 
+/* ---------------------------------------------------------------- say */
 function viewSay(){
   var h = "<p class='muted'>Here because you will not remember it, and there is no reason you should. "
         + "Open it in the queue.</p>";
 
-  h += "<div class='card ok'><h3>The three that always work</h3>"
-    + "<ul style='margin:8px 0 0'>"
-    + "<li><strong>Point, and hold up one finger.</strong> Universally understood, faintly rude to nobody, and extremely common.</li>"
-    + "<li><strong>&ldquo;One of that, please.&rdquo;</strong> English is an official language and every stallholder has heard this a thousand times.</li>"
-    + "<li><strong>Join the longest queue and order what the person in front ordered.</strong> This is a recognised national strategy, not a cop-out.</li>"
+  h += "<div class='card ok'><h3>The three that always work</h3><ul style='margin:8px 0 0'>"
+    + "<li><strong>Point, and hold up one finger.</strong> Understood everywhere, rude to nobody.</li>"
+    + "<li><strong>&ldquo;One of that, please.&rdquo;</strong> English is official here. They have heard it a thousand times.</li>"
+    + "<li><strong>Join the longest queue and order what the person in front ordered.</strong> A recognised national strategy.</li>"
     + "</ul></div>";
 
-  h += "<h2>Kopi</h2>"
-    + "<p class='muted'>Two or three terms stacked together. <strong>Kopi</strong> on its own is coffee with condensed milk and sugar.</p>";
-  h += "<table><tr><th>Say</th><th>Means</th></tr>"
-    + "<tr><td>kopi</td><td>Coffee, condensed milk, sweet. The default.</td></tr>"
+  h += "<h2>Kopi</h2><p class='muted'>Two or three terms stacked. <strong>Kopi</strong> alone is coffee, condensed milk, sweet.</p>"
+    + "<table><tr><th>Say</th><th>Means</th></tr>"
     + "<tr><td>-o</td><td>No milk. Black, still sweet.</td></tr>"
     + "<tr><td>-c</td><td>Evaporated milk instead of condensed.</td></tr>"
     + "<tr><td>kosong</td><td>No sugar at all.</td></tr>"
@@ -376,63 +567,83 @@ function viewSay(){
     + "<tr><td>po</td><td>Weak.</td></tr>"
     + "<tr><td>peng</td><td>Iced.</td></tr>"
     + "<tr><td>da bao</td><td>Take away. Goes last.</td></tr>"
-    + "<tr><td>teh</td><td>Same system, but tea.</td></tr>"
-    + "</table>";
-  h += "<div class='card'><h3>Three orders that cover most days</h3>"
-    + "<div class='row'><b>Standard</b><div><strong>Kopi-o siew dai.</strong> Black, a bit sweet. The most ordinary thing you can say.</div></div>"
-    + "<div class='row'><b>Milky</b><div><strong>Kopi-c siew dai.</strong> Evaporated milk, less sugar.</div></div>"
-    + "<div class='row'><b>Hot day</b><div><strong>Kopi-o peng.</strong> Iced.</div></div>"
-    + "</div>";
-  h += "<p class='dim'>They will often repeat it back loudly across the stall. That is the order going to the person making it, "
-    + "not a correction of your pronunciation.</p>";
+    + "<tr><td>teh</td><td>Same system, tea.</td></tr></table>";
 
-  h += "<h2>Hawker centres</h2>";
-  h += "<div class='card'>"
-    + "<div class='row'><b>Seat first</b><div>Find a table before you queue, and <strong>chope</strong> it with a packet of tissues. That is the accepted signal and everybody uses it.</div></div>"
-    + "<div class='row'><b>Sharing</b><div>Sitting with strangers at a big table is normal. <strong>&ldquo;Can sit?&rdquo;</strong> is the whole phrase.</div></div>"
-    + "<div class='row'><b>Ordering</b><div>Each stall separately, and you usually pay and wait there. Some give you a buzzer.</div></div>"
-    + "<div class='row'><b>Cash</b><div>Still fastest. Bring small notes. Plenty take PayNow now, but do not count on it.</div></div>"
-    + "<div class='row'><b>Trays</b><div>Returning your tray has been required since 2021. Return station is near the exit.</div></div>"
-    + "<div class='row'><b>Timing</b><div>Avoid 12:00 to 13:30 near the CBD. Go at 14:00 instead &mdash; calm, no queue, nobody behind you.</div></div>"
-    + "</div>";
+  h += "<div class='card'><h3>Three orders for most days</h3>"
+    + "<div class='row'><b>Standard</b><div><strong>Kopi-o siew dai.</strong> The most ordinary thing you can say.</div></div>"
+    + "<div class='row'><b>Milky</b><div><strong>Kopi-c siew dai.</strong></div></div>"
+    + "<div class='row'><b>Hot day</b><div><strong>Kopi-o peng.</strong></div></div></div>"
+    + "<p class='dim'>They shout it back across the stall. That is the order reaching whoever makes it, not a correction.</p>";
 
-  h += "<h2>Two words in Hokkien</h2>"
-    + "<p class='muted'>Worth having, given who you are going to be having dinner with.</p>"
+  h += "<h2>Hawker centres</h2><div class='card'>"
+    + "<div class='row'><b>Seat first</b><div>Table before queue, and <strong>chope</strong> it with a packet of tissues. Everybody does this.</div></div>"
+    + "<div class='row'><b>Sharing</b><div>Normal at a big table. <strong>&ldquo;Can sit?&rdquo;</strong> is the whole phrase.</div></div>"
+    + "<div class='row'><b>Cash</b><div>Fastest. Small notes. PayNow is common but do not count on it.</div></div>"
+    + "<div class='row'><b>Trays</b><div>Returning yours has been required since 2021. Station is near the exit.</div></div>"
+    + "<div class='row'><b>Timing</b><div>Avoid 12:00&ndash;13:30 near the CBD. Go at 14:00 &mdash; no queue, nobody behind you.</div></div></div>";
+
+  h += "<h2>Hokkien</h2><p class='muted'>His family speak it, and it is the one nobody teaches.</p>"
     + "<table><tr><th>Say</th><th>Means</th></tr>"
-    + "<tr><td>chiah pa boe</td><td>Have you eaten? The standard greeting, and the correct answer is yes.</td></tr>"
-    + "<tr><td>ho chiah</td><td>Delicious. Deploy at his mother's table.</td></tr>"
-    + "<tr><td>kam siah</td><td>Thank you.</td></tr>"
-    + "</table>"
-    + "<p class='dim'>Better than any of this: ask his family to teach you. Asking an elder for their Hokkien is a much warmer "
-    + "thing than getting it right off a page.</p>";
+    + "<tr><td>chiah pa boe</td><td>Have you eaten? The standard greeting. Say yes.</td></tr>"
+    + "<tr><td>ho chiah</td><td>Delicious. For his mother's table.</td></tr>"
+    + "<tr><td>kam siah</td><td>Thank you.</td></tr></table>"
+    + "<div class='card ok'><p style='margin:0'><strong>Better than any of this: ask his family to teach you.</strong> "
+    + "Hokkien is the language that got squeezed out, and the people who still speak it know that. "
+    + "Asking an elder for five phrases does more for belonging than a term of classes.</p></div>";
   return h;
 }
 
-function viewBeen(){
-  var names = Object.keys(S.done);
-  if (!names.length){
-    return "<div class='card'><h3>Nothing here yet</h3>"
-      + "<p class='muted' style='margin:8px 0 0'>Which is exactly right for day one. Go to one place, press <strong>I went</strong>, "
-      + "and this fills up on its own.</p></div>";
+/* ---------------------------------------------------------------- log */
+function viewLog(){
+  var keys = Object.keys(S.days).filter(function(k){
+    var d = S.days[k];
+    return d.said || d.kept !== undefined || Object.keys(d.ing).length;
+  }).sort().reverse();
+  var places = Object.keys(S.done);
+
+  var kept = 0, asked = 0;
+  keys.forEach(function(k){ if (S.days[k].said){ asked++; if (S.days[k].kept === true) kept++; } });
+
+  var h = "";
+  if (!keys.length && !places.length){
+    return "<div class='card'><h3>Nothing here yet</h3><p class='muted' style='margin:8px 0 0'>"
+      + "Right for day one. Name one thing on Today, go somewhere, and this fills up on its own.</p></div>";
   }
-  names.sort(function(a,b){ return S.done[b].localeCompare(S.done[a]); });
-  var h = "<div class='card ok'><h3>" + names.length + (names.length===1 ? " place" : " places") + "</h3>"
-        + "<p class='muted' style='margin:8px 0 0'>No streak, no target. Just the list getting longer.</p></div>";
-  h += "<div class='card'>";
-  names.forEach(function(n){
-    h += "<div class='row'><b>" + esc(nice(S.done[n])) + "</b><div>" + esc(n) + "</div></div>";
+
+  h += "<div class='card ok'><div style='display:flex;gap:24px;flex-wrap:wrap'>"
+    + "<div><span class='count'>" + kept + "/" + asked + "</span><div class='dim'>days you named and kept</div></div>"
+    + "<div><span class='count'>" + places.length + "</span><div class='dim'>places been</div></div>"
+    + "</div><p class='muted' style='margin:12px 0 0'>No streak and no target. A record, so it is not being kept in your head.</p></div>";
+
+  h += "<h2>Days</h2><div class='card'>";
+  keys.slice(0, 40).forEach(function(k){
+    var d = S.days[k], ing = INGREDIENTS.filter(function(g){ return d.ing[g[0]]; }).map(function(g){ return g[2]; });
+    var mark = d.kept === true ? "&#10003; " : d.kept === false ? "&mdash; " : "";
+    h += "<div class='row'><b>" + esc(nice(k)) + "</b><div>"
+      + (d.said ? mark + esc(d.said) : "<span class='dim'>nothing named</span>")
+      + (ing.length ? "<br><span class='dim'>" + esc(ing.join(", ")) + "</span>" : "")
+      + "</div></div>";
   });
   h += "</div>";
+
+  if (places.length){
+    h += "<h2>Places</h2><div class='card'>";
+    places.sort(function(a,b){ return S.done[b].localeCompare(S.done[a]); }).forEach(function(n){
+      h += "<div class='row'><b>" + esc(nice(S.done[n])) + "</b><div>" + esc(n) + "</div></div>";
+    });
+    h += "</div>";
+  }
+
   h += "<div class='btns'><button data-reset='1'>Clear everything</button></div>";
   return h;
 }
 
 /* ---------------------------------------------------------------- shell */
 var TABS = {
-  today: ["Today", "One place, and what to say", viewToday],
-  week:  ["Anchors", "The fixed points", viewWeek],
-  say:   ["Phrasebook", "Read it in the queue", viewSay],
-  been:  ["Been", "Where you have got to", viewBeen]
+  today: ["Today", "A day fixed to London", viewToday],
+  next:  ["Next", "What is actually going on", viewNext],
+  say:   ["Say", "Read it in the queue", viewSay],
+  log:   ["Log", "The record, so you are not holding it", viewLog]
 };
 var tab = "today";
 
@@ -448,30 +659,55 @@ function render(){
   window.scrollTo(0,0);
 }
 
+function campSheet(){
+  var names = CAMPS.map(function(c){ return c[0]; });
+  var i = names.indexOf(S.camp);
+  var next = names[(i + 1) % names.length];
+  S.camp = next; save(); render();
+}
+
 document.addEventListener("click", function(ev){
   var b = ev.target.closest ? ev.target.closest("button") : null;
   if (!b) return;
+  var d = day(today());
+
   if (b.dataset.tab){ tab = b.dataset.tab; render(); return; }
-  if (b.dataset.done){ S.done[b.dataset.done] = today(); delete S.skip[today()]; save(); tab = "been"; render(); return; }
+  if (b.dataset.camp){ campSheet(); return; }
+  if (b.dataset.ing){ var k = b.dataset.ing; if (d.ing[k]) delete d.ing[k]; else d.ing[k] = 1; save(); render(); return; }
+  if (b.dataset.say){
+    var v = (document.getElementById("said").value || "").trim();
+    if (v){ d.said = v; save(); render(); }
+    return;
+  }
+  if (b.dataset.unsay){ delete d.said; save(); render(); return; }
+  if (b.dataset.kept){ day(shift(-1)).kept = b.dataset.kept === "1"; save(); render(); return; }
+  if (b.dataset.thread){
+    var st = S.threads[b.dataset.thread] || (S.threads[b.dataset.thread] = {});
+    if (st.done) delete st.done; else st.done = today();
+    save(); render(); return;
+  }
+  if (b.dataset.done){ S.done[b.dataset.done] = today(); delete S.skip[today()]; save(); tab = "log"; render(); return; }
   if (b.dataset.skip){ S.skip[today()] = (S.skip[today()] || 0) + 1; save(); render(); return; }
   if (b.dataset.easy){ S.easyOnly = !S.easyOnly; delete S.skip[today()]; save(); render(); return; }
   if (b.dataset.reset){
-    if (confirm("Clear every place you have logged? This cannot be undone.")){
-      S.done = {}; S.skip = {}; save(); render();
+    if (confirm("Clear everything logged? This cannot be undone.")){
+      S.done = {}; S.skip = {}; S.days = {}; S.threads = {}; save(); render();
     }
     return;
   }
   if (b.id === "theme"){
     var cur = document.documentElement.getAttribute("data-theme");
-    var next = cur === "dark" ? "light" : cur === "light" ? null : "dark";
-    if (next) document.documentElement.setAttribute("data-theme", next);
+    var nx = cur === "dark" ? "light" : cur === "light" ? null : "dark";
+    if (nx) document.documentElement.setAttribute("data-theme", nx);
     else document.documentElement.removeAttribute("data-theme");
-    S.theme = next; save();
+    S.theme = nx; save();
   }
 });
 
 if (S.theme) document.documentElement.setAttribute("data-theme", S.theme);
 render();
+/* The shift moves under you, so keep the bar honest. */
+setInterval(function(){ if (tab === "today") render(); }, 60000);
 </script>
 </body>
 </html>
