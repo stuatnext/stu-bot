@@ -129,8 +129,8 @@ def build_anchors():
 def build_year():
     """Dated things, and the shape of the year he said he wanted to be able to see."""
     evs = []
-    evs += event("year-nextpredict", "NEXTPredict", date(2026, 10, 22), date(2026, 10, 23),
-                 all_day=True,
+    evs += event("year-nextpredict", "NEXTPredict, New York", date(2026, 10, 22), date(2026, 10, 23),
+                 all_day=True, location="New York",
                  desc=("Negotiate nothing before this.\n\n"
                        "Also: 24 October is when the constraint on what you can post expires. The "
                        "reason to hold back is needing Kalshi and Polymarket on a stage. Once they "
@@ -153,6 +153,22 @@ def build_year():
                        "Pick a month and say it out loud to her. A visit without a month is a wish.\n\n"
                        "Two return fares run roughly GBP 1,400-1,900. Waive a few months of her "
                        "rent and that is the flight."))
+    # The next four months as actually planned, so the shape of it is visible
+    # somewhere other than his head.
+    for label, place, a, b, note in [
+        ("UK stopover", "UK", (2026,9,8), (2026,9,8), "One night, and it counts as a UK day."),
+        ("Company retreat", "Bulgaria", (2026,9,9), (2026,9,11), "End date assumed - correct it."),
+        ("UK - family, September", "UK", (2026,9,12), (2026,9,23), "The twelve days. Protect these from work."),
+        ("Singapore, before France", "Singapore", (2026,9,24), (2026,10,9), "TOKEN2049 in here. Longest settled run before January."),
+        ("France with partner", "France", (2026,10,10), (2026,10,16), "Not a working trip."),
+        ("UK - family, October", "UK", (2026,10,17), (2026,10,21), "A few days before New York."),
+        ("UNDECIDED - UK week or home", "?", (2026,10,24), (2026,11,1), "Decide now, not at an airport. Home means seven unbroken weeks in Singapore. UK means the October conversation happens in a room at head office, four days after you launched their event."),
+        ("Singapore - the seven weeks", "Singapore", (2026,11,2), (2026,12,19), "Seven weeks. Where the routine actually starts."),
+        ("UK - Christmas", "UK", (2026,12,20), (2027,1,2), "Fourteen days."),
+    ]:
+        evs += event("trip-%d%02d%02d" % a, label, date(*a), date(*b), all_day=True,
+                     location=place, desc=note)
+
     evs += event("year-pr", "PR application window opens up",
                  date(2028, 1, 1), all_day=True,
                  desc=("PTS scheme. Most successful applicants have one to two years of track "

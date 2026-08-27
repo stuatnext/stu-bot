@@ -124,8 +124,8 @@ textarea{min-height:62px;}
 
 nav{position:fixed; left:0; right:0; bottom:0; display:flex; background:var(--surface);
   border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:20;}
-nav button{flex:1; border:none; border-radius:0; background:none; padding:10px 4px 12px;
-  font-size:11.5px; color:var(--ink-3); min-height:60px; display:flex; flex-direction:column;
+nav button{flex:1; border:none; border-radius:0; background:none; padding:10px 2px 12px;
+  font-size:11px; color:var(--ink-3); min-height:60px; display:flex; flex-direction:column;
   align-items:center; justify-content:center; gap:3px;}
 nav button[aria-current="true"]{color:var(--accent); font-weight:600;}
 nav .ic{font-size:18px; line-height:1;}
@@ -158,6 +158,7 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
 <nav>
   <button data-tab="today" aria-current="true"><span class="ic">&#9737;</span>Today</button>
   <button data-tab="next"><span class="ic">&#9654;</span>Next</button>
+  <button data-tab="trips"><span class="ic">&#9992;</span>Trips</button>
   <button data-tab="say"><span class="ic">&#9786;</span>Say</button>
   <button data-tab="log"><span class="ic">&#10003;</span>Log</button>
 </nav>
@@ -220,6 +221,33 @@ var MILESTONES = [
   ["Mum and your brother", "2027-02-01", "February is the driest month and the first window after the hours change."],
   ["PR window", "2028-01-01", "PTS scheme. One to two years of track record, then six to twelve months to process."]
 ];
+
+/* The next four months, as actually planned. Some end dates are inferred and
+   marked - the point is not precision, it is that this stops living in his head.
+   [ label, where, start, end, kind, uk, note ] */
+var TRIPS = [
+["Stopover", "UK", "2026-09-08", "2026-09-08", "move", 1, "One night. Counts as a UK day."],
+["Company retreat", "Bulgaria", "2026-09-09", "2026-09-11", "work", 0, "End date assumed - correct it."],
+["Family", "UK", "2026-09-12", "2026-09-23", "family", 1, "The twelve days. This is the one to protect from work."],
+["Home", "Singapore", "2026-09-24", "2026-10-09", "home", 0, "TOKEN2049 falls in here. Sixteen days - the longest settled run before January."],
+["With your partner", "France", "2026-10-10", "2026-10-16", "leisure", 0, "Yours and his. Not a working trip."],
+["Family", "UK", "2026-10-17", "2026-10-21", "family", 1, "A few days and a weekend before New York."],
+["NEXTPredict", "New York", "2026-10-22", "2026-10-23", "work", 0, "Moderating, and running it commercially. The muzzle lifts on the 24th."],
+["Undecided", "UK or home", "2026-10-24", "2026-11-01", "open", 0, "The open week. See below - this is the decision."],
+["Home", "Singapore", "2026-11-02", "2026-12-19", "home", 0, "Seven weeks. The first real stretch of ground since June."],
+["Christmas", "UK", "2026-12-20", "2027-01-02", "family", 1, "Fourteen days."]
+];
+
+function ukDays(includeOpen){
+  var n = 0;
+  TRIPS.forEach(function(t){
+    if (!t[5] && !(includeOpen && t[4] === "open")) return;
+    if (t[4] === "open" && !includeOpen) return;
+    var a = new Date(t[2] + "T00:00:00"), b = new Date(t[3] + "T00:00:00");
+    n += Math.round((b - a) / 86400000) + 1;
+  });
+  return n;
+}
 
 /* The four things that were in a day he described and liked. Never a streak. */
 var INGREDIENTS = [
@@ -638,10 +666,68 @@ function viewLog(){
   return h;
 }
 
+/* ---------------------------------------------------------------- trips */
+function viewTrips(){
+  var base = ukDays(false), withOpen = base + 9;
+  var h = "";
+
+  /* The number he cannot hold in his head, and the one that costs real money. */
+  var band = withOpen <= 45 ? "e" : withOpen <= 90 ? "l" : "hot";
+  h += "<div class='card" + (withOpen > 45 ? " hot" : " ok") + "'>";
+  h += "<div style='display:flex;align-items:baseline;gap:14px'><span class='count'>" + base + "</span>"
+    + "<div><h3>UK days this tax year</h3><div class='dim'>6 Apr 2026 to 5 Apr 2027</div></div></div>";
+  h += "<p class='muted' style='margin:12px 0 0'>Take the open week in the UK and it is <strong>"
+    + withOpen + "</strong>. Under 46 you would need four ties to be UK resident, which you do not have. "
+    + "<strong>Over 46 and three ties is enough</strong> &mdash; and you plausibly have work and "
+    + "accommodation already.</p>";
+  h += "<p class='dim' style='margin:8px 0 0'>So this year is fine. But you are one trip from the band "
+    + "that taxes your Singapore salary, and there are still three months of the tax year after "
+    + "Christmas. Do not carry this in your head.</p>";
+  h += "</div>";
+
+  h += "<h2>Between now and January</h2>";
+  var last = null;
+  TRIPS.forEach(function(t){
+    var d = daysUntil(t[2]), gone = daysUntil(t[3]) < 0, now = d <= 0 && !gone;
+    var len = Math.round((new Date(t[3]+"T00:00:00") - new Date(t[2]+"T00:00:00"))/86400000) + 1;
+    h += "<div class='card" + (now ? " ok" : "") + "' style='" + (gone ? "opacity:.5" : "") + "'>";
+    h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>"
+      + "<div><h3>" + esc(t[1]) + "</h3><div class='dim'>" + esc(t[0]) + " &middot; "
+      + nice(t[2]) + (t[2] !== t[3] ? " to " + nice(t[3]) : "") + " &middot; " + len + "d</div></div>"
+      + "<span class='pill" + (t[5] ? " l" : t[4]==="home" ? " e" : "") + "'>"
+      + (t[5] ? "UK day" + (len>1?"s":"") : t[4]) + "</span></div>";
+    h += "<p class='dim' style='margin:8px 0 0'>" + esc(t[6]) + "</p>";
+    h += "</div>";
+  });
+
+  h += "<div class='card tip'><h3>The open week is the whole decision &mdash; and it has a third factor</h3>"
+    + "<p style='margin:8px 0 0'><strong>The conversation falls inside it.</strong> The week of 27 October "
+    + "is exactly when you should be renegotiating, and NEXT is a UK company. Take the UK week and you can "
+    + "do it <em>in a room</em>, four days after launching their event, instead of over video from "
+    + "Singapore with a seven-hour gap. For a rate negotiation that is worth a great deal.</p>"
+    + "<p style='margin:8px 0 0'>Straight home after New York and you land in Singapore with "
+    + "<strong>seven unbroken weeks</strong> before Christmas &mdash; the first real ground you will "
+    + "have had since June, and the window where a routine can actually start.</p>"
+    + "<p>Take the UK week and you get more family, and you go to <strong>" + withOpen + " UK days</strong>, and the seven weeks "
+    + "becomes six. Both are defensible. But pick it now rather than at an airport, because you have "
+    + "already told me what happens to you when the ground keeps moving.</p></div>";
+
+  h += "<div class='card'><h3>What actually survives all this</h3>"
+    + "<div class='row'><b>Everywhere</b><div><strong>parkrun.</strong> It runs in the UK, Bulgaria, "
+    + "France, the US and Singapore, and one barcode works at all of them. This is the reason it was "
+    + "the right anchor.</div></div>"
+    + "<div class='row'><b>Mostly</b><div><strong>Your mum.</strong> Easier for four of these weeks, "
+    + "since you will be in the same house.</div></div>"
+    + "<div class='row'><b>Nowhere</b><div><strong>The gym, the hawker lunches, the daily place.</strong> "
+    + "Those need ground. They start in November.</div></div></div>";
+  return h;
+}
+
 /* ---------------------------------------------------------------- shell */
 var TABS = {
   today: ["Today", "A day fixed to London", viewToday],
   next:  ["Next", "What is actually going on", viewNext],
+  trips: ["Trips", "Where you will be, and the UK count", viewTrips],
   say:   ["Say", "Read it in the queue", viewSay],
   log:   ["Log", "The record, so you are not holding it", viewLog]
 };

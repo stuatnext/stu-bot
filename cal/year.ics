@@ -12,7 +12,8 @@ UID:year-nextpredict@stu-bot
 DTSTAMP:20260826T000000Z
 DTSTART;VALUE=DATE:20261022
 DTEND;VALUE=DATE:20261024
-SUMMARY:NEXTPredict
+SUMMARY:NEXTPredict\, New York
+LOCATION:New York
 DESCRIPTION:Negotiate nothing before this.\n\nAlso: 24 October is when the 
  constraint on what you can post expires. The reason to hold back is needin
  g Kalshi and Polymarket on a stage. Once they have been on it\, that is sp
@@ -51,6 +52,89 @@ DESCRIPTION:February is the driest month of the year and there is no haze.
  y it out loud to her. A visit without a month is a wish.\n\nTwo return far
  es run roughly GBP 1\,400-1\,900. Waive a few months of her rent and that 
  is the flight.
+END:VEVENT
+BEGIN:VEVENT
+UID:trip-20260908@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260908
+DTEND;VALUE=DATE:20260909
+SUMMARY:UK stopover
+LOCATION:UK
+DESCRIPTION:One night\, and it counts as a UK day.
+END:VEVENT
+BEGIN:VEVENT
+UID:trip-20260909@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260909
+DTEND;VALUE=DATE:20260912
+SUMMARY:Company retreat
+LOCATION:Bulgaria
+DESCRIPTION:End date assumed - correct it.
+END:VEVENT
+BEGIN:VEVENT
+UID:trip-20260912@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260912
+DTEND;VALUE=DATE:20260924
+SUMMARY:UK - family\, September
+LOCATION:UK
+DESCRIPTION:The twelve days. Protect these from work.
+END:VEVENT
+BEGIN:VEVENT
+UID:trip-20260924@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20260924
+DTEND;VALUE=DATE:20261010
+SUMMARY:Singapore\, before France
+LOCATION:Singapore
+DESCRIPTION:TOKEN2049 in here. Longest settled run before January.
+END:VEVENT
+BEGIN:VEVENT
+UID:trip-20261010@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20261010
+DTEND;VALUE=DATE:20261017
+SUMMARY:France with partner
+LOCATION:France
+DESCRIPTION:Not a working trip.
+END:VEVENT
+BEGIN:VEVENT
+UID:trip-20261017@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20261017
+DTEND;VALUE=DATE:20261022
+SUMMARY:UK - family\, October
+LOCATION:UK
+DESCRIPTION:A few days before New York.
+END:VEVENT
+BEGIN:VEVENT
+UID:trip-20261024@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20261024
+DTEND;VALUE=DATE:20261102
+SUMMARY:UNDECIDED - UK week or home
+LOCATION:?
+DESCRIPTION:Decide now\, not at an airport. Home means seven unbroken weeks
+  in Singapore. UK means the October conversation happens in a room at head
+  office\, four days after you launched their event.
+END:VEVENT
+BEGIN:VEVENT
+UID:trip-20261102@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20261102
+DTEND;VALUE=DATE:20261220
+SUMMARY:Singapore - the seven weeks
+LOCATION:Singapore
+DESCRIPTION:Seven weeks. Where the routine actually starts.
+END:VEVENT
+BEGIN:VEVENT
+UID:trip-20261220@stu-bot
+DTSTAMP:20260826T000000Z
+DTSTART;VALUE=DATE:20261220
+DTEND;VALUE=DATE:20270103
+SUMMARY:UK - Christmas
+LOCATION:UK
+DESCRIPTION:Fourteen days.
 END:VEVENT
 BEGIN:VEVENT
 UID:year-pr@stu-bot

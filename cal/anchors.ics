@@ -30,8 +30,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:anchor-mum@stu-bot
 DTSTAMP:20260826T000000Z
-DTSTART:20260826T143000
-DTEND:20260826T151500
+DTSTART:20260902T143000
+DTEND:20260902T151500
 SUMMARY:Call Mum - walk while you talk
 RRULE:FREQ=WEEKLY;BYDAY=WE
 DESCRIPTION:About 07:00 for her. Kettle on\, nobody dressed.\n\nWhat moves 
@@ -47,8 +47,8 @@ END:VEVENT
 BEGIN:VEVENT
 UID:anchor-kelvin@stu-bot
 DTSTAMP:20260826T000000Z
-DTSTART:20260827T100000
-DTEND:20260827T101500
+DTSTART:20260828T100000
+DTEND:20260828T101500
 SUMMARY:Text Kelvin about the games night
 DESCRIPTION:Propose a date rather than asking whether he is free. A date is
   much easier to answer\, and it does not depend on either of you rememberi
