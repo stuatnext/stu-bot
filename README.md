@@ -86,10 +86,15 @@ in play.
 **Log** — days named and kept, places been. No streak and no target: a record, so it is not being
 held in his head.
 
-Three deliberate refusals: **nothing can be failed** (no streaks, no chains, no resets), **nothing
-depends on remembering**, and **the easy tier is not the consolation tier** — half the places involve
-no talking at all, because the real barrier turned out to be *"I get scared of ordering"* rather than
-not knowing where to go.
+Two deliberate refusals: **nothing can be failed** (no streaks, no chains, no resets) and **nothing
+depends on remembering**.
+
+A third was removed after he pushed back on it. The real barrier turned out to be *"I get scared of
+ordering"* rather than not knowing where to go — so an earlier version graded places by nerve and
+weighted half the suggestions toward ones that asked nothing of him. He said *"I'm not looking for
+you to protect me. Being scared isn't a reason to not consider something,"* which was correct. The
+grade is now a plain description of what kind of place it is — outdoors, counter service, hawker
+stall — and the filter is a preference he sets rather than a ramp built for him.
 
 State lives in `localStorage` under `daylight.v4`.
 

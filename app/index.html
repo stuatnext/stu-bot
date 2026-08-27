@@ -314,7 +314,7 @@ var KEY = "daylight.v4";
 var S = load();
 
 function load(){
-  var d = { camp:"Singapore", wake:"08:00", done:{}, skip:{}, easyOnly:false,
+  var d = { camp:"Singapore", wake:"08:00", done:{}, skip:{}, filter:0,
             days:{}, threads:{}, theme:null };
   try {
     var raw = localStorage.getItem(KEY);
@@ -393,12 +393,16 @@ function shuffled(list, seed){
   return a;
 }
 function pick(){
+  var f = S.filter || 0;   /* 0 all, 1 outdoors, 2 hawker */
   var pool = PLACES.filter(function(p){
     if (S.done[p[0]]) return false;
-    if (S.easyOnly && p[3] !== 0) return false;
+    if (f === 1 && p[3] !== 0) return false;
+    if (f === 2 && p[3] !== 2) return false;
     return true;
   });
-  if (!pool.length) pool = S.easyOnly ? PLACES.filter(function(p){ return p[3]===0; }) : PLACES.slice();
+  if (!pool.length) pool = PLACES.filter(function(p){
+    return f === 1 ? p[3] === 0 : f === 2 ? p[3] === 2 : true;
+  });
   if (!pool.length) return null;
   var order = shuffled(pool, seedFor(today()));
   return order[(S.skip[today()] || 0) % order.length];
@@ -412,7 +416,9 @@ function esc(s){
 function maps(name){
   return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " Singapore");
 }
-var NERVE = [["e","Nothing to order"],["m","Order in English"],["l","Hawker stall"]];
+/* Not a difficulty ladder. What kind of place it is, so you know what you are
+   walking into - which is information, not a warning. */
+var KIND = [["e","Outdoors"],["m","Counter service"],["l","Hawker stall"]];
 
 /* ---------------------------------------------------------------- the bar */
 function barHTML(){
@@ -497,7 +503,7 @@ function viewToday(){
   /* Somewhere to go, and the words for when you get there. */
   var p = pick();
   if (p){
-    var n = NERVE[p[3]];
+    var n = KIND[p[3]];
     h += "<h2>Somewhere today</h2>";
     h += "<div class='card'>";
     h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>";
@@ -515,10 +521,11 @@ function viewToday(){
     h += "<div class='btns'><button class='pri' data-done='" + esc(p[0]) + "'>I went</button>"
       + "<button data-skip='1'>Somewhere else</button></div>";
     h += "<div class='btns'><button onclick=\"window.open('" + maps(p[0]) + "','_blank','noopener')\">Maps</button>"
-      + "<button data-easy='1'>" + (S.easyOnly ? "Show everything" : "Something easier") + "</button></div>";
+      + "<button data-easy='1'>" + ["Everything", "Outdoors only", "Hawker only"][S.filter || 0] + "</button></div>";
     if (p[3] === 2){
-      h += "<div class='card tip'><h3>If the words go</h3><p style='margin:7px 0 0'>Point and hold up one finger. "
-        + "That is what half the queue is doing. <strong>You do not have to get the phrasing right to be served.</strong></p></div>";
+      h += "<div class='card tip'><h3>How ordering works here</h3><p style='margin:7px 0 0'>Pointing and holding up "
+        + "one finger is a normal way to order, not a fallback &mdash; half the queue does it. "
+        + "The kopi codes are in <strong>Say</strong> if you want them.</p></div>";
     }
   }
   return h;
@@ -774,7 +781,7 @@ document.addEventListener("click", function(ev){
   }
   if (b.dataset.done){ S.done[b.dataset.done] = today(); delete S.skip[today()]; save(); tab = "log"; render(); return; }
   if (b.dataset.skip){ S.skip[today()] = (S.skip[today()] || 0) + 1; save(); render(); return; }
-  if (b.dataset.easy){ S.easyOnly = !S.easyOnly; delete S.skip[today()]; save(); render(); return; }
+  if (b.dataset.easy){ S.filter = ((S.filter || 0) + 1) % 3; delete S.skip[today()]; save(); render(); return; }
   if (b.dataset.reset){
     if (confirm("Clear everything logged? This cannot be undone.")){
       S.done = {}; S.skip = {}; S.days = {}; S.threads = {}; save(); render();
