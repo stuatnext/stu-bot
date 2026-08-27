@@ -195,7 +195,7 @@ var CAMPS = [
 var THREADS = [
   ["oct", "The October ask",
    "You are a supplier renegotiating, not an employee asking. And you will be four days past launching a new event.",
-   "Write the statement of work: scope, coverage hours, response times, rate.", "Week of 27 Oct", true],
+   "Fill in the orange bits of the draft. Event numbers, and what your channel drove.", "Week of 27 Oct", true],
   ["client", "A second client",
    "One customer funds the salary, which holds the pass, which is your permission to live here. There is no floor under it.",
    "Follow up with people you meet at NEXTPredict, in November.", "November", true],
@@ -576,7 +576,8 @@ function viewNext(){
     + "<div class='row'><b>Wed 14:30</b><div><strong>Call your mum</strong> while you walk. About 07:00 for her. "
     + "Late is fine; a clean miss is not.</div></div></div>";
 
-  h += "<div class='btns'><button onclick=\"location.href='../cal/'\">Put these in Apple Calendar</button></div>";
+  h += "<div class='btns'><button class='pri' onclick=\"location.href='../docs/proposal.html'\">The October draft</button>"
+    + "<button onclick=\"location.href='../cal/'\">Apple Calendar</button></div>";
   return h;
 }
 

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Twenty-Two Hours</title>
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#EDEFEC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1211" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --ground:#EDEFEC; --surface:#FBFCFA; --surface-2:#E4E8E3; --sunk:#E0E4DF;
+  --line:#D4D9D3; --line-strong:#B7BFB9;
+  --ink:#141B18; --ink-2:#4A5551; --ink-3:#79847F;
+  --accent:#1F4FE0; --accent-soft:#DDE4FB;
+  --signal:#B35C0C; --signal-soft:#F7E6D4;
+  --crit:#A03830; --crit-soft:#F3DEDC;
+  --good:#2C7A51; --good-soft:#DCEDE3;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1211; --surface:#151D1B; --surface-2:#1D2724; --sunk:#111917;
+    --line:#293430; --line-strong:#3C4945;
+    --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
+    --accent:#7C9BFF; --accent-soft:#1C2647;
+    --signal:#E09453; --signal-soft:#2E2317;
+    --crit:#E08A82; --crit-soft:#2C1C1C;
+    --good:#5CB585; --good-soft:#16261D;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1211; --surface:#151D1B; --surface-2:#1D2724; --sunk:#111917;
+  --line:#293430; --line-strong:#3C4945;
+  --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
+  --accent:#7C9BFF; --accent-soft:#1C2647;
+  --signal:#E09453; --signal-soft:#2E2317;
+  --crit:#E08A82; --crit-soft:#2C1C1C;
+  --good:#5CB585; --good-soft:#16261D;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%;}
+body{margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;}
+.wrap{max-width:720px; margin:0 auto;
+  padding:44px max(20px, env(safe-area-inset-left)) 80px max(20px, env(safe-area-inset-right));}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif; margin:0; text-wrap:balance; letter-spacing:-.02em;}
+h1{font-size:clamp(30px,7vw,42px); font-weight:800; line-height:1.08;}
+h2{font-size:22px; font-weight:600; margin:46px 0 4px;}
+h3{font-size:16px; font-weight:600; margin:26px 0 4px;}
+p{margin:11px 0; max-width:62ch;}
+.eyebrow{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);}
+.mono{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;}
+.lede{font-size:18px; color:var(--ink-2); max-width:60ch;}
+.rule{border:none; border-top:1px solid var(--line); margin:38px 0 0;}
+strong{font-weight:600;}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px 20px; margin:16px 0;}
+.card.flag{background:var(--crit-soft); border-color:var(--crit);}
+.card.note{background:var(--signal-soft); border-color:var(--signal);}
+.card.win{background:var(--good-soft); border-color:var(--good);}
+.card h3{margin-top:0;}
+.card p:last-child{margin-bottom:0;}
+
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14.5px;}
+.scroll{overflow-x:auto;}
+th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+th{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:400; white-space:nowrap;}
+td.mono{white-space:nowrap;}
+ul,ol{margin:11px 0; padding-left:22px; max-width:62ch;}
+li{margin:7px 0;}
+li::marker{color:var(--ink-3);}
+
+figure{margin:24px 0; padding:18px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r);}
+figure svg{display:block; width:100%; max-width:100%; height:auto; color:var(--ink-2);}
+figcaption{margin-top:14px; font-size:13.5px; color:var(--ink-3); line-height:1.5;}
+
+.stat{display:flex; gap:22px; flex-wrap:wrap; margin:18px 0;}
+.stat>div{flex:1; min-width:150px;}
+.stat b{display:block; font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-size:32px; font-weight:700; letter-spacing:-.03em; line-height:1.1;}
+.stat span{font-size:13px; color:var(--ink-3); display:block; margin-top:3px;}
+
+.kill{display:flex; gap:13px; align-items:flex-start; padding:13px 0; border-bottom:1px solid var(--line);}
+.kill:last-child{border-bottom:none;}
+.kill b{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; flex:none; width:78px; padding-top:3px; color:var(--crit);}
+.kill.keep b{color:var(--good);}
+.tag{display:inline-block; font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:5px; background:var(--sunk); color:var(--ink-2);}
+.tag.a{background:var(--accent-soft); color:var(--accent);}
+.tag.s{background:var(--signal-soft); color:var(--signal);}
+.tag.g{background:var(--good-soft); color:var(--good);}
+.q{padding:15px 0; border-bottom:1px solid var(--line);}
+.q:last-child{border-bottom:none;}
+.q p{margin:5px 0 0; font-size:14.5px; color:var(--ink-2);}
+.qn{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3); letter-spacing:.1em;}
+a{color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-soft);}
+a:hover{border-bottom-color:var(--accent);}
+.step{display:flex; gap:16px; align-items:flex-start; padding:16px 0; border-bottom:1px solid var(--line);}
+.step:last-child{border-bottom:none;}
+.step>b{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; flex:none; width:86px; padding-top:4px; color:var(--accent);}
+.step h3{margin:0 0 2px;}
+.step p{margin:4px 0 0; font-size:14.5px; color:var(--ink-2);}
+.src{font-size:13.5px; color:var(--ink-3); padding-left:20px;}
+.src li{margin:5px 0;}
+.big{font-size:19px; font-weight:600; color:var(--ink); max-width:56ch; line-height:1.45; margin:20px 0;}
+a:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:2px;}
+.doc{background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--r); padding:22px 24px; margin:16px 0;}
+.doc h3{margin:22px 0 6px; font-size:15px;}
+.doc h3:first-child{margin-top:0;}
+.doc p{font-size:15px; margin:9px 0;}
+.doc ul{font-size:15px;}
+.fill{background:var(--signal-soft); color:var(--signal); padding:1px 6px; border-radius:4px; font-family:"JetBrains Mono",monospace; font-size:12.5px; white-space:nowrap;}
+.big2{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-weight:700; font-size:40px; letter-spacing:-.03em; line-height:1;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<div class="eyebrow">The October ask &middot; draft for the week of 27 October</div>
+<h1>Twenty-Two Hours</h1>
+<p class="lede">You will not want to write this in late October. You will have just launched an
+event, flown three continents in a fortnight, and you will be tired. So here it is now, with the
+arithmetic done and the objections answered.</p>
+
+<hr class="rule">
+
+<h2>The number that wins it</h2>
+
+<p>The objection you will face is not about your lifestyle. It is <em>&ldquo;you would be less
+available.&rdquo;</em> Here is the answer, and it is better than you think.</p>
+
+<div class="stat">
+  <div><b>30h</b><span>London overlap you give them now, per week</span></div>
+  <div><b>22h</b><span>under the proposal</span></div>
+  <div><b>17.5h</b><span>what the US and Colombia team give</span></div>
+</div>
+
+<div class="card win">
+<h3>Say this out loud in the room</h3>
+<p><strong>&ldquo;Even after this change I would still be giving London more overlap than the US and
+Colombia team.&rdquo;</strong></p>
+<p>It is true, it is checkable, and it ends the availability argument in one sentence. They already
+accept 17.5 hours a week from people whose hours were adjusted. You would be at 22.</p>
+</div>
+
+<h3>How it works</h3>
+<div class="scroll">
+<table>
+<tr><th>Days</th><th>Singapore</th><th>UTC</th><th>London overlap</th></tr>
+<tr><td>Three days</td><td class="mono">16:00&ndash;23:00</td><td class="mono">08:00&ndash;15:00</td><td class="mono">6h each</td></tr>
+<tr><td>Two days</td><td class="mono">12:00&ndash;19:00</td><td class="mono">04:00&ndash;11:00</td><td class="mono">2h each</td></tr>
+<tr><td><strong>Week</strong></td><td></td><td></td><td class="mono"><strong>22h</strong></td></tr>
+</table>
+</div>
+<p>Two hours is a stand-up and one meeting. It is not nothing, and it is deliberately not zero
+&mdash; asking for 09:00 to 17:00 Singapore would give them an hour a day and deserve a refusal.</p>
+<p>What you get back is <strong>eight hours a week of evening</strong> that currently does not exist.</p>
+
+<h2>Three asks, in this order</h2>
+
+<div class="step"><b>First</b><div><h3>The working pattern.</h3><p>Costs them nothing. Frame it as an operational change to a service definition, not a favour. This is the one you must not trade away.</p></div></div>
+<div class="step"><b>Second</b><div><h3>The rate.</h3><p>Same document. You are a supplier renewing terms &mdash; scope and price belong together, and splitting them would be the odd move.</p></div></div>
+<div class="step"><b>Third</b><div><h3>Consent for outside consulting.</h3><p>Ask last, once the rest is agreed. It costs them almost nothing and it is the single change that makes a second client possible. If they are relaxed about it, get it in writing.</p></div></div>
+
+<hr class="rule">
+
+<h2>The draft</h2>
+<p class="dim">Yours to butcher. Anything in <span class="fill">orange</span> is something I do not
+know and you do.</p>
+
+<div class="doc">
+<h3>Strait Up Growth Pte Ltd &mdash; engagement terms, <span class="fill">2027 term</span></h3>
+
+<p><strong>Summary.</strong> This proposes the service definition and rate for the next twelve
+months. The commercial substance is unchanged. Two of the five working days move to a Singapore-hours
+pattern, and London retains 22 hours of live overlap per week.</p>
+
+<h3>1. The year behind it</h3>
+<ul>
+<li><strong>NEXTPredict launched.</strong> A new event property taken from nothing to a first edition
+in New York, run commercially end to end. <span class="fill">attendee number</span> attendees,
+<span class="fill">sponsor count and value</span> in sponsorship, <span class="fill">named speakers</span>
+on stage.</li>
+<li><strong>Panel moderated</strong> at that event, and the speaker relationships that made the
+programme possible sourced directly.</li>
+<li><strong>Brand and audience.</strong> My own channel has been the primary organic driver for
+NEXTPredict: <span class="fill">reach / inbound / named connections</span>. This sits outside the
+scope below and has not been charged for.</li>
+<li><span class="fill">whatever else the year contained &mdash; revenue, retention, deals closed</span></li>
+</ul>
+
+<h3>2. Proposed service definition</h3>
+<p><strong>Coverage.</strong> Monday, Wednesday, Thursday: 08:00&ndash;15:00 UTC. Tuesday and Friday:
+04:00&ndash;11:00 UTC. <span class="fill">confirm which two days</span></p>
+<p><strong>Live overlap with London.</strong> 22 hours per week, against 30 today. For comparison, a
+colleague on standard hours in the US or Colombia provides approximately 17.5.</p>
+<p><strong>Response times.</strong> Anything marked urgent, by <span class="fill">agree: 2 hours?</span>
+within coverage and by <span class="fill">agree: 09:00 UTC next working day</span> outside it.
+Everything else within one working day.</p>
+<p><strong>Escalation.</strong> A named route for genuine emergencies outside coverage
+&mdash; <span class="fill">phone? a specific channel?</span> Deliberately narrow, so that it stays
+meaningful.</p>
+<p><strong>Out of scope.</strong> Standing meetings scheduled after 11:00 UTC on the two Singapore
+days. I will send written input in advance instead. <span class="fill">note the Monday all-hands at
+20:30 SGT and how it is handled</span></p>
+<p><strong>Deliverables.</strong> Unchanged. <span class="fill">list them</span></p>
+
+<h3>3. Rate</h3>
+<p>Current: <span class="fill">rate</span>. Proposed: <span class="fill">rate</span>, effective
+<span class="fill">date</span>. <span class="fill">last reviewed when?</span></p>
+<p>The basis is the year above, not the hours. Output and accountability are unchanged; what changes
+is when two of the five days sit.</p>
+
+<h3>4. Term</h3>
+<p>Twelve months, reviewed <span class="fill">month</span>. Notice unchanged at
+<span class="fill">period</span>.</p>
+
+<h3>5. One further request</h3>
+<p>Separately from the above: confirmation that Strait Up Growth may take on non-competing client
+work alongside this engagement. It does not affect the coverage or deliverables set out here, and I
+would want it recorded rather than assumed.</p>
+</div>
+
+<h2>What they will say, and what you say back</h2>
+
+<div class="row"><b>Objection</b><div><strong>&ldquo;You would be less available.&rdquo;</strong><br>
+22 hours against the 17.5 they already accept from the US and Colombia. And the two hours on those
+days are the London morning, which is when decisions get made rather than when they get reported.</div></div>
+<div class="row"><b>Objection</b><div><strong>&ldquo;There is no precedent.&rdquo;</strong><br>
+There are two. Adjusted hours already exist in the US and Colombia, and Focus Wednesday is
+company-wide. This is narrower than either.</div></div>
+<div class="row"><b>Objection</b><div><strong>&ldquo;Let us do the rate now and hours in the spring.&rdquo;</strong><br>
+This is the one to watch for, and it is the likely move. The answer is that they are one document
+because the engagement is one thing &mdash; the pattern is what makes the next twelve months
+sustainable, and it is not the part to defer.</div></div>
+<div class="row"><b>Objection</b><div><strong>&ldquo;Can we trial it?&rdquo;</strong><br>
+Yes, and say yes quickly. Three months from January with a review in April costs you nothing and
+gives them an exit, which is exactly why they will agree to it.</div></div>
+
+<div class="card note">
+<h3>Two things to know before you walk in</h3>
+<p><strong>You have less leverage than the case deserves.</strong> One client funds your salary, which
+holds your pass, which is your permission to live in the same country as your partner. Walking away
+is not a move available to you until there is a second client. So negotiate like somebody who wants a
+long relationship, because you do.</p>
+<p><strong>And more leverage than you feel.</strong> You launched their event. Replacing you in
+January, four days after a successful first edition, is a genuinely bad idea and they know it. Those
+two facts are both true at once.</p>
+</div>
+
+<h2>When</h2>
+<div class="step"><b>Before 22 Oct</b><div><h3>Fill in the orange.</h3><p>Especially the event numbers and what your channel drove. Get them while people are still counting.</p></div></div>
+<div class="step"><b>22&ndash;23 Oct</b><div><h3>NEXTPredict. Say nothing about any of this.</h3></div></div>
+<div class="step"><b>Week of 27 Oct</b><div><h3>Send it, then talk.</h3><p>Document first so they read it without you in the room, conversation after. And if you take the UK week, do it in person &mdash; four days after launching their event, at their office.</p></div></div>
+
+<hr class="rule">
+<p class="eyebrow" style="margin-top:26px">22 hours &middot; three asks &middot; pattern first</p>
+
+</div>
+</body>
+</html>

@@ -6,6 +6,7 @@ A day planner for a shift that is fixed to London and lived in Asia.
 
 **Live:** https://stuatnext.github.io/stu-bot/ (once Pages is switched on — see below)
 **The plan:** [`docs/plan.html`](docs/plan.html) — start here
+**The October ask:** [`docs/proposal.html`](docs/proposal.html) — drafted, for the week of 27 Oct
 **The calendars:** [`cal/`](cal/) — subscribe once, in Apple Calendar
 **The business side:** [`docs/admin.html`](docs/admin.html) — structure, filings, insurance
 **Design brief:** [`docs/design-brief.html`](docs/design-brief.html)
