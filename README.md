@@ -184,8 +184,13 @@ else. It unlocks on 1 December.
 An earlier version refused streaks on principle. He asked for them, with *"rewards and collectibles
 so that it's genuinely gamified"*, and that was his call to make rather than mine.
 
-So each pillar carries its own streak, plus **two freezes a month**: a missed day spends a freeze and
-the run survives, rather than a single bad night wiping three weeks. Streaks only count from the
+So each pillar carries its own streak, plus **five freezes a month, spent by hand**. The first
+version spent them automatically the moment the streak walker found a gap — which meant they were
+gone before he knew a day had gone wrong, and a safety net you cannot feel is not a safety net. Now
+nothing is spent unless he presses the button, a frozen day is a decision with a date on it, and the
+pips show what is left without arithmetic. A frozen day carries the run across without counting
+toward it, and earns no pack and no money — the run survives, but a day he did not do is not a day
+he did. Streaks only count from the
 first day a pillar was ever recorded, so the period before he started using the app is not treated as
 a wall of failures. Badges unlock on totals, and the collection is Singapore's districts — most of
 which he has never visited.

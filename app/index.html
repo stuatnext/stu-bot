@@ -368,6 +368,22 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
 .q.on .qt b{color:var(--good);}
 .q.hot .qn b{color:var(--signal);}
 
+/* ------------------------------------------------------------------ freezes
+   Five a month, spent by hand. The pips are the point: you can see what is
+   left without doing arithmetic, and an empty row is a real feeling. */
+.frz{margin:12px 0 0; padding:13px 15px; border-radius:15px;
+  border:1px solid var(--line); background:var(--surface);}
+.frz.cold{border-color:var(--accent); background:var(--accent-soft);}
+.frz .top{display:flex; align-items:center; gap:11px;}
+.frz .pips{display:flex; gap:5px; flex:none;}
+.frz .pips i{width:13px; height:13px; border-radius:50%; background:var(--sunk);
+  border:1px solid var(--line-strong);}
+.frz .pips i.on{background:var(--accent); border-color:var(--accent);}
+.frz .lbl{flex:1; min-width:0; font-size:13.5px; color:var(--ink-2);}
+.frz .lbl b{color:var(--ink);}
+.frz .btns{margin-top:10px;}
+.frz .btns button{min-height:42px; font-size:14px;}
+
 /* ------------------------------------------------------------------- HUD */
 .hud{display:flex; align-items:center; gap:12px; padding:13px 15px; margin:13px 0;
   border-radius:var(--r); border:1px solid var(--line);
@@ -652,7 +668,7 @@ var BED_DEFAULT = "23:45";
 
 /* A streak you can break in one bad night is a streak that ends in week two.
    Two freezes a month absorb the ordinary misses without making it meaningless. */
-var FREEZES_PER_MONTH = 2;
+var FREEZES_PER_MONTH = 5;
 
 function pDone(iso, key){
   var d = S.days[iso];
@@ -667,36 +683,43 @@ function firstDay(key){
   return ks.length ? ks[0] : null;
 }
 
-/* Walk back from today. A miss inside the tracked period spends a freeze if
-   one is left that month, which preserves the run without counting toward it.
-   Out of freezes, the streak ends. */
+/* Freezes are spent by hand. The earlier version spent them for him the
+   moment the streak walker found a gap, which meant they were gone before he
+   knew a day had gone wrong - a safety net you cannot feel is not a safety
+   net. Now nothing is spent unless he presses the button, and a frozen day is
+   a decision with a date on it. */
+function frozen(k){ return !!(S.freezes || {})[k]; }
+function freezesUsed(month){
+  return Object.keys(S.freezes || {}).filter(function(k){ return monthOf(k) === month; }).length;
+}
+function freezesLeft(month){
+  return Math.max(0, FREEZES_PER_MONTH - freezesUsed(month || monthOf(today())));
+}
+
+/* A day can be frozen while there is still something to save: not one that is
+   already complete, not one that has not happened, and not past the month's
+   allowance. */
+function canFreeze(k){
+  if (k > today() || allThree(k)) return false;
+  return frozen(k) || freezesLeft(monthOf(k)) > 0;
+}
+
+/* Walk back from today. A frozen day carries the run across without counting
+   toward it - the streak survives, but a day he did not do is not a day he
+   did. Anything else missed ends it. */
 function streak(key){
   var first = firstDay(key);
   if (!first) return 0;
-  var n = 0, spent = {}, now = new Date();
+  var n = 0, now = new Date();
   for (var i = 0; i < 400; i++){
     var k = iso(new Date(now.getFullYear(), now.getMonth(), now.getDate() - i));
     if (k < first) break;
     if (pDone(k, key)){ n++; continue; }
     if (k === today()) continue;            /* today is not a miss until it is over */
-    var m = monthOf(k);
-    spent[m] = (spent[m] || 0) + 1;
-    if (spent[m] <= FREEZES_PER_MONTH) continue;   /* frozen: run survives, count does not rise */
+    if (frozen(k)) continue;                /* spent deliberately, on this date */
     break;
   }
   return n;
-}
-
-function freezesLeft(key){
-  var first = firstDay(key);
-  if (!first) return FREEZES_PER_MONTH;
-  var m = monthOf(today()), used = 0, now = new Date();
-  for (var i = 1; i < 32; i++){
-    var k = iso(new Date(now.getFullYear(), now.getMonth(), now.getDate() - i));
-    if (monthOf(k) !== m || k < first) break;
-    if (!pDone(k, key)) used++;
-  }
-  return Math.max(0, FREEZES_PER_MONTH - used);
 }
 
 /* Collectibles. Places are the natural set - he is already logging them, and
@@ -1010,7 +1033,7 @@ var S = load();
 function load(){
   var d = { camp:"Singapore", wake:"08:30", bed:"23:45", done:{}, skip:{}, filter:0,
             days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, openedDay:0, openedStreak:0,
-            theme:null, mute:false, rate:0, spends:[] };
+            theme:null, mute:false, rate:0, spends:[], freezes:{} };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
@@ -1899,9 +1922,34 @@ function viewToday(){
       + "</button>";
   });
   h += "</div>";
-  h += "<p class='dim' style='margin:10px 0 0'>" + freezesLeft(PILLARS[0][0]) + " of "
-    + FREEZES_PER_MONTH + " freezes left this month &mdash; a missed day spends one rather than "
-    + "breaking the run.</p>";
+  /* Freezes, spent by hand rather than by the streak walker behind his back. */
+  var left = freezesLeft(), yk = shift(-1), tFroz = frozen(t), yFroz = frozen(yk);
+  h += "<div class='frz" + (tFroz ? " cold" : "") + "'><div class='top'><span class='pips'>";
+  for (var fi = 0; fi < FREEZES_PER_MONTH; fi++){
+    h += "<i class='" + (fi < left ? "on" : "") + "'></i>";
+  }
+  h += "</span><span class='lbl'><b>" + left + " of " + FREEZES_PER_MONTH
+    + "</b> freezes left this month</span></div>";
+  h += "<p class='dim' style='margin:8px 0 0'>A frozen day carries the run across without "
+    + "counting toward it. Nothing is spent unless you press it.</p>";
+
+  h += "<div class='btns'>";
+  /* canFreeze carries the month rule, which matters on the 1st: freezing
+     yesterday spends from last month's allowance, not this month's. */
+  if (tFroz) h += "<button data-freeze='" + t + "'>Today is frozen &middot; undo</button>";
+  else if (canFreeze(t)) h += "<button data-freeze='" + t + "'>Freeze today</button>";
+
+  if (yFroz) h += "<button data-freeze='" + yk + "'>Yesterday is frozen &middot; undo</button>";
+  else if (canFreeze(yk) && Object.keys(S.days).length){
+    h += "<button data-freeze='" + yk + "'>Freeze yesterday</button>";
+  }
+  h += "</div>";
+  if (!left && !tFroz && !yFroz){
+    h += "<p class='dim' style='margin:9px 0 0'>None left until "
+      + nice(iso(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)))
+      + ". Which is the point of there being a number.</p>";
+  }
+  h += "</div>";
 
   /* One line, kept because he uses it. */
   if (y.said && y.kept === undefined){
@@ -2078,7 +2126,8 @@ function viewLog(){
   /* The plain record underneath. */
   var keys = Object.keys(S.days).filter(function(k){
     var d = S.days[k];
-    return d.said || d.kept !== undefined || (d.p && Object.keys(d.p).length) || d.bedok !== undefined;
+    return d.said || d.kept !== undefined || (d.p && Object.keys(d.p).length)
+        || d.bedok !== undefined || frozen(k);
   }).sort().reverse();
 
   if (keys.length){
@@ -2088,6 +2137,7 @@ function viewLog(){
       var marks = PILLARS.filter(function(g){ return d.p && d.p[g[0]]; }).map(function(g){ return g[2]; }).join(" ");
       h += "<div class='row'><b>" + esc(nice(k)) + "</b><div>"
         + (marks ? "<span style='font-size:15px'>" + marks + "</span> " : "")
+        + (frozen(k) ? "<span class='pill m'>frozen</span> " : "")
         + (d.bedok === true ? "<span class='pill e'>bed</span> " : d.bedok === false ? "<span class='pill'>late</span> " : "")
         + (d.said ? esc(d.said) : "<span class='dim'>nothing named</span>")
         + "</div></div>";
@@ -2516,6 +2566,20 @@ document.addEventListener("click", function(ev){
   if (b.dataset.card){ openSheet(b.dataset.card); return; }
   if (b.dataset.claim){
     claimTrophy(b.dataset.claim); return;
+  }
+  if (b.dataset.freeze){
+    var fk = b.dataset.freeze;
+    if (frozen(fk)){
+      delete S.freezes[fk]; save(); sfx("tap"); toast("Freeze returned.");
+    } else if (canFreeze(fk)){
+      S.freezes = S.freezes || {};
+      S.freezes[fk] = 1;
+      day(fk);                     /* so a frozen day with nothing on it still shows in the log */
+      save(); buzz([18, 40, 18]); sfx("flip");
+      toast((fk === today() ? "Today" : "Yesterday") + " frozen. "
+        + freezesLeft() + " left this month.");
+    }
+    render(); return;
   }
   if (b.dataset.spend){
     var amt = prompt("How much did you spend? Just the number.", "");
