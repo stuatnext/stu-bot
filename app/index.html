@@ -445,6 +445,40 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
 .md .lbl{font-size:10.5px; line-height:1.2; margin-top:5px; color:var(--ink-3);}
 .md.got .lbl{color:var(--ink-2); font-weight:600;}
 
+/* ---------------------------------------------------------------- the pot
+   A real number in real money. It gets the biggest type on the page because
+   it is the only thing here you can actually spend. */
+.pot{position:relative; overflow:hidden; padding:22px 20px; margin:13px 0; border-radius:20px;
+  border:1px solid var(--good); color:var(--ink);
+  background:linear-gradient(150deg,var(--good-soft),var(--surface) 72%);}
+.pot .amt{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:clamp(40px,12vw,58px); font-weight:700; letter-spacing:-.045em; line-height:1;
+  color:var(--good);}
+.pot .cap{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-3); margin-top:9px;}
+.pot p{margin:10px 0 0; font-size:13.5px; color:var(--ink-2);}
+.ledger{display:grid; gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:12px; overflow:hidden; margin:12px 0;}
+.ledger div{display:flex; justify-content:space-between; gap:12px; padding:10px 13px;
+  background:var(--surface); font-size:13.5px;}
+.ledger div span:last-child{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-weight:600; flex:none;}
+.ledger div.out span:last-child{color:var(--crit);}
+.ledger div.tot{background:var(--sunk); font-weight:600;}
+
+/* A locked set is a door. It should look like one. */
+.door{display:flex; align-items:center; gap:13px; padding:15px 16px; margin:11px 0;
+  border-radius:15px; border:1px dashed var(--line-strong); background:var(--sunk);}
+.door .lk{flex:none; width:38px; height:38px; border-radius:11px; display:flex;
+  align-items:center; justify-content:center; font-size:16px;
+  background:var(--surface-2); border:1px solid var(--line-strong); color:var(--ink-3);}
+.door .bd{flex:1; min-width:0;}
+.door .bd b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:600;
+  font-size:15.5px; color:var(--ink-2);}
+.door .bd span{display:block; font-size:12.5px; color:var(--ink-3); line-height:1.3; margin-top:2px;}
+.door .at{flex:none; font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--ink-3); text-align:right; max-width:96px; line-height:1.3;}
+
 /* --------------------------------------------------------------- detail */
 #sheet{position:fixed; inset:0; z-index:110; display:none; align-items:center; justify-content:center;
   flex-direction:column; gap:16px; padding:24px;
@@ -687,20 +721,41 @@ var BADGES = [
   [5,   "Clocked off",    "stop",   "Five days finished on time."],
   [20,  "Not a martyr",   "stop",   "Twenty. The shift ends when it ends."]
 ];
-/* [ set key, name, what it is ] */
+/* [ set key, name, what it is, rank that opens it ] */
 var SETS = [
-["hawk","Hawker","The stalls. Ordered, not read about."],
-["kopi","Kopitiam","Breakfast and the code you say it in."],
-["slang","Singlish","You will start doing this without noticing."],
-["every","Everyday","The things you stop seeing after a month."],
-["herit","Heritage","Temples, shophouses, and what was here before the towers."],
-["green","Green","Parks, reservoirs, and actual jungle."],
-["isles","Islands and Edges","The bits that need a boat or a long walk."],
-["region","Two Hours Out","Weekend range. You can work from any of them."],
-["road","The Road","Where this year actually takes you."],
-["home","Home","The things you notice you miss. Material for the newsletter."],
-["gold","Trophies","Not in packs. These only happen by happening."]
+["hawk","Hawker","The stalls. Ordered, not read about.",0],
+["kopi","Kopitiam","Breakfast and the code you say it in.",0],
+["slang","Singlish","You will start doing this without noticing.",0],
+["every","Everyday","The things you stop seeing after a month.",0],
+["herit","Heritage","Temples, shophouses, and what was here before the towers.",0],
+["green","Green","Parks, reservoirs, and actual jungle.",0],
+["isles","Islands and Edges","The bits that need a boat or a long walk.",0],
+["region","Two Hours Out","Weekend range. You can work from any of them.",0],
+["road","The Road","Where this year actually takes you.",0],
+["home","Home","The things you notice you miss. Material for the newsletter.",0],
+["bean","Coffee","The one thing you actually drink. Worth knowing properly.",14],
+["deep","Deep Cuts","Singapore at two years rather than two months.",30],
+["sheff","Sheffield and Before","Home, and the people you said you rarely speak to.",50],
+["post","The Newsletter","The thing that outlives the event. Your name on it, not theirs.",75],
+["sug","Straight Up Growth","The business becoming a business.",105],
+["mkt","The Industry","Prediction markets, and the name you are building in them.",140],
+["gold","Trophies","Not in packs. These only happen by happening.",0]
 ];
+
+/* A set you cannot see yet is a door; a set you can see and cannot fill is a
+   gap. Both are reasons to come back, and they are not the same reason. */
+function setNeeds(key){
+  var s = SETS.filter(function(x){ return x[0] === key; })[0];
+  return s && s[3] ? s[3] : 0;
+}
+function setOpen(key){ return fullDays() >= setNeeds(key); }
+
+/* Counted once per change rather than once per card per pack draw. */
+var FD = null;
+function fullDays(){
+  if (FD === null) FD = Object.keys(S.days).filter(allThree).length;
+  return FD;
+}
 
 /* [ name, rarity, set, note ]   rarity: 0 common 1 uncommon 2 rare 3 gold */
 var CARDS = [
@@ -803,7 +858,82 @@ var CARDS = [
 ["Two days",3,"gold","The hours agreed."],
 ["Client number two",3,"gold","Someone other than NEXT pays Strait Up Growth."],
 ["Issue one",3,"gold","The first thing you publish that is yours."],
-["Thirty",3,"gold","A thirty-day streak on anything."]
+["Thirty",3,"gold","A thirty-day streak on anything."],
+
+/* --- Season two. Locked behind rank, so the binder shows doors as well as gaps. */
+["Flat white",0,"bean","The Antipodean default. Half the roasters here trained there."],
+["Long black",0,"bean","Espresso through hot water. The other way round is an americano."],
+["Cortado",0,"bean","Half espresso, half warm milk. Order it when you want to taste the bean."],
+["Filter, black",0,"bean","No milk, no sugar. The order that tells you if the beans are any good."],
+["Cold brew",0,"bean","Eighteen hours, no heat. Less acid and more caffeine than you expect."],
+["Espresso standing up",0,"bean","Thirty seconds at the counter. No table, no laptop, no decision."],
+["Single origin",1,"bean","One farm, one lot. Where you find out you have preferences."],
+["Washed or natural",1,"bean","Washed is clean and bright, natural is fruity and divisive."],
+["One without sugar",1,"bean","You take it sweet. Order one plain, once, and find out what it was doing."],
+["A bag at home",1,"bean","Beans you chose, in your kitchen. Coffee stopped being fuel."],
+["Roast date",2,"bean","Two weeks off roast is the window. Asking for it is a small real expertise."],
+["A roaster you follow",2,"bean","Not a cafe you like. A roaster whose choices you trust."],
+
+["The reservoir at six",0,"deep","Before the heat. The version of this city almost nobody sees."],
+["Fruit by the kilo",0,"deep","Wet market, not supermarket. Cheaper, better, and you have to speak."],
+["The night bus",0,"deep","There is one. Learning it is a small and real freedom."],
+["A hawker you go back to",1,"deep","Not the famous one. Yours."],
+["Getai season",1,"deep","Seventh month. Loud, bright, and not staged for anyone visiting."],
+["Thaipusam",1,"deep","January. Walk part of the route rather than watching it go past."],
+["Second day of the new year",1,"deep","When the city is shut and quiet and completely unlike itself."],
+["A void deck funeral",1,"deep","You will pass one. Knowing what it is stops it being strange."],
+["Your estate's old name",1,"deep","Ask someone over sixty why it is called that. They will know."],
+["Invited into a flat",2,"deep","Not a viewing. An invitation."],
+["Ordering for two",2,"deep","Two people's food, at a stall, no phone out. That is fluency."],
+["An uncle who knows your order",2,"deep","The actual test of whether you live somewhere."],
+
+["The Peak District",0,"sheff","Twenty minutes from the centre. Singapore cannot sell you that at any price."],
+["Scraps",0,"sheff","The bits of batter. Free, and the test of whether a chippy is yours."],
+["A beer garden in June",0,"sheff","Nine at night and still light. You have not had that in years."],
+["The walk from the station",0,"sheff","The first ten minutes, when it stops being a trip and starts being back."],
+["The group chat",0,"sheff","Still there, still mostly dormant. One message restarts it."],
+["The accent coming back",1,"sheff","Two days in and it returns. Everyone notices except you."],
+["A call, not a text",1,"sheff","You said you rarely speak to them. This is the card that fixes it."],
+["Germany",1,"sheff","The friend since primary school, kept alive on almost nothing. Give it an hour."],
+["Christmas at home",1,"sheff","The trip that is not negotiable, and the one that costs UK days."],
+["Someone's wedding",1,"sheff","The invitations start around now. Being the one who came counts."],
+["2018",2,"sheff","Newly in London, and the last time life felt right. Work out which part transfers."],
+
+["The five-minute version",0,"mkt","Explaining prediction markets to your mum. Harder than any panel."],
+["A market resolving",0,"mkt","You watched a question become a fact. Still the best advert for the whole thing."],
+["The order book",0,"mkt","Where the price actually comes from. Worth one clean sentence."],
+["Sports, not politics",1,"mkt","Where the volume really is. Not the part anyone writes about."],
+["The liquidity problem",1,"mkt","Every thin market's real story. Say it and people know you have looked."],
+["One regulator, properly",1,"mkt","Pick a jurisdiction and learn it. It decides whether any of this scales."],
+["Kalshi",1,"mkt","Regulated, US, and a name you want on the stage."],
+["Polymarket",1,"mkt","The other one. Bigger crowd, different rules, same argument."],
+["A speaker who said yes",1,"mkt","The ask you were nervous about. They said yes."],
+["The take you held back",2,"mkt","Diary it for the week after the event, when it costs you nothing."],
+["Quoted without prompting",2,"mkt","Your framing, in someone else's post. That is a moat forming."],
+
+["The financial year end",0,"sug","You do not know it yet. One email to Ottavia and you do."],
+["A written scope",0,"sug","What you do and what you do not. It stops a client becoming a job."],
+["Books actually current",0,"sug","Caught up, not nearly caught up. A completely different feeling."],
+["Paid yourself on time",0,"sug","A payroll of one, run properly. Practice for a payroll of more."],
+["The annual return",1,"sug","ACRA. Boring, dated, and expensive to miss."],
+["The first tax filing",1,"sug","New company, so this one sets the pattern for every year after."],
+["Cover that follows you",1,"sug","Your UK policy does not, and NEXT's does not extend. A gap with your name on it."],
+["The day rate, out loud",1,"sug","The number, to a stranger's face, without softening it."],
+["A second signature",1,"sug","Someone other than you able to sign something. The start of not being the whole company."],
+["The first hire",2,"sug","Even part-time. Capacity is the constraint on all of it."],
+["An intern from here",2,"sug","A young Singaporean, taught something real. The best idea in any of these conversations."],
+
+["Before the shift",0,"post","The morning block. The only hours nobody else has a claim on."],
+["Not about work",0,"post","Nostalgia. The pillar you keep naming and keep not writing."],
+["A draft you sat on",0,"post","Written anyway. The habit is the writing, not the posting."],
+["An idea off a card",0,"post","This deck is also a notebook. One of these becomes a post."],
+["A name you committed to",1,"post","When Shift Happens, or something better. Naming it is most of starting."],
+["Your byline, not theirs",1,"post","Off the company page. The entire point of building a moat."],
+["A reply from someone you rate",1,"post","Not a like. A reply."],
+["The first hundred",1,"post","Small, real, and yours rather than the company's."],
+["Somewhere that is not rented",1,"post","An archive you own. LinkedIn is someone else's ground."],
+["Ten in a row",2,"post","Ten posts, ten days, no gaps. Where a presence starts being real."],
+["Published anyway",2,"post","The provocative one, out, after the event. The fear had a shelf life."]
 ];
 
 var RARITY = [
@@ -879,14 +1009,15 @@ var S = load();
 
 function load(){
   var d = { camp:"Singapore", wake:"08:30", bed:"23:45", done:{}, skip:{}, filter:0,
-            days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, openedDay:0, openedStreak:0, theme:null };
+            days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, openedDay:0, openedStreak:0,
+            theme:null, mute:false, rate:0, spends:[] };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
   } catch(e){}
   return d;
 }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function save(){ FD = null; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
 
 /* days[iso] = { said: "...", kept: true|false|undefined, ing: {out:1,...} } */
 function day(iso){
@@ -1023,6 +1154,11 @@ function rollRarity(r, boosted){
 
 /* Pulls prefer cards not yet held, so a pack usually closes a gap rather than
    handing him a fourth kopi-o. */
+/* Gold is earned by hand and locked sets are not yours yet, so neither can
+   turn up in a pack. Pulling a card for a set you cannot see is a bug that
+   looks like a feature until you try to find it. */
+function inPool(c){ return c[2] !== "gold" && setOpen(c[2]); }
+
 function openPack(kind){
   var size = kind === "streak" ? STREAK_PACK_SIZE : PACK_SIZE;
   var boosted = kind === "streak";
@@ -1030,8 +1166,10 @@ function openPack(kind){
   for (var n = 0; n < size; n++){
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
     var rar = rollRarity(((seed >>> 8) & 0xffff) / 65536, boosted);
-    var tier = CARDS.filter(function(c){ return c[1] === rar && c[2] !== "gold"; });
-    if (!tier.length) tier = CARDS.filter(function(c){ return c[1] === 0; });
+    var tier = CARDS.filter(function(c){ return c[1] === rar && inPool(c); });
+    if (!tier.length) tier = CARDS.filter(function(c){ return c[1] === 0 && inPool(c); });
+    if (!tier.length) tier = CARDS.filter(inPool);
+    if (!tier.length) break;
     var fresh = tier.filter(function(c){ return !(S.cards || {})[c[0]] && got.indexOf(c[0]) < 0; });
     var from = fresh.length ? fresh : tier.filter(function(c){ return got.indexOf(c[0]) < 0; });
     if (!from.length) from = tier;
@@ -1079,17 +1217,52 @@ function xp(){
   return n;
 }
 
+/* ------------------------------------------------------------------- the pot
+   His idea, and a better one than XP: a number in real money that builds while
+   you are consistent and goes down when you spend it on yourself. XP is a score
+   you cannot do anything with. This one buys a coffee.
+
+   He sets the rate, because a rate the app picked would be the app deciding
+   what his consistency is worth. Everything else is a multiple of it, so the
+   whole economy moves when he changes one number. */
+var RATE_DEFAULT = 5;
+function rate(){ var r = Number(S.rate); return r > 0 ? r : RATE_DEFAULT; }
+
+function potEarned(){
+  var r = rate(), pc = packCounts();
+  return {
+    days:     pc.day * r,           /* every full day */
+    streaks:  pc.streak * r * 2,    /* every seventh consecutive one, again */
+    sets:     setsComplete() * r * 3,
+    trophies: goldHeld() * r * 5
+  };
+}
+function goldHeld(){
+  return CARDS.filter(function(c){ return c[1] === 3 && (S.cards || {})[c[0]]; }).length;
+}
+function potSpent(){
+  return (S.spends || []).reduce(function(a, s){ return a + Number(s[1] || 0); }, 0);
+}
+function potTotal(){
+  var e = potEarned();
+  return e.days + e.streaks + e.sets + e.trophies;
+}
+function pot(){ return potTotal() - potSpent(); }
+function money(n){
+  return "$" + (Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, "");
+}
+
 /* Ranks rather than bare numbers - a level should say something about you. */
 var RANKS = [
   [0,     "Just landed"],
-  [120,   "Two months in"],
-  [320,   "Finding your way"],
-  [640,   "Regular"],
-  [1100,  "Local-ish"],
-  [1750,  "Knows a guy"],
-  [2600,  "Gives directions"],
-  [3700,  "Been here years"],
-  [5200,  "Institution"]
+  [150,   "Two months in"],
+  [450,   "Finding your way"],
+  [950,   "Regular"],
+  [1700,  "Local-ish"],
+  [2800,  "Knows a guy"],
+  [4200,  "Gives directions"],
+  [6200,  "Been here years"],
+  [9000,  "Institution"]
 ];
 function rank(){
   var x = xp(), i = 0;
@@ -1104,7 +1277,7 @@ function rank(){
 function nearestSet(){
   var best = null;
   SETS.forEach(function(s){
-    if (s[0] === "gold") return;
+    if (s[0] === "gold" || !setOpen(s[0])) return;
     var total = setCards(s[0]).length, have = setHeld(s[0]);
     if (have === total || have === 0) return;
     var left = total - have;
@@ -1126,6 +1299,9 @@ function hashOf(s){
 /* Behind every emblem sits one of eight backdrops, picked by the card's name.
    Without this a set of eleven hawker cards is eleven identical bowls, and a
    collection where everything looks the same is not worth collecting. */
+/* Shifts are unsigned. hashOf returns a full uint32, and a signed >> on
+   anything with the top bit set goes negative - which quietly put half the
+   deck's artwork off-card, at 0.65 scale and 18 degrees off true. */
 function backdrop(h){
   var kind = h % 8, o = "<g opacity='.17' stroke='currentColor' fill='none' stroke-width='1.4'>", i, j;
   if (kind === 0){
@@ -1137,7 +1313,7 @@ function backdrop(h){
       o += "<circle cx='" + (7 + i * 12.5) + "' cy='" + (7 + j * 12.5) + "' r='1.7' fill='currentColor' stroke='none'/>";
   } else if (kind === 3){
     for (i = 0; i < 26; i++)
-      o += "<circle cx='" + ((h >> (i % 12)) % 100) + "' cy='" + ((h >> ((i + 5) % 13)) % 100)
+      o += "<circle cx='" + ((h >>> (i % 12)) % 100) + "' cy='" + ((h >>> ((i + 5) % 13)) % 100)
          + "' r='" + (1 + (i % 4)) + "' fill='currentColor' stroke='none'/>";
   } else if (kind === 4){
     for (i = 0; i < 8; i++) o += "<path d='M0 " + (i * 15 - 6) + " L50 " + (i * 15 + 6) + " L100 " + (i * 15 - 6) + "'/>";
@@ -1163,11 +1339,11 @@ function backdrop(h){
    are identical and every card still reads as belonging somewhere. */
 function cardArt(c){
   var h = hashOf(c[0]), k = c[2];
-  var a = h % 97, b = (h >> 7) % 89, d = (h >> 13) % 73;
+  var a = h % 97, b = (h >>> 7) % 89, d = (h >>> 13) % 73;
   var o = "<svg viewBox='0 0 100 100' preserveAspectRatio='xMidYMid meet' aria-hidden='true'>";
   o += backdrop(h);
-  var tx = ((h >> 3) % 11) - 5, ty = ((h >> 9) % 11) - 5;
-  var rot = ((h >> 17) % 13) - 6, sc = (0.82 + ((h >> 21) % 18) / 100).toFixed(2);
+  var tx = ((h >>> 3) % 11) - 5, ty = ((h >>> 9) % 11) - 5;
+  var rot = ((h >>> 17) % 13) - 6, sc = (0.82 + ((h >>> 21) % 18) / 100).toFixed(2);
   o += "<g transform='translate(" + (50 + tx) + " " + (50 + ty) + ") rotate(" + rot
      + ") scale(" + sc + ") translate(-50 -50)'>";
   var S1 = "stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'";
@@ -1196,7 +1372,7 @@ function cardArt(c){
   } else if (k === "every"){
     for (i = 0; i < 20; i++){
       x = 20 + (i % 5) * 14; y = 24 + Math.floor(i / 5) * 14;
-      var lit = ((h >> i) & 1) === 1;
+      var lit = ((h >>> i) & 1) === 1;
       o += "<rect x='" + x + "' y='" + y + "' width='9' height='10' rx='1.5' " +
         (lit ? "fill='currentColor' opacity='.42'" : "fill='none' stroke='currentColor' stroke-width='1.3' opacity='.4'") + "/>";
     }
@@ -1209,7 +1385,7 @@ function cardArt(c){
     o += "<path " + S1 + " stroke-width='2' opacity='.55' d='M14 34 l36 -" + (14 + a % 8) + " l36 " + (14 + a % 8) + "'/>";
   } else if (k === "green"){
     for (i = 0; i < 5; i++){
-      x = 22 + ((h >> (i * 3)) % 56); y = 30 + ((h >> (i * 5)) % 42);
+      x = 22 + ((h >>> (i * 3)) % 56); y = 30 + ((h >>> (i * 5)) % 42);
       o += "<path " + S1 + " stroke-width='1.9' opacity='" + (.34 + (i % 3) * .14) +
         "' d='M" + x + " " + y + " q" + (9 + i) + " -" + (13 + i * 2) + " " + (18 + i * 2) + " 0 q-" +
         (9 + i) + " " + (13 + i * 2) + " -" + (18 + i * 2) + " 0 Z'/>";
@@ -1229,22 +1405,62 @@ function cardArt(c){
   } else if (k === "road"){
     var px = 14, py = 78, path = "M14 78";
     for (i = 0; i < 4; i++){
-      px = 14 + (i + 1) * 18; py = 78 - (i + 1) * 12 + ((h >> (i * 4)) % 13) - 6;
+      px = 14 + (i + 1) * 18; py = 78 - (i + 1) * 12 + ((h >>> (i * 4)) % 13) - 6;
       path += " L" + px + " " + py;
     }
     o += "<path " + S1 + " stroke-width='2.3' opacity='.7' d='" + path + "'/>";
     for (i = 0; i < 5; i++){
-      o += "<circle cx='" + (14 + i * 18) + "' cy='" + (78 - i * 12 + (i ? ((h >> ((i - 1) * 4)) % 13) - 6 : 0)) +
+      o += "<circle cx='" + (14 + i * 18) + "' cy='" + (78 - i * 12 + (i ? ((h >>> ((i - 1) * 4)) % 13) - 6 : 0)) +
         "' r='" + (i === 4 ? 4.5 : 3) + "' fill='currentColor' opacity='" + (i === 4 ? .8 : .45) + "'/>";
     }
   } else if (k === "home"){
     o += "<path " + S1 + " stroke-width='2.4' opacity='.8' d='M22 76 v-26 l28 -18 l28 18 v26'/>";
     o += "<rect " + S1 + " stroke-width='1.9' opacity='.5' x='42' y='58' width='16' height='18'/>";
     for (i = 0; i < 7; i++){
-      x = 12 + i * 12 + (h >> i) % 6;
+      x = 12 + i * 12 + (h >>> i) % 6;
       o += "<path " + S1 + " stroke-width='1.5' opacity='.3' d='M" + x + " " + (10 + (i * 5) % 14) +
         " l-3 " + (9 + i % 5) + "'/>";
     }
+  } else if (k === "bean"){
+    o += "<path " + S1 + " stroke-width='2.3' opacity='.8' d='M30 26 h40 l-9 22 h-22 Z'/>";
+    o += "<path " + S1 + " stroke-width='1.6' opacity='.45' d='M50 48 v" + (10 + a % 7) + "'/>";
+    o += "<path " + S1 + " stroke-width='2.3' opacity='.75' d='M32 66 h30 a4 4 0 0 1 0 -0 v10 " +
+      "a8 8 0 0 1 -8 8 h-14 a8 8 0 0 1 -8 -8 Z'/>";
+    o += "<path " + S1 + " stroke-width='1.9' opacity='.5' d='M62 68 q9 2 9 8 t-9 8'/>";
+    o += "<ellipse " + S1 + " stroke-width='1.6' opacity='.4' cx='" + (22 + b % 10) + "' cy='" +
+      (34 + d % 10) + "' rx='7' ry='4.5' transform='rotate(-28 " + (22 + b % 10) + " " + (34 + d % 10) + ")'/>";
+  } else if (k === "deep"){
+    o += "<path " + S1 + " stroke-width='2.2' opacity='.8' d='M38 30 h24 M50 30 v6'/>";
+    o += "<ellipse " + S1 + " stroke-width='2.4' opacity='.8' cx='50' cy='54' rx='" +
+      (17 + a % 5) + "' ry='18'/>";
+    for (i = 0; i < 3; i++)
+      o += "<path " + S1 + " stroke-width='1.3' opacity='.34' d='M" + (43 + i * 7) + " 37 v34'/>";
+    o += "<path " + S1 + " stroke-width='2' opacity='.6' d='M50 72 v" + (8 + b % 8) + "'/>";
+  } else if (k === "sheff"){
+    o += "<path " + S1 + " stroke-width='2.3' opacity='.75' d='M6 70 q18 -" + (18 + a % 10) +
+      " 34 -4 q16 -" + (14 + b % 9) + " 30 2 q12 5 24 -2'/>";
+    o += "<path " + S1 + " stroke-width='1.8' opacity='.45' d='M6 82 q22 -12 42 -3 q18 8 46 -4'/>";
+    o += "<path " + S1 + " stroke-width='2.1' opacity='.7' d='M" + (36 + d % 14) + " 62 v-12 h12 v12'/>";
+    o += "<path " + S1 + " stroke-width='1.6' opacity='.4' d='M" + (40 + d % 14) + " 50 v-9'/>";
+  } else if (k === "post"){
+    o += "<path " + S1 + " stroke-width='2.3' opacity='.8' d='M28 20 h34 l12 12 v48 h-46 Z'/>";
+    o += "<path " + S1 + " stroke-width='1.8' opacity='.5' d='M62 20 v12 h12'/>";
+    for (i = 0; i < 5; i++)
+      o += "<path " + S1 + " stroke-width='1.5' opacity='" + (.42 - i * .05) +
+        "' d='M35 " + (44 + i * 8) + " h" + (20 + ((h >>> (i * 3)) % 22)) + "'/>";
+  } else if (k === "sug"){
+    for (i = 0; i < 4; i++){
+      var bh = 12 + i * 13 + ((h >>> (i * 4)) % 9);
+      o += "<rect " + S1 + " stroke-width='2' opacity='" + (.42 + i * .12) + "' x='" + (20 + i * 16) +
+        "' y='" + (78 - bh) + "' width='11' height='" + bh + "'/>";
+    }
+    o += "<path " + S1 + " stroke-width='2.2' opacity='.75' d='M18 " + (52 + a % 8) + " L82 22'/>";
+    o += "<path d='M82 22 l-12 1 l7 6 Z' fill='currentColor' opacity='.75'/>";
+  } else if (k === "mkt"){
+    o += "<path " + S1 + " stroke-width='1.5' opacity='.4' stroke-dasharray='5 5' d='M12 50 h76'/>";
+    o += "<path " + S1 + " stroke-width='2.4' opacity='.8' d='M14 74 q18 2 26 -12 q9 -15 20 -4 q10 10 26 -30'/>";
+    o += "<circle cx='" + (60 + a % 12) + "' cy='" + (30 + b % 14) + "' r='4.5' fill='currentColor' opacity='.75'/>";
+    o += "<path " + S1 + " stroke-width='1.4' opacity='.32' d='M28 18 v64 M72 18 v64'/>";
   } else {
     for (i = 0; i < 8; i++){
       var ang = i * 45 + (a % 20);
@@ -1638,9 +1854,18 @@ function viewToday(){
 
   /* Bedtime. The keystone, and he named it himself. */
   var bt = S.bed || BED_DEFAULT;
+  var clash = s.end >= t2m(bt);
   h += "<div class='card" + (y.bedok ? " ok" : "") + "'><h3>Bed by " + esc(bt) + "</h3>"
     + "<p class='dim' style='margin:6px 0 0'>Wake time follows from this, and everything else follows "
     + "from wake time. You said it yourself: the thing to agree is simply a time.</p>";
+  if (clash){
+    h += "<p style='margin:9px 0 0'><strong>This is not possible today.</strong> The shift ends at "
+      + s.endT + " and bed is " + esc(bt) + ". The time is not the thing that is wrong here.</p>"
+      + "<p class='dim' style='margin:6px 0 0'>Malta keeps you to 17:00 their time all year, so when "
+      + "their clocks go back on 25 October the same contract quietly moves your finish to midnight. "
+      + "Nobody chose that. It is a drafting defect, and it is the strongest thing you have to take "
+      + "into the October conversation.</p>";
+  }
   if (y.bedok === undefined){
     h += "<div class='btns'><button class='pri' data-bed='1'>Made it last night</button>"
       + "<button data-bed='0'>Did not</button></div>";
@@ -1869,6 +2094,8 @@ function viewLog(){
     });
     h += "</div>";
   }
+  h += "<div class='btns'><button data-tab='recap'>"
+    + (recapReady() ? "Your year" : "Your year &middot; opens 1 December") + "</button></div>";
   h += "<div class='btns'><button data-tab='trips'>Trips and UK days</button>"
     + "<button data-tab='say'>Phrasebook</button></div>";
   h += "<div class='btns'><button data-reset='1'>Clear everything</button></div>";
@@ -1966,9 +2193,24 @@ function viewCards(){
   }
   if (w.streak || w.day) h += "</div>";
   if (!w.day && !w.streak){
+    var pool = CARDS.filter(inPool).length;
+    var poolHeld = CARDS.filter(function(c){ return inPool(c) && (S.cards || {})[c[0]]; }).length;
     h += "<div class='card'><h3>No packs waiting</h3>"
       + "<p class='muted' style='margin:8px 0 0'>A day with all three earns one. Every seventh "
-      + "consecutive full day earns a streak pack &mdash; five cards, better odds.</p></div>";
+      + "consecutive full day earns a streak pack &mdash; five cards, better odds.</p>"
+      + "<p class='dim' style='margin:8px 0 0'>" + poolHeld + " of " + pool + " cards open to you, "
+      + "out of " + CARDS.length + " in the deck.</p></div>";
+  }
+
+  var door = SETS.filter(function(s){ return !setOpen(s[0]); })
+                 .sort(function(a, b){ return a[3] - b[3]; })[0];
+  if (door){
+    var dleft = setNeeds(door[0]) - fullDays();
+    h += "<div class='card'><h3>" + dleft + " full " + (dleft === 1 ? "day" : "days")
+      + " to " + esc(door[1]) + "</h3>"
+      + "<p class='muted' style='margin:7px 0 0'>" + esc(door[2]) + "</p>"
+      + "<p class='dim' style='margin:7px 0 0'>" + setCards(door[0]).length
+      + " new cards, and they cannot turn up in a pack before then.</p></div>";
   }
 
   if (near){
@@ -1980,6 +2222,15 @@ function viewCards(){
 
   SETS.forEach(function(st){
     var cs = setCards(st[0]), have = setHeld(st[0]), done = have === cs.length;
+    if (!setOpen(st[0])){
+      var need = setNeeds(st[0]), left = need - fullDays();
+      h += "<div class='door'><span class='lk'>&#9679;</span>"
+        + "<span class='bd'><b>" + esc(st[1]) + "</b><span>" + cs.length
+        + " cards, sealed. " + left + " more full " + (left === 1 ? "day" : "days")
+        + ".</span></span>"
+        + "<span class='at'>opens at<br>" + need + " days</span></div>";
+      return;
+    }
     h += "<div class='seth'>" + ring(have, cs.length)
       + "<div><h2>" + esc(st[1]) + "</h2><div class='dim'>" + have + " of " + cs.length
       + (done ? " &middot; complete" : "") + "</div></div></div>";
@@ -2010,9 +2261,34 @@ function viewRewards(){
   var best = bestStreak();
   var h = "";
 
+  var e = potEarned(), spent = potSpent(), have = pot();
+  h += "<div class='pot'><div class='amt'>" + money(have) + "</div>"
+    + "<div class='cap'>yours to spend</div>"
+    + "<p>Earned at " + money(rate()) + " a full day, and it does not expire. Spend it on "
+    + "anything. The only rule is that you tell it when you have, so the number stays true.</p>"
+    + "<div class='btns'><button class='pri' data-spend='1'>Spent some</button>"
+    + "<button data-rate='1'>Change the rate</button></div></div>";
+
+  h += "<div class='ledger'>"
+    + "<div><span>" + packCounts().day + " full days</span><span>" + money(e.days) + "</span></div>"
+    + "<div><span>" + packCounts().streak + " seven-day runs</span><span>" + money(e.streaks) + "</span></div>"
+    + "<div><span>" + setsComplete() + " sets finished</span><span>" + money(e.sets) + "</span></div>"
+    + "<div><span>" + goldHeld() + " trophies</span><span>" + money(e.trophies) + "</span></div>"
+    + (spent ? "<div class='out'><span>Spent</span><span>-" + money(spent) + "</span></div>" : "")
+    + "<div class='tot'><span>Pot</span><span>" + money(have) + "</span></div></div>";
+
+  if ((S.spends || []).length){
+    h += "<h2>What you spent it on</h2><div class='card'>";
+    S.spends.slice().reverse().slice(0, 12).forEach(function(s){
+      h += "<div class='row'><b>" + esc(nice(s[0])) + "</b><div>" + esc(s[2] || "Something")
+        + " <span class='dim'>" + money(s[1]) + "</span></div></div>";
+    });
+    h += "</div>";
+  }
+
   h += "<div class='flame'><div class='n'>" + best + "<small>day streak</small></div>"
-    + "<p>Your best run across the three right now. Everything on this page is bought "
-    + "with it, and nothing on it is something the app decides you have earned.</p></div>";
+    + "<p>Your best run across the three right now. The pot builds off this, and the three "
+    + "prizes below unlock off it.</p></div>";
 
   REWARD_TIERS.forEach(function(t){
     var name = (S.rewards || {})[t[0]];
@@ -2073,6 +2349,90 @@ function viewRewards(){
   return h;
 }
 
+/* ---------------------------------------------------------------- recap
+   He has an SpLD around short-term memory and said as much. A year is exactly
+   the span he will not be able to reconstruct in December, and the app has
+   been writing it all down anyway. This is the app remembering for him. */
+function recapReady(){ return new Date().getMonth() === 11; }
+
+function viewRecap(){
+  var yr = String(new Date().getFullYear());
+  var keys = Object.keys(S.days).filter(function(k){ return k.slice(0, 4) === yr; }).sort();
+  var h = "";
+
+  if (!recapReady()){
+    h += "<div class='card tip'><h3>This opens on 1 December</h3>"
+      + "<p style='margin:8px 0 0'>A year is exactly the length you said you cannot hold in your "
+      + "head. So it gets written down all the way through and handed back to you in one piece, "
+      + "at the point where you would otherwise be trying to remember it.</p>"
+      + "<p class='dim' style='margin:8px 0 0'>Below is what it has on you so far.</p></div>";
+  }
+
+  var full = keys.filter(allThree).length;
+  var best = 0, run = 0, prev = null;
+  keys.forEach(function(k){
+    if (!allThree(k)){ run = 0; prev = k; return; }
+    var gap = prev ? Math.round((new Date(k) - new Date(prev)) / 86400000) : 99;
+    run = gap === 1 ? run + 1 : 1;
+    if (run > best) best = run;
+    prev = k;
+  });
+
+  h += "<div class='pot'><div class='amt'>" + full + "</div>"
+    + "<div class='cap'>full days in " + yr + "</div>"
+    + "<p>Days you trained, spoke to someone at home, and finished when the shift finished. "
+    + "Your longest unbroken run was <strong>" + best + "</strong>.</p></div>";
+
+  var e = potEarned();
+  h += "<div class='ledger'>";
+  PILLARS.forEach(function(g){
+    var n = keys.filter(function(k){ return pDone(k, g[0]); }).length;
+    h += "<div><span>" + g[1] + "</span><span>" + n + " days</span></div>";
+  });
+  h += "<div><span>Cards held</span><span>" + heldCount() + " of " + CARDS.length + "</span></div>"
+    + "<div><span>Sets finished</span><span>" + setsComplete() + " of " + SETS.length + "</span></div>"
+    + "<div><span>Trophies</span><span>" + goldHeld() + "</span></div>"
+    + "<div><span>Places logged</span><span>" + Object.keys(S.done || {}).length + "</span></div>"
+    + "<div class='tot'><span>Earned</span><span>" + money(potTotal()) + "</span></div>"
+    + (potSpent() ? "<div class='out'><span>Spent on yourself</span><span>" + money(potSpent()) + "</span></div>" : "")
+    + "</div>";
+
+  /* His own words, which are the only part of this he cannot get anywhere else. */
+  var said = keys.filter(function(k){ return S.days[k].said; });
+  h += "<h2>What you said mattered</h2>";
+  if (said.length){
+    h += "<p class='dim' style='margin:0 0 6px'>" + said.length + " days where you named one thing. "
+      + "These are your words, not the app's.</p><div class='card'>";
+    said.slice().reverse().forEach(function(k){
+      h += "<div class='row'><b>" + esc(nice(k)) + "</b><div>" + esc(S.days[k].said) + "</div></div>";
+    });
+    h += "</div>";
+  } else {
+    h += "<div class='card'><p class='muted' style='margin:0'>Nothing named yet. The box on Today "
+      + "takes one line, and in December it is the only part of this you will actually want.</p></div>";
+  }
+
+  if ((S.spends || []).length){
+    h += "<h2>What it bought you</h2><div class='card'>";
+    S.spends.filter(function(s){ return s[0].slice(0, 4) === yr; }).slice().reverse().forEach(function(s){
+      h += "<div class='row'><b>" + esc(nice(s[0])) + "</b><div>" + esc(s[2] || "Something")
+        + " <span class='dim'>" + money(s[1]) + "</span></div></div>";
+    });
+    h += "</div>";
+  }
+
+  var went = TRIPS.filter(function(t){ return t[2].slice(0, 4) === yr && daysUntil(t[3]) < 0; });
+  if (went.length){
+    h += "<h2>Where you went</h2><div class='card'>";
+    went.forEach(function(t){
+      h += "<div class='row'><b>" + esc(nice(t[2])) + "</b><div><strong>" + esc(t[1]) + "</strong> "
+        + "<span class='dim'>" + esc(t[0]) + "</span></div></div>";
+    });
+    h += "</div>";
+  }
+  return h;
+}
+
 /* ---------------------------------------------------------------- shell */
 var TABS = {
   today:   ["Today", "A day fixed to head office", viewToday],
@@ -2081,7 +2441,8 @@ var TABS = {
   next:    ["Next", "What is actually going on", viewNext],
   trips:   ["Trips", "Where you will be, and the UK count", viewTrips],
   say:     ["Say", "Read it in the queue", viewSay],
-  log:     ["Log", "The record, so you are not holding it", viewLog]
+  log:     ["Log", "The record, so you are not holding it", viewLog],
+  recap:   ["The Year", "Written down so you do not have to remember it", viewRecap]
 };
 var tab = "today";
 
@@ -2155,6 +2516,26 @@ document.addEventListener("click", function(ev){
   if (b.dataset.card){ openSheet(b.dataset.card); return; }
   if (b.dataset.claim){
     claimTrophy(b.dataset.claim); return;
+  }
+  if (b.dataset.spend){
+    var amt = prompt("How much did you spend? Just the number.", "");
+    if (amt === null) return;
+    var n = Number(String(amt).replace(/[^0-9.]/g, ""));
+    if (!(n > 0)) return;
+    var what = prompt("On what?", "");
+    if (what === null) return;
+    S.spends = S.spends || [];
+    S.spends.push([today(), n, String(what).slice(0, 80)]);
+    save(); sfx("done"); buzz(20);
+    toast(money(n) + " spent. " + money(pot()) + " left.");
+    render(); return;
+  }
+  if (b.dataset.rate){
+    var v = prompt("What is one full day worth, in dollars?", String(rate()));
+    if (v === null) return;
+    var r = Number(String(v).replace(/[^0-9.]/g, ""));
+    if (r > 0){ S.rate = r; save(); render(); }
+    return;
   }
   if (b.dataset.mute){
     S.mute = !S.mute; save(); paintSound();

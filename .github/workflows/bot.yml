@@ -7,14 +7,15 @@ name: Daylight bot
 
 on:
   schedule:
-    # Cron is UTC. Singapore is UTC+8.
-    - cron: '30 0 * * 1-5'   # 08:30 SGT - names the day, asks for a first action
-    - cron: '0 7 * * 1-5'    # 15:00 SGT - one hour before the shift
-    - cron: '0 14 * * 1-5'   # 22:00 SGT - how did it go
+    # Cron is UTC. Singapore is UTC+8. He asked for one message a day, in the
+    # morning, so there is exactly one send here. The afternoon job posts
+    # nothing - it only pulls his replies back into the record.
+    - cron: '30 0 * * *'     # 08:30 SGT - the one message
+    - cron: '0 9 * * *'      # 17:00 SGT - silent; collects replies
   workflow_dispatch:
     inputs:
       mode:
-        description: 'morning, evening or collect'
+        description: 'morning or collect'
         required: false
         default: 'morning'
 
@@ -38,9 +39,8 @@ jobs:
             echo "mode=${{ github.event.inputs.mode }}" >> "$GITHUB_OUTPUT"
           else
             case "${{ github.event.schedule }}" in
-              "30 0 * * 1-5") echo "mode=morning" >> "$GITHUB_OUTPUT" ;;
-              "0 14 * * 1-5") echo "mode=evening" >> "$GITHUB_OUTPUT" ;;
-              *)              echo "mode=collect" >> "$GITHUB_OUTPUT" ;;
+              "30 0 * * *") echo "mode=morning" >> "$GITHUB_OUTPUT" ;;
+              *)            echo "mode=collect" >> "$GITHUB_OUTPUT" ;;
             esac
           fi
 

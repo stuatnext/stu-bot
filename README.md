@@ -111,6 +111,17 @@ log so they sit beside the prizes rather than in a table.
 
 Reduced motion turns all of it off and shows every card at once.
 
+#### The pot
+
+His idea, and better than the one I offered. XP is a score you cannot do anything with; the pot is
+real money. Every full day is worth a rate **he sets**, because a rate the app picked would be the
+app deciding what his consistency is worth. Everything else scales off it — a seven-day run pays
+double, a finished set triple, a trophy five times. It accumulates with no cap and no expiry, and he
+logs what he spends so the number stays true.
+
+At the default five dollars a day, a perfect run to the end of the deck is about **$1,125**. That is
+a flight home, which is the thing money is actually for here.
+
 #### Cards, packs and progression
 
 **90 cards across 11 sets.** Singapore is most of it — Hawker, Kopitiam, Singlish, Everyday,
@@ -139,6 +150,34 @@ publishes that is his, and a thirty-day streak.
 
 **Rewards** are real treats at 7, 30 and 90 day streaks, written by him. The app only decides when
 they are earned, because a treat granted on a Tuesday is not a reward.
+
+#### Why the deck is 158 cards and not 90
+
+The first version ran out. Simulated at perfect play — all three pillars, every day — the 90-card
+deck was **complete on day 31**. Every pack after that was pure duplicates, and the collection died
+at exactly the point the habit would have been forming.
+
+So there is a second season: six more sets — Coffee, Deep Cuts, Sheffield and Before, The
+Newsletter, Straight Up Growth, The Industry — for 158 cards across 17 sets. They are **locked**,
+and shown as doors rather than hidden, because a door you can see is a different reason to come back
+than a gap you can fill.
+
+They open on **full days, not on rank**. Gating them on rank was circular: cards give XP, XP opens
+sets, sets give cards, and every door opened inside a month. Days are immune to that, they are
+legible on the door itself, and consistency is the thing that should be buying this. The gates are
+14, 30, 50, 75, 105 and 140 full days, which puts completion at **day 147 at perfect play** and
+comfortably past a year in practice.
+
+Ranks were recalibrated too. The whole deck plus a year of full days is worth about 12,750 XP; the
+old top rank sat at 5,200, so the last title arrived long before the last card.
+
+#### The year, written down
+
+He has an SpLD around short-term memory and said so plainly. A year is exactly the span he will not
+be able to reconstruct in December — so the app writes it down all the way through and hands it back
+in one piece: full days, longest run, cards, sets, trophies, what the pot bought, where he went, and
+every line he typed into "one thing today". Those lines are the only part he cannot get anywhere
+else. It unlocks on 1 December.
 
 #### On streaks
 

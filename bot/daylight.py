@@ -76,15 +76,35 @@ def fmt_dur(minutes):
     return "%dh" % h if h else "%dm" % m
 
 
+def last_sunday(year, month):
+    """The last Sunday of a month, which is when EU clocks change."""
+    d = datetime(year, month, 1) + timedelta(days=32)
+    d = datetime(d.year, d.month, 1) - timedelta(days=1)
+    return d - timedelta(days=(d.weekday() + 1) % 7)
+
+
+def hq_offset(when):
+    """Malta is CET in winter and CEST in summer. The contract fixes his hours
+    to head office LOCAL time, so the offset is the whole story: the same shift
+    lands an hour later in Singapore from the last Sunday in October. Getting
+    this wrong makes every winter morning message an hour out."""
+    y = when.year
+    summer = last_sunday(y, 3) <= when.replace(tzinfo=None) < last_sunday(y, 10)
+    return 120 if summer else 60
+
+
 def day_shape(cfg, when=None):
-    """Work is fixed to head office in UTC, so the local shape follows from the
-    offset: free morning equals the offset, evening is what is left of eight
-    hours. This is why the same shift feels different in every country."""
+    """Work is fixed to head office LOCAL time, so the Singapore shape follows
+    from two offsets: Malta's, which moves twice a year, and his own, which does
+    not. This is why the same shift feels different in every country and in
+    every season."""
     off = cfg.get("timezone_offset_minutes", 480)
-    start = hhmm_to_min(cfg.get("work_start_utc", "08:00")) + off
-    end = hhmm_to_min(cfg.get("work_end_utc", "15:00")) + off
+    ref = when or (datetime.now(timezone.utc) + timedelta(minutes=off))
+    hq = hq_offset(ref)
+    start = hhmm_to_min(cfg.get("hq_start_local", "10:00")) - hq + off
+    end = hhmm_to_min(cfg.get("hq_end_local", "17:00")) - hq + off
     wake = hhmm_to_min(cfg.get("wake_local", "08:00"))
-    local = when or datetime.now(timezone.utc) + timedelta(minutes=off)
+    local = ref
     minute_of_day = local.hour * 60 + local.minute
     return {
         "start": start,
@@ -158,6 +178,13 @@ def morning_text(cfg, state, local):
         lines.append("")
         lines.append("<i>Yesterday you said: %s - and never said how it went.</i>"
                      % prev["commitment"])
+
+    # This runs in Actions and cannot see the app's state, which lives in the
+    # browser on his phone. So it points at the three rather than claiming to
+    # know how they are going - a bot that guesses your streak is worse than
+    # one that admits it cannot see it.
+    lines.append("")
+    lines.append("Trained, family, stopped. All three earns a pack.")
     return "\n".join(lines)
 
 
