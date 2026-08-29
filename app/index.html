@@ -139,73 +139,259 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
 .count{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-weight:700;
   font-size:26px; letter-spacing:-.03em; line-height:1;}
 
-/* ------------------------------------------------------------------ cards
-   A collectible has to look collectible. Rows are a spreadsheet; these are
-   objects with a face, a rarity and a back you turn over. */
-.grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:12px 0;}
-@media (min-width:520px){ .grid{grid-template-columns:repeat(3,1fr);} }
+/* ================================================================== the game
+   Everything below is the card game. A collectible is an object: portrait,
+   framed, with art on the front and a back you turn over. Boxes with text in
+   them are a website. */
 
-.cf{position:relative; border-radius:12px; padding:12px 11px 11px; min-height:132px;
-  display:flex; flex-direction:column; justify-content:space-between; overflow:hidden;
-  border:1px solid var(--line); background:var(--surface); isolation:isolate;}
-.cf .nm{font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:14.5px;
-  line-height:1.2; letter-spacing:-.01em;}
-.cf .nt{font-size:11.5px; line-height:1.35; color:var(--ink-2); margin-top:5px;}
-.cf .ft{display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:10px;}
-.cf .rb{font-family:"JetBrains Mono",monospace; font-size:8.5px; letter-spacing:.1em;
-  text-transform:uppercase; padding:3px 7px; border-radius:999px; white-space:nowrap;}
-.cf .dup{font-family:"JetBrains Mono",monospace; font-size:10.5px; font-weight:700; color:var(--ink-3);}
+.tc{position:relative; aspect-ratio:5/7; perspective:1100px; -webkit-perspective:1100px;}
+.tc-i{position:absolute; inset:0; transform-style:preserve-3d; -webkit-transform-style:preserve-3d;
+  transition:transform .62s cubic-bezier(.3,1.3,.5,1);}
+.tc.down .tc-i{transform:rotateY(180deg);}
+.tc-f,.tc-b{position:absolute; inset:0; border-radius:11px; overflow:hidden;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  box-shadow:0 2px 5px rgba(0,0,0,.22), 0 8px 20px rgba(0,0,0,.14);}
+.tc-b{transform:rotateY(180deg);}
 
-.cf.r0{background:var(--surface); border-color:var(--line-strong);}
-.cf.r0 .rb{background:var(--sunk); color:var(--ink-3);}
-.cf.r1{background:var(--accent-soft); border-color:var(--accent);}
-.cf.r1 .rb{background:var(--accent); color:var(--surface);}
-.cf.r1 .nt{color:var(--ink-2);}
-.cf.r2{background:var(--signal-soft); border-color:var(--signal);}
-.cf.r2 .rb{background:var(--signal); color:var(--surface);}
-.cf.r3{background:var(--good-soft); border-color:var(--good); box-shadow:0 0 0 1px var(--good) inset;}
-.cf.r3 .rb{background:var(--good); color:var(--surface);}
+/* The frame is the metal, the pane is what it holds. */
+.tc-f{padding:5px; background:linear-gradient(155deg,var(--fa),var(--fb) 38%,var(--fc) 62%,var(--fb));}
+.tc-pane{position:absolute; inset:5px; border-radius:7px; overflow:hidden;
+  background:var(--pane); display:flex; flex-direction:column;
+  box-shadow:0 0 0 1px rgba(0,0,0,.16) inset;}
 
-/* Locked cards read as a gap in the set rather than as nothing. */
-.cf.lk{background:var(--sunk); border-style:dashed; border-color:var(--line-strong); min-height:112px;}
-.cf.lk .nm{color:var(--ink-3); filter:blur(3px); user-select:none;}
-.cf.lk .rb{background:transparent; color:var(--ink-3);}
+/* Art window. Deterministic per card, tinted by rarity, never empty. */
+.tc-art{position:relative; flex:1 1 auto; min-height:0; overflow:hidden; color:var(--ink);
+  background:radial-gradient(120% 90% at 50% 20%,var(--artA),var(--artB));
+  border-top:1px solid rgba(0,0,0,.2); border-bottom:1px solid rgba(0,0,0,.2);
+  box-shadow:0 0 14px rgba(0,0,0,.09) inset;}
+.tc-art svg{position:absolute; inset:0; width:100%; height:100%; display:block;}
 
-/* Shine, for the ones worth a second look. */
-.cf.r2::after,.cf.r3::after{content:""; position:absolute; inset:-40% -120%; z-index:-1;
-  background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);
-  transform:translateX(-120%);}
-.cf.r2.shine::after,.cf.r3.shine::after{animation:sweep 1.15s ease-out .15s 1;}
-@keyframes sweep{to{transform:translateX(120%);}}
+/* Name plate. */
+.tc-nm{flex:none; padding:5px 7px; font-family:"Bricolage Grotesque",sans-serif;
+  font-weight:700; letter-spacing:-.015em; line-height:1.1; color:var(--plateInk);
+  background:linear-gradient(180deg,var(--plateA),var(--plateB));
+  font-size:clamp(8.5px,2.7vw,11.5px); overflow:hidden; text-wrap:balance;
+  display:flex; align-items:center; min-height:26px;}
+.tc-nt{flex:none; padding:6px 8px 7px; font-size:10px; line-height:1.3; color:var(--plateInk2);
+  background:linear-gradient(180deg,var(--plateB),var(--plateA)); display:none;}
+.tc.lg .tc-nm{font-size:16.5px; padding:9px 12px; min-height:0;}
+.tc.lg .tc-art{flex:0 0 54%;}
+.tc.lg .tc-nt{display:flex; align-items:flex-start; flex:1 1 auto; font-size:12.5px;
+  padding:10px 12px 12px;}
 
-/* ------------------------------------------------------------------ reveal */
-.cf.in{animation:flipin .5s cubic-bezier(.22,1.2,.36,1) both;}
-@keyframes flipin{
-  from{opacity:0; transform:rotateY(-78deg) translateY(14px) scale(.9);}
-  to  {opacity:1; transform:none;}
+/* Rarity gem, bottom right of the art. */
+.tc-gem{position:absolute; right:5px; bottom:5px; width:13px; height:13px; z-index:4;
+  border-radius:3px; transform:rotate(45deg); border:1px solid rgba(0,0,0,.3);
+  background:linear-gradient(140deg,var(--fc),var(--fa)); box-shadow:0 1px 3px rgba(0,0,0,.35);}
+.tc.lg .tc-gem{width:20px; height:20px;}
+.tc-cnt{position:absolute; left:5px; bottom:5px; z-index:4; font-family:"JetBrains Mono",monospace;
+  font-size:9.5px; font-weight:700; padding:1px 5px; border-radius:4px;
+  background:rgba(0,0,0,.5); color:#fff;}
+
+/* Rarity palettes. Steel, blue, amber, gold. */
+.tc.r0{--fa:#9AA5A0; --fb:#C9D1CC; --fc:#7E8A85; --pane:#F4F6F3;
+  --artA:#E7EBE6; --artB:#CFD6D0; --ink:#2B3531; --plateA:#EDF0EC; --plateB:#DFE4DF;
+  --plateInk:#1E2724; --plateInk2:#4E5854;}
+.tc.r1{--fa:#3F6BE8; --fb:#8FA9F5; --fc:#2749A8; --pane:#F2F5FE;
+  --artA:#DCE5FD; --artB:#B9C9F7; --ink:#16255C; --plateA:#E6ECFE; --plateB:#D3DDFA;
+  --plateInk:#16255C; --plateInk2:#41548F;}
+.tc.r2{--fa:#D98B2B; --fb:#F2C77A; --fc:#A85F0E; --pane:#FEF7EC;
+  --artA:#FBE9CC; --artB:#F3CE9B; --ink:#5A3407; --plateA:#FCEFDA; --plateB:#F7E2C2;
+  --plateInk:#5A3407; --plateInk2:#8A6224;}
+.tc.r3{--fa:#C8A227; --fb:#FBEC9B; --fc:#8C6A0B; --pane:#FFFBEA;
+  --artA:#FCF3CE; --artB:#F0DE94; --ink:#4C3A03; --plateA:#FDF6DB; --plateB:#F8EDBE;
+  --plateInk:#4C3A03; --plateInk2:#7A6212;}
+.tc.r3 .tc-f{box-shadow:0 0 0 1px #E9CF63, 0 2px 6px rgba(0,0,0,.25), 0 0 22px rgba(226,186,60,.5);}
+
+/* Foil. A conic sheen that moves with the card, on rare and above only. */
+.tc-holo{position:absolute; inset:0; z-index:2; pointer-events:none; opacity:.5;
+  mix-blend-mode:color-dodge;
+  background:conic-gradient(from var(--ang,0deg) at 50% 45%,
+    rgba(255,0,128,.34),rgba(255,200,0,.34),rgba(0,255,190,.34),
+    rgba(80,120,255,.34),rgba(255,0,128,.34));}
+.tc.r3 .tc-holo{opacity:.66;}
+.tc-glare{position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.75) 48%,transparent 60%);
+  transform:translateX(-130%);}
+.tc.sweep .tc-glare{animation:glare 1.1s ease-out .1s 1;}
+@keyframes glare{to{transform:translateX(130%);}}
+
+/* The back. Same for every card, so a face-down stack reads as a stack. */
+.tc-b{background:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 7px,transparent 7px 14px),
+    repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 7px,transparent 7px 14px),
+    linear-gradient(160deg,#1B3A6B,#0C1B33 55%,#16305A);
+  border:1px solid rgba(255,255,255,.14);}
+.tc-b::after{content:""; position:absolute; inset:9px; border-radius:5px;
+  border:1px solid rgba(255,255,255,.22);
+  background:radial-gradient(60% 40% at 50% 50%,rgba(255,255,255,.13),transparent 70%);}
+.tc-mark{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  z-index:2; font-family:"Bricolage Grotesque",sans-serif; font-weight:800; color:rgba(255,255,255,.5);
+  font-size:min(9vw,28px); letter-spacing:-.04em;}
+
+/* Locked cards in the binder are backs, not blurred text. You can see the gap. */
+.tc.lk .tc-b{opacity:.5;}
+.tc.lk{filter:saturate(.5);}
+
+/* ------------------------------------------------------------------ binder */
+.binder{display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin:11px 0 4px;}
+@media (min-width:520px){ .binder{grid-template-columns:repeat(4,1fr);} }
+.binder .tc{cursor:pointer;}
+.binder .tc:active{transform:scale(.96);}
+
+.seth{display:flex; align-items:center; gap:11px; margin:26px 0 2px;}
+.seth h2{margin:0; font-size:17px;}
+.ring{width:36px; height:36px; flex:none; transform:rotate(-90deg);}
+.ring circle{fill:none; stroke-width:4;}
+.ring .bg{stroke:var(--sunk);}
+.ring .fg{stroke:var(--accent); stroke-linecap:round; transition:stroke-dasharray .6s ease;}
+.ring.done .fg{stroke:var(--good);}
+
+/* ------------------------------------------------------------------- packs
+   A pack is a foil sachet with a tear strip, not a button with a border. */
+.packs{display:flex; gap:11px; justify-content:center; margin:14px 0 6px;}
+.packs .pk{flex:1 1 0; max-width:150px; margin:0;}
+.pk{position:relative; width:100%; max-width:190px; margin:14px auto 4px; aspect-ratio:3/4;
+  border-radius:9px; cursor:pointer; overflow:hidden; border:none; padding:0; display:block;
+  background:linear-gradient(150deg,#2A3F86,#5C7BD8 28%,#1B2C63 55%,#4A66C4 78%,#22356F);
+  box-shadow:0 6px 20px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.16) inset;
+  color:#fff; font-family:"Bricolage Grotesque",sans-serif;}
+.pk.big{background:linear-gradient(150deg,#6B4A0E,#E0B54B 28%,#4E360A 55%,#C79A34 78%,#5A3F0C);}
+.pk-strip{position:absolute; top:0; left:0; right:0; height:20%;
+  border-bottom:2px dashed rgba(255,255,255,.45);
+  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.04));}
+.pk-body{position:absolute; inset:20% 0 0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:5px; text-align:center; padding:8px 14px;}
+.pk-ttl{font-weight:800; font-size:15px; letter-spacing:-.02em; line-height:1.1;
+  text-shadow:0 1px 3px rgba(0,0,0,.4);}
+.pk-sub{font-family:"Instrument Sans",sans-serif; font-weight:500; font-size:11px;
+  opacity:.85; line-height:1.25;}
+#stage .pk{max-width:196px;}
+#stage .pk-ttl{font-size:20px;} #stage .pk-sub{font-size:12.5px;}
+.pk-n{position:absolute; top:22%; right:9px; font-family:"JetBrains Mono",monospace;
+  font-size:11px; font-weight:700; background:rgba(0,0,0,.4); padding:2px 7px; border-radius:20px;}
+.pk-sheen{position:absolute; inset:-30% -60%; pointer-events:none;
+  background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.4) 50%,transparent 60%);
+  animation:pksheen 3.4s ease-in-out infinite;}
+@keyframes pksheen{0%{transform:translateX(-60%);}55%,100%{transform:translateX(60%);}}
+.pk:active{transform:scale(.975);}
+.pk.tear .pk-strip{animation:tear .42s ease-in forwards;}
+@keyframes tear{to{transform:translateY(-130%) rotate(-7deg); opacity:0;}}
+.pk.tear{animation:pkgo .5s ease-in .18s forwards;}
+@keyframes pkgo{to{transform:scale(1.15); opacity:0;}}
+
+/* -------------------------------------------------------------- the stage
+   Opening a pack takes over the screen. That is the difference between a
+   reward and a list item. */
+#stage{position:fixed; inset:0; z-index:120; display:none;
+  background:radial-gradient(80% 55% at 50% 38%,#1B2942,#070B12 72%);
+  padding:max(18px,env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+  flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  overscroll-behavior:contain;}
+#stage.on{display:flex; animation:stagein .28s ease-out both;}
+@keyframes stagein{from{opacity:0;}to{opacity:1;}}
+#stage .rays{position:absolute; inset:0; pointer-events:none; opacity:0; z-index:0;
+  background:conic-gradient(from 0deg at 50% 42%,transparent 0 12deg,rgba(255,255,255,.09) 12deg 18deg,
+    transparent 18deg 30deg,rgba(255,255,255,.07) 30deg 34deg,transparent 34deg 60deg);
+  animation:spin 26s linear infinite;}
+#stage.lit .rays{opacity:1; transition:opacity .5s;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#stage .step{position:relative; z-index:2; font-family:"JetBrains Mono",monospace; font-size:12px;
+  letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.62); min-height:16px;}
+#stage .slot{position:relative; z-index:2; width:min(66vw,250px); max-height:56vh; aspect-ratio:5/7;}
+#stage .slot .tc{position:absolute; inset:0;}
+#stage .under{position:relative; z-index:2; width:min(66vw,250px); display:flex; gap:8px;}
+#stage .under button{flex:1; min-height:48px; border-radius:11px; font-weight:600;
+  border:1px solid rgba(255,255,255,.28); background:rgba(255,255,255,.1); color:#fff;}
+#stage .under button.pri{background:#fff; color:#0B1220; border-color:#fff;}
+#stage .dots{position:relative; z-index:2; display:flex; gap:6px;}
+#stage .dots i{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.24);}
+#stage .dots i.on{background:#fff;}
+#stage .dots i.hi{background:#F5C451; box-shadow:0 0 8px #F5C451;}
+
+/* The card behind the one you are looking at, so a pack feels like a stack. */
+#stage .ghost{position:absolute; inset:0; border-radius:11px; background:linear-gradient(160deg,#1B3A6B,#0C1B33);
+  border:1px solid rgba(255,255,255,.12); box-shadow:0 6px 18px rgba(0,0,0,.4);}
+#stage .g1{transform:translateY(9px) scale(.965); opacity:.62;}
+#stage .g2{transform:translateY(17px) scale(.93); opacity:.34;}
+
+.burst{position:absolute; inset:0; z-index:4; pointer-events:none;}
+.burst i{position:absolute; left:50%; top:46%; width:5px; height:5px; border-radius:50%;
+  background:#FFD86B; opacity:0; animation:spark .95s ease-out forwards;}
+@keyframes spark{
+  0%{opacity:1; transform:translate(0,0) scale(1);}
+  100%{opacity:0; transform:translate(var(--dx),var(--dy)) scale(.25);}
 }
-.reveal{perspective:900px;}
-.rvl{background:var(--sunk); border-color:var(--line-strong);}
-.pack{width:100%; border-radius:14px; padding:26px 18px; text-align:center; cursor:pointer;
-  border:1px solid var(--accent); background:var(--accent-soft); color:var(--accent);
-  font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:18px;
-  min-height:118px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;}
-.pack .sub{font-family:"Instrument Sans",sans-serif; font-weight:400; font-size:13px; color:var(--ink-2);}
-.pack:active{transform:scale(.98);}
-.pack.big{background:var(--signal-soft); border-color:var(--signal); color:var(--signal);}
-.pack.pulse{animation:pulse 2.4s ease-in-out infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--signal-soft);}50%{box-shadow:0 0 0 7px transparent;}}
 
-.tally{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
-  font-size:15px; text-align:center; margin:14px 0 2px; color:var(--good); font-weight:700;
-  animation:rise .45s ease-out both;}
-@keyframes rise{from{opacity:0; transform:translateY(8px);}to{opacity:1;transform:none;}}
+/* The score, once the last card is over. */
+.score{position:relative; z-index:2; text-align:center; color:#fff; animation:rise .5s ease-out both;}
+.score .big{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:31px; font-weight:700; letter-spacing:-.02em; color:#8FE3B4;}
+.score .sm{font-size:13px; color:rgba(255,255,255,.7); margin-top:3px;}
+@keyframes rise{from{opacity:0; transform:translateY(12px);}to{opacity:1; transform:none;}}
+
+.lvlup{position:relative; z-index:2; font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
+  font-size:20px; color:#F5C451; text-align:center; animation:pop .5s cubic-bezier(.2,1.5,.4,1) both;}
+@keyframes pop{from{opacity:0; transform:scale(.6);}to{opacity:1; transform:none;}}
+
+/* ---------------------------------------------------------- the objectives
+   Three things to do, as three things you tap. A panel with a button inside
+   it is a form; the tile itself has to be the target. */
+.qhead{display:flex; align-items:center; gap:12px; margin:22px 0 10px;}
+.qhead h2{margin:0; flex:1;}
+.qpips{display:flex; gap:5px; flex:none;}
+.qpips i{width:22px; height:6px; border-radius:3px; background:var(--sunk);
+  transition:background .3s ease;}
+.qpips i.on{background:var(--good);}
+.qpips i.all{background:var(--signal); box-shadow:0 0 9px var(--signal);}
+
+.quests{display:grid; gap:9px;}
+.q{display:flex; align-items:center; gap:13px; width:100%; text-align:left; cursor:pointer;
+  padding:13px 15px; border-radius:15px; min-height:74px;
+  border:1px solid var(--line); background:linear-gradient(150deg,var(--surface),var(--surface-2));
+  transition:transform .12s ease, border-color .2s, background .2s;}
+.q:active{transform:scale(.985);}
+.q .qg{flex:none; width:40px; height:40px; border-radius:12px; display:flex; align-items:center;
+  justify-content:center; font-size:17px; background:var(--sunk); color:var(--ink-2);
+  border:1px solid var(--line); transition:all .2s;}
+.q .qt{flex:1; min-width:0;}
+.q .qt b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:600;
+  font-size:15.5px; letter-spacing:-.01em;}
+.q .qt span{display:block; font-size:12.5px; color:var(--ink-3); line-height:1.3; margin-top:1px;}
+.q .qn{flex:none; text-align:center; min-width:44px;}
+.q .qn b{display:block; font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:21px; font-weight:700; letter-spacing:-.02em; line-height:1;}
+.q .qn span{display:block; font-size:9px; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--ink-3); margin-top:3px;}
+.q.on{border-color:var(--good); background:linear-gradient(150deg,var(--good-soft),var(--surface));}
+.q.on .qg{background:var(--good); color:#fff; border-color:var(--good);}
+.q.on .qt b{color:var(--good);}
+.q.hot .qn b{color:var(--signal);}
+
+/* ------------------------------------------------------------------- HUD */
+.hud{display:flex; align-items:center; gap:12px; padding:13px 15px; margin:13px 0;
+  border-radius:var(--r); border:1px solid var(--line);
+  background:linear-gradient(150deg,var(--surface),var(--surface-2));}
+.hud .lv{position:relative; width:52px; height:52px; flex:none;}
+.hud .lv svg{width:52px; height:52px; transform:rotate(-90deg);}
+.hud .lv circle{fill:none; stroke-width:5;}
+.hud .lv .bg{stroke:var(--sunk);}
+.hud .lv .fg{stroke:var(--accent); stroke-linecap:round; transition:stroke-dasharray .8s ease;}
+.hud .lv b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:"JetBrains Mono",monospace; font-size:17px; font-weight:700;}
+.hud .who{flex:1; min-width:0;}
+.hud .who h3{font-size:16px;}
+.hud .who .dim{font-size:12.5px;}
+.hud .xp{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-weight:700; font-size:23px; letter-spacing:-.02em; text-align:right; line-height:1.1;}
+.hud .xp small{display:block; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink-3); font-weight:400;}
 
 /* A toast for the moment the third pillar lands. */
 #toast{position:fixed; left:50%; bottom:calc(84px + env(safe-area-inset-bottom));
-  transform:translateX(-50%) translateY(20px); z-index:60; opacity:0; pointer-events:none;
-  background:var(--good); color:var(--surface); border-radius:11px; padding:12px 18px;
-  font-weight:600; font-size:14.5px; box-shadow:0 6px 22px rgba(0,0,0,.18); max-width:88vw; text-align:center;}
+  transform:translateX(-50%) translateY(20px); z-index:130; opacity:0; pointer-events:none;
+  background:var(--good); color:#fff; border-radius:11px; padding:12px 18px;
+  font-weight:600; font-size:14.5px; box-shadow:0 6px 22px rgba(0,0,0,.28); max-width:88vw; text-align:center;}
 #toast.on{animation:toast 2.8s ease-out both;}
 @keyframes toast{
   0%{opacity:0; transform:translateX(-50%) translateY(20px);}
@@ -213,17 +399,66 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
   100%{opacity:0; transform:translateX(-50%) translateY(-8px);}
 }
 
-/* Set progress, as a ring rather than another number. */
-.ring{width:34px; height:34px; flex:none; transform:rotate(-90deg);}
-.ring circle{fill:none; stroke-width:4;}
-.ring .bg{stroke:var(--sunk);}
-.ring .fg{stroke:var(--accent); stroke-linecap:round; transition:stroke-dasharray .6s ease;}
-.ring.done .fg{stroke:var(--good);}
-.seth{display:flex; align-items:center; gap:12px; margin:24px 0 4px;}
-.seth h2{margin:0;}
+/* ------------------------------------------------------------ reward track
+   The real-life rewards are the point of the streak, so they get to look like
+   prizes rather than list items. */
+.flame{display:flex; align-items:center; gap:16px; padding:18px; margin:13px 0; border-radius:18px;
+  border:1px solid var(--signal); color:var(--ink);
+  background:linear-gradient(150deg,var(--signal-soft),var(--surface) 70%);}
+.flame .n{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:44px; font-weight:700; letter-spacing:-.04em; line-height:.9; color:var(--signal);}
+.flame .n{flex:none; text-align:center;}
+.flame .n small{display:block; font-family:"Instrument Sans",sans-serif; font-size:9.5px;
+  letter-spacing:.1em; text-transform:uppercase; font-weight:500; color:var(--ink-3);
+  margin-top:7px; white-space:nowrap;}
+.flame p{margin:0; font-size:13.5px; color:var(--ink-2);}
+
+.trk{display:flex; gap:14px; align-items:flex-start; padding:15px; margin:11px 0; border-radius:16px;
+  border:1px solid var(--line); background:linear-gradient(150deg,var(--surface),var(--surface-2));}
+.trk.won{border-color:var(--good); background:linear-gradient(150deg,var(--good-soft),var(--surface));}
+.trk .mdl{position:relative; width:58px; height:58px; flex:none;}
+.trk .mdl svg{width:58px; height:58px; transform:rotate(-90deg);}
+.trk .mdl circle{fill:none; stroke-width:5;}
+.trk .mdl .bg{stroke:var(--sunk);}
+.trk .mdl .fg{stroke:var(--signal); stroke-linecap:round; transition:stroke-dasharray .7s ease;}
+.trk.won .mdl .fg{stroke:var(--good);}
+.trk .mdl b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:"JetBrains Mono",monospace; font-size:15px; font-weight:700;}
+.trk .bd{flex:1; min-width:0;}
+.trk .bd .tag{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3);}
+.trk .bd h3{font-size:16px; margin:2px 0 0;}
+.trk .bd .prize{font-size:14px; margin:5px 0 0; color:var(--ink);}
+.trk .bd .prize em{font-style:normal; font-weight:600;}
+.trk .bd .dim{font-size:12.5px; margin-top:4px;}
+.trk .btns{gap:8px; margin-top:11px;}
+.trk .btns button{flex:1 1 auto; min-width:0; min-height:40px; font-size:13.5px; padding:8px 12px;}
+
+.medals{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:12px 0;}
+.md{text-align:center;}
+.md .disc{width:100%; aspect-ratio:1; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
+  font-size:17px; border:2px solid var(--line-strong); background:var(--sunk); color:var(--ink-3);}
+.md.got .disc{border-color:#C8A227; color:#5A4506;
+  background:radial-gradient(65% 65% at 35% 28%,#FBEC9B,#D9B23C 60%,#B08C1C);
+  box-shadow:0 2px 8px rgba(180,140,30,.35);}
+.md .lbl{font-size:10.5px; line-height:1.2; margin-top:5px; color:var(--ink-3);}
+.md.got .lbl{color:var(--ink-2); font-weight:600;}
+
+/* --------------------------------------------------------------- detail */
+#sheet{position:fixed; inset:0; z-index:110; display:none; align-items:center; justify-content:center;
+  flex-direction:column; gap:16px; padding:24px;
+  background:rgba(6,10,16,.86); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);}
+#sheet.on{display:flex; animation:stagein .2s ease-out both;}
+#sheet .slot{width:min(70vw,262px); aspect-ratio:5/7; position:relative;}
+#sheet .slot .tc{position:absolute; inset:0;}
+#sheet .meta{color:rgba(255,255,255,.72); text-align:center; font-size:13.5px; max-width:280px;}
+#sheet button{min-height:46px; padding:0 26px; border-radius:11px; font-weight:600;
+  border:1px solid rgba(255,255,255,.3); background:rgba(255,255,255,.11); color:#fff;}
 
 @media (prefers-reduced-motion:reduce){
-  .cf.in,.cf.r2.shine::after,.cf.r3.shine::after,.pack.pulse,#toast.on,.tally{animation:none !important;}
+  .tc-i,.tc.sweep .tc-glare,.pk-sheen,#stage .rays,.burst i,.score,.lvlup,#toast.on,
+  #stage.on,#sheet.on,.pk.tear .pk-strip,.pk.tear{animation:none !important; transition:none !important;}
   #toast.on{opacity:1;}
 }
 </style>
@@ -236,7 +471,10 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
     <div class="eyebrow" id="eyebrow">Daylight</div>
     <h1 id="title">Today</h1>
   </div>
-  <button id="theme" title="Switch theme" style="padding:8px 12px; min-height:44px; min-width:44px;">&#9681;</button>
+  <div style="display:flex; gap:7px; flex:none;">
+    <button id="sound" data-mute="1" title="Sound" style="padding:8px 12px; min-height:44px; min-width:44px;">&#9834;</button>
+    <button id="theme" title="Switch theme" style="padding:8px 12px; min-height:44px; min-width:44px;">&#9681;</button>
+  </div>
 </header>
 
 <main id="view"></main>
@@ -244,6 +482,8 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="stage" aria-live="polite"></div>
+<div id="sheet"></div>
 
 <div style="display:none">
 
@@ -873,11 +1113,224 @@ function nearestSet(){
   return best;
 }
 
-/* ---------------------------------------------------------------- feel
-   The reveal is the whole point. A list appearing is not a pack opening. */
-function buzz(ms){
-  try { if (navigator.vibrate) navigator.vibrate(ms); } catch(e){}
+/* =================================================================== the game
+   Art, sound, and a pack opening that takes over the screen. Everything here
+   exists because a card you cannot turn over is a paragraph with a border. */
+
+function hashOf(s){
+  var h = 2166136261;
+  for (var i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0);
 }
+
+/* Behind every emblem sits one of eight backdrops, picked by the card's name.
+   Without this a set of eleven hawker cards is eleven identical bowls, and a
+   collection where everything looks the same is not worth collecting. */
+function backdrop(h){
+  var kind = h % 8, o = "<g opacity='.17' stroke='currentColor' fill='none' stroke-width='1.4'>", i, j;
+  if (kind === 0){
+    for (i = 1; i <= 6; i++) o += "<circle cx='50' cy='50' r='" + (i * 9 + (h % 5)) + "'/>";
+  } else if (kind === 1){
+    for (i = -4; i < 12; i++) o += "<path d='M" + (i * 13) + " 0 L" + (i * 13 + 60) + " 100'/>";
+  } else if (kind === 2){
+    for (i = 0; i < 8; i++) for (j = 0; j < 8; j++)
+      o += "<circle cx='" + (7 + i * 12.5) + "' cy='" + (7 + j * 12.5) + "' r='1.7' fill='currentColor' stroke='none'/>";
+  } else if (kind === 3){
+    for (i = 0; i < 26; i++)
+      o += "<circle cx='" + ((h >> (i % 12)) % 100) + "' cy='" + ((h >> ((i + 5) % 13)) % 100)
+         + "' r='" + (1 + (i % 4)) + "' fill='currentColor' stroke='none'/>";
+  } else if (kind === 4){
+    for (i = 0; i < 8; i++) o += "<path d='M0 " + (i * 15 - 6) + " L50 " + (i * 15 + 6) + " L100 " + (i * 15 - 6) + "'/>";
+  } else if (kind === 5){
+    for (i = -3; i < 10; i++){
+      o += "<path d='M" + (i * 14) + " 0 L" + (i * 14 + 100) + " 100'/>";
+      o += "<path d='M" + (i * 14) + " 100 L" + (i * 14 + 100) + " 0'/>";
+    }
+  } else if (kind === 6){
+    for (i = 0; i < 16; i++){
+      var a = i * 22.5 * Math.PI / 180;
+      o += "<path d='M50 50 L" + (50 + Math.cos(a) * 78).toFixed(1) + " "
+         + (50 + Math.sin(a) * 78).toFixed(1) + "'/>";
+    }
+  } else {
+    for (i = 0; i < 7; i++)
+      o += "<path d='M-10 " + (100 - i * 15) + " q60 -" + (26 + i * 3) + " 120 0'/>";
+  }
+  return o + "</g>";
+}
+
+/* Each set has its own emblem, varied per card by its name, so no two faces
+   are identical and every card still reads as belonging somewhere. */
+function cardArt(c){
+  var h = hashOf(c[0]), k = c[2];
+  var a = h % 97, b = (h >> 7) % 89, d = (h >> 13) % 73;
+  var o = "<svg viewBox='0 0 100 100' preserveAspectRatio='xMidYMid meet' aria-hidden='true'>";
+  o += backdrop(h);
+  var tx = ((h >> 3) % 11) - 5, ty = ((h >> 9) % 11) - 5;
+  var rot = ((h >> 17) % 13) - 6, sc = (0.82 + ((h >> 21) % 18) / 100).toFixed(2);
+  o += "<g transform='translate(" + (50 + tx) + " " + (50 + ty) + ") rotate(" + rot
+     + ") scale(" + sc + ") translate(-50 -50)'>";
+  var S1 = "stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'";
+  var i, x, y;
+
+  if (k === "hawk"){
+    o += "<path " + S1 + " stroke-width='2.4' opacity='.85' d='M16 58 Q50 " + (86 + a % 7) + " 84 58 Z'/>";
+    o += "<path " + S1 + " stroke-width='1.8' opacity='.5' d='M16 58 h68'/>";
+    for (i = 0; i < 3; i++){
+      x = 34 + i * 16;
+      o += "<path " + S1 + " stroke-width='1.9' opacity='" + (.5 - i * .08) + "' d='M" + x + " 44 q" +
+        (6 - (a + i * 5) % 11) + " -8 0 -15 q" + ((b + i * 7) % 11 - 5) + " -7 0 -13'/>";
+    }
+  } else if (k === "kopi"){
+    o += "<circle " + S1 + " stroke-width='2.4' opacity='.8' cx='50' cy='52' r='" + (25 + a % 5) + "'/>";
+    o += "<circle " + S1 + " stroke-width='1.5' opacity='.5' cx='50' cy='52' r='" + (17 + b % 5) + "'/>";
+    o += "<circle " + S1 + " stroke-width='1.1' opacity='.32' cx='" + (26 + a % 9) + "' cy='" +
+      (24 + b % 9) + "' r='" + (8 + d % 6) + "'/>";
+    o += "<path " + S1 + " stroke-width='2' opacity='.55' d='M75 44 q11 3 11 11 t-11 11'/>";
+  } else if (k === "slang"){
+    o += "<rect " + S1 + " stroke-width='2.3' opacity='.8' x='14' y='22' rx='9' width='" +
+      (52 + a % 14) + "' height='30'/>";
+    o += "<path " + S1 + " stroke-width='2.3' opacity='.8' d='M26 52 l-3 12 l13 -12'/>";
+    o += "<rect " + S1 + " stroke-width='1.8' opacity='.42' x='" + (34 + b % 10) +
+      "' y='62' rx='7' width='" + (38 + d % 12) + "' height='22'/>";
+  } else if (k === "every"){
+    for (i = 0; i < 20; i++){
+      x = 20 + (i % 5) * 14; y = 24 + Math.floor(i / 5) * 14;
+      var lit = ((h >> i) & 1) === 1;
+      o += "<rect x='" + x + "' y='" + y + "' width='9' height='10' rx='1.5' " +
+        (lit ? "fill='currentColor' opacity='.42'" : "fill='none' stroke='currentColor' stroke-width='1.3' opacity='.4'") + "/>";
+    }
+  } else if (k === "herit"){
+    for (i = 0; i < 3; i++){
+      x = 20 + i * 22;
+      o += "<path " + S1 + " stroke-width='2.1' opacity='.75' d='M" + x + " 74 v-22 a10 10 0 0 1 20 0 v22'/>";
+    }
+    o += "<path " + S1 + " stroke-width='2.4' opacity='.85' d='M12 74 h76'/>";
+    o += "<path " + S1 + " stroke-width='2' opacity='.55' d='M14 34 l36 -" + (14 + a % 8) + " l36 " + (14 + a % 8) + "'/>";
+  } else if (k === "green"){
+    for (i = 0; i < 5; i++){
+      x = 22 + ((h >> (i * 3)) % 56); y = 30 + ((h >> (i * 5)) % 42);
+      o += "<path " + S1 + " stroke-width='1.9' opacity='" + (.34 + (i % 3) * .14) +
+        "' d='M" + x + " " + y + " q" + (9 + i) + " -" + (13 + i * 2) + " " + (18 + i * 2) + " 0 q-" +
+        (9 + i) + " " + (13 + i * 2) + " -" + (18 + i * 2) + " 0 Z'/>";
+    }
+  } else if (k === "isles"){
+    o += "<path " + S1 + " stroke-width='2.2' opacity='.7' d='M22 44 q10 -12 22 -4 q11 7 26 1 q8 -3 10 5 l-2 16 h-56 Z'/>";
+    for (i = 0; i < 4; i++){
+      y = 68 + i * 8;
+      o += "<path " + S1 + " stroke-width='1.7' opacity='" + (.5 - i * .09) + "' d='M8 " + y + " q11 -5 22 0 t22 0 t22 0 t22 0'/>";
+    }
+  } else if (k === "region"){
+    o += "<path " + S1 + " stroke-width='1.9' opacity='.55' stroke-dasharray='4 5' d='M16 74 Q50 " +
+      (14 + a % 14) + " 84 44'/>";
+    o += "<circle cx='16' cy='74' r='4' fill='currentColor' opacity='.7'/>";
+    o += "<path d='M84 44 l-11 5 l3 -6 l-3 -6 Z' fill='currentColor' opacity='.75'/>";
+    o += "<circle " + S1 + " stroke-width='1.4' opacity='.3' cx='50' cy='52' r='" + (30 + b % 7) + "'/>";
+  } else if (k === "road"){
+    var px = 14, py = 78, path = "M14 78";
+    for (i = 0; i < 4; i++){
+      px = 14 + (i + 1) * 18; py = 78 - (i + 1) * 12 + ((h >> (i * 4)) % 13) - 6;
+      path += " L" + px + " " + py;
+    }
+    o += "<path " + S1 + " stroke-width='2.3' opacity='.7' d='" + path + "'/>";
+    for (i = 0; i < 5; i++){
+      o += "<circle cx='" + (14 + i * 18) + "' cy='" + (78 - i * 12 + (i ? ((h >> ((i - 1) * 4)) % 13) - 6 : 0)) +
+        "' r='" + (i === 4 ? 4.5 : 3) + "' fill='currentColor' opacity='" + (i === 4 ? .8 : .45) + "'/>";
+    }
+  } else if (k === "home"){
+    o += "<path " + S1 + " stroke-width='2.4' opacity='.8' d='M22 76 v-26 l28 -18 l28 18 v26'/>";
+    o += "<rect " + S1 + " stroke-width='1.9' opacity='.5' x='42' y='58' width='16' height='18'/>";
+    for (i = 0; i < 7; i++){
+      x = 12 + i * 12 + (h >> i) % 6;
+      o += "<path " + S1 + " stroke-width='1.5' opacity='.3' d='M" + x + " " + (10 + (i * 5) % 14) +
+        " l-3 " + (9 + i % 5) + "'/>";
+    }
+  } else {
+    for (i = 0; i < 8; i++){
+      var ang = i * 45 + (a % 20);
+      var rad = ang * Math.PI / 180;
+      o += "<path " + S1 + " stroke-width='2' opacity='.6' d='M50 50 L" +
+        (50 + Math.cos(rad) * 34).toFixed(1) + " " + (50 + Math.sin(rad) * 34).toFixed(1) + "'/>";
+    }
+    o += "<circle cx='50' cy='50' r='13' fill='currentColor' opacity='.55'/>";
+    o += "<circle " + S1 + " stroke-width='2' opacity='.7' cx='50' cy='50' r='20'/>";
+  }
+  return o + "</g></svg>";
+}
+
+/* A card. Face up or face down, small in the binder or large on the stage. */
+function tcard(c, count, opts){
+  opts = opts || {};
+  var r = c[1];
+  var cls = "tc r" + r + (opts.down ? " down" : "") + (count ? "" : " lk")
+          + (opts.lg ? " lg" : "") + (opts.extra || "");
+  var h = "<div class='" + cls + "'" + (opts.attr || "") + ">";
+  h += "<div class='tc-i'>";
+  h += "<div class='tc-f'><div class='tc-pane'>";
+  h += "<div class='tc-nm'>" + esc(c[0]) + "</div>";
+  h += "<div class='tc-art'>" + cardArt(c);
+  if (r >= 2) h += "<div class='tc-holo'></div>";
+  if (count > 1) h += "<span class='tc-cnt'>x" + count + "</span>";
+  h += "<div class='tc-gem'></div></div>";
+  h += "<div class='tc-nt'>" + esc(c[3]) + "</div>";
+  h += "<div class='tc-glare'></div>";
+  h += "</div></div>";
+  h += "<div class='tc-b'><div class='tc-mark'>D</div></div>";
+  h += "</div></div>";
+  return h;
+}
+
+/* ------------------------------------------------------------------ sound
+   Synthesised, so there are no files to load and nothing to go missing. It
+   only ever starts on a tap, which is also the only way iOS allows it. */
+var AC = null;
+function actx(){
+  if (S.mute) return null;
+  try {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === "suspended") AC.resume();
+  } catch (e){ return null; }
+  return AC;
+}
+function tone(f, t0, dur, type, vol, to){
+  var a = actx(); if (!a) return;
+  var o = a.createOscillator(), g = a.createGain(), n = a.currentTime + t0;
+  o.type = type || "sine";
+  o.frequency.setValueAtTime(f, n);
+  if (to) o.frequency.exponentialRampToValueAtTime(to, n + dur);
+  g.gain.setValueAtTime(0.0001, n);
+  g.gain.exponentialRampToValueAtTime(vol || .16, n + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, n + dur);
+  o.connect(g); g.connect(a.destination);
+  o.start(n); o.stop(n + dur + .02);
+}
+function hiss(t0, dur, vol, f0, f1){
+  var a = actx(); if (!a) return;
+  var len = Math.floor(a.sampleRate * dur);
+  var buf = a.createBuffer(1, len, a.sampleRate), ch = buf.getChannelData(0);
+  for (var i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / len);
+  var src = a.createBufferSource(); src.buffer = buf;
+  var flt = a.createBiquadFilter(); flt.type = "bandpass";
+  var n = a.currentTime + t0;
+  flt.frequency.setValueAtTime(f0 || 900, n);
+  flt.frequency.exponentialRampToValueAtTime(f1 || 2600, n + dur);
+  var g = a.createGain(); g.gain.setValueAtTime(vol || .14, n);
+  g.gain.exponentialRampToValueAtTime(0.0001, n + dur);
+  src.connect(flt); flt.connect(g); g.connect(a.destination);
+  src.start(n); src.stop(n + dur);
+}
+function sfx(name){
+  if (S.mute) return;
+  if (name === "tap")   { tone(620, 0, .05, "square", .07); }
+  if (name === "tear")  { hiss(0, .42, .2, 500, 3400); tone(150, .02, .3, "sawtooth", .07, 70); }
+  if (name === "flip")  { hiss(0, .1, .09, 1600, 500); tone(340, 0, .1, "triangle", .1, 560); }
+  if (name === "rare")  { [523, 659, 784].forEach(function(f, i){ tone(f, i * .07, .34, "triangle", .13); }); }
+  if (name === "gold")  { [523, 659, 784, 1047].forEach(function(f, i){ tone(f, i * .075, .5, "triangle", .15); });
+                          hiss(.1, .5, .07, 3000, 7000); }
+  if (name === "level") { [392, 523, 659, 784, 1047].forEach(function(f, i){ tone(f, i * .085, .42, "sine", .14); }); }
+  if (name === "done")  { tone(587, 0, .16, "sine", .11); tone(784, .09, .26, "sine", .11); }
+}
+function buzz(p){ try { if (navigator.vibrate) navigator.vibrate(p); } catch (e){} }
 function toast(msg){
   var el = document.getElementById("toast");
   if (!el) return;
@@ -887,71 +1340,222 @@ function toast(msg){
   el.classList.add("on");
 }
 function reduced(){
-  return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e){ return false; }
 }
 
-/* Count-up, because a number that jumps is a number nobody watches. */
-function countUp(el, from, to, ms){
-  if (reduced() || from === to){ el.textContent = to; return; }
-  var t0 = performance.now();
-  (function step(now){
-    var k = Math.min(1, (now - t0) / ms);
-    el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
-    if (k < 1) requestAnimationFrame(step);
-  })(t0);
+/* -------------------------------------------------------------- the stage */
+var ST = null;
+
+function stageEl(){ return document.getElementById("stage"); }
+
+function openStage(kind){
+  var before = rank().level;
+  var got = openPack(kind);
+  ST = { cards: got, i: 0, kind: kind, lvlBefore: before, turned: 0 };
+  var el = stageEl();
+  el.innerHTML =
+      "<div class='rays'></div>"
+    + "<div class='step' id='stStep'>Tap to open</div>"
+    + "<button class='pk" + (kind === "streak" ? " big" : "") + "' id='stPack'>"
+    +   "<span class='pk-sheen'></span><span class='pk-strip'></span>"
+    +   "<span class='pk-body'><span class='pk-ttl'>"
+    +     (kind === "streak" ? "Streak Pack" : "Day Pack") + "</span>"
+    +   "<span class='pk-sub'>" + got.length + " cards</span></span>"
+    + "</button>"
+    + "<div class='under' style='visibility:hidden'></div>";
+  el.className = "on";
+  document.body.style.overflow = "hidden";
+  document.getElementById("stPack").addEventListener("click", tearPack, { once: true });
 }
 
-function cardFace(c, count, opts){
-  opts = opts || {};
-  var r = c[1], cls = "cf r" + r + (count ? "" : " lk") + (opts.extra || "");
-  var h = "<div class='" + cls + "'" + (opts.style ? " style='" + opts.style + "'" : "") + ">";
-  h += "<div><div class='nm'>" + esc(count ? c[0] : "Locked away") + "</div>";
-  if (count) h += "<div class='nt'>" + esc(c[3]) + "</div>";
-  h += "</div>";
-  h += "<div class='ft'><span class='rb'>" + RARITY[r][0] + "</span>"
-     + (count > 1 ? "<span class='dup'>x" + count + "</span>" : "") + "</div>";
-  h += "</div>";
-  return h;
+function tearPack(){
+  var pk = document.getElementById("stPack");
+  sfx("tear"); buzz([12, 30, 18]);
+  pk.classList.add("tear");
+  stageEl().classList.add("lit");
+  setTimeout(showSlot, reduced() ? 0 : 560);
 }
 
-/* Cards turn over one at a time, rare ones catch the light, and the phone
-   buzzes harder for the good ones. */
-function playReveal(names){
-  var box = document.getElementById("reveal");
-  if (!box) return;
-  box.innerHTML = "";
-  /* Whatever you were scrolled to, the pack is what you are looking at now. */
-  var ease = reduced() ? "auto" : "smooth";
-  box.parentNode.scrollIntoView({ behavior: ease, block: "start" });
-  var gained = 0, fresh = 0;
-  names.forEach(function(name, i){
-    var c = CARDS.filter(function(x){ return x[0] === name; })[0];
-    if (!c) return;
-    gained += RARITY[c[1]][3];
-    if (S.cards[name] === 1) fresh++;
-    var d = document.createElement("div");
-    d.innerHTML = cardFace(c, S.cards[name], { extra: " in", style: "animation-delay:" + (i * 0.22) + "s" });
-    var el = d.firstChild;
-    box.appendChild(el);
-    var wait = reduced() ? 0 : (i * 220 + 120);
-    setTimeout(function(){
-      if (c[1] >= 2){ el.classList.add("shine"); buzz([18, 40, 26]); }
-      else buzz(12);
-    }, wait);
-  });
-  var t = document.createElement("div");
-  t.className = "tally";
-  var dupes = names.length - fresh;
-  t.textContent = "+" + fresh + " new"
-    + (dupes ? "  \u00b7  " + dupes + " spare" : "")
-    + "  \u00b7  +" + gained + " XP";
-  t.style.animationDelay = (reduced() ? 0 : names.length * 0.22 + 0.15) + "s";
-  box.parentNode.insertBefore(t, box.nextSibling);
-  /* And once the last one has turned over, the score comes to you. */
+function showSlot(){
+  var el = stageEl(), left = ST.cards.length - ST.i;
+  var dots = "";
+  for (var i = 0; i < ST.cards.length; i++){
+    var c = CARDS.filter(function(x){ return x[0] === ST.cards[i]; })[0];
+    var seen = i < ST.i;
+    dots += "<i class='" + (seen ? (c && c[1] >= 2 ? "on hi" : "on") : "") + "' data-dot='" + i + "'></i>";
+  }
+  el.innerHTML =
+      "<div class='rays'></div>"
+    + "<div class='step' id='stStep'>Tap to turn over &middot; " + (ST.i + 1)
+    +   " of " + ST.cards.length + "</div>"
+    + "<div class='slot' id='stSlot'>"
+    +   (left > 2 ? "<div class='ghost g2'></div>" : "")
+    +   (left > 1 ? "<div class='ghost g1'></div>" : "")
+    + "</div>"
+    + "<div class='dots'>" + dots + "</div>"
+    + "<div class='under' id='stUnder' style='visibility:hidden'>"
+    +   "<button id='stNext'>Next</button></div>";
+  el.className = "on lit";
+
+  var c = CARDS.filter(function(x){ return x[0] === ST.cards[ST.i]; })[0];
+  var slot = document.getElementById("stSlot");
+  slot.insertAdjacentHTML("beforeend", tcard(c, S.cards[c[0]], { down: true, lg: true }));
+  var tc = slot.querySelector(".tc");
+  tc.addEventListener("click", function(){ turnCard(tc, c); }, { once: true });
+  tilt(tc);
+}
+
+function turnCard(tc, c){
+  tc.classList.remove("down");
+  sfx("flip"); buzz(14);
+  var delay = reduced() ? 0 : 340;
   setTimeout(function(){
-    var r = t.getBoundingClientRect();
-    if (r.bottom > window.innerHeight - 80) t.scrollIntoView({ behavior: ease, block: "center" });
-  }, reduced() ? 0 : names.length * 220 + 400);
+    if (c[1] >= 2){
+      tc.classList.add("sweep");
+      sparks(tc, c[1] === 3 ? 22 : 14);
+      sfx(c[1] === 3 ? "gold" : "rare");
+      buzz([20, 45, 25, 45, 40]);
+    }
+    var st = document.getElementById("stStep");
+    if (st) st.textContent = RARITY[c[1]][0] + (S.cards[c[0]] > 1 ? " \u00b7 spare" : " \u00b7 new");
+    var dot = document.querySelector("[data-dot='" + ST.i + "']");
+    if (dot) dot.className = c[1] >= 2 ? "on hi" : "on";
+    var u = document.getElementById("stUnder");
+    if (u){
+      u.style.visibility = "visible";
+      var b = document.getElementById("stNext");
+      var last = ST.i >= ST.cards.length - 1;
+      b.textContent = last ? "Done" : "Next";
+      if (last) b.className = "pri";
+      b.onclick = function(){
+        sfx("tap");
+        if (last) showScore(); else { ST.i++; showSlot(); }
+      };
+    }
+  }, delay);
+}
+
+function sparks(host, n){
+  if (reduced()) return;
+  var b = document.createElement("div");
+  b.className = "burst";
+  var h = "";
+  for (var i = 0; i < n; i++){
+    var a = (i / n) * Math.PI * 2 + Math.random();
+    var d = 70 + Math.random() * 90;
+    h += "<i style='--dx:" + (Math.cos(a) * d).toFixed(0) + "px;--dy:"
+       + (Math.sin(a) * d).toFixed(0) + "px;animation-delay:" + (i * 14) + "ms'></i>";
+  }
+  b.innerHTML = h;
+  host.appendChild(b);
+  setTimeout(function(){ if (b.parentNode) b.parentNode.removeChild(b); }, 1300);
+}
+
+/* Touch the card and the foil moves. Rare cards should reward being looked at. */
+function tilt(tc){
+  if (reduced()) return;
+  function at(ev){
+    var t = (ev.touches && ev.touches[0]) || ev;
+    var r = tc.getBoundingClientRect();
+    var x = (t.clientX - r.left) / r.width - .5, y = (t.clientY - r.top) / r.height - .5;
+    var inner = tc.querySelector(".tc-i");
+    if (inner && !tc.classList.contains("down")){
+      inner.style.transform = "rotateY(" + (x * 17).toFixed(1) + "deg) rotateX("
+        + (-y * 17).toFixed(1) + "deg)";
+    }
+    tc.style.setProperty("--ang", ((x + .5) * 340).toFixed(0) + "deg");
+  }
+  function off(){
+    var inner = tc.querySelector(".tc-i");
+    if (inner && !tc.classList.contains("down")) inner.style.transform = "";
+  }
+  tc.addEventListener("touchmove", function(e){ at(e); }, { passive: true });
+  tc.addEventListener("touchend", off);
+  tc.addEventListener("mousemove", at);
+  tc.addEventListener("mouseleave", off);
+}
+
+function showScore(){
+  var el = stageEl(), fresh = 0, gain = 0;
+  ST.cards.forEach(function(n){
+    var c = CARDS.filter(function(x){ return x[0] === n; })[0];
+    if (!c) return;
+    gain += RARITY[c[1]][3];
+    if (S.cards[n] === 1) fresh++;
+  });
+  var spare = ST.cards.length - fresh;
+  var r = rank(), levelled = r.level > ST.lvlBefore;
+  var w = packsWaiting(), more = w.day + w.streak;
+
+  el.innerHTML =
+      "<div class='rays'></div>"
+    + (levelled ? "<div class='lvlup'>Level " + r.level + " &middot; " + esc(r.name) + "</div>" : "")
+    + "<div class='score'><div class='big'>+" + gain + " XP</div>"
+    +   "<div class='sm'>" + fresh + " new" + (spare ? " &middot; " + spare + " spare" : "")
+    +   " &middot; " + heldCount() + " of " + CARDS.length + " held</div></div>"
+    + "<div class='under'>"
+    +   (more ? "<button id='stMore'>Open another</button>" : "")
+    +   "<button class='pri' id='stDone'>Done</button></div>";
+  el.className = "on lit";
+  sfx(levelled ? "level" : "done");
+  buzz(levelled ? [30, 60, 30, 60, 60] : 20);
+  document.getElementById("stDone").onclick = closeStage;
+  var m = document.getElementById("stMore");
+  if (m) m.onclick = function(){
+    sfx("tap");
+    openStage(packsWaiting().streak ? "streak" : "day");
+  };
+}
+
+function closeStage(){
+  sfx("tap");
+  var el = stageEl();
+  el.className = "";
+  el.innerHTML = "";
+  document.body.style.overflow = "";
+  ST = null;
+  render();
+}
+
+/* -------------------------------------------------------------- card detail
+   Tapping a card in the binder should show you the card, not a tooltip. */
+function openSheet(name){
+  var c = CARDS.filter(function(x){ return x[0] === name; })[0];
+  if (!c) return;
+  var held = (S.cards || {})[name];
+  var st = SETS.filter(function(s){ return s[0] === c[2]; })[0];
+  var el = document.getElementById("sheet");
+  el.innerHTML = "<div class='slot' id='shSlot'></div>"
+    + "<div class='meta'>" + (held
+        ? esc(st ? st[1] : "") + " &middot; " + RARITY[c[1]][0] + (held > 1 ? " &middot; " + held + " copies" : "")
+        : "Not found yet &middot; " + esc(st ? st[1] : "")) + "</div>"
+    + "<button id='shClose'>Close</button>";
+  el.className = "on";
+  document.getElementById("shSlot").innerHTML = tcard(c, held, { lg: true, down: !held });
+  var tc = el.querySelector(".tc");
+  if (held) tilt(tc);
+  sfx("tap");
+  document.getElementById("shClose").onclick = closeSheet;
+  el.onclick = function(ev){ if (ev.target === el) closeSheet(); };
+}
+function closeSheet(){
+  var el = document.getElementById("sheet");
+  el.className = ""; el.innerHTML = "";
+}
+
+/* Trophies are not pulled, they are earned - but the moment should look the
+   same, or claiming one feels like ticking a box. */
+function claimTrophy(name){
+  var before = rank().level;
+  S.cards = S.cards || {};
+  S.cards[name] = 1;
+  save();
+  ST = { cards: [name], i: 0, kind: "gold", lvlBefore: before, turned: 0 };
+  var el = stageEl();
+  el.className = "on lit";
+  el.innerHTML = "";
+  document.body.style.overflow = "hidden";
+  showSlot();
 }
 
 function ring(have, total){
@@ -1047,23 +1651,32 @@ function viewToday(){
   }
   h += "<div class='btns'><button data-bedtime='1' style='min-height:38px'>Change the time</button></div></div>";
 
-  /* The three, in his order, with streaks. */
-  h += "<h2>The three</h2>";
+  /* The three, in his order. Tiles you tap, with the pack they lead to shown
+     as three pips - a target you can see is a target you finish. */
+  var got = PILLARS.filter(function(g){ return !!(d.p && d.p[g[0]]); }).length;
+  var full = got === PILLARS.length;
+  h += "<div class='qhead'><h2>The three</h2><div class='qpips'>";
+  for (var qi = 0; qi < PILLARS.length; qi++){
+    h += "<i class='" + (qi < got ? (full ? "on all" : "on") : "") + "'></i>";
+  }
+  h += "</div></div>";
+  h += "<p class='dim' style='margin:0 0 10px'>"
+    + (full ? "All three. A pack is waiting on the Cards tab."
+            : got === PILLARS.length - 1 ? "One more and today earns a pack."
+            : (PILLARS.length - got) + " more to earn today's pack.") + "</p>";
+  h += "<div class='quests'>";
   PILLARS.forEach(function(g){
-    var on = !!(d.p && d.p[g[0]]), st = streak(g[0]), fz = freezesLeft(g[0]);
-    h += "<div class='card" + (on ? " ok" : "") + "'>";
-    h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:center'>";
-    h += "<div style='display:flex;align-items:center;gap:11px'><span style='font-size:20px'>" + g[2] + "</span>"
-      + "<div><h3>" + g[1] + "</h3><div class='dim'>" + esc(g[3]) + "</div></div></div>";
-    h += "<div style='text-align:right;flex:none'><span class='count'>" + st + "</span>"
-      + "<div class='dim' style='font-size:11px'>day streak</div></div>";
-    h += "</div>";
-    h += "<div class='btns'><button class='" + (on ? "" : "pri") + "' data-p='" + g[0] + "'>"
-      + (on ? "Done today" : "Mark done") + "</button></div>";
-    h += "<p class='dim' style='margin:8px 0 0'>" + fz + " of " + FREEZES_PER_MONTH
-      + " freezes left this month &mdash; a missed day spends one rather than breaking the run.</p>";
-    h += "</div>";
+    var on = !!(d.p && d.p[g[0]]), st = streak(g[0]);
+    h += "<button class='q" + (on ? " on" : "") + (st >= 7 ? " hot" : "") + "' data-p='" + g[0] + "'>"
+      + "<span class='qg'>" + (on ? "&#10003;" : g[2]) + "</span>"
+      + "<span class='qt'><b>" + g[1] + "</b><span>" + esc(g[3]) + "</span></span>"
+      + "<span class='qn'><b>" + st + "</b><span>" + (st === 1 ? "day" : "days") + "</span></span>"
+      + "</button>";
   });
+  h += "</div>";
+  h += "<p class='dim' style='margin:10px 0 0'>" + freezesLeft(PILLARS[0][0]) + " of "
+    + FREEZES_PER_MONTH + " freezes left this month &mdash; a missed day spends one rather than "
+    + "breaking the run.</p>";
 
   /* One line, kept because he uses it. */
   if (y.said && y.kept === undefined){
@@ -1218,27 +1831,9 @@ function viewLog(){
   });
   h += "</div></div>";
 
-  /* Badges. Earned ones solid, the next one shown so there is something to aim at. */
-  h += "<h2>Badges</h2>";
-  if (earned.length){
-    h += "<div class='card ok'>";
-    earned.forEach(function(b){
-      h += "<div class='row'><b>" + b[0] + "</b><div><strong>" + esc(b[1]) + "</strong><br>"
-        + "<span class='dim'>" + esc(b[3]) + "</span></div></div>";
-    });
-    h += "</div>";
-  } else {
-    h += "<div class='card'><p class='muted' style='margin:0'>None yet. The first one is three training "
-      + "sessions, which is genuinely the hardest three.</p></div>";
-  }
-  if (next){
-    var have = totalDone(next[2]), pct = Math.round(100 * have / next[0]);
-    h += "<div class='card'><h3>Next: " + esc(next[1]) + "</h3>"
-      + "<p class='dim' style='margin:6px 0 8px'>" + esc(next[3]) + "</p>"
-      + "<div style='height:9px;background:var(--sunk);border-radius:5px;overflow:hidden'>"
-      + "<div style='height:100%;width:" + pct + "%;background:var(--good)'></div></div>"
-      + "<p class='dim' style='margin:7px 0 0'>" + have + " of " + next[0] + "</p></div>";
-  }
+  /* Trophies live on the Rewards tab now, beside the prizes they belong with. */
+  h += "<div class='btns'><button data-tab='rewards'>" + earned.length + " of " + BADGES.length
+    + " trophies" + (next ? " &middot; next is " + esc(next[1]) : "") + "</button></div>";
 
   /* The collection. Districts, because most of Singapore is still unvisited. */
   var dd = districts(), names = Object.keys(dd.all).sort();
@@ -1340,47 +1935,47 @@ function viewTrips(){
 /* ---------------------------------------------------------------- collection */
 function viewCards(){
   var w = packsWaiting(), r = rank(), near = nearestSet();
+  var pct = r.to ? (r.xp - r.from) / (r.to - r.from) : 1;
+  var C = 2 * Math.PI * 22;
   var h = "";
 
-  /* The reveal lives here and is filled in after render, so it can be sequenced. */
-  if (S.reveal && S.reveal.length){
-    h += "<div class='card rvl'><h3>" + (S.revealKind === "streak" ? "Streak pack" : "Pack") + "</h3>"
-      + "<div class='grid reveal' id='reveal'></div>"
-      + "<div class='btns'><button data-reveal='clear'>Done</button></div></div>";
-  }
+  h += "<div class='hud'>"
+    + "<div class='lv'><svg viewBox='0 0 52 52' aria-hidden='true'>"
+    +   "<circle class='bg' cx='26' cy='26' r='22'></circle>"
+    +   "<circle class='fg' cx='26' cy='26' r='22' stroke-dasharray='"
+    +     (C * pct).toFixed(1) + " " + C.toFixed(1) + "'></circle></svg><b>" + r.level + "</b></div>"
+    + "<div class='who'><h3>" + esc(r.name) + "</h3><div class='dim'>"
+    +   (r.to ? (r.to - r.xp) + " XP to " + esc(r.nextName) : "Top rank") + "</div></div>"
+    + "<div class='xp'>" + r.xp + "<small>XP</small></div>"
+    + "</div>";
 
-  var pct = r.to ? Math.round(100 * (r.xp - r.from) / (r.to - r.from)) : 100;
-  h += "<div class='card'><div style='display:flex;justify-content:space-between;align-items:baseline;gap:12px'>"
-    + "<div><h3>" + esc(r.name) + "</h3><div class='dim'>level " + r.level + "</div></div>"
-    + "<span class='count' id='xp'>" + r.xp + "</span></div>";
-  h += "<div style='height:9px;background:var(--sunk);border-radius:5px;overflow:hidden;margin-top:11px'>"
-    + "<div style='height:100%;width:" + pct + "%;background:var(--accent);transition:width .7s ease'></div></div>";
-  h += "<p class='dim' style='margin:7px 0 0'>"
-    + (r.to ? (r.to - r.xp) + " to <strong>" + esc(r.nextName) + "</strong>" : "Top rank. Nothing above this.")
-    + "</p></div>";
-
-  /* Packs as objects you tap, not buttons in a row. */
+  if (w.streak || w.day) h += "<div class='packs'>";
   if (w.streak){
-    h += "<div class='pack big pulse' data-pack='streak' role='button' tabindex='0'>"
-      + "Open a streak pack<span class='sub'>Five cards, better odds"
-      + (w.streak > 1 ? " &middot; " + w.streak + " waiting" : "") + "</span></div>";
+    h += "<button class='pk big' data-pack='streak'>"
+      +   "<span class='pk-sheen'></span><span class='pk-strip'></span>"
+      +   (w.streak > 1 ? "<span class='pk-n'>" + w.streak + "</span>" : "")
+      +   "<span class='pk-body'><span class='pk-ttl'>Streak Pack</span>"
+      +   "<span class='pk-sub'>Five cards &middot; better odds</span></span></button>";
   }
   if (w.day){
-    h += "<div class='pack" + (w.streak ? "" : " pulse") + "' data-pack='day' role='button' tabindex='0'>"
-      + "Open a pack<span class='sub'>Three cards"
-      + (w.day > 1 ? " &middot; " + w.day + " waiting" : "") + "</span></div>";
+    h += "<button class='pk' data-pack='day'>"
+      +   "<span class='pk-sheen'></span><span class='pk-strip'></span>"
+      +   (w.day > 1 ? "<span class='pk-n'>" + w.day + "</span>" : "")
+      +   "<span class='pk-body'><span class='pk-ttl'>Day Pack</span>"
+      +   "<span class='pk-sub'>Three cards</span></span></button>";
   }
+  if (w.streak || w.day) h += "</div>";
   if (!w.day && !w.streak){
     h += "<div class='card'><h3>No packs waiting</h3>"
       + "<p class='muted' style='margin:8px 0 0'>A day with all three earns one. Every seventh "
-      + "consecutive full day earns a streak pack &mdash; five cards, better odds.</p>"
-      + "<p class='dim' style='margin:8px 0 0'>" + heldCount() + " of " + CARDS.length + " cards held.</p></div>";
+      + "consecutive full day earns a streak pack &mdash; five cards, better odds.</p></div>";
   }
 
   if (near){
     h += "<div class='card tip'><h3>" + near.left + " from finishing " + esc(near.set[1]) + "</h3>"
       + "<p style='margin:7px 0 0'>" + esc(near.set[2]) + "</p>"
-      + "<p class='dim' style='margin:7px 0 0'>" + near.have + " of " + near.total + " &middot; a set is worth 100 XP.</p></div>";
+      + "<p class='dim' style='margin:7px 0 0'>" + near.have + " of " + near.total
+      + " &middot; a finished set is worth 100 XP.</p></div>";
   }
 
   SETS.forEach(function(st){
@@ -1388,9 +1983,12 @@ function viewCards(){
     h += "<div class='seth'>" + ring(have, cs.length)
       + "<div><h2>" + esc(st[1]) + "</h2><div class='dim'>" + have + " of " + cs.length
       + (done ? " &middot; complete" : "") + "</div></div></div>";
-    h += "<p class='dim' style='margin:0 0 6px'>" + esc(st[2]) + "</p>";
-    h += "<div class='grid'>";
-    cs.forEach(function(c){ h += cardFace(c, (S.cards || {})[c[0]]); });
+    h += "<p class='dim' style='margin:0'>" + esc(st[2]) + "</p>";
+    h += "<div class='binder'>";
+    cs.forEach(function(c){
+      var n = (S.cards || {})[c[0]];
+      h += tcard(c, n, { down: !n, attr: " data-card=\"" + esc(c[0]) + "\"" });
+    });
     h += "</div>";
     if (st[0] === "gold"){
       var unclaimed = cs.filter(function(c){ return !(S.cards || {})[c[0]]; });
@@ -1410,33 +2008,56 @@ function viewCards(){
 /* ---------------------------------------------------------------- rewards */
 function viewRewards(){
   var best = bestStreak();
-  var h = "<p class='muted'>You set these. The app only decides when they are earned, because a treat "
-        + "you granted yourself on a Tuesday is not a reward.</p>";
+  var h = "";
 
-  h += "<div class='card'><div style='display:flex;align-items:baseline;gap:14px'>"
-    + "<span class='count'>" + best + "</span><div><h3>best current streak</h3>"
-    + "<div class='dim'>across the three</div></div></div></div>";
+  h += "<div class='flame'><div class='n'>" + best + "<small>day streak</small></div>"
+    + "<p>Your best run across the three right now. Everything on this page is bought "
+    + "with it, and nothing on it is something the app decides you have earned.</p></div>";
 
   REWARD_TIERS.forEach(function(t){
     var name = (S.rewards || {})[t[0]];
     var unlocked = best >= t[0];
     var claimed = ((S.claimed || {})[t[0]] || 0);
-    h += "<div class='card" + (unlocked && name ? " ok" : "") + "'>";
-    h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>"
-      + "<h3>" + t[1] + "</h3><span class='pill" + (unlocked ? " e" : "") + "'>" + t[0] + " days</span></div>";
-    h += "<p class='dim' style='margin:6px 0 0'>" + esc(t[2]) + "</p>";
-    if (name){
-      h += "<p style='margin:9px 0 0'><strong>" + esc(name) + "</strong>"
-        + (claimed ? " <span class='dim'>&middot; claimed " + claimed + "x</span>" : "") + "</p>";
-      h += "<div class='btns'>";
-      if (unlocked) h += "<button class='pri' data-claimreward='" + t[0] + "'>Earned it &mdash; claim</button>";
-      h += "<button data-setreward='" + t[0] + "'>Change</button></div>";
-      if (!unlocked) h += "<p class='dim' style='margin:8px 0 0'>" + (t[0] - best) + " days to go.</p>";
-    } else {
-      h += "<div class='btns'><button data-setreward='" + t[0] + "'>Set what this earns you</button></div>";
-    }
+    var k = Math.min(1, best / t[0]), C = 2 * Math.PI * 25;
+    h += "<div class='trk" + (unlocked ? " won" : "") + "'>";
+    h += "<div class='mdl'><svg viewBox='0 0 58 58' aria-hidden='true'>"
+      + "<circle class='bg' cx='29' cy='29' r='25'></circle>"
+      + "<circle class='fg' cx='29' cy='29' r='25' stroke-dasharray='"
+      + (C * k).toFixed(1) + " " + C.toFixed(1) + "'></circle></svg><b>" + t[0] + "</b></div>";
+    h += "<div class='bd'>";
+    h += "<div class='tag'>" + t[1] + " &middot; " + t[0] + " days</div>";
+    h += "<h3>" + (name ? esc(name) : "Nothing set yet") + "</h3>";
+    h += "<p class='dim' style='margin:5px 0 0'>" + esc(t[2]) + "</p>";
+    if (claimed) h += "<p class='dim' style='margin:4px 0 0'>Claimed " + claimed
+      + (claimed === 1 ? " time" : " times") + " so far.</p>";
+    h += "<div class='btns'>";
+    if (name && unlocked) h += "<button class='pri' data-claimreward='" + t[0] + "'>Earned it &mdash; claim</button>";
+    if (!name) h += "<button data-setreward='" + t[0] + "'>Set what this earns you</button>";
+    else h += "<button data-setreward='" + t[0] + "'>Change</button>";
     h += "</div>";
+    if (name && !unlocked) h += "<p class='dim' style='margin:8px 0 0'>"
+      + (t[0] - best) + " more days.</p>";
+    h += "</div></div>";
   });
+
+  /* Badges belong here, next to the prizes, not buried in a log. */
+  h += "<h2>Trophies</h2>";
+  h += "<p class='dim' style='margin:0 0 4px'>Earned by total days, not consecutive ones "
+    + "&mdash; so a bad week costs you nothing here.</p>";
+  h += "<div class='medals'>";
+  BADGES.forEach(function(b){
+    var n = totalDone(b[2]), got = n >= b[0];
+    h += "<div class='md" + (got ? " got" : "") + "' title='" + esc(b[3]) + "'>"
+      + "<div class='disc'>" + b[0] + "</div>"
+      + "<div class='lbl'>" + esc(b[1]) + "</div></div>";
+  });
+  h += "</div>";
+  var nx = BADGES.filter(function(b){ return totalDone(b[2]) < b[0]; })
+                 .sort(function(a,b){ return (a[0]-totalDone(a[2])) - (b[0]-totalDone(b[2])); })[0];
+  if (nx){
+    h += "<p class='dim' style='margin:2px 0 0'>Next: <strong>" + esc(nx[1]) + "</strong> at "
+      + nx[0] + " &mdash; " + (nx[0] - totalDone(nx[2])) + " to go. " + esc(nx[3]) + "</p>";
+  }
 
   h += "<div class='card tip'><h3>Pick things you would otherwise not do</h3>"
     + "<p style='margin:8px 0 0'>A reward you would have had anyway is not a reward. So set the bar "
@@ -1463,23 +2084,12 @@ var TABS = {
   log:     ["Log", "The record, so you are not holding it", viewLog]
 };
 var tab = "today";
-var LAST_XP = null;
 
 function render(){
   var t = TABS[tab];
   document.getElementById("title").textContent = t[0];
   document.getElementById("eyebrow").textContent = t[1];
-  var prevXp = LAST_XP;
   document.getElementById("view").innerHTML = t[2]();
-  if (S.reveal && S.reveal.length && tab === "cards"){
-    playReveal(S.reveal);
-  }
-  var xpEl = document.getElementById("xp");
-  if (xpEl){
-    var now = Number(xpEl.textContent);
-    if (prevXp !== null && prevXp !== now) countUp(xpEl, prevXp, now, 900);
-    LAST_XP = now;
-  }
   var nav = document.querySelectorAll("nav button");
   for (var i=0;i<nav.length;i++){
     nav[i].setAttribute("aria-current", nav[i].dataset.tab === tab ? "true" : "false");
@@ -1495,7 +2105,7 @@ function campSheet(){
 }
 
 document.addEventListener("click", function(ev){
-  var b = ev.target.closest ? ev.target.closest("button, .pack") : null;
+  var b = ev.target.closest ? ev.target.closest("button, .tc") : null;
   if (!b) return;
   var d = day(today());
 
@@ -1508,8 +2118,9 @@ document.addEventListener("click", function(ev){
     if (!wasFull && allThree(today())){
       var sp = packsWaiting();
       buzz([25, 60, 25, 60, 45]);
+      sfx(sp.streak ? "gold" : "rare");
       toast(sp.streak ? "Streak pack earned." : "All three. Pack earned.");
-    } else if (d.p[k]) buzz(14);
+    } else if (d.p[k]){ buzz(14); sfx("tap"); }
     render(); return;
   }
   if (b.dataset.bed === "1" || b.dataset.bed === "0"){ day(shift(-1)).bedok = b.dataset.bed === "1"; save(); render(); return; }
@@ -1540,17 +2151,15 @@ document.addEventListener("click", function(ev){
   if (b.dataset.done){ S.done[b.dataset.done] = today(); delete S.skip[today()]; save(); tab = "log"; render(); return; }
   if (b.dataset.skip){ S.skip[today()] = (S.skip[today()] || 0) + 1; save(); render(); return; }
   if (b.dataset.easy){ S.filter = ((S.filter || 0) + 1) % 3; delete S.skip[today()]; save(); render(); return; }
-  if (b.dataset.pack){
-    LAST_XP = rank().xp;
-    S.revealKind = b.dataset.pack;
-    S.reveal = openPack(b.dataset.pack);
-    buzz(30); tab = "cards"; render(); return;
-  }
-  if (b.dataset.reveal){ delete S.reveal; delete S.revealKind; save(); render(); return; }
+  if (b.dataset.pack){ openStage(b.dataset.pack); return; }
+  if (b.dataset.card){ openSheet(b.dataset.card); return; }
   if (b.dataset.claim){
-    S.cards = S.cards || {}; S.cards[b.dataset.claim] = 1; save();
-    LAST_XP = null; S.revealKind = "gold"; S.reveal = [b.dataset.claim];
-    buzz([30, 70, 40]); tab = "cards"; render(); return;
+    claimTrophy(b.dataset.claim); return;
+  }
+  if (b.dataset.mute){
+    S.mute = !S.mute; save(); paintSound();
+    if (!S.mute) sfx("tap");
+    return;
   }
   if (b.dataset.setreward){
     var tier = b.dataset.setreward;
@@ -1578,6 +2187,12 @@ document.addEventListener("click", function(ev){
 });
 
 if (S.theme) document.documentElement.setAttribute("data-theme", S.theme);
+function paintSound(){
+  var el = document.getElementById("sound");
+  if (el){ el.innerHTML = S.mute ? "&#9835;" : "&#9834;"; el.style.opacity = S.mute ? ".4" : "1";
+           el.setAttribute("aria-label", S.mute ? "Sound off" : "Sound on"); }
+}
+paintSound();
 render();
 /* The shift moves under you, so keep the bar honest. */
 setInterval(function(){ if (tab === "today") render(); }, 60000);

@@ -84,7 +84,32 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 
 **Next** — countdown, and the six threads running, each with exactly one next action.
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
-**Say** — the phrasebook. **Log** — streaks, badges, and the district collection.
+**Say** — the phrasebook. **Log** — the day record and the district collection.
+
+#### It has to look like a game
+
+He tried an earlier build and said it *"looks like a plain website"* — which it did. Rounded
+rectangles with text in them are a webpage no matter what the text says.
+
+So a card is now a card: portrait, framed in metal that darkens with rarity, a name banner across
+the top, an art window, a text box at the foot, a rarity gem in the corner, and a patterned back.
+Every face is drawn as inline SVG from a hash of the card's own name — one of eight backdrops
+behind a per-set emblem, offset, rotated and scaled — so eleven hawker cards are eleven different
+pictures rather than eleven identical bowls. Rare and gold cards carry a conic-gradient foil that
+moves when you drag a finger across them.
+
+Opening a pack takes over the screen. A foil sachet tears, the stage lights up behind it, and the
+cards come one at a time face-down for you to turn over yourself. Turning one plays a synthesised
+flip; a rare fires sparks, a shine sweep and an arpeggio. The score lands at the end, and a level-up
+gets its own line. Sound is WebAudio generated at runtime — no files to load or go missing — and
+mutes from the header.
+
+The three pillars stopped being three panels with buttons inside them and became three tiles you tap
+directly, with pips at the top showing how close today is to earning a pack. Rewards became a track:
+a progress ring per tier, the real-life prize as the headline, and the trophies moved here from the
+log so they sit beside the prizes rather than in a table.
+
+Reduced motion turns all of it off and shows every card at once.
 
 #### Cards, packs and progression
 
