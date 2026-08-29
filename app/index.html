@@ -138,6 +138,94 @@ td:first-child{white-space:nowrap; font-family:"JetBrains Mono",monospace; font-
 ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--ink-3);}
 .count{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-weight:700;
   font-size:26px; letter-spacing:-.03em; line-height:1;}
+
+/* ------------------------------------------------------------------ cards
+   A collectible has to look collectible. Rows are a spreadsheet; these are
+   objects with a face, a rarity and a back you turn over. */
+.grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:12px 0;}
+@media (min-width:520px){ .grid{grid-template-columns:repeat(3,1fr);} }
+
+.cf{position:relative; border-radius:12px; padding:12px 11px 11px; min-height:132px;
+  display:flex; flex-direction:column; justify-content:space-between; overflow:hidden;
+  border:1px solid var(--line); background:var(--surface); isolation:isolate;}
+.cf .nm{font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:14.5px;
+  line-height:1.2; letter-spacing:-.01em;}
+.cf .nt{font-size:11.5px; line-height:1.35; color:var(--ink-2); margin-top:5px;}
+.cf .ft{display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:10px;}
+.cf .rb{font-family:"JetBrains Mono",monospace; font-size:8.5px; letter-spacing:.1em;
+  text-transform:uppercase; padding:3px 7px; border-radius:999px; white-space:nowrap;}
+.cf .dup{font-family:"JetBrains Mono",monospace; font-size:10.5px; font-weight:700; color:var(--ink-3);}
+
+.cf.r0{background:var(--surface); border-color:var(--line-strong);}
+.cf.r0 .rb{background:var(--sunk); color:var(--ink-3);}
+.cf.r1{background:var(--accent-soft); border-color:var(--accent);}
+.cf.r1 .rb{background:var(--accent); color:var(--surface);}
+.cf.r1 .nt{color:var(--ink-2);}
+.cf.r2{background:var(--signal-soft); border-color:var(--signal);}
+.cf.r2 .rb{background:var(--signal); color:var(--surface);}
+.cf.r3{background:var(--good-soft); border-color:var(--good); box-shadow:0 0 0 1px var(--good) inset;}
+.cf.r3 .rb{background:var(--good); color:var(--surface);}
+
+/* Locked cards read as a gap in the set rather than as nothing. */
+.cf.lk{background:var(--sunk); border-style:dashed; border-color:var(--line-strong); min-height:112px;}
+.cf.lk .nm{color:var(--ink-3); filter:blur(3px); user-select:none;}
+.cf.lk .rb{background:transparent; color:var(--ink-3);}
+
+/* Shine, for the ones worth a second look. */
+.cf.r2::after,.cf.r3::after{content:""; position:absolute; inset:-40% -120%; z-index:-1;
+  background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);
+  transform:translateX(-120%);}
+.cf.r2.shine::after,.cf.r3.shine::after{animation:sweep 1.15s ease-out .15s 1;}
+@keyframes sweep{to{transform:translateX(120%);}}
+
+/* ------------------------------------------------------------------ reveal */
+.cf.in{animation:flipin .5s cubic-bezier(.22,1.2,.36,1) both;}
+@keyframes flipin{
+  from{opacity:0; transform:rotateY(-78deg) translateY(14px) scale(.9);}
+  to  {opacity:1; transform:none;}
+}
+.reveal{perspective:900px;}
+.rvl{background:var(--sunk); border-color:var(--line-strong);}
+.pack{width:100%; border-radius:14px; padding:26px 18px; text-align:center; cursor:pointer;
+  border:1px solid var(--accent); background:var(--accent-soft); color:var(--accent);
+  font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:18px;
+  min-height:118px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;}
+.pack .sub{font-family:"Instrument Sans",sans-serif; font-weight:400; font-size:13px; color:var(--ink-2);}
+.pack:active{transform:scale(.98);}
+.pack.big{background:var(--signal-soft); border-color:var(--signal); color:var(--signal);}
+.pack.pulse{animation:pulse 2.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--signal-soft);}50%{box-shadow:0 0 0 7px transparent;}}
+
+.tally{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:15px; text-align:center; margin:14px 0 2px; color:var(--good); font-weight:700;
+  animation:rise .45s ease-out both;}
+@keyframes rise{from{opacity:0; transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* A toast for the moment the third pillar lands. */
+#toast{position:fixed; left:50%; bottom:calc(84px + env(safe-area-inset-bottom));
+  transform:translateX(-50%) translateY(20px); z-index:60; opacity:0; pointer-events:none;
+  background:var(--good); color:var(--surface); border-radius:11px; padding:12px 18px;
+  font-weight:600; font-size:14.5px; box-shadow:0 6px 22px rgba(0,0,0,.18); max-width:88vw; text-align:center;}
+#toast.on{animation:toast 2.8s ease-out both;}
+@keyframes toast{
+  0%{opacity:0; transform:translateX(-50%) translateY(20px);}
+  12%,78%{opacity:1; transform:translateX(-50%) translateY(0);}
+  100%{opacity:0; transform:translateX(-50%) translateY(-8px);}
+}
+
+/* Set progress, as a ring rather than another number. */
+.ring{width:34px; height:34px; flex:none; transform:rotate(-90deg);}
+.ring circle{fill:none; stroke-width:4;}
+.ring .bg{stroke:var(--sunk);}
+.ring .fg{stroke:var(--accent); stroke-linecap:round; transition:stroke-dasharray .6s ease;}
+.ring.done .fg{stroke:var(--good);}
+.seth{display:flex; align-items:center; gap:12px; margin:24px 0 4px;}
+.seth h2{margin:0;}
+
+@media (prefers-reduced-motion:reduce){
+  .cf.in,.cf.r2.shine::after,.cf.r3.shine::after,.pack.pulse,#toast.on,.tally{animation:none !important;}
+  #toast.on{opacity:1;}
+}
 </style>
 </head>
 <body>
@@ -152,6 +240,12 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
 </header>
 
 <main id="view"></main>
+
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<div style="display:none">
 
 </div>
 
@@ -779,6 +873,95 @@ function nearestSet(){
   return best;
 }
 
+/* ---------------------------------------------------------------- feel
+   The reveal is the whole point. A list appearing is not a pack opening. */
+function buzz(ms){
+  try { if (navigator.vibrate) navigator.vibrate(ms); } catch(e){}
+}
+function toast(msg){
+  var el = document.getElementById("toast");
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove("on");
+  void el.offsetWidth;               /* restart the animation */
+  el.classList.add("on");
+}
+function reduced(){
+  return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/* Count-up, because a number that jumps is a number nobody watches. */
+function countUp(el, from, to, ms){
+  if (reduced() || from === to){ el.textContent = to; return; }
+  var t0 = performance.now();
+  (function step(now){
+    var k = Math.min(1, (now - t0) / ms);
+    el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+function cardFace(c, count, opts){
+  opts = opts || {};
+  var r = c[1], cls = "cf r" + r + (count ? "" : " lk") + (opts.extra || "");
+  var h = "<div class='" + cls + "'" + (opts.style ? " style='" + opts.style + "'" : "") + ">";
+  h += "<div><div class='nm'>" + esc(count ? c[0] : "Locked away") + "</div>";
+  if (count) h += "<div class='nt'>" + esc(c[3]) + "</div>";
+  h += "</div>";
+  h += "<div class='ft'><span class='rb'>" + RARITY[r][0] + "</span>"
+     + (count > 1 ? "<span class='dup'>x" + count + "</span>" : "") + "</div>";
+  h += "</div>";
+  return h;
+}
+
+/* Cards turn over one at a time, rare ones catch the light, and the phone
+   buzzes harder for the good ones. */
+function playReveal(names){
+  var box = document.getElementById("reveal");
+  if (!box) return;
+  box.innerHTML = "";
+  /* Whatever you were scrolled to, the pack is what you are looking at now. */
+  var ease = reduced() ? "auto" : "smooth";
+  box.parentNode.scrollIntoView({ behavior: ease, block: "start" });
+  var gained = 0, fresh = 0;
+  names.forEach(function(name, i){
+    var c = CARDS.filter(function(x){ return x[0] === name; })[0];
+    if (!c) return;
+    gained += RARITY[c[1]][3];
+    if (S.cards[name] === 1) fresh++;
+    var d = document.createElement("div");
+    d.innerHTML = cardFace(c, S.cards[name], { extra: " in", style: "animation-delay:" + (i * 0.22) + "s" });
+    var el = d.firstChild;
+    box.appendChild(el);
+    var wait = reduced() ? 0 : (i * 220 + 120);
+    setTimeout(function(){
+      if (c[1] >= 2){ el.classList.add("shine"); buzz([18, 40, 26]); }
+      else buzz(12);
+    }, wait);
+  });
+  var t = document.createElement("div");
+  t.className = "tally";
+  var dupes = names.length - fresh;
+  t.textContent = "+" + fresh + " new"
+    + (dupes ? "  \u00b7  " + dupes + " spare" : "")
+    + "  \u00b7  +" + gained + " XP";
+  t.style.animationDelay = (reduced() ? 0 : names.length * 0.22 + 0.15) + "s";
+  box.parentNode.insertBefore(t, box.nextSibling);
+  /* And once the last one has turned over, the score comes to you. */
+  setTimeout(function(){
+    var r = t.getBoundingClientRect();
+    if (r.bottom > window.innerHeight - 80) t.scrollIntoView({ behavior: ease, block: "center" });
+  }, reduced() ? 0 : names.length * 220 + 400);
+}
+
+function ring(have, total){
+  var C = 2 * Math.PI * 15, k = total ? have / total : 0;
+  return "<svg class='ring" + (k === 1 ? " done" : "") + "' viewBox='0 0 34 34' aria-hidden='true'>"
+    + "<circle class='bg' cx='17' cy='17' r='15'></circle>"
+    + "<circle class='fg' cx='17' cy='17' r='15' stroke-dasharray='" + (C * k).toFixed(1) + " " + C.toFixed(1) + "'></circle>"
+    + "</svg>";
+}
+
 /* ---------------------------------------------------------------- the bar */
 function barHTML(){
   /* The bar always runs wake to midnight, so the proportions mean something.
@@ -1159,70 +1342,67 @@ function viewCards(){
   var w = packsWaiting(), r = rank(), near = nearestSet();
   var h = "";
 
+  /* The reveal lives here and is filled in after render, so it can be sequenced. */
   if (S.reveal && S.reveal.length){
-    h += "<div class='card ok'><h3>You pulled</h3>";
-    S.reveal.forEach(function(name){
-      var c = CARDS.filter(function(x){ return x[0] === name; })[0];
-      if (!c) return;
-      var st = SETS.filter(function(x){ return x[0] === c[2]; })[0];
-      h += "<div class='row'><b><span class='pill " + RARITY[c[1]][1] + "'>" + RARITY[c[1]][0] + "</span></b>"
-        + "<div><strong>" + esc(c[0]) + "</strong> <span class='dim'>&middot; " + esc(st ? st[1] : "") + "</span>"
-        + "<br><span class='dim'>" + esc(c[3]) + "</span></div></div>";
-    });
-    h += "<div class='btns'><button data-reveal='clear'>Nice</button></div></div>";
+    h += "<div class='card rvl'><h3>" + (S.revealKind === "streak" ? "Streak pack" : "Pack") + "</h3>"
+      + "<div class='grid reveal' id='reveal'></div>"
+      + "<div class='btns'><button data-reveal='clear'>Done</button></div></div>";
   }
 
-  /* Rank, and how far to the next one. */
   var pct = r.to ? Math.round(100 * (r.xp - r.from) / (r.to - r.from)) : 100;
   h += "<div class='card'><div style='display:flex;justify-content:space-between;align-items:baseline;gap:12px'>"
     + "<div><h3>" + esc(r.name) + "</h3><div class='dim'>level " + r.level + "</div></div>"
-    + "<span class='count'>" + r.xp + "</span></div>";
+    + "<span class='count' id='xp'>" + r.xp + "</span></div>";
   h += "<div style='height:9px;background:var(--sunk);border-radius:5px;overflow:hidden;margin-top:11px'>"
-    + "<div style='height:100%;width:" + pct + "%;background:var(--accent)'></div></div>";
+    + "<div style='height:100%;width:" + pct + "%;background:var(--accent);transition:width .7s ease'></div></div>";
   h += "<p class='dim' style='margin:7px 0 0'>"
-    + (r.to ? (r.to - r.xp) + " to <strong>" + esc(r.nextName) + "</strong>" : "Top rank. There is nothing above this.")
+    + (r.to ? (r.to - r.xp) + " to <strong>" + esc(r.nextName) + "</strong>" : "Top rank. Nothing above this.")
     + "</p></div>";
 
-  /* Packs. */
-  var total = w.day + w.streak;
-  h += "<div class='card" + (total ? " ok" : "") + "'>";
-  h += "<div style='display:flex;align-items:baseline;gap:14px'><span class='count'>" + total + "</span>"
-    + "<div><h3>" + (total === 1 ? "pack waiting" : "packs waiting") + "</h3>"
-    + "<div class='dim'>" + heldCount() + " of " + CARDS.length + " cards</div></div></div>";
-  if (w.streak) h += "<p class='muted' style='margin:10px 0 0'><strong>" + w.streak + " streak pack"
-    + (w.streak > 1 ? "s" : "") + "</strong> &mdash; five cards each, and better odds.</p>";
-  h += "<div class='btns'>";
-  if (w.streak) h += "<button class='pri' data-pack='streak'>Open a streak pack</button>";
-  if (w.day) h += "<button class='" + (w.streak ? "" : "pri") + "' data-pack='day'>Open a pack</button>";
-  h += "</div>";
-  if (!total) h += "<p class='muted' style='margin:10px 0 0'>A day with all three earns one. "
-    + "Every seventh consecutive full day earns a streak pack.</p>";
-  h += "</div>";
+  /* Packs as objects you tap, not buttons in a row. */
+  if (w.streak){
+    h += "<div class='pack big pulse' data-pack='streak' role='button' tabindex='0'>"
+      + "Open a streak pack<span class='sub'>Five cards, better odds"
+      + (w.streak > 1 ? " &middot; " + w.streak + " waiting" : "") + "</span></div>";
+  }
+  if (w.day){
+    h += "<div class='pack" + (w.streak ? "" : " pulse") + "' data-pack='day' role='button' tabindex='0'>"
+      + "Open a pack<span class='sub'>Three cards"
+      + (w.day > 1 ? " &middot; " + w.day + " waiting" : "") + "</span></div>";
+  }
+  if (!w.day && !w.streak){
+    h += "<div class='card'><h3>No packs waiting</h3>"
+      + "<p class='muted' style='margin:8px 0 0'>A day with all three earns one. Every seventh "
+      + "consecutive full day earns a streak pack &mdash; five cards, better odds.</p>"
+      + "<p class='dim' style='margin:8px 0 0'>" + heldCount() + " of " + CARDS.length + " cards held.</p></div>";
+  }
 
-  /* The hook: whatever you are closest to finishing. */
   if (near){
     h += "<div class='card tip'><h3>" + near.left + " from finishing " + esc(near.set[1]) + "</h3>"
       + "<p style='margin:7px 0 0'>" + esc(near.set[2]) + "</p>"
-      + "<p class='dim' style='margin:7px 0 0'>" + near.have + " of " + near.total + " &middot; a completed set is worth 100.</p></div>";
+      + "<p class='dim' style='margin:7px 0 0'>" + near.have + " of " + near.total + " &middot; a set is worth 100 XP.</p></div>";
   }
 
-  /* Sets. */
   SETS.forEach(function(st){
     var cs = setCards(st[0]), have = setHeld(st[0]), done = have === cs.length;
-    h += "<h2>" + esc(st[1]) + " <span class='dim' style='font-weight:400'>" + have + "/" + cs.length
-      + (done ? " &#10003;" : "") + "</span></h2>";
-    h += "<p class='dim' style='margin:0 0 8px'>" + esc(st[2]) + "</p>";
-    h += "<div class='card" + (done ? " ok" : "") + "'>";
-    cs.forEach(function(c){
-      var n = (S.cards || {})[c[0]];
-      h += "<div class='row' style='" + (n ? "" : "opacity:.42") + "'>"
-        + "<b>" + (n ? (n > 1 ? "x" + n : "&#10003;") : "&mdash;") + "</b>"
-        + "<div><strong>" + esc(c[0]) + "</strong> <span class='pill " + RARITY[c[1]][1] + "'>" + RARITY[c[1]][0] + "</span>"
-        + (n ? "<br><span class='dim'>" + esc(c[3]) + "</span>" : "")
-        + (c[2] === "gold" && !n ? " <button data-claim='" + esc(c[0]) + "' style='min-height:32px;padding:4px 10px;font-size:13px'>Claim</button>" : "")
-        + "</div></div>";
-    });
+    h += "<div class='seth'>" + ring(have, cs.length)
+      + "<div><h2>" + esc(st[1]) + "</h2><div class='dim'>" + have + " of " + cs.length
+      + (done ? " &middot; complete" : "") + "</div></div></div>";
+    h += "<p class='dim' style='margin:0 0 6px'>" + esc(st[2]) + "</p>";
+    h += "<div class='grid'>";
+    cs.forEach(function(c){ h += cardFace(c, (S.cards || {})[c[0]]); });
     h += "</div>";
+    if (st[0] === "gold"){
+      var unclaimed = cs.filter(function(c){ return !(S.cards || {})[c[0]]; });
+      if (unclaimed.length){
+        h += "<div class='card'><h3>Claim one</h3><p class='dim' style='margin:6px 0 0'>Only when it "
+          + "has actually happened.</p><div class='btns'>";
+        unclaimed.forEach(function(c){
+          h += "<button data-claim='" + esc(c[0]) + "'>" + esc(c[0]) + "</button>";
+        });
+        h += "</div></div>";
+      }
+    }
   });
   return h;
 }
@@ -1283,12 +1463,23 @@ var TABS = {
   log:     ["Log", "The record, so you are not holding it", viewLog]
 };
 var tab = "today";
+var LAST_XP = null;
 
 function render(){
   var t = TABS[tab];
   document.getElementById("title").textContent = t[0];
   document.getElementById("eyebrow").textContent = t[1];
+  var prevXp = LAST_XP;
   document.getElementById("view").innerHTML = t[2]();
+  if (S.reveal && S.reveal.length && tab === "cards"){
+    playReveal(S.reveal);
+  }
+  var xpEl = document.getElementById("xp");
+  if (xpEl){
+    var now = Number(xpEl.textContent);
+    if (prevXp !== null && prevXp !== now) countUp(xpEl, prevXp, now, 900);
+    LAST_XP = now;
+  }
   var nav = document.querySelectorAll("nav button");
   for (var i=0;i<nav.length;i++){
     nav[i].setAttribute("aria-current", nav[i].dataset.tab === tab ? "true" : "false");
@@ -1304,13 +1495,23 @@ function campSheet(){
 }
 
 document.addEventListener("click", function(ev){
-  var b = ev.target.closest ? ev.target.closest("button") : null;
+  var b = ev.target.closest ? ev.target.closest("button, .pack") : null;
   if (!b) return;
   var d = day(today());
 
   if (b.dataset.tab){ tab = b.dataset.tab; render(); return; }
   if (b.dataset.camp){ campSheet(); return; }
-  if (b.dataset.p){ var k = b.dataset.p; if (d.p[k]) delete d.p[k]; else d.p[k] = 1; save(); render(); return; }
+  if (b.dataset.p){
+    var k = b.dataset.p, wasFull = allThree(today());
+    if (d.p[k]) delete d.p[k]; else d.p[k] = 1;
+    save();
+    if (!wasFull && allThree(today())){
+      var sp = packsWaiting();
+      buzz([25, 60, 25, 60, 45]);
+      toast(sp.streak ? "Streak pack earned." : "All three. Pack earned.");
+    } else if (d.p[k]) buzz(14);
+    render(); return;
+  }
   if (b.dataset.bed === "1" || b.dataset.bed === "0"){ day(shift(-1)).bedok = b.dataset.bed === "1"; save(); render(); return; }
   if (b.dataset.bed === "x"){ delete day(shift(-1)).bedok; save(); render(); return; }
   if (b.dataset.bedtime){
@@ -1339,11 +1540,17 @@ document.addEventListener("click", function(ev){
   if (b.dataset.done){ S.done[b.dataset.done] = today(); delete S.skip[today()]; save(); tab = "log"; render(); return; }
   if (b.dataset.skip){ S.skip[today()] = (S.skip[today()] || 0) + 1; save(); render(); return; }
   if (b.dataset.easy){ S.filter = ((S.filter || 0) + 1) % 3; delete S.skip[today()]; save(); render(); return; }
-  if (b.dataset.pack){ S.reveal = openPack(b.dataset.pack); render(); return; }
-  if (b.dataset.reveal){ delete S.reveal; save(); render(); return; }
+  if (b.dataset.pack){
+    LAST_XP = rank().xp;
+    S.revealKind = b.dataset.pack;
+    S.reveal = openPack(b.dataset.pack);
+    buzz(30); tab = "cards"; render(); return;
+  }
+  if (b.dataset.reveal){ delete S.reveal; delete S.revealKind; save(); render(); return; }
   if (b.dataset.claim){
     S.cards = S.cards || {}; S.cards[b.dataset.claim] = 1; save();
-    S.reveal = [b.dataset.claim]; render(); return;
+    LAST_XP = null; S.revealKind = "gold"; S.reveal = [b.dataset.claim];
+    buzz([30, 70, 40]); tab = "cards"; render(); return;
   }
   if (b.dataset.setreward){
     var tier = b.dataset.setreward;
