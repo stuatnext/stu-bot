@@ -189,6 +189,43 @@ it.
 Today went from 2,180px of stacked rows to **1,077px** with a hero you can read in
 half a second.
 
+#### The app had no front door
+
+Four passes at making Today look like a game, and it still opened badly — because
+every one of them was designed for somebody who already knew what the app was.
+A person seeing it for the first time got a loaded HUD, two currencies reading
+zero, a ring claiming 1/3 with nothing done, and a line about Mandarin opening in
+seven days. Roughly twenty-five pieces of information before they had touched
+anything.
+
+Real games never cold-open like that. They show a title, hand you *one* action,
+pay you immediately, and only then reveal the rest.
+
+**The gate.** A title screen: the mark, the name, and one sentence — *a day fixed
+to Malta, lived in Singapore.* Shown once, ever.
+
+**The tutorial board.** The first session is a dial, one question and three
+buttons. No chips, no Also today, no ladder, no currencies. It lasts until he has
+done the loop once *and been paid for it* — the world arrives when the first pack
+closes, not on his first tap.
+
+**Nothing appears until it means something.** The pot chip is hidden until there
+is money in it, spares until a card has been pulled twice, the XP figure until
+there is XP, the ladder until three full days. The board grows as he does.
+
+An existing save skips all of it: any save with days in it is treated as already
+onboarded.
+
+#### The dial
+
+The hero is no longer a generic progress ring. His day is set by a clock two
+continents away, so the day is drawn as a clock: twenty-four hours round the
+outside with **Malta's shift shaded onto the rim** and a hand at now; the three
+things he does on an inner ring; and what they pay in the middle. One object
+where there used to be four stacked blocks — a shift bar, a progress ring, a
+count and a claim button. When the third lands the whole thing lights and the
+centre turns gold and becomes the button.
+
 #### The collection stopped being a filing cabinet
 
 The Cards tab used to be one column of all seventeen sets: **16,856 pixels** of mostly identical
