@@ -49,6 +49,10 @@
 }
 
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+/* A display value in a class beats the user-agent [hidden] rule, so hiding a
+   flex element by attribute silently does nothing. This is why the two zeroed
+   currency chips kept showing after they were told to hide. */
+[hidden]{display:none !important}
 html{-webkit-text-size-adjust:100%; text-size-adjust:100%; height:100%}
 body{
   margin:0; min-height:100%;
@@ -629,126 +633,6 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 
 
 
-/* ============================================================== the day screen
-   Fourth pass, and the first one that changes the shape rather than the paint.
-   Seven stacked rows of [icon][title][sentence][value] is a settings list, and
-   restyling a list does not make it a game. One hero, three objects, one strip,
-   and everything that is prose lives behind a tap. */
-
-.daywrap{display:block;width:100%;border:0;background:none;padding:4px 0 0;cursor:pointer;
-  font:inherit;color:inherit;transition:opacity .15s}
-.daywrap:active{opacity:.7}
-.daybar{display:flex;position:relative;height:8px;border-radius:5px;overflow:hidden;
-  background:var(--sunk);box-shadow:0 0 0 1px var(--line) inset}
-.daybar .free{background:linear-gradient(180deg,#2E6E58,#1E4C3D)}
-.daybar .work{background:linear-gradient(180deg,#4A3FA8,#2E2870)}
-.daybar .rest{background:var(--sunk)}
-.daybar .now{position:absolute;top:-3px;bottom:-3px;width:2px;border-radius:2px;
-  background:var(--ember);box-shadow:0 0 8px var(--ember);z-index:2}
-.daycap{display:flex;justify-content:space-between;margin-top:7px;
-  font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--ink3)}
-
-/* the hero */
-.stage{display:flex;flex-direction:column;align-items:center;padding:10px 0 0}
-.dayring{position:relative;width:min(62vw,224px);aspect-ratio:1;border:0;background:none;
-  padding:0;font:inherit;color:inherit}
-.dayring[data-open]{cursor:pointer;transition:transform .14s var(--tap)}
-.dayring[data-open]:active{transform:scale(.97)}
-.dayring svg{width:100%;height:100%;transform:rotate(-90deg);display:block}
-.dayring .seg{fill:none;stroke-width:15;stroke-linecap:round}
-.dayring .slot{stroke:#16202F}
-.dayring .lit{stroke:var(--jade);filter:drop-shadow(0 0 8px color-mix(in srgb,var(--jade) 55%,transparent))}
-.dayring .lit.ghost{stroke:color-mix(in srgb,var(--jade) 34%,transparent);filter:none}
-.dayring .core{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:5px}
-.dayring .prize{width:80px;height:80px;border-radius:26px;display:flex;align-items:center;
-  justify-content:center;border:1px solid var(--line2);color:var(--ink3);
-  background:linear-gradient(160deg,#1A2331,#111826);box-shadow:0 8px 22px rgba(0,0,0,.5)}
-.dayring.done .prize{border-color:#C99417;color:var(--goldInk);
-  background:linear-gradient(160deg,var(--gold2),var(--gold) 55%,#D08F10);
-  box-shadow:0 0 0 6px color-mix(in srgb,var(--gold) 12%,transparent),
-    0 10px 30px color-mix(in srgb,var(--gold) 34%,transparent);
-  animation:breathe 2.4s ease-in-out infinite}
-@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-.dayring .cnt{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:38px;
-  letter-spacing:-.05em;line-height:1}
-.dayring .cnt i{font-style:normal;color:var(--ink3);font-size:23px}
-.dayring.done .cnt{color:var(--gold2)}
-.dayring .cap{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--ink3)}
-.herosub{margin:10px 18px 0;font-size:13.5px;color:var(--ink3);text-align:center;
-  text-wrap:balance}
-
-/* the three, as objects rather than rows */
-.triad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
-.pil{border:0;padding:14px 5px 12px;border-radius:22px;cursor:pointer;font:inherit;
-  display:flex;flex-direction:column;align-items:center;gap:9px;color:var(--ink2);
-  background:linear-gradient(175deg,#182231,#101725);
-  box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 -3px 0 rgba(0,0,0,.45) inset,
-    0 6px 16px rgba(0,0,0,.4);
-  transition:transform .14s var(--tap),background .25s}
-.pil:active{transform:translateY(3px) scale(.98)}
-.pil .disc{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;background:radial-gradient(70% 70% at 35% 25%,#1E2A3C,#121A28);
-  box-shadow:0 0 0 2px #223046 inset,0 4px 10px rgba(0,0,0,.5);
-  transition:all .28s var(--pop)}
-.pil .disc svg{color:var(--ink3);transition:color .2s}
-.pil .lb{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:14.5px;
-  letter-spacing:-.01em}
-.pil .st{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.09em;
-  text-transform:uppercase;color:var(--ink3);min-height:12px}
-.pil.on{background:linear-gradient(175deg,#17402F,#0E2A20);
-  box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 -3px 0 rgba(0,0,0,.4) inset,
-    0 6px 20px color-mix(in srgb,var(--jade) 20%,transparent)}
-.pil.on .disc{background:radial-gradient(70% 70% at 35% 25%,#7DF0C4,var(--jade) 55%,#1B9B6E);
-  box-shadow:0 0 0 2px rgba(125,240,196,.5) inset,0 0 18px color-mix(in srgb,var(--jade) 50%,transparent)}
-.pil.on .disc svg{color:#04241A}
-.pil.on .lb{color:var(--jadeInk)}
-.pil.on .st{color:var(--jade)}
-.pil.carried .disc{opacity:.5}
-.pil.pop{animation:qpop .45s var(--pop)}
-@keyframes qpop{0%{transform:none}40%{transform:scale(1.06)}100%{transform:none}}
-
-.firstrun{margin:13px 6px 0;font-size:13px;color:var(--ink3);text-align:center;line-height:1.45;
-  text-wrap:balance}
-
-/* one strip for every small number on the day */
-.strip2{display:flex;gap:8px;margin:16px -14px 0;padding:0 14px;overflow-x:auto;
-  scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.strip2::-webkit-scrollbar{display:none}
-.strip2 button{flex:none;display:flex;align-items:center;gap:7px;padding:9px 13px;min-height:44px;
-  border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink2);
-  font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;
-  transition:transform .12s var(--tap)}
-.strip2 button:active{transform:scale(.95)}
-.strip2 button svg{flex:none;color:var(--ink3)}
-.strip2 button b{font-family:"JetBrains Mono",monospace;font-weight:800;color:var(--ink)}
-.strip2 button.on{border-color:color-mix(in srgb,var(--violet) 48%,transparent);
-  background:var(--violetSoft)}
-.strip2 button.on svg{color:var(--violetInk)}
-
-/* below the fold: the things that are not the game */
-.also{margin-top:24px}
-.alsoh{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:12px;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin:0 2px 9px}
-.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
-  padding:12px 13px;border-radius:16px;min-height:62px;margin:8px 0;color:var(--ink);
-  border:1px solid var(--line);background:var(--panel);font:inherit;
-  transition:transform .12s var(--tap)}
-.row:active{transform:scale(.985)}
-.row .ic{flex:none;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;
-  justify-content:center;background:var(--sunk);border:1px solid var(--line2);color:var(--ink3)}
-.row .bd{flex:1;min-width:0}
-.row .bd b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
-  font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.row .bd span{display:block;font-size:12.5px;color:var(--ink3);margin-top:1px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.row .ch{flex:none;color:var(--ink3)}
-.row.on{border-color:color-mix(in srgb,var(--jade) 42%,transparent)}
-.row.on .ic{background:var(--jade);border-color:var(--jade);color:#05231A}
-.row.warn{border-color:color-mix(in srgb,var(--ember) 45%,transparent)}
-.row.warn .ic{color:var(--ember)}
 
 /* ---------------------------------------------------- the long game
    The locked sets were always a progression track; they were just never drawn
@@ -773,6 +657,147 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
   box-shadow:0 0 0 3px color-mix(in srgb,var(--violet) 16%,transparent)}
 .node .l{font-size:9px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink3);
   margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+
+/* ==================================================================== the gate
+   Shown once, ever. Before this the app opened straight onto a loaded HUD with
+   two currencies reading zero, which tells a first-time user nothing except
+   that they have already fallen behind. */
+#gate{position:fixed; inset:0; z-index:190; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:22px; cursor:pointer;
+  background:radial-gradient(120% 50% at 50% 32%,#14203A 0%,transparent 62%),var(--bg);
+  transition:opacity .5s ease, visibility .5s}
+#gate[hidden]{display:none}
+#gate.going{opacity:0; visibility:hidden; pointer-events:none}
+#gate .mk{width:118px; height:118px; animation:gatein .6s var(--pop) both}
+#gate h1{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:44px;
+  letter-spacing:-.045em; animation:gatein .6s var(--pop) both .08s}
+#gate p{margin:0; color:var(--ink2); font-size:15px; text-align:center; max-width:270px;
+  line-height:1.5; animation:gatein .6s var(--pop) both .16s}
+#gate .go{margin-top:12px; font-family:"JetBrains Mono",monospace; font-size:11px;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--ink3);
+  animation:gatepulse 2.2s ease-in-out infinite 1s}
+@keyframes gatein{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+@keyframes gatepulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* ==================================================================== the dial
+   His day is set by a clock two continents away, so the day is a clock: the
+   outer ring is twenty-four hours with Malta's shift shaded onto it and a hand
+   at now; the inner ring is the three things he does; the middle is what they
+   pay. One object where there used to be four stacked blocks. */
+.stage{display:flex; justify-content:center; padding:10px 0 0}
+.dial{position:relative; width:min(74vw,286px); aspect-ratio:1; border:0; padding:0;
+  background:none; font:inherit; color:inherit}
+.dial[data-open]{cursor:pointer; transition:transform .14s var(--tap)}
+.dial[data-open]:active{transform:scale(.97)}
+.dial svg{width:100%; height:100%; display:block; transform:rotate(-90deg)}
+.dial .track{fill:none; stroke:#131C2A; stroke-width:9}
+.dial .shift{fill:none; stroke:#3B348C; stroke-width:9}
+.dial .tick{stroke:#243247; stroke-width:2; stroke-linecap:round}
+.dial .tick.six{stroke:#33455E}
+.dial .hand{stroke:var(--ember); stroke-width:3.4; stroke-linecap:round;
+  filter:drop-shadow(0 0 6px color-mix(in srgb,var(--ember) 75%,transparent))}
+.dial .slot{fill:none; stroke:#182437; stroke-width:17; stroke-linecap:round}
+.dial .lit{fill:none; stroke:var(--jade); stroke-width:17; stroke-linecap:round;
+  filter:drop-shadow(0 0 9px color-mix(in srgb,var(--jade) 50%,transparent))}
+.dial .core{position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px}
+.dial .prize{width:78px; height:78px; border-radius:28px; display:flex; align-items:center;
+  justify-content:center; border:1px solid var(--line2); color:var(--ink3);
+  background:linear-gradient(160deg,#19222F,#101724); box-shadow:0 10px 26px rgba(0,0,0,.55);
+  opacity:.55; transition:opacity .3s}
+.dial.won .prize{opacity:1; border-color:#C99417; color:var(--goldInk);
+  background:linear-gradient(160deg,var(--gold2),var(--gold) 55%,#D08F10);
+  box-shadow:0 0 0 7px color-mix(in srgb,var(--gold) 12%,transparent),
+    0 12px 34px color-mix(in srgb,var(--gold) 38%,transparent);
+  animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.dial .dcount{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:34px;
+  letter-spacing:-.05em; line-height:1; margin-top:8px}
+.dial .dcount i{font-style:normal; color:var(--ink3); font-size:21px}
+.dial.won .dcount{color:var(--gold2)}
+.dial .dcap{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--ink3)}
+.dial .dtime{position:absolute; left:0; right:0; bottom:-24px; text-align:center;
+  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink3)}
+
+/* the one line on the screen */
+.ask{text-align:center; font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
+  font-size:24px; letter-spacing:-.03em; margin:44px 0 0; text-wrap:balance}
+.ask.gold{color:var(--gold2)}
+.asksub{text-align:center; color:var(--ink3); font-size:14px; margin:7px 0 0; text-wrap:balance}
+
+/* the three, as objects */
+.triad{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:22px}
+.pil{border:0; padding:15px 5px 13px; border-radius:24px; cursor:pointer; font:inherit;
+  display:flex; flex-direction:column; align-items:center; gap:9px; color:var(--ink2);
+  background:linear-gradient(175deg,#18222F,#0F1622);
+  box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 -3px 0 rgba(0,0,0,.5) inset,
+    0 7px 18px rgba(0,0,0,.45);
+  transition:transform .14s var(--tap), background .25s}
+.pil:active{transform:translateY(3px) scale(.98)}
+.pil .disc{width:60px; height:60px; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; background:radial-gradient(70% 70% at 35% 25%,#1D2939,#111927);
+  box-shadow:0 0 0 2px #22314A inset,0 4px 10px rgba(0,0,0,.55);
+  transition:all .28s var(--pop)}
+.pil .disc svg{color:var(--ink3); transition:color .2s}
+.pil .lb{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:15px}
+.pil .st{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--ink3)}
+.pil.on{background:linear-gradient(175deg,#164030,#0D2A20);
+  box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 -3px 0 rgba(0,0,0,.45) inset,
+    0 7px 22px color-mix(in srgb,var(--jade) 22%,transparent)}
+.pil.on .disc{background:radial-gradient(70% 70% at 35% 25%,#7DF0C4,var(--jade) 55%,#1B9B6E);
+  box-shadow:0 0 0 2px rgba(125,240,196,.55) inset,
+    0 0 20px color-mix(in srgb,var(--jade) 55%,transparent)}
+.pil.on .disc svg{color:#04241A}
+.pil.on .lb{color:var(--jadeInk)}
+.pil.on .st{color:var(--jade)}
+.pil.carried .disc{opacity:.5}
+.pil.pop{animation:qpop .45s var(--pop)}
+@keyframes qpop{0%{transform:none}40%{transform:scale(1.06)}100%{transform:none}}
+
+/* a HUD with nothing in it yet should not pretend otherwise */
+#hud.bare .who .xpbar{opacity:.35}
+
+/* one strip for every small number on the day */
+.strip2{display:flex; gap:8px; margin:26px -14px 0; padding:0 14px; overflow-x:auto;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch}
+.strip2::-webkit-scrollbar{display:none}
+.strip2 button{flex:none; display:flex; align-items:center; gap:7px; padding:9px 13px;
+  min-height:44px; border-radius:14px; border:1px solid var(--line); background:var(--panel);
+  color:var(--ink2); font:inherit; font-size:13px; font-weight:600; cursor:pointer;
+  white-space:nowrap; transition:transform .12s var(--tap)}
+.strip2 button:active{transform:scale(.95)}
+.strip2 button svg{flex:none; color:var(--ink3)}
+.strip2 button b{font-family:"JetBrains Mono",monospace; font-weight:800; color:var(--ink)}
+.strip2 button.on{border-color:color-mix(in srgb,var(--violet) 48%,transparent);
+  background:var(--violetSoft)}
+.strip2 button.on svg{color:var(--violetInk)}
+
+/* below the fold: the things that are not the game */
+.also{margin-top:26px}
+.alsoh{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:12px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink3); margin:0 2px 9px}
+.row{display:flex; align-items:center; gap:12px; width:100%; text-align:left; cursor:pointer;
+  padding:12px 13px; border-radius:16px; min-height:62px; margin:8px 0; color:var(--ink);
+  border:1px solid var(--line); background:var(--panel); font:inherit;
+  transition:transform .12s var(--tap)}
+.row:active{transform:scale(.985)}
+.row .ic{flex:none; width:36px; height:36px; border-radius:11px; display:flex;
+  align-items:center; justify-content:center; background:var(--sunk);
+  border:1px solid var(--line2); color:var(--ink3)}
+.row .bd{flex:1; min-width:0}
+.row .bd b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:700;
+  font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.row .bd span{display:block; font-size:12.5px; color:var(--ink3); margin-top:1px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.row .ch{flex:none; color:var(--ink3)}
+.row.on{border-color:color-mix(in srgb,var(--jade) 42%,transparent)}
+.row.on .ic{background:var(--jade); border-color:var(--jade); color:#05231A}
+.row.warn{border-color:color-mix(in srgb,var(--ember) 45%,transparent)}
+.row.warn .ic{color:var(--ember)}
 
 </style>
 </head>
@@ -849,6 +874,20 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 <div id="stage" aria-live="polite"></div>
 <div id="sheet"></div>
 <div id="modal" role="dialog" aria-modal="true"></div>
+
+<!-- The front door. A game says who it is before it hands you anything, and
+     this one had no first screen at all - it opened straight onto a loaded HUD
+     with two zeroed currencies. Shown once, ever. -->
+<div id="gate" hidden>
+  <svg class="mk" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+    <circle cx="50" cy="50" r="19" stroke="#F2B735" stroke-width="6"/>
+    <path d="M50 8v13M50 79v13M8 50h13M79 50h13M20.5 20.5l9.2 9.2M70.3 70.3l9.2 9.2M79.5 20.5l-9.2 9.2M29.7 70.3l-9.2 9.2"
+      stroke="#F2B735" stroke-width="6" stroke-linecap="round"/>
+  </svg>
+  <h1>Daylight</h1>
+  <p>A day fixed to Malta, lived in Singapore.</p>
+  <div class="go">Tap to begin</div>
+</div>
 
 <script>
 "use strict";
@@ -1322,11 +1361,14 @@ function load(){
   var d = { camp:"Singapore", wake:"08:30", bed:"23:45", done:{}, skip:{}, filter:0,
             days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, openedDay:0, openedStreak:0,
             theme:null, mute:false, rate:0, spends:[], freezes:{},
-            crafted:{}, sparesSpent:0, seen:{}, booted:0 };
+            crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0 };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
   } catch(e){}
+  /* A save with history belongs to someone who already knows what the three
+     are. Only a genuinely empty one gets the tutorial board. */
+  if (!d.onboarded && Object.keys(d.days).length) d.onboarded = 1;
   return d;
 }
 function save(){ FD = null; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
@@ -2427,6 +2469,9 @@ function showScore(){
 }
 
 function closeStage(){
+  /* Opening the first pack is the end of the tutorial: he has done the loop
+     once and been paid for it, so the rest of the app can appear. */
+  graduate();
   sfx("tap");
   var el = stageEl();
   el.className = "";
@@ -2507,9 +2552,17 @@ function claimTrophy(name){
    reading. */
 var HUD = { xp:0, pot:0, spares:0, level:0 };
 function paintHud(animate){
-  var r = rank(), p = pot(), sp = spares();
+  var r = rank(), pt = pot(), sp = spares();
   var pct = r.to ? (r.xp - r.from) / (r.to - r.from) : 1;
   var C = 2 * Math.PI * 19;
+
+  /* Nothing in the HUD until it means something. Two chips reading zero on a
+     first open is the app showing off furniture he has not earned. */
+  var earnedAny = potTotal() > 0, hasSpares = sparesEarned() > 0;
+  document.getElementById("chipPot").hidden = !earnedAny;
+  document.getElementById("chipShard").hidden = !hasSpares;
+  document.getElementById("hudXpN").hidden = r.xp === 0;
+  document.getElementById("hud").classList.toggle("bare", r.xp === 0);
 
   var crest = document.getElementById("crest");
   crest.querySelector(".fg").setAttribute("stroke-dasharray", (C * pct).toFixed(1) + " " + C.toFixed(1));
@@ -2520,18 +2573,16 @@ function paintHud(animate){
   document.getElementById("hudRank").textContent = r.name;
   document.getElementById("hudXpBar").style.width = (pct * 100).toFixed(1) + "%";
   document.getElementById("hudXpN").textContent = r.to
-    ? num(r.xp) + " / " + num(r.to) + " XP"
-    : num(r.xp) + " XP · top rank";
+    ? num(r.xp) + " / " + num(r.to) + " XP" : num(r.xp) + " XP · top rank";
 
   var potEl = document.getElementById("chipPotN"), spEl = document.getElementById("chipShardN");
-  if (animate) countTo(potEl, HUD.pot, p, function(v){ return num(v); });
-  else potEl.textContent = num(p);
+  if (animate) countTo(potEl, HUD.pot, pt, function(v){ return num(v); });
+  else potEl.textContent = num(pt);
   if (animate) countTo(spEl, HUD.spares, sp, function(v){ return num(v); });
   else spEl.textContent = num(sp);
 
-  HUD = { xp:r.xp, pot:p, spares:sp, level:r.level };
+  HUD = { xp:r.xp, pot:pt, spares:sp, level:r.level };
 
-  /* badges on the bar */
   var w = packsWaiting(), packs = w.day + w.streak, nu = newCount();
   setBadge("deck", packs || nu, !!packs);
 }
@@ -2547,113 +2598,133 @@ function setBadge(tab, n, pulse){
   b.appendChild(s);
 }
 
-/* ================================================================== the day
-   A slim bar with no words on it. The words are in the caption under it and
-   the reasoning is in a sheet behind it. */
-function dayBarHTML(){
-  var s = shape(), from = s.wake, to = 1440, span = to - from;
-  function pct(a, b){ return Math.max(0, Math.min(100, ((b - a) / span) * 100)); }
-  var freeW = s.weekend ? 100 : pct(from, Math.min(s.start, to));
-  var workW = s.weekend ? 0 : pct(Math.max(s.start, from), Math.min(s.end, to));
-  var restW = Math.max(0, 100 - freeW - workW);
-  var inDay = s.now >= from && s.now <= to;
+/* ================================================================== the dial
+   The one idea worth having here. His day is set by a clock two continents
+   away, so the day is drawn as a clock: twenty-four hours round the outside
+   with Malta's shift shaded onto it and a hand at now; the three things he
+   does on an inner ring; and what they pay in the middle.
 
-  var left, right;
-  if (s.weekend){ left = "No shift today"; right = "All of it is yours"; }
-  else if (s.working){ left = "Malta until " + s.endT; right = dur(s.end - s.now) + " left"; }
-  else if (s.now < s.start){ left = s.startT + " – " + s.endT; right = dur(Math.max(0, s.untilWork)) + " to go"; }
-  else { left = "Shift is done"; right = dur(Math.max(0, 1440 - s.now)) + " of evening"; }
+   One object instead of four stacked blocks - a shift bar, a progress ring, a
+   count and a claim button - which is most of why the old screen read as a
+   list of information rather than a game. */
+function dialHTML(done, packs){
+  var s = shape();
+  var R1 = 132, R2 = 106, C1 = 2 * Math.PI * R1, C2 = 2 * Math.PI * R2;
+  var i, h = "<svg viewBox='0 0 300 300' aria-hidden='true'>";
 
-  var h = "<span class='daybar'>";
-  if (inDay) h += "<span class='now' style='left:" + pct(from, s.now).toFixed(2) + "%'></span>";
-  if (freeW > .5) h += "<span class='free' style='width:" + freeW.toFixed(2) + "%'></span>";
-  if (workW > .5) h += "<span class='work' style='width:" + workW.toFixed(2) + "%'></span>";
-  if (restW > .5) h += "<span class='rest' style='width:" + restW.toFixed(2) + "%'></span>";
-  h += "</span><span class='daycap'><span>" + esc(left) + "</span><span>" + esc(right) + "</span></span>";
-  return h;
-}
+  h += "<circle class='track' cx='150' cy='150' r='" + R1 + "'></circle>";
+  if (!s.weekend && s.end > s.start){
+    var from = (s.start / 1440) * C1, len = ((s.end - s.start) / 1440) * C1;
+    h += "<circle class='shift' cx='150' cy='150' r='" + R1 + "' stroke-dasharray='"
+      + len.toFixed(1) + " " + (C1 - len).toFixed(1) + "' stroke-dashoffset='"
+      + (-from).toFixed(1) + "'></circle>";
+  }
+  /* Twenty-four ticks, longer every six hours, so it reads as a whole day
+     rather than a twelve-hour clock face. */
+  for (i = 0; i < 24; i++){
+    var ang = (i / 24) * 2 * Math.PI;
+    var out = i % 6 === 0 ? 16 : 11;
+    h += "<line class='tick" + (i % 6 === 0 ? " six" : "") + "' x1='"
+      + (150 + Math.cos(ang) * (R1 + 9)).toFixed(1) + "' y1='" + (150 + Math.sin(ang) * (R1 + 9)).toFixed(1)
+      + "' x2='" + (150 + Math.cos(ang) * (R1 + out)).toFixed(1) + "' y2='"
+      + (150 + Math.sin(ang) * (R1 + out)).toFixed(1) + "'></line>";
+  }
+  var na = (s.now / 1440) * 2 * Math.PI;
+  h += "<line class='hand' x1='" + (150 + Math.cos(na) * (R1 - 15)).toFixed(1) + "' y1='"
+    + (150 + Math.sin(na) * (R1 - 15)).toFixed(1) + "' x2='" + (150 + Math.cos(na) * (R1 + 17)).toFixed(1)
+    + "' y2='" + (150 + Math.sin(na) * (R1 + 17)).toFixed(1) + "'></line>";
 
-/* The day as one object. Three arc segments round a prize, which is the whole
-   of the game in one glance: how close today is, and what it pays. */
-function ringHTML(done, carried, packs){
-  var C = 2 * Math.PI * 100, gap = 16, seg = (C - 3 * gap) / 3, i, h = "";
-  h += "<svg viewBox='0 0 236 236' aria-hidden='true'>";
+  var gap = 18, seg = (C2 - 3 * gap) / 3;
   for (i = 0; i < 3; i++){
-    h += "<circle class='seg slot' cx='118' cy='118' r='100' stroke-dasharray='"
-      + seg.toFixed(1) + " " + (C - seg).toFixed(1) + "' stroke-dashoffset='"
+    h += "<circle class='slot' cx='150' cy='150' r='" + R2 + "' stroke-dasharray='"
+      + seg.toFixed(1) + " " + (C2 - seg).toFixed(1) + "' stroke-dashoffset='"
       + (-(i * (seg + gap))).toFixed(1) + "'></circle>";
   }
-  /* Earned segments burn; a carried one is only ghosted in. A weekend with no
-     shift should not look like the app handed him a third of the day. */
-  for (i = 0; i < done + carried; i++){
-    h += "<circle class='seg lit" + (i >= done ? " ghost" : "") + "' cx='118' cy='118' r='100' stroke-dasharray='"
-      + seg.toFixed(1) + " " + (C - seg).toFixed(1) + "' stroke-dashoffset='"
+  for (i = 0; i < done; i++){
+    h += "<circle class='lit' cx='150' cy='150' r='" + R2 + "' stroke-dasharray='"
+      + seg.toFixed(1) + " " + (C2 - seg).toFixed(1) + "' stroke-dashoffset='"
       + (-(i * (seg + gap))).toFixed(1) + "'></circle>";
   }
   h += "</svg>";
-  h += "<span class='core'><span class='prize'>" + svg("pack", 40) + "</span>"
-    + "<span class='cnt'>" + (packs ? packs : (done + carried) + "<i>/3</i>") + "</span>"
-    + "<span class='cap'>" + (packs ? (packs === 1 ? "pack waiting" : "packs waiting") : "for a pack")
+  h += "<span class='core'><span class='prize'>" + svg("pack", 42) + "</span>"
+    + "<span class='dcount'>" + (packs ? packs : done + "<i>/3</i>") + "</span>"
+    + "<span class='dcap'>" + (packs ? (packs === 1 ? "pack ready" : "packs ready") : "for a pack")
     + "</span></span>";
+  h += "<span class='dtime'>" + esc(dialLabel(s)) + "</span>";
   return h;
+}
+function dialLabel(s){
+  if (s.weekend) return "No shift today";
+  if (s.working) return "Malta until " + s.endT;
+  if (s.now < s.start) return "Malta has " + s.startT + " – " + s.endT;
+  return "Done at " + s.endT;
 }
 
 /* ================================================================== TODAY
-   One hero, three objects, one strip. The screen used to be seven stacked rows
-   of [icon][title][sentence][value], which is the shape of a settings list -
-   and no amount of restyling a list turns it into a game. */
+   Fifth pass, and the first one that starts from a person who has never seen
+   the app. The board only ever grows: nothing appears until it means
+   something, so a first open is a dial, a question and three buttons, and by
+   the time the chips and the ladder arrive he already knows what they are for. */
 function viewToday(){
   var t = today(), d = day(t), y = day(shift(-1));
   var w = packsWaiting(), packs = w.day + w.streak;
   var done = PILLARS.filter(function(g){ return pDone(t, g[0]); }).length;
-  var carried = PILLARS.filter(function(g){ return !pDone(t, g[0]) && !required(g[0], t); }).length;
+  /* The tutorial board lasts until he has done the loop once and been paid for
+     it - not until his first tap. Otherwise the chips and the ladder land
+     halfway through learning what the three are. */
+  var green = !S.onboarded;
   var h = "";
 
-  /* the shift, as a line rather than a panel */
-  h += "<button class='daywrap' data-hq='1'>" + dayBarHTML() + "</button>";
+  /* the dial */
+  h += "<div class='stage'><" + (packs ? "button" : "div") + " class='dial"
+    + (packs ? " won" : "") + "'" + (packs ? " data-open='1'" : "") + ">"
+    + dialHTML(done, packs) + "</" + (packs ? "button" : "div") + "></div>";
 
-  /* the hero */
-  var near = nearestSet(), door = nextDoor(), sub;
-  if (packs) sub = packs === 1 ? "Tap to open it." : "Tap to open them.";
-  else if (near) sub = near.set[1] + " is " + near.left + (near.left === 1 ? " card" : " cards") + " from finished.";
-  else if (door) sub = (door[3] - fullDays()) + " more full days opens " + door[1] + ".";
-  else sub = "Every seventh day in a row pays double.";
+  /* one line, and only one. What it says depends on where he is. */
+  var ask, sub;
+  if (packs){
+    ask = packs === 1 ? "That is a pack." : packs + " packs.";
+    sub = "Tap it to open.";
+  } else if (allThree(t)){
+    ask = "Today is in."; sub = "Come back tomorrow for the next one.";
+  } else if (green && !done){
+    ask = "Three things make a day."; sub = "Tap the ones you have done.";
+  } else {
+    var owed = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
+    ask = owed === 1 ? "One more." : owed + " to go.";
+    sub = green ? "All three earns a pack." : "All three earns a pack.";
+  }
+  h += "<p class='ask" + (packs ? " gold" : "") + "'>" + esc(ask) + "</p>"
+    + "<p class='asksub'>" + esc(sub) + "</p>";
 
-  h += "<div class='stage'>"
-    + "<" + (packs ? "button" : "div") + " class='dayring" + (packs ? " done" : "") + "'"
-    + (packs ? " data-open='1'" : "") + ">" + ringHTML(done, carried, packs) + "</" + (packs ? "button" : "div") + ">"
-    + "<p class='herosub'>" + esc(sub) + "</p></div>";
-
-  /* the three, as objects */
+  /* the three */
   h += "<div class='triad'>";
   PILLARS.forEach(function(g){
     var on = pDone(t, g[0]), st = streak(g[0]), carried = !on && !required(g[0], t);
-    h += "<button class='pil" + (on ? " on" : "") + (carried ? " carried" : "") + "' data-p='" + g[0] + "'"
-      + " aria-pressed='" + (on ? "true" : "false") + "'>"
-      + "<span class='disc'>" + svg(on ? "tick" : g[2], 28) + "</span>"
+    h += "<button class='pil" + (on ? " on" : "") + (carried ? " carried" : "") + "' data-p='"
+      + g[0] + "' aria-pressed='" + (on ? "true" : "false") + "'>"
+      + "<span class='disc'>" + svg(on ? "tick" : g[2], 29) + "</span>"
       + "<span class='lb'>" + esc(g[1]) + "</span>"
-      + "<span class='st'>" + (on ? (st + (st === 1 ? " day" : " days")) : carried ? "carried" : "")
-      + "</span></button>";
+      + (st > 0 || carried
+          ? "<span class='st'>" + (carried ? "carried" : st + (st === 1 ? " day" : " days")) + "</span>"
+          : "")
+      + "</button>";
   });
   h += "</div>";
 
-  /* what the three mean, once, until the first one is ever recorded */
-  if (!PILLARS.some(function(g){ return !!firstDay(g[0]); })){
-    h += "<p class='firstrun'>Moving on purpose, a conversation home, and finishing when the "
-      + "shift finishes. Tap one when you have done it.</p>";
-  }
+  /* On the very first day, that is the whole screen. Everything below has to
+     earn its place by being about something he has actually got. */
+  if (green) return h;
 
-  /* the small numbers */
   var bt = S.bed || BED_DEFAULT;
   h += "<div class='strip2'>";
   h += "<button data-bedsheet='1' class='" + (y.bedok ? "on" : "") + "'>" + svg("moon", 16)
     + "Bed <b>" + esc(bt) + "</b></button>";
   h += "<button data-frzsheet='1'>" + svg("snow", 16) + "<b>" + freezesLeft() + "</b> freezes</button>";
   h += "<button data-gap='set'>" + svg("gap", 16) + (d.gap ? "<b>" + esc(d.gap) + "</b>" : "Gap") + "</button>";
-  h += "<button data-camp='1'>" + svg("pin", 16) + esc(S.camp) + "</button>";
+  h += "<button data-hq='1'>" + svg("pin", 16) + esc(S.camp) + "</button>";
   h += "</div>";
 
-  /* everything that is not the game, below the fold */
   h += "<div class='also'><div class='alsoh'>Also today</div>";
   if (y.said && y.kept === undefined){
     h += "<button class='row warn' data-keptsheet='1'><span class='ic'>" + svg("gap", 20) + "</span>"
@@ -2673,7 +2744,9 @@ function viewToday(){
     + "<span class='ch'>" + svg("arrow", 16) + "</span></button>";
   h += "</div>";
 
-  h += seasonHTML();
+  /* The ladder is a reason to come back, which is meaningless before there is
+     anything to come back to. Three full days in. */
+  if (fullDays() >= 3) h += seasonHTML();
   return h;
 }
 
@@ -3675,19 +3748,48 @@ window.addEventListener("keydown", function(ev){
   else if (ST) closeStage();
 });
 
+/* -------------------------------------------------------------- the front door
+   A game says who it is before it hands you anything. This one used to open
+   straight onto a loaded HUD with two currencies reading zero. */
+function everLoggedAnything(){
+  return PILLARS.some(function(g){ return !!firstDay(g[0]); }) || !!S.onboarded;
+}
+function openGate(){
+  var g = document.getElementById("gate");
+  if (!g) return;
+  if (everLoggedAnything()) return;         /* shown once, ever */
+  g.hidden = false;
+  g.addEventListener("click", function(){
+    g.classList.add("going");
+    sfx("done"); buzz(12);
+    setTimeout(function(){ g.hidden = true; }, 520);
+  }, { once: true });
+}
+/* The world arrives when the first pack has been opened, not before. Until
+   then Today is a dial, a question and three buttons. */
+function graduate(){
+  if (S.onboarded) return;
+  S.onboarded = 1; save();
+  toast("That is the loop. The rest is yours now.", true);
+}
+
 /* ------------------------------------------------------------------- start */
 if (S.theme) document.documentElement.setAttribute("data-theme", S.theme);
 render();
 paintHud();
+openGate();
 
 /* The shift moves under you, so keep the clock honest - but repaint the strip
    only, never the screen. A full rebuild every minute silently ate anything
    half-typed into the day's one line. */
 setInterval(function(){
   if (tab !== "today" || ST || MODAL) return;
-  var bar = document.querySelector("#screen .daywrap");
-  if (!bar) return;
-  bar.innerHTML = dayBarHTML();
+  var dial = document.querySelector("#screen .dial");
+  if (!dial) return;
+  var t = today();
+  dial.innerHTML = dialHTML(
+    PILLARS.filter(function(g){ return pDone(t, g[0]); }).length,
+    packsTotal());
 }, 60000);
 
 /* Hold the splash for a beat, then hand over. It covers the frame where the
