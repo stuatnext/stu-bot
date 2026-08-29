@@ -86,30 +86,120 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
-#### It has to look like a game
+#### It has to feel like a game
 
-He tried an earlier build and said it *"looks like a plain website"* — which it did. Rounded
-rectangles with text in them are a webpage no matter what the text says.
+He tried an earlier build and said it *"looks like a plain website"*, so the collectible half was
+built properly: a card is a card — portrait, framed in metal that darkens with rarity, a name banner,
+an art window, a text box at the foot, a rarity gem and a patterned back. Every face is inline SVG
+drawn from a hash of the card's own name. Rare and gold carry a conic-gradient foil that moves when
+you drag a finger across them. Opening a pack takes over the screen: a foil sachet tears, the stage
+lights up behind it, and the cards come one at a time face-down for you to turn over yourself.
+Sound is WebAudio generated at runtime — no files to load or go missing.
 
-So a card is now a card: portrait, framed in metal that darkens with rarity, a name banner across
-the top, an art window, a text box at the foot, a rarity gem in the corner, and a patterned back.
-Every face is drawn as inline SVG from a hash of the card's own name — one of eight backdrops
-behind a per-set emblem, offset, rotated and scaled — so eleven hawker cards are eleven different
-pictures rather than eleven identical bowls. Rare and gold cards carry a conic-gradient foil that
-moves when you drag a finger across them.
+He looked at that and said: **"make this feel like a real game. Like a real mobile game."**
 
-Opening a pack takes over the screen. A foil sachet tears, the stage lights up behind it, and the
-cards come one at a time face-down for you to turn over yourself. Turning one plays a synthesised
-flip; a rare fires sparks, a shine sweep and an arpeggio. The score lands at the end, and a level-up
-gets its own line. Sound is WebAudio generated at runtime — no files to load or go missing — and
-mutes from the header.
+Which was fair, because the pack stage was the only screen that did. Everything around it was still
+a 620-pixel document column on a light ground, with a magazine kicker and a headline at the top,
+forty identical bordered paragraphs down the page, and — loudest of all — five `window.prompt()`
+dialogs and a `confirm()` doing the work of a settings screen. The assets were a game. The shell was
+a webpage with a game parked on one tab.
 
-The three pillars stopped being three panels with buttons inside them and became three tiles you tap
-directly, with pips at the top showing how close today is to earning a pack. Rewards became a track:
-a progress ring per tier, the real-life prize as the headline, and the trophies moved here from the
-log so they sit beside the prizes rather than in a table.
+So v5 is the shell.
 
-Reduced motion turns all of it off and shows every card at once.
+**Night is the default.** Not a dark theme: the only theme, with light left in as a legibility escape
+hatch. A game is a lit object in a dark room.
+
+**A HUD that never leaves.** Rank, the XP bar, the pot and the spares sit above every screen, on
+every tab. Currency furniture that stays put is most of what separates a client from a document —
+the app becomes a place you are in rather than a page you are reading. It is tappable: the crest
+goes to the deck, the coin goes to the pot.
+
+**A claim you can see from the door.** Today opens on a gold slab that says how many packs are
+waiting and what one of them could finish, then three tiles, and nothing else above the fold. The
+strapline, the page title and the paragraph about Malta are below them now.
+
+**The reward falls out of the thing you touched.** Tapping the third pillar used to re-render the
+page and show a green snackbar, and then you had to navigate to another tab to collect. Now the
+tile stamps under your thumb, the pot value flies from it to the HUD chip, and a full-screen
+celebration fires. It still does not open the pack for you — nothing here acts on your behalf.
+
+**No browser dialogs.** The rate, the bedtime, the reward names, the spend log, the basecamp, the
+reset and the trophy claims all go through one in-app bottom sheet with a promise-based API. A
+native `prompt()` renders in whatever the browser feels like and says *web page* louder than
+anything else on the screen.
+
+**Everything is drawn.** The bottom bar has real SVG icons with a badge that counts the packs
+waiting, not five unicode dingbats. Buttons have physics — a three-pixel lower edge that collapses
+when pressed. Screens fade and lift rather than swapping innerHTML, and re-drawing the screen you
+are already on no longer throws you back to the top of it.
+
+**The typeface is on the device.** Bricolage Grotesque, Instrument Sans and JetBrains Mono are
+self-hosted in `app/fonts/` (regenerate with `node scripts/fetch-fonts.mjs`), so the game keeps its
+face on a plane and opening it tells Google nothing. `app/sw.js` caches the shell, so it installs to
+the home screen and still opens with no signal.
+
+Reduced motion turns all of it off — no confetti, no transitions, no card flip — and every card is
+face up.
+
+#### And then the home screen was still too long
+
+First pass got the top of Today right — claim slab, three tiles — and then let it become a document
+again underneath: a freeze explainer with five dots and two paragraphs, a panel about Malta's hours,
+the rationale for bedtime, a full write-up of the place of the day with its own four buttons. Two
+thousand one hundred and eighty pixels. He looked at it and asked why it was not simple to digest and
+start playing, which was the right question.
+
+So: **anything that is a thing you do is a row you tap. Anything that is a reason is behind it.**
+
+The board is now the claim slab, the three, bedtime as one row, the shift bar, three chips
+(freezes, today's gap, where you are standing), two rows for the day's one line and the place of the
+day, and the ladder. Every one of them opens a sheet carrying the prose that used to be stacked on
+the screen — not a word of it was cut, it just stopped being the first thing you have to read.
+**1,224 pixels.** Bedtime is violet rather than green, because it is the keystone but it is not one
+of the three and it should not look like it earns the pack.
+
+#### The collection stopped being a filing cabinet
+
+The Cards tab used to be one column of all seventeen sets: **16,856 pixels** of mostly identical
+face-down backs, with no filter and nothing sticky. It is now one set at a time behind a rail that
+stays on screen, with a progress ring per set, an All / Missing / Held filter, and a count you can
+read at a glance. Same content, 1,651 pixels.
+
+And a card he does not hold is now shown as **its own face, drained of colour** — never as a back.
+He has to be able to see what he is missing and what it would take. Tapping one used to answer
+"what is this card?" with a face-down back captioned *not found yet*, which is the one place that
+question ever gets asked.
+
+Each art window also takes a hue from the card's own name, so the frame still tells you the rarity
+and the picture now tells you which card it is. Eleven hawker cards were eleven grey bowls with
+slightly different backdrops; they are eleven different cards now.
+
+#### Spares
+
+Seventy-two per cent of everything he will ever pull is a card he already holds. That was worth
+nothing, which meant most packs paid out nothing and there was no reason to open the app on a day
+with none waiting.
+
+Now a duplicate is worth **spares** — 4 for a common, 10 an uncommon, 25 a rare — and spares make a
+card he is missing, at 30, 70 or 160. He picks the card; nothing is chosen for him.
+
+They are deliberately **not money**. They never appear on the Pot screen, nothing converts between
+the two, and they cannot buy a pack: a pack is what the three pillars earned or it is not a pack.
+The pot is real dollars at a rate he set, and the moment anything converts into it the app is back
+to deciding what his consistency is worth. Like the pack counts, spares are recomputed from the
+record rather than incremented, so the number cannot drift.
+
+#### The weekend was breaking a streak it had no right to
+
+"Stopped" means finishing when the shift finishes. There is no Malta shift on a Saturday, so it
+could not be ticked honestly — and the streak walker counted every Saturday and Sunday as a miss,
+quietly eating his freezes two at a time.
+
+A pillar is now only owed on a day it is possible to do. Stopped is carried at the weekend, Trained
+and Family still count every day (parkrun is Saturday 07:30 and keeps its teeth), and a weekend with
+a run and a call home is a full day. This is the same rule his Mandarin study already runs on:
+weekdays only, the weekend absorbed rather than counted as a failure. It only ever adds days —
+nothing already earned can go down — so the first open after this lands with a pile of packs.
 
 #### The pot
 
@@ -124,7 +214,7 @@ a flight home, which is the thing money is actually for here.
 
 #### Cards, packs and progression
 
-**90 cards across 11 sets.** Singapore is most of it — Hawker, Kopitiam, Singlish, Everyday,
+**188 cards across 18 sets.** Singapore is most of it — Hawker, Kopitiam, Singlish, Everyday,
 Heritage, Green, Islands and Edges — but the deck deliberately reaches past it, because he is barely
 in Singapore between September and Christmas. **Two Hours Out** is weekend range he can work from:
 Batam, Bangkok, Penang, Yogyakarta, Luang Prabang. **The Road** is where this year actually takes
@@ -143,6 +233,14 @@ earns a **streak pack** — five cards, better odds — so a streak feels differ
 Counts are recomputed from the record rather than incremented, so they cannot drift, and pulls prefer
 cards not yet held.
 
+**Mandarin is thirty real words.** He is learning it — 36 sessions logged, a best streak of nine,
+and a vocabulary bank of thirty words with characters, pinyin, HSK levels and his own mnemonics. The
+set is that bank, not an invention: the character fills the art window, the pinyin is the card's
+name, the HSK level *is* the rarity, and the line drawn under each character is its tone, because
+his study log records the tone pairs he keeps dropping. It is the only decoration in the deck that
+is also the lesson. It opens at seven full days. Hokkien stays a trophy rather than a set, because
+it only happens by happening, with people.
+
 **Gold cards are never in packs.** Seven of them, claimed by hand, because they can only be earned by
 happening: a hawker order with no phrasebook, a first Hokkien exchange with his partner's family, his
 mum through the gate at Changi, the hours agreed, a second client signed, the first thing he
@@ -151,22 +249,22 @@ publishes that is his, and a thirty-day streak.
 **Rewards** are real treats at 7, 30 and 90 day streaks, written by him. The app only decides when
 they are earned, because a treat granted on a Tuesday is not a reward.
 
-#### Why the deck is 158 cards and not 90
+#### Why the deck kept growing
 
 The first version ran out. Simulated at perfect play — all three pillars, every day — the 90-card
 deck was **complete on day 31**. Every pack after that was pure duplicates, and the collection died
 at exactly the point the habit would have been forming.
 
 So there is a second season: six more sets — Coffee, Deep Cuts, Sheffield and Before, The
-Newsletter, Straight Up Growth, The Industry — for 158 cards across 17 sets. They are **locked**,
+Newsletter, Straight Up Growth, The Industry — and then Mandarin, for 188 cards across
+18 sets. They are **locked**,
 and shown as doors rather than hidden, because a door you can see is a different reason to come back
 than a gap you can fill.
 
 They open on **full days, not on rank**. Gating them on rank was circular: cards give XP, XP opens
 sets, sets give cards, and every door opened inside a month. Days are immune to that, they are
 legible on the door itself, and consistency is the thing that should be buying this. The gates are
-14, 30, 50, 75, 105 and 140 full days, which puts completion at **day 147 at perfect play** and
-comfortably past a year in practice.
+7, 14, 30, 50, 75, 105 and 140 full days, which puts completion comfortably past a year in practice.
 
 Ranks were recalibrated too. The whole deck plus a year of full days is worth about 12,750 XP; the
 old top rank sat at 5,200, so the last title arrived long before the last card.
@@ -213,9 +311,12 @@ merge yet.
 
 ### Storage
 
-State lives in `localStorage` under `daylight.v2`, with export and import in **Review**. Export
-before clearing browser data, and treat phone and laptop as separate copies. Everything goes
-through the `STORE` object at the top of the script, so a backend is a single-object change.
+State lives in `localStorage` under `daylight.v4` — the key did not change for v5, because every
+field the old app wrote still means the same thing and the new ones default empty. An existing save
+opens straight into the new shell with its days, cards, pot and freezes intact.
+
+Export before clearing browser data, and treat phone and laptop as separate copies. Everything goes
+through `load()` and `save()` at the top of the script, so a backend is a two-function change.
 
 ### Not yet built
 

@@ -1,15 +1,29 @@
 {
   "name": "Daylight",
   "short_name": "Daylight",
-  "description": "One place a day, and exactly what to say when you get there.",
-  "start_url": "./",
+  "description": "A day fixed to head office, lived in Singapore. Three things, a deck, and a pot.",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0D1211",
-  "theme_color": "#0D1211",
+  "background_color": "#080B12",
+  "theme_color": "#080B12",
   "icons": [
-    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "lifestyle",
+    "games",
+    "productivity"
   ]
 }
