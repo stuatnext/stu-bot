@@ -158,6 +158,37 @@ the screen — not a word of it was cut, it just stopped being the first thing y
 **1,224 pixels.** Bedtime is violet rather than green, because it is the keystone but it is not one
 of the three and it should not look like it earns the pack.
 
+#### And then the shape was wrong, not the paint
+
+Three rounds of making the rows nicer, and it still read as a settings screen —
+because it was one. Every element on Today was the same object: `[icon] [title]
+[sentence] [value]`, stacked seven deep. Restyling a list does not turn it into a
+game, and two of those rows carried a full sentence of description.
+
+So the fourth pass changed the shape.
+
+**One hero.** The day is a single object: three arc segments around a prize, with
+the count in the middle. It is the progress bar, the goal and the claim button
+at once, and when a pack is waiting the centre turns gold, breathes, and *is* the
+button. A pillar that is carried rather than earned — Stopped, at the weekend —
+ghosts its segment in rather than lighting it, so the ring never looks like the
+app handed him a third of the day.
+
+**Three objects, not three rows.** The pillars are big discs in a row: icon,
+one-word label, streak. No descriptions. The definitions appear once, as a single
+line, until the first day is ever recorded, and then never again.
+
+**One strip.** Bed, freezes, the gap and where he is standing are four chips with
+one number each.
+
+**Everything else is below the fold or behind a tap.** The place of the day and
+the day's one line are two rows under *Also today*; the shift bar is eight pixels
+tall with no words on it and the whole Malta explanation sits in the sheet behind
+it.
+
+Today went from 2,180px of stacked rows to **1,077px** with a hero you can read in
+half a second.
+
 #### The collection stopped being a filing cabinet
 
 The Cards tab used to be one column of all seventeen sets: **16,856 pixels** of mostly identical

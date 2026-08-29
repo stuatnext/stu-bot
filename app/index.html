@@ -614,99 +614,152 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
   font-size:15px; font-weight:800; color:var(--jade)}
 .ware .cost svg{width:15px; height:15px}
 
-/* ==================================================== the three, as a board */
-.bhead{display:flex; align-items:center; gap:10px; margin:24px 2px 10px}
-.bhead h2{margin:0; flex:1}
-.pips{display:flex; gap:4px; flex:none}
-.pips i{width:19px; height:5px; border-radius:3px; background:var(--line);
-  transition:background .3s, box-shadow .3s}
-.pips i.on{background:var(--jade); box-shadow:0 0 8px color-mix(in srgb,var(--jade) 55%,transparent)}
-.pips i.all{background:var(--gold); box-shadow:0 0 10px var(--gold)}
-.pips i.carried{background:var(--line2);
-  background-image:repeating-linear-gradient(115deg,transparent 0 2px,color-mix(in srgb,var(--jade) 55%,transparent) 2px 4px)}
 
-.q{display:flex; align-items:center; gap:13px; width:100%; text-align:left; cursor:pointer;
-  padding:13px 14px; border-radius:var(--r); min-height:76px; margin:8px 0; color:var(--ink);
-  border:1px solid var(--line); font:inherit;
-  background:linear-gradient(150deg,var(--panel),var(--panel2));
-  box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 4%,transparent) inset, 0 6px 16px rgba(0,0,0,.26);
-  transition:transform .12s var(--tap), border-color .22s, background .22s}
-.q:active{transform:scale(.985)}
-.q .g{flex:none; width:44px; height:44px; border-radius:14px; display:flex; align-items:center;
-  justify-content:center; background:var(--sunk); border:1px solid var(--line2); color:var(--ink3);
-  transition:all .22s}
-.q .t{flex:1; min-width:0}
-.q .t b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:16.5px;
-  letter-spacing:-.02em}
-.q .t span{display:block; font-size:12.5px; color:var(--ink3); line-height:1.3; margin-top:1px}
-.q .n{flex:none; text-align:center; min-width:46px}
-.q .n b{display:block; font-family:"JetBrains Mono",monospace; font-size:22px; font-weight:800;
-  letter-spacing:-.03em; line-height:1}
-.q .n span{display:block; font-size:8.5px; letter-spacing:.12em; text-transform:uppercase;
-  color:var(--ink3); margin-top:3px}
-.q.on{border-color:color-mix(in srgb,var(--jade) 50%,transparent);
-  background:linear-gradient(150deg,color-mix(in srgb,var(--jade) 13%,transparent),var(--panel) 62%)}
-.q.on .g{background:var(--jade); border-color:var(--jade); color:#05231A}
-.q.on .t b{color:var(--jadeInk)}
-.q.on .n b{color:var(--jade)}
-.q.hot .n b{color:var(--gold2)}
-.q.pop{animation:qpop .45s var(--pop)}
-@keyframes qpop{0%{transform:none}40%{transform:scale(1.035)}100%{transform:none}}
+/* ================================================================ reduced motion
+   Off, not slower. Everything stays legible and every card is face up. */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important;
+    transition-duration:.001ms !important; scroll-behavior:auto !important}
+  #toast.on{opacity:1}
+  .tc-i{transition:none !important}
+  #fx{display:none !important}
+}
 
-/* the big claim button — the only gold thing on the home screen */
-.claim{position:relative; display:block; width:100%; border:0; padding:0; margin:14px 0 4px;
-  border-radius:var(--r2); overflow:hidden; cursor:pointer; color:var(--goldInk);
-  background:linear-gradient(160deg,var(--gold2),var(--gold) 46%,#D89412);
-  box-shadow:0 10px 28px color-mix(in srgb,var(--gold) 28%,transparent),
-    0 2px 0 rgba(255,255,255,.5) inset, 0 -3px 0 rgba(0,0,0,.16) inset;
+
+
+
+
+/* ============================================================== the day screen
+   Fourth pass, and the first one that changes the shape rather than the paint.
+   Seven stacked rows of [icon][title][sentence][value] is a settings list, and
+   restyling a list does not make it a game. One hero, three objects, one strip,
+   and everything that is prose lives behind a tap. */
+
+.daywrap{display:block;width:100%;border:0;background:none;padding:4px 0 0;cursor:pointer;
+  font:inherit;color:inherit;transition:opacity .15s}
+.daywrap:active{opacity:.7}
+.daybar{display:flex;position:relative;height:8px;border-radius:5px;overflow:hidden;
+  background:var(--sunk);box-shadow:0 0 0 1px var(--line) inset}
+.daybar .free{background:linear-gradient(180deg,#2E6E58,#1E4C3D)}
+.daybar .work{background:linear-gradient(180deg,#4A3FA8,#2E2870)}
+.daybar .rest{background:var(--sunk)}
+.daybar .now{position:absolute;top:-3px;bottom:-3px;width:2px;border-radius:2px;
+  background:var(--ember);box-shadow:0 0 8px var(--ember);z-index:2}
+.daycap{display:flex;justify-content:space-between;margin-top:7px;
+  font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3)}
+
+/* the hero */
+.stage{display:flex;flex-direction:column;align-items:center;padding:10px 0 0}
+.dayring{position:relative;width:min(62vw,224px);aspect-ratio:1;border:0;background:none;
+  padding:0;font:inherit;color:inherit}
+.dayring[data-open]{cursor:pointer;transition:transform .14s var(--tap)}
+.dayring[data-open]:active{transform:scale(.97)}
+.dayring svg{width:100%;height:100%;transform:rotate(-90deg);display:block}
+.dayring .seg{fill:none;stroke-width:15;stroke-linecap:round}
+.dayring .slot{stroke:#16202F}
+.dayring .lit{stroke:var(--jade);filter:drop-shadow(0 0 8px color-mix(in srgb,var(--jade) 55%,transparent))}
+.dayring .lit.ghost{stroke:color-mix(in srgb,var(--jade) 34%,transparent);filter:none}
+.dayring .core{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:5px}
+.dayring .prize{width:80px;height:80px;border-radius:26px;display:flex;align-items:center;
+  justify-content:center;border:1px solid var(--line2);color:var(--ink3);
+  background:linear-gradient(160deg,#1A2331,#111826);box-shadow:0 8px 22px rgba(0,0,0,.5)}
+.dayring.done .prize{border-color:#C99417;color:var(--goldInk);
+  background:linear-gradient(160deg,var(--gold2),var(--gold) 55%,#D08F10);
+  box-shadow:0 0 0 6px color-mix(in srgb,var(--gold) 12%,transparent),
+    0 10px 30px color-mix(in srgb,var(--gold) 34%,transparent);
+  animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.dayring .cnt{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:38px;
+  letter-spacing:-.05em;line-height:1}
+.dayring .cnt i{font-style:normal;color:var(--ink3);font-size:23px}
+.dayring.done .cnt{color:var(--gold2)}
+.dayring .cap{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink3)}
+.herosub{margin:10px 18px 0;font-size:13.5px;color:var(--ink3);text-align:center;
+  text-wrap:balance}
+
+/* the three, as objects rather than rows */
+.triad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.pil{border:0;padding:14px 5px 12px;border-radius:22px;cursor:pointer;font:inherit;
+  display:flex;flex-direction:column;align-items:center;gap:9px;color:var(--ink2);
+  background:linear-gradient(175deg,#182231,#101725);
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 -3px 0 rgba(0,0,0,.45) inset,
+    0 6px 16px rgba(0,0,0,.4);
+  transition:transform .14s var(--tap),background .25s}
+.pil:active{transform:translateY(3px) scale(.98)}
+.pil .disc{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;background:radial-gradient(70% 70% at 35% 25%,#1E2A3C,#121A28);
+  box-shadow:0 0 0 2px #223046 inset,0 4px 10px rgba(0,0,0,.5);
+  transition:all .28s var(--pop)}
+.pil .disc svg{color:var(--ink3);transition:color .2s}
+.pil .lb{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:14.5px;
+  letter-spacing:-.01em}
+.pil .st{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink3);min-height:12px}
+.pil.on{background:linear-gradient(175deg,#17402F,#0E2A20);
+  box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 -3px 0 rgba(0,0,0,.4) inset,
+    0 6px 20px color-mix(in srgb,var(--jade) 20%,transparent)}
+.pil.on .disc{background:radial-gradient(70% 70% at 35% 25%,#7DF0C4,var(--jade) 55%,#1B9B6E);
+  box-shadow:0 0 0 2px rgba(125,240,196,.5) inset,0 0 18px color-mix(in srgb,var(--jade) 50%,transparent)}
+.pil.on .disc svg{color:#04241A}
+.pil.on .lb{color:var(--jadeInk)}
+.pil.on .st{color:var(--jade)}
+.pil.carried .disc{opacity:.5}
+.pil.pop{animation:qpop .45s var(--pop)}
+@keyframes qpop{0%{transform:none}40%{transform:scale(1.06)}100%{transform:none}}
+
+.firstrun{margin:13px 6px 0;font-size:13px;color:var(--ink3);text-align:center;line-height:1.45;
+  text-wrap:balance}
+
+/* one strip for every small number on the day */
+.strip2{display:flex;gap:8px;margin:16px -14px 0;padding:0 14px;overflow-x:auto;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.strip2::-webkit-scrollbar{display:none}
+.strip2 button{flex:none;display:flex;align-items:center;gap:7px;padding:9px 13px;min-height:44px;
+  border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink2);
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;
   transition:transform .12s var(--tap)}
-.claim:active{transform:translateY(2px) scale(.99)}
-.claim .in{display:flex; align-items:center; gap:13px; padding:16px 18px; text-align:left}
-.claim .glyph{width:44px; height:44px; flex:none; border-radius:13px; background:rgba(58,42,5,.14);
-  display:flex; align-items:center; justify-content:center}
-.claim .t{flex:1; min-width:0}
-.claim .t b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
-  font-size:19px; letter-spacing:-.025em; line-height:1.05}
-.claim .t span{display:block; font-size:12.5px; opacity:.74; margin-top:2px; font-weight:500}
-.claim .shine{position:absolute; inset:-40% -60%; pointer-events:none;
-  background:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);
-  animation:sheen 3.6s ease-in-out infinite}
-@keyframes sheen{0%{transform:translateX(-55%)}55%,100%{transform:translateX(55%)}}
-/* the same slab, when there is nothing to claim */
-.claim.idle{background:var(--panel); border:1px solid var(--line); color:var(--ink);
-  box-shadow:0 6px 16px rgba(0,0,0,.24)}
-.claim.idle .glyph{background:var(--sunk); border:1px solid var(--line2); color:var(--ink3)}
-.claim.idle .t span{opacity:1; color:var(--ink3)}
-.claim.idle .shine{display:none}
+.strip2 button:active{transform:scale(.95)}
+.strip2 button svg{flex:none;color:var(--ink3)}
+.strip2 button b{font-family:"JetBrains Mono",monospace;font-weight:800;color:var(--ink)}
+.strip2 button.on{border-color:color-mix(in srgb,var(--violet) 48%,transparent);
+  background:var(--violetSoft)}
+.strip2 button.on svg{color:var(--violetInk)}
 
-/* the shift, drawn as a track */
-.strip{margin:16px 0 0; padding:13px 14px; border-radius:var(--r); border:1px solid var(--line);
-  background:var(--panel)}
-.striph{display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:9px}
-.striph b{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:14.5px}
-.striph span{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink3); flex:none}
-.track{position:relative; height:26px; border-radius:9px; overflow:hidden; display:flex;
-  background:var(--sunk)}
-.track .free{background:linear-gradient(180deg,color-mix(in srgb,var(--jade) 34%,transparent),
-  color-mix(in srgb,var(--jade) 15%,transparent))}
-.track .work{background:linear-gradient(180deg,color-mix(in srgb,var(--violet) 42%,transparent),
-  color-mix(in srgb,var(--violet) 18%,transparent))}
-.track .rest{background:var(--sunk)}
-.track .now{position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--ember);
-  box-shadow:0 0 10px var(--ember); z-index:2}
-.tlab{display:flex; justify-content:space-between; margin-top:6px; font-family:"JetBrains Mono",monospace;
-  font-size:10px; color:var(--ink3)}
+/* below the fold: the things that are not the game */
+.also{margin-top:24px}
+.alsoh{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin:0 2px 9px}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  padding:12px 13px;border-radius:16px;min-height:62px;margin:8px 0;color:var(--ink);
+  border:1px solid var(--line);background:var(--panel);font:inherit;
+  transition:transform .12s var(--tap)}
+.row:active{transform:scale(.985)}
+.row .ic{flex:none;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;
+  justify-content:center;background:var(--sunk);border:1px solid var(--line2);color:var(--ink3)}
+.row .bd{flex:1;min-width:0}
+.row .bd b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
+  font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .bd span{display:block;font-size:12.5px;color:var(--ink3);margin-top:1px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .ch{flex:none;color:var(--ink3)}
+.row.on{border-color:color-mix(in srgb,var(--jade) 42%,transparent)}
+.row.on .ic{background:var(--jade);border-color:var(--jade);color:#05231A}
+.row.warn{border-color:color-mix(in srgb,var(--ember) 45%,transparent)}
+.row.warn .ic{color:var(--ember)}
 
-/* the season track */
-.season{margin:20px 0 0; padding:15px; border-radius:var(--r2);
+/* ---------------------------------------------------- the long game
+   The locked sets were always a progression track; they were just never drawn
+   as one. Seven gates do not fit across a phone, so the ladder scrolls. */
+.season{margin:22px 0 0; padding:15px; border-radius:var(--r2);
   border:1px solid color-mix(in srgb,var(--violet) 42%,transparent);
   background:linear-gradient(150deg,var(--violetSoft),var(--panel) 72%)}
 .season .top{display:flex; align-items:baseline; gap:10px}
 .season .top b{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:17px; flex:1}
 .season .top span{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink2); flex:none}
 .season p{margin:7px 0 0; font-size:12.5px; color:var(--ink3)}
-/* Seven gates do not fit across a phone, and squeezing them turns every label
-   into an ellipsis. Let the ladder scroll instead. */
 .nodes{display:flex; gap:7px; margin-top:13px; overflow-x:auto; scrollbar-width:none;
   -webkit-overflow-scrolling:touch; margin-inline:-4px; padding-inline:4px}
 .nodes::-webkit-scrollbar{display:none}
@@ -720,135 +773,6 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
   box-shadow:0 0 0 3px color-mix(in srgb,var(--violet) 16%,transparent)}
 .node .l{font-size:9px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink3);
   margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-
-/* freezes */
-.frz{margin:12px 0 0; padding:13px 15px; border-radius:var(--r); border:1px solid var(--line);
-  background:var(--panel)}
-.frz.cold{border-color:color-mix(in srgb,var(--violet) 55%,transparent); background:var(--violetSoft)}
-.frz .top{display:flex; align-items:center; gap:11px}
-.frz .pips2{display:flex; gap:5px; flex:none}
-.frz .pips2 i{width:13px; height:13px; border-radius:50%; background:var(--sunk);
-  border:1px solid var(--line2)}
-.frz .pips2 i.on{background:var(--violet); border-color:var(--violet);
-  box-shadow:0 0 7px color-mix(in srgb,var(--violet) 55%,transparent)}
-.frz .lbl{flex:1; min-width:0; font-size:13.5px; color:var(--ink2)}
-.frz .lbl b{color:var(--ink)}
-
-/* the count-up number, used wherever a total changes */
-.tick{font-variant-numeric:tabular-nums}
-
-table{width:100%; border-collapse:collapse; margin:10px 0; font-size:14.5px}
-th,td{text-align:left; padding:10px 11px; border-bottom:1px solid var(--line); vertical-align:top}
-th{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.11em; text-transform:uppercase;
-  color:var(--ink3); font-weight:400}
-td:first-child{white-space:nowrap; font-family:"JetBrains Mono",monospace; font-weight:600}
-ul{margin:9px 0; padding-left:20px} li{margin:6px 0} li::marker{color:var(--ink3)}
-
-/* ================================================================ reduced motion
-   Off, not slower. Everything stays legible and every card is face up. */
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important;
-    transition-duration:.001ms !important; scroll-behavior:auto !important}
-  #toast.on{opacity:1}
-  .tc-i{transition:none !important}
-  #fx{display:none !important}
-}
-
-
-/* ============================================================ the compact board
-   Second round of this. The first pass got the top of Today right and then let
-   it become a document again: a freeze explainer, a paragraph about Malta, the
-   rationale for bedtime, and a full write-up of the place of the day, all
-   stacked down the home screen. Two thousand pixels.
-
-   Everything that is a THING YOU DO is now a row you tap. Everything that is a
-   REASON is behind it, in a sheet. The home screen is the board; the prose
-   still exists and is one tap away, which is where prose belongs in a game. */
-.tile{display:flex; align-items:center; gap:12px; width:100%; text-align:left; cursor:pointer;
-  padding:11px 13px; border-radius:14px; min-height:62px; margin:8px 0; color:var(--ink);
-  border:1px solid var(--line); background:var(--panel); font:inherit;
-  transition:transform .12s var(--tap), border-color .22s, background .22s}
-.tile:active{transform:scale(.985)}
-.tile .ic{flex:none; width:38px; height:38px; border-radius:12px; display:flex; align-items:center;
-  justify-content:center; background:var(--sunk); border:1px solid var(--line2); color:var(--ink3);
-  transition:all .22s}
-.tile .bd{flex:1; min-width:0}
-.tile .bd b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:700;
-  font-size:15.5px; letter-spacing:-.015em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.tile .bd span{display:block; font-size:12.5px; color:var(--ink3); line-height:1.3; margin-top:1px;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.tile .rt{flex:none; display:flex; align-items:center; gap:7px; color:var(--ink3); font-size:13px;
-  font-weight:600}
-.tile.on{border-color:color-mix(in srgb,var(--jade) 45%,transparent);
-  background:linear-gradient(150deg,color-mix(in srgb,var(--jade) 11%,transparent),var(--panel) 62%)}
-.tile.on .ic{background:var(--jade); border-color:var(--jade); color:#05231A}
-.tile.on .bd b{color:var(--jadeInk)}
-.tile.warn{border-color:color-mix(in srgb,var(--crit) 45%,transparent)}
-.tile.warn .ic{color:var(--crit)}
-/* Bedtime is the keystone but it is not one of the three, and green would put
-   it in the same family as the tiles that earn the pack. Night is night. */
-.tile.night.on{border-color:color-mix(in srgb,var(--violet) 50%,transparent);
-  background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 14%,transparent),var(--panel) 62%)}
-.tile.night.on .ic{background:var(--violet); border-color:var(--violet); color:#0B0820}
-.tile.night.on .bd b{color:var(--violetInk)}
-
-/* The row of small things: freezes, the gap, where he is standing. Chips, not
-   panels - each is one number and a sheet behind it. */
-.mini{display:flex; gap:7px; margin:10px -14px 0; padding:0 14px; overflow-x:auto;
-  scrollbar-width:none; -webkit-overflow-scrolling:touch}
-.mini::-webkit-scrollbar{display:none}
-.mini button{flex:none; display:flex; align-items:center; gap:7px; padding:8px 13px; min-height:44px;
-  border-radius:13px; border:1px solid var(--line); background:var(--panel); color:var(--ink2);
-  font:inherit; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;
-  transition:transform .12s var(--tap)}
-.mini button:active{transform:scale(.95)}
-.mini button svg{width:16px; height:16px; flex:none; color:var(--ink3)}
-.mini button b{font-family:"JetBrains Mono",monospace; font-weight:800; color:var(--ink)}
-.mini button.cold{border-color:color-mix(in srgb,var(--violet) 50%,transparent);
-  background:var(--violetSoft)}
-
-/* The shift, compact. It is the identity of the whole app, so it stays on the
-   board - but the paragraph explaining Malta moved into a sheet behind it. */
-.strip.tap{cursor:pointer; width:100%; text-align:left; font:inherit; color:var(--ink);
-  transition:transform .12s var(--tap)}
-.strip.tap:active{transform:scale(.99)}
-
-
-/* ====================================================== where do I start, then
-   Third round, and this one was a real bug rather than taste: the resting icon
-   for Trained was a checkmark and Family had no icon at all, so a fresh board
-   read as done / broken / unchecked and there was no way to tell which row
-   wanted a thumb. Fixed above. What is left is making the rows look pressable
-   before they have anything to show. */
-
-.startline{margin:2px 2px 10px; font-size:13.5px; color:var(--ink2)}
-
-/* An untapped pillar is an empty socket: dashed ring, muted glyph, waiting.
-   A tapped one is filled and solid. The difference has to be visible from
-   across the room, because it is the only feedback the tap gives. */
-.q .g{border-style:dashed; border-color:var(--line2)}
-.q.on .g{border-style:solid}
-.q:not(.on):active .g{border-color:var(--gold); color:var(--gold2)}
-
-/* The right-hand side when there is no run yet. Not a number, not a checkbox -
-   the target the tile is going to fill. */
-.q .n.dot{display:flex; align-items:center; justify-content:center; width:46px}
-.q .n.dot i{width:22px; height:22px; border-radius:50%; border:2px dashed var(--line2);
-  display:block; transition:all .22s var(--tap)}
-.q.on .n.dot i{border-style:solid; border-color:var(--jade); background:var(--jade);
-  box-shadow:0 0 12px color-mix(in srgb,var(--jade) 45%,transparent)}
-
-/* The three carry the screen, so they sit above everything around them. */
-.q{min-height:78px}
-.q .t b{font-size:17px}
-.q.on{box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 5%,transparent) inset,
-  0 6px 20px color-mix(in srgb,var(--jade) 12%,transparent)}
-
-/* The prize should look like a prize even before it is won, or the first thing
-   on a fresh board is a dead grey slab. */
-.claim.idle{border-color:color-mix(in srgb,var(--gold) 26%,transparent);
-  background:linear-gradient(150deg,color-mix(in srgb,var(--gold) 7%,transparent),var(--panel) 62%)}
-.claim.idle .glyph{color:var(--gold2); border-color:color-mix(in srgb,var(--gold) 34%,transparent)}
 
 </style>
 </head>
@@ -2623,151 +2547,132 @@ function setBadge(tab, n, pulse){
   b.appendChild(s);
 }
 
-/* ================================================================ the shift */
-/* The bar itself. The wrapper is a button on Today and a plain box elsewhere. */
-function trackHTML(){
-  /* Always wake to midnight, so the proportions mean something. Opening it at
-     three in the morning should not put the night inside the free segment. */
+/* ================================================================== the day
+   A slim bar with no words on it. The words are in the caption under it and
+   the reasoning is in a sheet behind it. */
+function dayBarHTML(){
   var s = shape(), from = s.wake, to = 1440, span = to - from;
   function pct(a, b){ return Math.max(0, Math.min(100, ((b - a) / span) * 100)); }
-  /* There is no Malta shift on a Saturday, so the track does not draw one. */
   var freeW = s.weekend ? 100 : pct(from, Math.min(s.start, to));
   var workW = s.weekend ? 0 : pct(Math.max(s.start, from), Math.min(s.end, to));
   var restW = Math.max(0, 100 - freeW - workW);
   var inDay = s.now >= from && s.now <= to;
 
-  var head, right;
-  if (s.weekend){
-    head = "No shift today"; right = "All of it is yours";
-  } else if (s.working){
-    head = "Malta has you until " + s.endT;
-    right = dur(s.end - s.now) + " left";
-  } else if (s.now < s.start){
-    head = dur(Math.max(0, s.untilWork)) + " before HQ starts";
-    right = s.startT + " – " + s.endT;
-  } else {
-    head = "Shift is done"; right = dur(Math.max(0, 1440 - s.now)) + " of evening";
-  }
+  var left, right;
+  if (s.weekend){ left = "No shift today"; right = "All of it is yours"; }
+  else if (s.working){ left = "Malta until " + s.endT; right = dur(s.end - s.now) + " left"; }
+  else if (s.now < s.start){ left = s.startT + " – " + s.endT; right = dur(Math.max(0, s.untilWork)) + " to go"; }
+  else { left = "Shift is done"; right = dur(Math.max(0, 1440 - s.now)) + " of evening"; }
 
-  var h = "<div class='striph'><b>" + esc(head) + "</b><span class='mono'>"
-        + esc(right) + "</span></div>";
-  h += "<div class='track'>";
-  if (inDay) h += "<div class='now' style='left:" + pct(from, s.now).toFixed(2) + "%'></div>";
-  if (freeW > .5) h += "<div class='free' style='width:" + freeW.toFixed(2) + "%'></div>";
-  if (workW > .5) h += "<div class='work' style='width:" + workW.toFixed(2) + "%'></div>";
-  if (restW > .5) h += "<div class='rest' style='width:" + restW.toFixed(2) + "%'></div>";
-  h += "</div><div class='tlab'><span>" + hhmm(from) + "</span><span class='mono'>"
-    + (s.weekend ? "yours" : s.startT + " – " + s.endT) + "</span><span>24:00</span></div>";
+  var h = "<span class='daybar'>";
+  if (inDay) h += "<span class='now' style='left:" + pct(from, s.now).toFixed(2) + "%'></span>";
+  if (freeW > .5) h += "<span class='free' style='width:" + freeW.toFixed(2) + "%'></span>";
+  if (workW > .5) h += "<span class='work' style='width:" + workW.toFixed(2) + "%'></span>";
+  if (restW > .5) h += "<span class='rest' style='width:" + restW.toFixed(2) + "%'></span>";
+  h += "</span><span class='daycap'><span>" + esc(left) + "</span><span>" + esc(right) + "</span></span>";
   return h;
 }
-function trackInner(){ return trackHTML(); }
+
+/* The day as one object. Three arc segments round a prize, which is the whole
+   of the game in one glance: how close today is, and what it pays. */
+function ringHTML(done, carried, packs){
+  var C = 2 * Math.PI * 100, gap = 16, seg = (C - 3 * gap) / 3, i, h = "";
+  h += "<svg viewBox='0 0 236 236' aria-hidden='true'>";
+  for (i = 0; i < 3; i++){
+    h += "<circle class='seg slot' cx='118' cy='118' r='100' stroke-dasharray='"
+      + seg.toFixed(1) + " " + (C - seg).toFixed(1) + "' stroke-dashoffset='"
+      + (-(i * (seg + gap))).toFixed(1) + "'></circle>";
+  }
+  /* Earned segments burn; a carried one is only ghosted in. A weekend with no
+     shift should not look like the app handed him a third of the day. */
+  for (i = 0; i < done + carried; i++){
+    h += "<circle class='seg lit" + (i >= done ? " ghost" : "") + "' cx='118' cy='118' r='100' stroke-dasharray='"
+      + seg.toFixed(1) + " " + (C - seg).toFixed(1) + "' stroke-dashoffset='"
+      + (-(i * (seg + gap))).toFixed(1) + "'></circle>";
+  }
+  h += "</svg>";
+  h += "<span class='core'><span class='prize'>" + svg("pack", 40) + "</span>"
+    + "<span class='cnt'>" + (packs ? packs : (done + carried) + "<i>/3</i>") + "</span>"
+    + "<span class='cap'>" + (packs ? (packs === 1 ? "pack waiting" : "packs waiting") : "for a pack")
+    + "</span></span>";
+  return h;
+}
 
 /* ================================================================== TODAY
-   The board. A claim you can see from the door, then three things to tap.
-   Everything that used to be above them - the strapline, the page title, the
-   paragraph about Malta, the empty text field asking for his calendar gap -
-   is below them now or gone. */
+   One hero, three objects, one strip. The screen used to be seven stacked rows
+   of [icon][title][sentence][value], which is the shape of a settings list -
+   and no amount of restyling a list turns it into a game. */
 function viewToday(){
   var t = today(), d = day(t), y = day(shift(-1));
   var w = packsWaiting(), packs = w.day + w.streak;
+  var done = PILLARS.filter(function(g){ return pDone(t, g[0]); }).length;
+  var carried = PILLARS.filter(function(g){ return !pDone(t, g[0]) && !required(g[0], t); }).length;
   var h = "";
 
-  /* --- the claim. The one gold thing on the screen. */
-  var near = nearestSet();
-  if (packs){
-    var sub = w.streak
-      ? (w.streak > 1 ? w.streak + " streak packs" : "A streak pack") + (w.day ? " and " + w.day + " more" : "") + ". Better odds."
-      : near ? "One of them could finish " + near.set[1] + "." : (packs * 3) + " cards.";
-    h += "<button class='claim' data-open='1'><span class='shine'></span><span class='in'>"
-      + "<span class='glyph'>" + svg("pack", 26) + "</span>"
-      + "<span class='t'><b>" + packs + (packs === 1 ? " pack waiting" : " packs waiting") + "</b>"
-      + "<span>" + esc(sub) + "</span></span>"
-      + "<span class='arrow'>" + svg("arrow", 20) + "</span></span></button>";
-  } else {
-    var owed = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
-    h += "<div class='claim idle'><span class='in'>"
-      + "<span class='glyph'>" + svg("pack", 26) + "</span>"
-      + "<span class='t'><b>" + (owed ? (owed === 1 ? "One more for a pack" : owed + " more for a pack")
-                                      : "Today is in") + "</b>"
-      + "<span>" + esc(owed
-          ? "All three earns a pack. Every seventh day in a row earns a bigger one."
-          : "Nothing left to claim. The next pack is tomorrow's.") + "</span></span></span></div>";
+  /* the shift, as a line rather than a panel */
+  h += "<button class='daywrap' data-hq='1'>" + dayBarHTML() + "</button>";
+
+  /* the hero */
+  var near = nearestSet(), door = nextDoor(), sub;
+  if (packs) sub = packs === 1 ? "Tap to open it." : "Tap to open them.";
+  else if (near) sub = near.set[1] + " is " + near.left + (near.left === 1 ? " card" : " cards") + " from finished.";
+  else if (door) sub = (door[3] - fullDays()) + " more full days opens " + door[1] + ".";
+  else sub = "Every seventh day in a row pays double.";
+
+  h += "<div class='stage'>"
+    + "<" + (packs ? "button" : "div") + " class='dayring" + (packs ? " done" : "") + "'"
+    + (packs ? " data-open='1'" : "") + ">" + ringHTML(done, carried, packs) + "</" + (packs ? "button" : "div") + ">"
+    + "<p class='herosub'>" + esc(sub) + "</p></div>";
+
+  /* the three, as objects */
+  h += "<div class='triad'>";
+  PILLARS.forEach(function(g){
+    var on = pDone(t, g[0]), st = streak(g[0]), carried = !on && !required(g[0], t);
+    h += "<button class='pil" + (on ? " on" : "") + (carried ? " carried" : "") + "' data-p='" + g[0] + "'"
+      + " aria-pressed='" + (on ? "true" : "false") + "'>"
+      + "<span class='disc'>" + svg(on ? "tick" : g[2], 28) + "</span>"
+      + "<span class='lb'>" + esc(g[1]) + "</span>"
+      + "<span class='st'>" + (on ? (st + (st === 1 ? " day" : " days")) : carried ? "carried" : "")
+      + "</span></button>";
+  });
+  h += "</div>";
+
+  /* what the three mean, once, until the first one is ever recorded */
+  if (!PILLARS.some(function(g){ return !!firstDay(g[0]); })){
+    h += "<p class='firstrun'>Moving on purpose, a conversation home, and finishing when the "
+      + "shift finishes. Tap one when you have done it.</p>";
   }
 
-  /* --- the three. Still the point of the screen. */
-  var full = allThree(t);
-  h += "<div class='bhead'><h2>The three</h2><div class='pips'>";
-  PILLARS.forEach(function(g){
-    var on = pDone(t, g[0]), carried = !on && !required(g[0], t);
-    h += "<i class='" + (on ? (full ? "on all" : "on") : carried ? "carried" : "") + "'></i>";
-  });
-  h += "</div></div>";
-  /* Until he has ever recorded one, say what to do. One line, and it never
-     comes back once the first day is on the board. */
-  var everLogged = PILLARS.some(function(g){ return !!firstDay(g[0]); });
-  if (!everLogged) h += "<p class='startline'>Tap one when you have done it. "
-    + "All three today earns a pack.</p>";
-
-  PILLARS.forEach(function(g){
-    var on = pDone(t, g[0]), st = streak(g[0]), req = required(g[0], t);
-    h += "<button class='q" + (on ? " on" : "") + (st >= 7 ? " hot" : "") + "' data-p='" + g[0] + "'"
-      + " aria-pressed='" + (on ? "true" : "false") + "'>"
-      + "<span class='g'>" + svg(on ? "tick" : g[2], 22) + "</span>"
-      + "<span class='t'><b>" + esc(g[1]) + "</b><span>"
-      + esc(req ? g[3] : "No shift today, so this one is carried.") + "</span></span>"
-      /* A zero is not worth the biggest type on the row. Until there is a run
-         to show, the right-hand side is the state of the thing, not a count. */
-      + (st > 0
-          ? "<span class='n'><b>" + st + "</b><span>" + (st === 1 ? "day" : "days") + "</span></span>"
-          : "<span class='n dot'><i></i></span>")
-      + "</button>";
-  });
-
-  /* --- bedtime. The keystone he named himself, so it is a row you tap rather
-     than a panel with three paragraphs in it. Last night, not tonight. */
+  /* the small numbers */
   var bt = S.bed || BED_DEFAULT;
-  var bedState = y.bedok === undefined ? "not said" : y.bedok ? "made it" : "missed it";
-  h += "<button class='tile night" + (y.bedok ? " on" : "") + "' data-bedsheet='1'>"
-    + "<span class='ic'>" + svg(y.bedok ? "tick" : "moon", 20) + "</span>"
-    + "<span class='bd'><b>Bed by " + esc(bt) + "</b><span>Last night: " + bedState + "</span></span>"
-    + "<span class='rt'>" + svg("arrow", 16) + "</span></button>";
-
-  /* --- the shift. Compact, and the Malta explanation is behind it. */
-  h += "<button class='strip tap' data-hq='1'>" + trackInner() + "</button>";
-
-  /* --- the small numbers, as chips */
-  var left = freezesLeft(), tFroz = frozen(t);
-  h += "<div class='mini'>";
-  h += "<button class='" + (tFroz ? "cold" : "") + "' data-frzsheet='1'>" + svg("snow", 16)
-    + "<b>" + left + "</b> freezes</button>";
-  h += "<button data-gap='set'>" + svg("gap", 16) + (d.gap ? "<b>" + esc(d.gap) + "</b>" : "Set today's gap") + "</button>";
+  h += "<div class='strip2'>";
+  h += "<button data-bedsheet='1' class='" + (y.bedok ? "on" : "") + "'>" + svg("moon", 16)
+    + "Bed <b>" + esc(bt) + "</b></button>";
+  h += "<button data-frzsheet='1'>" + svg("snow", 16) + "<b>" + freezesLeft() + "</b> freezes</button>";
+  h += "<button data-gap='set'>" + svg("gap", 16) + (d.gap ? "<b>" + esc(d.gap) + "</b>" : "Gap") + "</button>";
   h += "<button data-camp='1'>" + svg("pin", 16) + esc(S.camp) + "</button>";
   h += "</div>";
 
-  /* --- what is on. Two rows, both opening into the detail. */
-  h += "<h2>Also today</h2>";
-
+  /* everything that is not the game, below the fold */
+  h += "<div class='also'><div class='alsoh'>Also today</div>";
   if (y.said && y.kept === undefined){
-    h += "<button class='tile warn' data-keptsheet='1'>"
-      + "<span class='ic'>" + svg("gap", 20) + "</span>"
+    h += "<button class='row warn' data-keptsheet='1'><span class='ic'>" + svg("gap", 20) + "</span>"
       + "<span class='bd'><b>Yesterday you said</b><span>" + esc(y.said) + "</span></span>"
-      + "<span class='rt'>Did it?</span></button>";
+      + "<span class='ch'>" + svg("arrow", 16) + "</span></button>";
   }
-  h += "<button class='tile" + (d.said ? " on" : "") + "' data-saysheet='1'>"
-    + "<span class='ic'>" + svg(d.said ? "tick" : "pen", 20) + "</span>"
-    + "<span class='bd'><b>" + (d.said ? esc(d.said) : "One thing today") + "</b>"
-    + "<span>" + (d.said ? "Named. Tap to change it." : "The one thing that would make today count") + "</span></span>"
-    + "<span class='rt'>" + svg("arrow", 16) + "</span></button>";
-
   var p = pick();
   if (p){
-    h += "<button class='tile' data-place='1'>"
-      + "<span class='ic'>" + svg("pin", 20) + "</span>"
-      + "<span class='bd'><b>" + esc(p[0]) + "</b><span>" + esc(KIND[p[3]][1] + " · " + p[1]) + "</span></span>"
-      + "<span class='rt'>" + svg("arrow", 16) + "</span></button>";
+    h += "<button class='row' data-place='1'><span class='ic'>" + svg("pin", 20) + "</span>"
+      + "<span class='bd'><b>" + esc(p[0]) + "</b><span>" + esc(KIND[p[3]][1] + " · " + p[1])
+      + "</span></span><span class='ch'>" + svg("arrow", 16) + "</span></button>";
   }
+  h += "<button class='row" + (d.said ? " on" : "") + "' data-saysheet='1'>"
+    + "<span class='ic'>" + svg(d.said ? "tick" : "pen", 20) + "</span>"
+    + "<span class='bd'><b>" + (d.said ? esc(d.said) : "One thing today") + "</b>"
+    + "<span>" + (d.said ? "Named. Tap to change it." : "Name it and it counts.") + "</span></span>"
+    + "<span class='ch'>" + svg("arrow", 16) + "</span></button>";
+  h += "</div>";
 
-  /* --- the ladder */
   h += seasonHTML();
   return h;
 }
@@ -3780,9 +3685,9 @@ paintHud();
    half-typed into the day's one line. */
 setInterval(function(){
   if (tab !== "today" || ST || MODAL) return;
-  var strip = document.querySelector("#screen .strip");
-  if (!strip) return;
-  strip.innerHTML = trackHTML();
+  var bar = document.querySelector("#screen .daywrap");
+  if (!bar) return;
+  bar.innerHTML = dayBarHTML();
 }, 60000);
 
 /* Hold the splash for a beat, then hand over. It covers the frame where the
