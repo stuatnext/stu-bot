@@ -220,11 +220,84 @@ onboarded.
 
 The hero is no longer a generic progress ring. His day is set by a clock two
 continents away, so the day is drawn as a clock: twenty-four hours round the
-outside with **Malta's shift shaded onto the rim** and a hand at now; the three
-things he does on an inner ring; and what they pay in the middle. One object
-where there used to be four stacked blocks — a shift bar, a progress ring, a
-count and a claim button. When the third lands the whole thing lights and the
-centre turns gold and becomes the button.
+outside with **Malta's shift shaded onto the rim**, the three things he does on
+an inner ring, and what they pay in the middle. One object where there used to
+be four stacked blocks — a shift bar, a progress ring, a count and a claim
+button. When the third lands the whole thing lights and the centre turns gold
+and becomes the button.
+
+The hand at *now* is not a hand. It is the sun, or the moon once it has gone
+down, and the ring is turned a quarter so that **noon is at the top and midnight
+at the bottom** — which puts sunrise on the left and sunset on the right, the way
+it happens out of the window. It is the one thing on the screen that is always
+moving, and it is why the dial reads as a sky rather than a gauge.
+
+#### "There's still no tutorial"
+
+There was one. He could not reach it, and that is the same thing.
+
+The first-run flow was gated on `S.onboarded`, and any save with days in it was
+migrated straight past it — his has months. The replay lived at the very bottom
+of More, under forty rows of history, four thousand pixels down a screen nobody
+scrolls. Built, shipped, unreachable.
+
+So the tutorial is now a proper **coach mark**: the board dims, one control is
+cut out of the dark with a gold ring around it, and one sentence sits beside it
+in its own card. Three steps — tap a pillar, finish the day, open the pack —
+with progress pips and a way out on every one. A tap anywhere lands on the
+highlighted control, which is more forgiving than making him hit it exactly.
+
+It runs in two modes off the same three steps. On a **first run** each step
+waits for the thing to actually be done before it moves on, so it cannot get
+ahead of him. A **replay** from More is a tour: every step is shown in order, a
+tap advances it, and nothing is ticked on his behalf. That distinction is the
+whole fix — the condition-driven version, replayed on a board where the pillars
+are already ticked, skipped its first two steps and opened on *"That is a
+pack."*
+
+And **"How this works" is now the first row of More**, not the last.
+
+#### "It's not beautiful at all"
+
+Every screenshot he sent was taken between 21:00 and 00:30, at which point the
+app was two greys and a card. The thing is called *Daylight*.
+
+**The sky is the time of day.** Seven phases — deep night, dawn, morning, day,
+golden hour, dusk, night — set on load and re-checked every minute. Each is
+three layers stacked the way a sky actually stacks: a band of light sitting on
+the horizon, a wash coming down from the zenith, and the body of the sky between
+them, with a fine grain over the top. The first attempt centred the horizon a
+screen and a bit below the bottom edge, so golden hour arrived as a brown
+rectangle; it sits just above the nav bar now and the palettes are pushed hard
+enough that the seven are unmistakably different rooms. Every panel is glass
+over it rather than a solid fill, so the hour reads through the whole app.
+
+**The three have their own colours.** Resting, they were three identical grey
+slabs, which reads as three disabled controls — the single loudest reason the
+board looked dead in a screenshot. Trained is blue, Family is rose, Stopped is
+gold. Done is still jade whichever one it is, so the state language does not
+move.
+
+#### Three screens that were still documents
+
+Today was a game. Pot, Threads and More were a spreadsheet, an essay and a log
+file, and between them they were most of *"overwhelming with information."*
+
+**Pot** was a five-row ledger with a total. It is a vault now: the number, then
+one bar showing where the money came from with four keys under it, then the
+spending as receipts. 2,384px → 1,600px, and *"1 seven-day runs"* and *"1
+trophies"* got their grammar back.
+
+**Threads** was six paragraphs stacked in a column — three thousand pixels of
+reading before you found a button. It is a quest log: a countdown at the top, a
+segmented bar showing how many are cleared, then one card per thread where the
+**next action is the loud line** and the reasoning is folded behind *"Why this
+one."* 2,962px → 2,153px.
+
+**More** was 4,113px of history with the settings at the bottom. The list of
+things you can actually do is at the top now, as a proper settings list with
+icons and chevrons; the last ten days show, the rest fold away. 4,113px →
+2,255px.
 
 #### The collection stopped being a filing cabinet
 

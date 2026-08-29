@@ -23,8 +23,9 @@
    room; a light-mode game is a document. Light mode survives as a legibility
    escape hatch, not as a second design. */
 :root{
-  --bg:#080B12; --bg2:#0C1119; --panel:#131A26; --panel2:#1A2330; --sunk:#0A0E16;
-  --line:#1F2A3A; --line2:#2E3D52;
+  --bg:#05060F; --bg2:#0A0E1C;
+  --panel:rgba(24,32,48,.62); --panel2:rgba(32,42,62,.58); --sunk:rgba(8,11,20,.55);
+  --line:rgba(150,180,220,.14); --line2:rgba(150,180,220,.26);
   --ink:#EEF3F8; --ink2:#9AAAC0; --ink3:#61738C;
   --gold:#F2B735; --gold2:#FFE38A; --goldInk:#3A2A05; --goldSoft:#2A2008;
   --jade:#3FD9A0; --jadeSoft:#0E2C24; --jadeInk:#8FF0CB;
@@ -54,18 +55,52 @@
    currency chips kept showing after they were told to hide. */
 [hidden]{display:none !important}
 html{-webkit-text-size-adjust:100%; text-size-adjust:100%; height:100%}
+/* ===================================================================== the sky
+   The app is called Daylight and it was painted the colour of a bank. The
+   games people call beautiful - Alto's Odyssey, Monument Valley - get it from
+   atmosphere and confident colour rather than ornament, and Alto's whole
+   palette moves with the time of day. His day IS the subject, so the sky
+   behind everything is the actual hour in the place he is standing.
+
+   It stays dark at every hour: he opens this thing at eleven at night, so
+   night is the room it lives in and the rest are moods of it. Set by
+   paintSky() on load and on the minute. */
+:root{
+  --sky1:#05060E; --sky2:#0C1226; --sky3:#191634; --glow:#2A2350;
+  --skyInk:#EEF2F8;
+}
+:root[data-sky="deepnight"]{ --sky1:#04050E; --sky2:#0A0F22; --sky3:#141636; --glow:#262052; }
+:root[data-sky="dawn"]    { --sky1:#0A0B1E; --sky2:#2A1738; --sky3:#171A3E; --glow:#8C3B4E; }
+:root[data-sky="morning"] { --sky1:#06111C; --sky2:#0F2C3A; --sky3:#123048; --glow:#2C7C78; }
+:root[data-sky="day"]     { --sky1:#07161F; --sky2:#10394A; --sky3:#123A58; --glow:#2E8F84; }
+:root[data-sky="gold"]    { --sky1:#150D14; --sky2:#3A1C22; --sky3:#2A1430; --glow:#B4632A; }
+:root[data-sky="dusk"]    { --sky1:#08071A; --sky2:#241435; --sky3:#1A1440; --glow:#7A2E58; }
+:root[data-sky="night"]   { --sky1:#050614; --sky2:#0D1330; --sky3:#181542; --glow:#382E70; }
+
 body{
   margin:0; min-height:100%;
+  /* Three layers, the way a sky actually stacks: a band of light sitting on
+     the horizon, a wash coming down from the zenith, and the body of the sky
+     between them. The horizon used to be centred a screen-and-a-bit below the
+     bottom edge, which meant golden hour arrived as a brown rectangle. */
   background:
-    radial-gradient(125% 58% at 50% -10%, var(--bg2) 0%, transparent 62%),
-    radial-gradient(90% 40% at 100% 102%, var(--bg2) 0%, transparent 72%),
-    var(--bg);
+    radial-gradient(125% 40% at 50% 99%, var(--glow) 0%, transparent 72%),
+    radial-gradient(120% 54% at 50% -12%, var(--sky3) 0%, transparent 68%),
+    linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 56%, var(--sky1) 100%);
   background-attachment:fixed;
   color:var(--ink);
   font-family:"Instrument Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
   overscroll-behavior-y:none;
+  transition:background 1.6s linear;
 }
+/* Grain. A flat gradient reads as a CSS gradient; a grained one reads as air.
+   One inline SVG turbulence, no request, invisible until you look for it. */
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#hud,#screen,#nav{position:relative; z-index:1}
 .mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums}
 .disp{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; letter-spacing:-.03em}
 .zh{font-family:"PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Source Han Sans SC",
@@ -549,14 +584,35 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 .vault .cap{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.16em;
   text-transform:uppercase; color:var(--ink3); margin-top:9px}
 .vault p{margin:10px 0 0; font-size:13.5px; color:var(--ink2)}
-.ledger{display:grid; gap:1px; background:var(--line); border:1px solid var(--line);
-  border-radius:14px; overflow:hidden; margin:12px 0}
-.ledger div{display:flex; justify-content:space-between; gap:12px; padding:11px 14px;
-  background:var(--panel); font-size:14px}
-.ledger div span:last-child{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
-  font-weight:700; flex:none}
-.ledger div.out span:last-child{color:var(--crit)}
-.ledger div.tot{background:var(--sunk); font-weight:700}
+.vault .fine{margin:14px 0 0; font-size:12.5px; line-height:1.5; color:var(--ink3)}
+.vault .btns{margin-top:16px}
+
+/* where the money came from: one bar, four keys. A table of five rows with a
+   total was a document; this is the same numbers in a third of the height. */
+.fill{padding:15px 15px 13px; margin:12px 0; border-radius:var(--r2);
+  border:1px solid var(--line); background:var(--panel)}
+.fbar{display:flex; gap:3px; height:12px; border-radius:99px; overflow:hidden;
+  background:var(--sunk)}
+.fbar i{display:block; border-radius:99px; min-width:5px}
+.fkeys{display:grid; grid-template-columns:1fr 1fr; gap:11px 12px; margin-top:14px}
+.fk{display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; font-size:12px; color:var(--ink3)}
+.fk i{width:8px; height:8px; border-radius:3px; flex:none; align-self:center}
+.fk b{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:15px; color:var(--ink)}
+.fk span{flex:1 0 100%; padding-left:15px; margin-top:-3px}
+.fout{display:flex; justify-content:space-between; align-items:baseline; margin-top:14px;
+  padding-top:12px; border-top:1px solid var(--line); font-size:13px; color:var(--ink3)}
+.fout b{font-family:"JetBrains Mono",monospace; font-size:15px; color:var(--crit)}
+
+/* spending history as receipts rather than rows of a table */
+.recs{display:grid; gap:7px; margin:10px 0 4px}
+.rec{display:grid; grid-template-columns:auto 1fr auto; align-items:baseline; gap:11px;
+  padding:11px 14px; border-radius:13px; border:1px solid var(--line); background:var(--panel)}
+.rec .rd{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink3)}
+.rec .rt{font-size:13.5px; color:var(--ink2)}
+.rec .rv{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:14px; color:var(--ink)}
 
 .flame{display:flex; align-items:center; gap:16px; padding:18px; margin:13px 0; border-radius:var(--r2);
   border:1px solid color-mix(in srgb,var(--ember) 45%,transparent); color:var(--ink);
@@ -695,8 +751,11 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 .dial .shift{fill:none; stroke:#3B348C; stroke-width:9}
 .dial .tick{stroke:#243247; stroke-width:2; stroke-linecap:round}
 .dial .tick.six{stroke:#33455E}
-.dial .hand{stroke:var(--ember); stroke-width:3.4; stroke-linecap:round;
-  filter:drop-shadow(0 0 6px color-mix(in srgb,var(--ember) 75%,transparent))}
+.dial .orb{fill:#FFD98A; filter:drop-shadow(0 0 12px rgba(255,196,90,.85))}
+.dial .orb.moon{fill:#DCE6F5; filter:drop-shadow(0 0 11px rgba(200,220,255,.6))}
+.dial .ray{stroke:#FFD98A; stroke-width:2.2; stroke-linecap:round; opacity:.8;
+  filter:drop-shadow(0 0 5px rgba(255,196,90,.7))}
+.dial .cut{fill:var(--sky2)}
 .dial .slot{fill:none; stroke:#182437; stroke-width:17; stroke-linecap:round}
 .dial .lit{fill:none; stroke:var(--jade); stroke-width:17; stroke-linecap:round;
   filter:drop-shadow(0 0 9px color-mix(in srgb,var(--jade) 50%,transparent))}
@@ -738,10 +797,12 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
   transition:transform .14s var(--tap), background .25s}
 .pil:active{transform:translateY(3px) scale(.98)}
 .pil .disc{width:60px; height:60px; border-radius:50%; display:flex; align-items:center;
-  justify-content:center; background:radial-gradient(70% 70% at 35% 25%,#1D2939,#111927);
-  box-shadow:0 0 0 2px #22314A inset,0 4px 10px rgba(0,0,0,.55);
-  transition:all .28s var(--pop)}
-.pil .disc svg{color:var(--ink3); transition:color .2s}
+  justify-content:center; transition:all .28s var(--pop);
+  background:radial-gradient(70% 70% at 35% 25%,
+    color-mix(in srgb,var(--pil) 17%,#1D2939), color-mix(in srgb,var(--pil) 7%,#111927));
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--pil) 34%,#22314A) inset,
+    0 4px 10px rgba(0,0,0,.55)}
+.pil .disc svg{color:color-mix(in srgb,var(--pil) 74%,var(--ink3)); transition:color .2s}
 .pil .lb{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:15px}
 .pil .st{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.09em;
   text-transform:uppercase; color:var(--ink3)}
@@ -752,6 +813,7 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
   box-shadow:0 0 0 2px rgba(125,240,196,.55) inset,
     0 0 20px color-mix(in srgb,var(--jade) 55%,transparent)}
 .pil.on .disc svg{color:#04241A}
+.pil.carried .disc svg{color:var(--ink3)}
 .pil.on .lb{color:var(--jadeInk)}
 .pil.on .st{color:var(--jade)}
 .pil.carried .disc{opacity:.5}
@@ -762,10 +824,13 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 #hud.bare .who .xpbar{opacity:.35}
 
 /* one strip for every small number on the day */
-.strip2{display:flex; gap:8px; margin:26px -14px 0; padding:0 14px; overflow-x:auto;
-  scrollbar-width:none; -webkit-overflow-scrolling:touch}
+/* This was a horizontal scroller, which meant the fourth chip was always half
+   off the edge and nothing said it was there. Four chips wrap onto two rows
+   and all four are visible, which is the whole point of them. */
+.strip2{display:flex; flex-wrap:wrap; gap:8px; margin:26px 0 0}
+.strip2 > *{flex:1 1 auto}
 .strip2::-webkit-scrollbar{display:none}
-.strip2 button{flex:none; display:flex; align-items:center; gap:7px; padding:9px 13px;
+.strip2 button{display:flex; justify-content:center; align-items:center; gap:7px; padding:9px 13px;
   min-height:44px; border-radius:14px; border:1px solid var(--line); background:var(--panel);
   color:var(--ink2); font:inherit; font-size:13px; font-weight:600; cursor:pointer;
   white-space:nowrap; transition:transform .12s var(--tap)}
@@ -798,6 +863,168 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 .row.on .ic{background:var(--jade); border-color:var(--jade); color:#05231A}
 .row.warn{border-color:color-mix(in srgb,var(--ember) 45%,transparent)}
 .row.warn .ic{color:var(--ember)}
+
+
+/* ------------------------------------------------------- glass over the sky
+   The surfaces are translucent now, so they have to blur what is behind them
+   or they read as dirty rectangles rather than panes. */
+.panel,.row,.strip2 button,.chip,.rail button,.filters button,.ware,.trk,.rec,.q,.ye,
+.season,.door,.frz,.pil,#modal .mw{
+  backdrop-filter:blur(16px) saturate(1.25); -webkit-backdrop-filter:blur(16px) saturate(1.25)}
+.pil{background:linear-gradient(175deg,rgba(30,42,62,.72),rgba(14,20,34,.66))}
+.pil.on{background:linear-gradient(175deg,rgba(22,64,48,.82),rgba(13,42,32,.74))}
+.dial .prize{backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
+.medals .disc,.tc,.pk{backdrop-filter:none; -webkit-backdrop-filter:none}
+
+
+/* =================================================================== the coach
+   A reduced screen is not a tutorial. This points at the thing, says one
+   sentence on its own ground, and will not advance until it is pressed.
+
+   The hole is a rectangle cut with a 9999px spread shadow rather than a masked
+   circle: it matches the shape of what it is pointing at, it cannot spill off
+   the edge of the screen, and hit-testing stays simple because the dimming
+   element never receives the tap. */
+#coach{position:fixed; inset:0; z-index:170; display:none}
+#coach.on{display:block}
+#coach .catch{position:absolute; inset:0}
+/* Shadow order is paint order: the 9999px veil has to be listed LAST or it
+   paints over its own ring and the highlight comes out muddy. */
+#coach .spot{position:absolute; border-radius:24px; pointer-events:none;
+  box-shadow:0 0 0 2px var(--gold2),
+    0 0 26px 5px color-mix(in srgb,var(--gold) 50%,transparent),
+    0 0 0 9999px rgba(3,5,11,.9);
+  animation:spot .38s var(--pop) both}
+@keyframes spot{from{opacity:0; transform:scale(.9)}to{opacity:1; transform:none}}
+#coach .say{position:absolute; left:16px; right:16px; pointer-events:none;
+  background:linear-gradient(165deg,rgba(26,34,52,.97),rgba(14,19,32,.97));
+  border:1px solid var(--line2); border-radius:22px; padding:20px 20px 18px;
+  box-shadow:0 18px 44px rgba(0,0,0,.6);
+  backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  animation:coachin .42s var(--pop) both .12s}
+#coach .say b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
+  font-size:23px; letter-spacing:-.03em; text-wrap:balance}
+#coach .say span{display:block; margin-top:7px; font-size:14px; color:var(--ink2);
+  line-height:1.5; text-wrap:balance}
+#coach .say i{display:block; margin-top:15px; font-family:"JetBrains Mono",monospace;
+  font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold2);
+  font-style:normal; animation:gatepulse 2s ease-in-out infinite}
+#coach .say .pips{display:flex; gap:6px; margin-top:16px; font-style:normal}
+#coach .say .pips i{display:block; width:6px; height:6px; border-radius:50%; margin:0;
+  background:var(--line2); animation:none}
+#coach .say .pips i.on{background:var(--gold2);
+  box-shadow:0 0 9px color-mix(in srgb,var(--gold) 60%,transparent)}
+#coach .say .pips + i{margin-top:11px}
+@keyframes coachin{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+#coach .skip{position:absolute; left:0; right:0; bottom:calc(84px + env(safe-area-inset-bottom));
+  text-align:center}
+#coach .skip button{background:none; border:0; color:var(--ink3); font:inherit; font-size:13px;
+  padding:12px 18px; min-height:44px; cursor:pointer; text-decoration:underline;
+  text-underline-offset:3px}
+@media (prefers-reduced-motion:reduce){ #coach .say i{animation:none !important} }
+
+
+/* ==================================================================== THREADS
+   A quest log. The next action is the loud line; the reason it matters is one
+   tap away instead of three lines of prose in front of the button. */
+.count{position:relative; overflow:hidden; display:grid;
+  grid-template-columns:auto 1fr; align-items:center; gap:16px; padding:20px;
+  margin:14px 0; border-radius:var(--r2);
+  border:1px solid color-mix(in srgb,var(--violetInk) 42%,transparent);
+  background:linear-gradient(150deg,var(--violetSoft),var(--panel) 72%)}
+.count .cn{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:52px; font-weight:800; letter-spacing:-.055em; line-height:.9;
+  color:var(--violetInk)}
+.count .cb h3{margin:0; font-size:17px; letter-spacing:-.01em}
+.count .cd{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink3); margin-top:5px}
+.count p{grid-column:1/-1; margin:2px 0 0; font-size:13.5px; color:var(--ink2)}
+
+.qhead{display:flex; align-items:baseline; justify-content:space-between; gap:12px}
+.qhead h2{margin-bottom:0}
+.qn{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink3)}
+.qbar{display:flex; gap:4px; margin:10px 0 12px}
+.qbar i{flex:1; height:4px; border-radius:99px; background:var(--sunk)}
+.qbar i.on{background:var(--jade); box-shadow:0 0 9px color-mix(in srgb,var(--jade) 55%,transparent)}
+
+.q{position:relative; padding:15px 16px 13px; margin:9px 0; border-radius:var(--r2);
+  border:1px solid var(--line); background:var(--panel)}
+.q.hot{border-color:color-mix(in srgb,var(--ember) 40%,transparent);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--ember) 9%,var(--panel)),var(--panel) 62%)}
+.q.done{border-color:color-mix(in srgb,var(--jade) 34%,transparent); opacity:.72}
+.qt{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
+.qt h3{margin:0; font-size:16.5px; letter-spacing:-.012em}
+.qa{margin:11px 0 0; font-size:15px; line-height:1.42; font-weight:600; color:var(--ink)}
+.q.done .qa{font-weight:500; color:var(--ink3)}
+.qa s{text-decoration-color:color-mix(in srgb,var(--ink3) 70%,transparent)}
+.qf{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:13px}
+.qgo{display:inline-flex; align-items:center; gap:7px; flex:none; padding:9px 14px;
+  border-radius:99px; border:1px solid color-mix(in srgb,var(--jade) 55%,transparent);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--jade) 22%,transparent),transparent);
+  color:var(--jade); font:inherit; font-size:13px; font-weight:700; cursor:pointer}
+.qgo svg{width:15px; height:15px}
+.qgo.off{border-color:var(--line); color:var(--ink3); background:none; font-weight:600}
+.qgo:active{transform:scale(.96)}
+
+/* the reasoning, folded away */
+.why{flex:1; min-width:0}
+.why summary{list-style:none; cursor:pointer; font-size:12.5px; color:var(--ink3);
+  display:inline-flex; align-items:center; gap:6px}
+.why summary::-webkit-details-marker{display:none}
+.why summary::before{content:""; width:6px; height:6px; flex:none;
+  border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor;
+  transform:rotate(-45deg); transition:transform .18s ease; margin-top:-2px}
+.why[open] summary::before{transform:rotate(45deg); margin-top:-4px}
+.why p{margin:9px 0 0; font-size:13px; line-height:1.5; color:var(--ink2)}
+.why.wide{display:block; padding:14px 16px; margin:14px 0; border-radius:var(--r2);
+  border:1px solid var(--line); background:var(--panel)}
+
+/* dated lines: the rest of the year, and the weekly two */
+.yr{display:grid; gap:7px; margin:10px 0}
+.ye{display:grid; grid-template-columns:56px 1fr; gap:13px; align-items:start;
+  padding:13px 15px; border-radius:14px; border:1px solid var(--line); background:var(--panel)}
+.ye .yd{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:21px; font-weight:700; line-height:1; color:var(--ink); text-align:right}
+.ye .yd small{display:block; font-size:9px; letter-spacing:.09em; font-weight:600;
+  color:var(--ink3); margin-top:5px}
+.ye .yd.mono{font-size:12px; letter-spacing:.08em}
+.ye strong{font-size:14.5px}
+.ye .dim{font-size:12.5px; line-height:1.45; margin-top:3px}
+
+/* ======================================================================= MORE
+   A settings list, not a wall. The way back into the tutorial is the first
+   row on the screen instead of the last thing under forty rows of history. */
+.menu{display:grid; gap:1px; margin:14px 0; border-radius:var(--r2); overflow:hidden;
+  border:1px solid var(--line); background:var(--line)}
+.mi{display:grid; grid-template-columns:38px 1fr 18px; align-items:center; gap:13px; width:100%;
+  padding:14px 15px; border:0; background:var(--panel); color:var(--ink); font:inherit;
+  text-align:left; cursor:pointer}
+.mi:active{background:var(--tap)}
+.mic{display:grid; place-items:center; width:38px; height:38px; border-radius:12px;
+  background:var(--sunk); color:var(--ink2)}
+.menu:first-of-type .mi:first-child .mic{background:color-mix(in srgb,var(--gold) 17%,transparent); color:var(--gold)}
+.mib{display:grid; gap:2px; min-width:0}
+.mib b{font-size:15px; font-weight:650; letter-spacing:-.01em}
+.mib span{font-size:12.5px; color:var(--ink3)}
+.mia{color:var(--ink3); display:grid; place-items:center}
+.mia svg{width:15px; height:15px}
+
+.str3{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px}
+.s1{text-align:center; padding:10px 4px}
+.s1 .si{color:var(--ink3); display:flex; justify-content:center}
+.s1 .sn{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:28px; font-weight:800; letter-spacing:-.04em; margin-top:4px}
+.s1 .sl{font-size:11px; color:var(--ink3)}
+.sgh{display:flex; align-items:baseline; gap:12px}
+.sgn{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:32px; font-weight:800; letter-spacing:-.04em}
+.sgn small{font-size:17px; color:var(--ink3)}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.tag.off{opacity:.42}
+.vault::after{content:""; position:absolute; right:-46px; top:-56px; width:200px; height:200px;
+  border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle,color-mix(in srgb,var(--jade) 24%,transparent),transparent 68%)}
 
 </style>
 </head>
@@ -878,6 +1105,8 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 <!-- The front door. A game says who it is before it hands you anything, and
      this one had no first screen at all - it opened straight onto a loaded HUD
      with two zeroed currencies. Shown once, ever. -->
+<div id="coach" aria-live="polite"></div>
+
 <div id="gate" hidden>
   <svg class="mk" viewBox="0 0 100 100" fill="none" aria-hidden="true">
     <circle cx="50" cy="50" r="19" stroke="#F2B735" stroke-width="6"/>
@@ -1006,10 +1235,13 @@ function ukDays(includeOpen){
    becomes. They were once "train" and "family", and "train" happened to be a
    checkmark while "family" was not defined at all, so a fresh board showed one
    row already ticked and one row blank. */
+/* key, label, resting icon, what it means, and the colour it wears when it is
+   waiting. Three identical grey slabs read as three disabled controls; three
+   colours read as three things. Done is always jade, whichever one it is. */
 var PILLARS = [
-  ["train",  "Trained", "run",   "Moving on purpose. Gym, a run, or a long walk."],
-  ["family", "Family",  "phone", "A conversation with someone at home. A message does not count."],
-  ["stop",   "Stopped", "clock", "Finished when the shift finished. Not burning out is a thing you do."]
+  ["train",  "Trained", "run",   "Moving on purpose. Gym, a run, or a long walk.", "#5AC8F5"],
+  ["family", "Family",  "phone", "A conversation with someone at home. A message does not count.", "#FF8FA3"],
+  ["stop",   "Stopped", "clock", "Finished when the shift finished. Not burning out is a thing you do.", "#F2B735"]
 ];
 
 var BED_DEFAULT = "23:45";
@@ -1800,6 +2032,26 @@ function svg(name, size){
        + (ICONS[name] || "") + "</svg>";
 }
 
+/* ====================================================================== the sky
+   Which hour of his day the app is lit by. Derived from the clock on the
+   device, so it is the sky where he is standing rather than where his work is. */
+function skyPhase(){
+  var h = new Date().getHours();
+  if (h < 5)  return "deepnight";
+  if (h < 7)  return "dawn";
+  if (h < 11) return "morning";
+  if (h < 16) return "day";
+  if (h < 19) return "gold";
+  if (h < 21) return "dusk";
+  return "night";
+}
+function paintSky(){
+  var p = skyPhase();
+  if (document.documentElement.getAttribute("data-sky") !== p){
+    document.documentElement.setAttribute("data-sky", p);
+  }
+}
+
 /* ==================================================================== sound
    Synthesised, so there are no files to load and nothing to go missing. It
    only ever starts on a tap, which is also the only way iOS allows it. */
@@ -2472,6 +2724,7 @@ function closeStage(){
   /* Opening the first pack is the end of the tutorial: he has done the loop
      once and been paid for it, so the rest of the app can appear. */
   graduate();
+  if (typeof coachStop === "function") coachStop();
   sfx("tap");
   var el = stageEl();
   el.className = "";
@@ -2610,6 +2863,10 @@ function setBadge(tab, n, pulse){
 function dialHTML(done, packs){
   var s = shape();
   var R1 = 132, R2 = 106, C1 = 2 * Math.PI * R1, C2 = 2 * Math.PI * R2;
+  /* Quarter turn, so the ring reads as a sky and not a gauge: midnight at the
+     bottom, noon at the top, and the sun therefore rising on the left and
+     setting on the right the way it does out of the window. */
+  var Q = Math.PI / 2;
   var i, h = "<svg viewBox='0 0 300 300' aria-hidden='true'>";
 
   h += "<circle class='track' cx='150' cy='150' r='" + R1 + "'></circle>";
@@ -2617,22 +2874,38 @@ function dialHTML(done, packs){
     var from = (s.start / 1440) * C1, len = ((s.end - s.start) / 1440) * C1;
     h += "<circle class='shift' cx='150' cy='150' r='" + R1 + "' stroke-dasharray='"
       + len.toFixed(1) + " " + (C1 - len).toFixed(1) + "' stroke-dashoffset='"
-      + (-from).toFixed(1) + "'></circle>";
+      + (-(from + C1 / 4)).toFixed(1) + "'></circle>";
   }
   /* Twenty-four ticks, longer every six hours, so it reads as a whole day
      rather than a twelve-hour clock face. */
   for (i = 0; i < 24; i++){
-    var ang = (i / 24) * 2 * Math.PI;
+    var ang = (i / 24) * 2 * Math.PI + Q;
     var out = i % 6 === 0 ? 16 : 11;
     h += "<line class='tick" + (i % 6 === 0 ? " six" : "") + "' x1='"
       + (150 + Math.cos(ang) * (R1 + 9)).toFixed(1) + "' y1='" + (150 + Math.sin(ang) * (R1 + 9)).toFixed(1)
       + "' x2='" + (150 + Math.cos(ang) * (R1 + out)).toFixed(1) + "' y2='"
       + (150 + Math.sin(ang) * (R1 + out)).toFixed(1) + "'></line>";
   }
-  var na = (s.now / 1440) * 2 * Math.PI;
-  h += "<line class='hand' x1='" + (150 + Math.cos(na) * (R1 - 15)).toFixed(1) + "' y1='"
-    + (150 + Math.sin(na) * (R1 - 15)).toFixed(1) + "' x2='" + (150 + Math.cos(na) * (R1 + 17)).toFixed(1)
-    + "' y2='" + (150 + Math.sin(na) * (R1 + 17)).toFixed(1) + "'></line>";
+  /* Not a clock hand - the sun, or the moon after it has gone down. It is what
+     makes the dial read as a sky rather than a gauge, and it is the one thing
+     on the screen that is always moving. */
+  var na = (s.now / 1440) * 2 * Math.PI + Q;
+  var ox = 150 + Math.cos(na) * R1, oy = 150 + Math.sin(na) * R1;
+  var night = skyPhase() === "night" || skyPhase() === "deepnight" || skyPhase() === "dusk";
+  h += "<circle class='orb" + (night ? " moon" : "") + "' cx='" + ox.toFixed(1) + "' cy='"
+    + oy.toFixed(1) + "' r='9'></circle>";
+  if (!night){
+    for (var k = 0; k < 8; k++){
+      var ra = k * Math.PI / 4;
+      h += "<line class='ray' x1='" + (ox + Math.cos(ra) * 12).toFixed(1) + "' y1='"
+        + (oy + Math.sin(ra) * 12).toFixed(1) + "' x2='" + (ox + Math.cos(ra) * 16).toFixed(1)
+        + "' y2='" + (oy + Math.sin(ra) * 16).toFixed(1) + "'></line>";
+    }
+  } else {
+    /* a crescent, cut by offsetting a disc of the sky over it */
+    h += "<circle class='cut' cx='" + (ox + 5).toFixed(1) + "' cy='" + (oy - 3.5).toFixed(1)
+      + "' r='8'></circle>";
+  }
 
   var gap = 18, seg = (C2 - 3 * gap) / 3;
   for (i = 0; i < 3; i++){
@@ -2702,7 +2975,7 @@ function viewToday(){
   PILLARS.forEach(function(g){
     var on = pDone(t, g[0]), st = streak(g[0]), carried = !on && !required(g[0], t);
     h += "<button class='pil" + (on ? " on" : "") + (carried ? " carried" : "") + "' data-p='"
-      + g[0] + "' aria-pressed='" + (on ? "true" : "false") + "'>"
+      + g[0] + "' style='--pil:" + g[4] + "' aria-pressed='" + (on ? "true" : "false") + "'>"
       + "<span class='disc'>" + svg(on ? "tick" : g[2], 29) + "</span>"
       + "<span class='lb'>" + esc(g[1]) + "</span>"
       + (st > 0 || carried
@@ -2901,37 +3174,55 @@ function viewDeck(){
 /* ===================================================================== POT
    Real money at a rate he set. Spares are deliberately not on this screen and
    nothing here converts into anything there. */
+/* A ledger is a document. A vault is a screen: one number you care about, a
+   bar that shows where it came from, and the prizes it is aimed at. */
+function plural(n, one, many){ return n + " " + (n === 1 ? one : many); }
+
 function viewPot(){
   var best = bestStreak(), e = potEarned(), spent = potSpent(), have = pot(), h = "";
-
-  h += "<div class='vault'><div class='amt' id='potBig'>" + money(have) + "</div>"
-    + "<div class='cap'>yours to spend</div>"
-    + "<p>Earned at " + money(rate()) + " a full day, and it does not expire. Spend it on anything. "
-    + "The only rule is that you tell it when you have, so the number stays true.</p>"
-    + "<div class='btns'><button class='btn pri' data-spend='1'>Spent some</button>"
-    + "<button class='btn' data-rate='1'>Change the rate</button></div></div>";
-
   var pc = packCounts();
-  h += "<div class='ledger'>"
-    + "<div><span>" + pc.day + " full days</span><span>" + money(e.days) + "</span></div>"
-    + "<div><span>" + pc.streak + " seven-day runs</span><span>" + money(e.streaks) + "</span></div>"
-    + "<div><span>" + setsComplete() + " sets finished</span><span>" + money(e.sets) + "</span></div>"
-    + "<div><span>" + goldHeld() + " trophies</span><span>" + money(e.trophies) + "</span></div>"
-    + (spent ? "<div class='out'><span>Spent</span><span>-" + money(spent) + "</span></div>" : "")
-    + "<div class='tot'><span>Pot</span><span>" + money(have) + "</span></div></div>";
+
+  h += "<div class='vault'>"
+    + "<div class='amt' id='potBig'>" + money(have) + "</div>"
+    + "<div class='cap'>yours to spend</div>"
+    + "<div class='btns'><button class='btn pri' data-spend='1'>Spent some</button>"
+    +   "<button class='btn' data-rate='1'>Change the rate</button></div>"
+    + "<p class='fine'>" + money(rate()) + " a full day, and it never expires. The only rule is that "
+    +   "you tell it when you spend, so the number stays true.</p></div>";
+
+  /* where it came from, as a bar rather than a table */
+  var src = [
+    [e.days,     plural(pc.day, "full day", "full days"),                 "var(--jade)"],
+    [e.streaks,  plural(pc.streak, "seven-day run", "seven-day runs"),    "var(--gold)"],
+    [e.sets,     plural(setsComplete(), "set finished", "sets finished"), "var(--violetInk)"],
+    [e.trophies, plural(goldHeld(), "trophy", "trophies"),                "var(--ember)"]
+  ].filter(function(r){ return r[0] > 0; });
+  if (src.length){
+    h += "<div class='fill'><div class='fbar'>";
+    src.forEach(function(r){ h += "<i style='flex:" + r[0] + ";background:" + r[2] + "'></i>"; });
+    h += "</div><div class='fkeys'>";
+    src.forEach(function(r){
+      h += "<div class='fk'><i style='background:" + r[2] + "'></i>"
+        + "<b>" + money(r[0]) + "</b><span>" + esc(r[1]) + "</span></div>";
+    });
+    h += "</div>";
+    if (spent) h += "<div class='fout'><span>Spent so far</span><b>&minus;" + money(spent) + "</b></div>";
+    h += "</div>";
+  }
 
   if ((S.spends || []).length){
-    h += "<h2>What you spent it on</h2><div class='panel'>";
-    S.spends.slice().reverse().slice(0, 12).forEach(function(s){
-      h += "<div class='row'><b class='k'>" + esc(nice(s[0])) + "</b><div>" + esc(s[2] || "Something")
-        + " <span class='dim'>" + money(s[1]) + "</span></div></div>";
+    h += "<h2>What you spent it on</h2><div class='recs'>";
+    S.spends.slice().reverse().slice(0, 8).forEach(function(s){
+      h += "<div class='rec'><span class='rd'>" + esc(nice(s[0])) + "</span>"
+        + "<span class='rt'>" + esc(s[2] || "Something") + "</span>"
+        + "<b class='rv'>" + money(s[1]) + "</b></div>";
     });
     h += "</div>";
   }
 
+  /* the prizes: a run, and three things it buys */
   h += "<div class='flame'><div class='n'>" + best + "<small>day streak</small></div>"
-    + "<p>Your best run across the three. The pot builds off this, and the three prizes below "
-    + "unlock off it.</p></div>";
+    + "<p>Your best run across the three. The prizes below unlock off it.</p></div>";
 
   REWARD_TIERS.forEach(function(t){
     var name = (S.rewards || {})[t[0]];
@@ -2945,8 +3236,8 @@ function viewPot(){
       + (C * k).toFixed(1) + " " + C.toFixed(1) + "'></circle></svg><b>" + t[0] + "</b></div>";
     h += "<div class='bd'><div class='lbl'>" + t[1] + " &middot; " + t[0] + " days</div>";
     h += "<h3>" + (name ? esc(name) : "Nothing set yet") + "</h3>";
-    h += "<p>" + esc(t[2]) + "</p>";
-    if (claimed) h += "<p class='dim'>Claimed " + claimed + (claimed === 1 ? " time" : " times") + " so far.</p>";
+    if (!name) h += "<p>" + esc(t[2]) + "</p>";
+    if (claimed) h += "<p class='dim'>Claimed " + claimed + (claimed === 1 ? " time" : " times") + ".</p>";
     h += "<div class='btns tight'>";
     if (name && unlocked) h += "<button class='btn pri' data-claimreward='" + t[0] + "'>Earned it</button>";
     h += "<button class='btn quiet' data-setreward='" + t[0] + "'>" + (name ? "Change" : "Set it") + "</button>";
@@ -2955,9 +3246,12 @@ function viewPot(){
     h += "</div></div>";
   });
 
-  h += "<h2>Trophies</h2>";
-  h += "<p class='dim' style='margin:0 0 8px'>Earned on total days, not consecutive ones, so a bad "
-    + "week costs you nothing here.</p><div class='medals'>";
+  h += "<details class='why wide'><summary>What makes a good prize</summary>"
+    + "<p>A reward you would have had anyway is not a reward. Set the bar at things you currently "
+    + "talk yourself out of &mdash; the good hawker centre across the island rather than the nearest "
+    + "one, a day in Batam, the flight that gets your brother here.</p></details>";
+
+  h += "<h2>Trophies</h2><div class='medals'>";
   BADGES.forEach(function(b){
     var n = totalDone(b[2]), got = n >= b[0];
     h += "<div class='md" + (got ? " got" : "") + "' title='" + esc(b[3]) + "'>"
@@ -2966,22 +3260,17 @@ function viewPot(){
   h += "</div>";
   var nx = BADGES.filter(function(b){ return totalDone(b[2]) < b[0]; })
                  .sort(function(a,b){ return (a[0]-totalDone(a[2])) - (b[0]-totalDone(b[2])); })[0];
-  if (nx) h += "<p class='dim'>Next: <strong>" + esc(nx[1]) + "</strong> at " + nx[0] + " — "
-    + (nx[0] - totalDone(nx[2])) + " to go. " + esc(nx[3]) + "</p>";
-
-  h += "<div class='panel ember'><h3>Pick things you would otherwise not do</h3>"
-    + "<p style='margin:8px 0 0'>A reward you would have had anyway is not a reward. Set the bar at "
-    + "things you currently talk yourself out of.</p>"
-    + "<div class='row'><b class='k'>Weekly</b><div>A coffee somewhere you have never been. A book. The good "
-    + "hawker centre across the island rather than the nearest one.</div></div>"
-    + "<div class='row'><b class='k'>Monthly</b><div>A proper meal out. A massage. A day in Batam — the ferry "
-    + "is forty-five minutes and costs less than a taxi to Changi.</div></div>"
-    + "<div class='row'><b class='k'>Quarterly</b><div>The one you keep deferring. A weekend in Bangkok, "
-    + "Penang or Yogyakarta. Or the flight that gets your brother here.</div></div></div>";
+  if (nx) h += "<p class='dim'>Next: <strong>" + esc(nx[1]) + "</strong> at " + nx[0] + " &mdash; "
+    + (nx[0] - totalDone(nx[2])) + " to go. Total days, not consecutive ones, so a bad week costs "
+    + "you nothing here.</p>";
   return h;
 }
 
-/* ================================================================= THREADS */
+/* ================================================================= THREADS
+   Six things going on, each with one next action. This used to be six
+   paragraphs stacked in a column - three thousand pixels of reading before
+   you found a button. It is a quest log now: the action is the loud part and
+   the reasoning is one tap away. */
 function viewThreads(){
   var h = "";
   var soon = MILESTONES.map(function(m){ return [m, daysUntil(m[1])]; })
@@ -2989,45 +3278,54 @@ function viewThreads(){
                        .sort(function(a,b){ return a[1] - b[1]; });
   if (soon.length){
     var m = soon[0];
-    h += "<div class='panel violet'><div style='display:flex;align-items:baseline;gap:14px'>"
-      + "<span class='mono' style='font-size:44px;font-weight:800;letter-spacing:-.05em;line-height:1;color:var(--violetInk)'>"
-      + m[1] + "</span><div><h3>days to " + esc(m[0][0]) + "</h3>"
-      + "<div class='dim'>" + nice(m[0][1]) + "</div></div></div>"
-      + "<p class='muted' style='margin:10px 0 0'>" + esc(m[0][2]) + "</p></div>";
+    h += "<div class='count'><div class='cn'>" + m[1] + "</div>"
+      + "<div class='cb'><h3>days to " + esc(m[0][0]) + "</h3>"
+      + "<div class='cd'>" + nice(m[0][1]) + "</div></div>"
+      + "<p>" + esc(m[0][2]) + "</p></div>";
   }
 
-  h += "<h2>Six things going on</h2>"
-    + "<p class='dim' style='margin:0 0 4px'>One next action each. A thread with three has none.</p>";
+  var cleared = THREADS.filter(function(t){ return (S.threads[t[0]] || {}).done; }).length;
+  h += "<div class='qhead'><h2>Open threads</h2>"
+    + "<span class='qn'>" + (THREADS.length - cleared) + " open</span></div>"
+    + "<div class='qbar'>";
   THREADS.forEach(function(t){
-    var st = S.threads[t[0]] || {};
-    h += "<div class='panel" + (st.done ? " jade" : "") + "'>";
-    h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>"
-      + "<h3>" + esc(t[1]) + "</h3>"
-      + "<span class='tag" + (t[5] && !st.done ? " ember" : "") + "'>" + esc(t[4]) + "</span></div>";
-    h += "<p class='dim' style='margin:7px 0 0'>" + esc(t[2]) + "</p>";
-    h += "<div class='row' style='margin-top:8px'><b class='k'>Next</b><div>"
-      + (st.done ? "<s>" + esc(t[3]) + "</s> — done " + nice(st.done) : "<strong>" + esc(t[3]) + "</strong>")
-      + "</div></div>";
-    h += "<div class='btns tight'><button class='btn" + (st.done ? " quiet" : " go") + "' data-thread='" + t[0] + "'>"
-      + (st.done ? "Not done after all" : "Done") + "</button></div></div>";
-  });
-
-  h += "<h2>The rest of the year</h2><div class='panel'>";
-  soon.slice(1).forEach(function(x){
-    h += "<div class='row'><b class='k'>" + x[1] + "d</b><div><strong>" + esc(x[0][0]) + "</strong> &middot; "
-      + nice(x[0][1]) + "<br><span class='dim'>" + esc(x[0][2]) + "</span></div></div>";
+    h += "<i" + ((S.threads[t[0]] || {}).done ? " class='on'" : "") + "></i>";
   });
   h += "</div>";
 
-  h += "<h2>Every week</h2><div class='panel'>"
-    + "<div class='row'><b class='k'>Sat 07:30</b><div><strong>parkrun.</strong> Furthest from Tanjong Pagar, "
-    + "not nearest. Walking is allowed. Share it with your partner — he wants the gym and a community too.</div></div>"
-    + "<div class='row'><b class='k'>Wed 14:30</b><div><strong>Call your mum</strong> while you walk. About 07:00 "
-    + "for her. Late is fine; a clean miss is not.</div></div></div>";
+  THREADS.forEach(function(t){
+    var st = S.threads[t[0]] || {};
+    h += "<div class='q" + (st.done ? " done" : (t[5] ? " hot" : "")) + "'>"
+      + "<div class='qt'><h3>" + esc(t[1]) + "</h3>"
+      +   "<span class='tag" + (t[5] && !st.done ? " ember" : "") + "'>" + esc(t[4]) + "</span></div>"
+      + "<div class='qa'>" + (st.done ? "<s>" + esc(t[3]) + "</s>" : esc(t[3])) + "</div>"
+      + "<div class='qf'>"
+      +   "<details class='why'><summary>Why this one</summary><p>" + esc(t[2]) + "</p></details>"
+      +   "<button class='qgo" + (st.done ? " off" : "") + "' data-thread='" + t[0] + "'>"
+      +     svg("tick", 15) + "<span>" + (st.done ? "Done " + nice(st.done) : "Mark done") + "</span>"
+      +   "</button></div></div>";
+  });
+
+  if (soon.length > 1){
+    h += "<h2>The rest of the year</h2><div class='yr'>";
+    soon.slice(1).forEach(function(x){
+      h += "<div class='ye'><span class='yd'>" + x[1] + "<small>d</small></span>"
+        + "<div><strong>" + esc(x[0][0]) + "</strong><span class='dim'> &middot; " + nice(x[0][1]) + "</span>"
+        + "<div class='dim'>" + esc(x[0][2]) + "</div></div></div>";
+    });
+    h += "</div>";
+  }
+
+  h += "<h2>Every week</h2><div class='yr'>"
+    + "<div class='ye'><span class='yd mono'>SAT<small>07:30</small></span><div><strong>parkrun.</strong>"
+    +   "<div class='dim'>Furthest from Tanjong Pagar, not nearest. Walking is allowed.</div></div></div>"
+    + "<div class='ye'><span class='yd mono'>WED<small>14:30</small></span><div><strong>Call your mum</strong>"
+    +   "<div class='dim'>While you walk. About 07:00 for her. Late is fine; a clean miss is not.</div></div></div>"
+    + "</div>";
 
   h += "<div class='btns'><button class='btn pri' data-go='../docs/proposal.html'>The October draft</button>"
-    + "<button class='btn' data-go='../cal/'>Apple Calendar</button></div>";
-  h += "<div class='btns'><button class='btn' data-tab='trips'>Trips and UK days</button></div>";
+    + "<button class='btn' data-go='../cal/'>Apple Calendar</button></div>"
+    + "<div class='btns'><button class='btn' data-tab='trips'>Trips and UK days</button></div>";
   return h;
 }
 
@@ -3152,26 +3450,39 @@ function viewMore(){
   var dd = districts(), names = Object.keys(dd.all).sort();
   var got = names.filter(function(n){ return dd.seen[n]; }).length;
 
-  h += "<div class='panel'><h3>Streaks</h3>"
-    + "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px'>";
+  /* The way out of every other screen, at the top. "Show me how this works"
+     used to sit four thousand pixels down, under forty rows of history, which
+     is the same as not existing. */
+  h += "<div class='menu'>"
+    + mrow("replay", "1", "pack", "How this works", "The three-tap tour, again")
+    + mrow("tab", "say", "phone", "Phrasebook", "Mandarin you can actually use")
+    + mrow("tab", "trips", "pin", "Trips and UK days", "What the tax year has left")
+    + mrow("tab", "recap", "clock", "Your year",
+        recapReady() ? "Everything, counted" : "Opens 1 December")
+    + "</div>";
+
+  h += "<div class='menu'>"
+    + mrow("sound", "1", "spare", "Sound", S.mute ? "Off" : "On")
+    + mrow("theme", "1", "moon", "Appearance", isLight() ? "Light" : "Dark")
+    + "</div>";
+
+  h += "<h2>Streaks</h2><div class='panel'>"
+    + "<div class='str3'>";
   PILLARS.forEach(function(g){
-    h += "<div style='text-align:center;padding:10px 4px'>"
-      + "<div style='color:var(--ink3);display:flex;justify-content:center'>" + svg(g[2], 20) + "</div>"
-      + "<div class='mono' style='font-size:28px;font-weight:800;letter-spacing:-.04em;margin-top:4px'>"
-      + streak(g[0]) + "</div>"
-      + "<div class='dim' style='font-size:11px'>" + g[1] + "</div></div>";
+    h += "<div class='s1'><div class='si'>" + svg(g[2], 20) + "</div>"
+      + "<div class='sn'>" + streak(g[0]) + "</div>"
+      + "<div class='sl'>" + esc(g[1]) + "</div></div>";
   });
   h += "</div></div>";
 
   h += "<h2>Singapore</h2><div class='panel'>"
-    + "<div style='display:flex;align-items:baseline;gap:12px'>"
-    + "<span class='mono' style='font-size:32px;font-weight:800;letter-spacing:-.04em'>"
-    + got + "/" + names.length + "</span>"
-    + "<div><h3>districts</h3><div class='dim'>" + Object.keys(S.done).length + " places logged</div></div></div>";
-  h += "<div style='display:flex;flex-wrap:wrap;gap:6px;margin-top:12px'>";
+    + "<div class='sgh'><span class='sgn'>" + got + "<small>/" + names.length + "</small></span>"
+    + "<div><h3>districts</h3><div class='dim'>"
+    + Object.keys(S.done).length + " places logged</div></div></div>"
+    + "<div class='tags'>";
   names.forEach(function(n){
     var on = !!dd.seen[n];
-    h += "<span class='tag" + (on ? " jade" : "") + "'" + (on ? "" : " style='opacity:.45'") + ">"
+    h += "<span class='tag" + (on ? " jade" : " off") + "'>"
       + esc(n) + (on ? " " + dd.seen[n] : "") + "</span>";
   });
   h += "</div></div>";
@@ -3182,29 +3493,35 @@ function viewMore(){
         || d.bedok !== undefined || frozen(k);
   }).sort().reverse();
   if (keys.length){
-    h += "<h2>Days</h2><div class='panel'>";
-    keys.slice(0, 40).forEach(function(k){
-      var d = S.days[k];
-      var marks = PILLARS.filter(function(g){ return d.p && d.p[g[0]]; }).length;
-      h += "<div class='row'><b class='k'>" + esc(nice(k)) + "</b><div>"
-        + (marks ? "<span class='tag jade'>" + marks + "/3</span> " : "")
-        + (frozen(k) ? "<span class='tag violet'>frozen</span> " : "")
-        + (d.bedok === true ? "<span class='tag'>bed</span> " : d.bedok === false ? "<span class='tag ember'>late</span> " : "")
-        + (d.said ? esc(d.said) : "<span class='dim'>nothing named</span>")
-        + "</div></div>";
-    });
-    h += "</div>";
+    h += "<h2>Days</h2><div class='panel'>" + dayRows(keys.slice(0, 10)) + "</div>";
+    if (keys.length > 10){
+      h += "<details class='why wide'><summary>" + (keys.length - 10) + " older days</summary>"
+        + "<div class='panel' style='margin:10px 0 0'>" + dayRows(keys.slice(10, 120)) + "</div></details>";
+    }
   }
 
-  h += "<h2>Elsewhere</h2>";
-  h += "<div class='btns'><button class='btn' data-tab='say'>Phrasebook</button>"
-    + "<button class='btn' data-tab='trips'>Trips and UK days</button></div>";
-  h += "<div class='btns'><button class='btn' data-tab='recap'>"
-    + (recapReady() ? "Your year" : "Your year &middot; opens 1 December") + "</button></div>";
-  h += "<div class='btns'><button class='btn quiet' data-sound='1'>Sound is "
-    + (S.mute ? "off" : "on") + "</button>"
-    + "<button class='btn quiet' data-theme='1'>Switch to " + (isLight() ? "dark" : "light") + "</button></div>";
   h += "<div class='btns'><button class='btn quiet' data-reset='1'>Clear everything</button></div>";
+  return h;
+}
+/* one row of the settings list */
+function mrow(attr, val, icon, title, sub){
+  return "<button class='mi' data-" + attr + "='" + val + "'>"
+    + "<span class='mic'>" + svg(icon, 18) + "</span>"
+    + "<span class='mib'><b>" + esc(title) + "</b><span>" + esc(sub) + "</span></span>"
+    + "<span class='mia'>" + svg("arrow", 15) + "</span></button>";
+}
+function dayRows(keys){
+  var h = "";
+  keys.forEach(function(k){
+    var d = S.days[k];
+    var marks = PILLARS.filter(function(g){ return d.p && d.p[g[0]]; }).length;
+    h += "<div class='row'><b class='k'>" + esc(nice(k)) + "</b><div>"
+      + (marks ? "<span class='tag jade'>" + marks + "/3</span> " : "")
+      + (frozen(k) ? "<span class='tag violet'>frozen</span> " : "")
+      + (d.bedok === true ? "<span class='tag'>bed</span> " : d.bedok === false ? "<span class='tag ember'>late</span> " : "")
+      + (d.said ? esc(d.said) : "<span class='dim'>nothing named</span>")
+      + "</div></div>";
+  });
   return h;
 }
 
@@ -3321,6 +3638,7 @@ function render(opts){
     nav[i].setAttribute("aria-current", nav[i].dataset.tab === lit ? "true" : "false");
   }
   paintHud(!!opts.animate);
+  coachSync();
   /* Going to a new screen goes to the top. Re-drawing the one you are on does
      not - losing your place mid-screen is what a page navigation feels like. */
   if (keep === null) window.scrollTo(0, 0); else window.scrollTo(0, keep);
@@ -3642,6 +3960,7 @@ document.addEventListener("click", function(ev){
   if (!b) return;
   var t = today(), d = day(t), ds = b.dataset || {};
 
+  if (ds.coachskip){ coachSkip(); return; }
   if (ds.tab){ go(ds.tab); return; }
   if (ds.go){ location.href = ds.go; return; }
   if (ds.p){ tapPillar(ds.p, b); return; }
@@ -3734,6 +4053,12 @@ document.addEventListener("click", function(ev){
     S.theme = nx; save(); sfx("tap");
     render({ keepScroll: true }); return;
   }
+  if (ds.replay){
+    sfx("tap");
+    tab = "today"; render();
+    coachStart(true);
+    return;
+  }
   if (ds.reset){ askReset(); return; }
   if (b.id === "crest"){ sfx("tap"); go("deck"); return; }
   if (b.id === "chipPot"){ sfx("tap"); go("pot"); return; }
@@ -3762,19 +4087,159 @@ function openGate(){
   g.addEventListener("click", function(){
     g.classList.add("going");
     sfx("done"); buzz(12);
-    setTimeout(function(){ g.hidden = true; }, 520);
+    setTimeout(function(){ g.hidden = true; coachStart(); }, 520);
   }, { once: true });
 }
 /* The world arrives when the first pack has been opened, not before. Until
    then Today is a dial, a question and three buttons. */
 function graduate(){
+  if (COACH.on) coachStop();
   if (S.onboarded) return;
   S.onboarded = 1; save();
   toast("That is the loop. The rest is yours now.", true);
 }
 
+
+/* ==================================================================== the coach
+   The previous pass called a stripped-down board a tutorial. It was not one -
+   it removed clutter but never told anyone what to do. This points at the
+   thing, says one sentence, and will not advance until it has been pressed.
+
+   Steps are declared by what they are waiting for, so the tutorial cannot get
+   out of step with the app: each one re-reads the real state to decide whether
+   it is still needed. */
+var COACH_STEPS = [
+  { at: [".pil", ".triad"],
+    head: "Start here.",
+    say: "Tap one of these if you have done it today. Moved on purpose, spoke to someone at "
+       + "home, or finished when the shift finished.",
+    tap: "Tap one", tourTap: "Next",
+    want: function(){ return PILLARS.some(function(g){ return pDone(today(), g[0]); }); } },
+
+  { at: [".pil:not(.on)", ".triad"],
+    head: "Now the rest.",
+    say: "Three of them is a full day. A full day is a pack of cards, and money in the pot.",
+    tap: "Keep going", tourTap: "Next",
+    want: function(){ return allThree(today()); } },
+
+  { at: [".dial"],
+    head: "That is a pack.",
+    say: "Earned, not given. Tap it and turn the cards over yourself.",
+    tourHead: "The dial is the day.",
+    tourSay: "The outer ring is the clock, with your Malta hours marked on it and the sun where "
+           + "it actually is. The inner one fills as you tick the three. Fill it and the middle "
+           + "becomes a pack.",
+    tap: "Open it", tourTap: "Got it",
+    want: function(){ return !packsTotal(); } }
+];
+var COACH = { i: -1, on: false, tour: false };
+
+function coachEl(){ return document.getElementById("coach"); }
+function sheetOpen(){ return !!document.getElementById("sheet").className; }
+function coachStop(){
+  COACH.on = false; COACH.tour = false; COACH.i = -1; COACH.target = null;
+  var el = coachEl(); el.className = ""; el.innerHTML = "";
+}
+function coachSkip(){
+  var tour = COACH.tour;
+  coachStop();
+  if (tour) return;
+  S.onboarded = 1; save();
+  render({ animate: true });
+  toast("Skipped. It is the first thing under More if you want it back.");
+}
+function coachEnd(){
+  var tour = COACH.tour;
+  coachStop();
+  if (tour) toast("That is the whole thing. Three taps a day.", true);
+}
+/* The first step whose selector actually matches. A replay runs on a board
+   where the pillars are already ticked, so ".pil:not(.on)" hits nothing and
+   the tour would have stopped dead on step two. */
+function coachPick(step){
+  for (var i = 0; i < step.at.length; i++){
+    var e = document.querySelector(step.at[i]);
+    if (e) return e;
+  }
+  return null;
+}
+/* Two modes, one set of steps. First run waits for the thing to actually be
+   done before it moves on. A replay from More is a tour: every step is shown
+   in order, a tap advances it, and nothing is ticked on his behalf. */
+function coachNext(){
+  if (!COACH.on) return;
+  if (COACH.tour){
+    COACH.i++;
+    if (COACH.i >= COACH_STEPS.length){ coachEnd(); return; }
+    return coachPaint();
+  }
+  for (var i = 0; i < COACH_STEPS.length; i++){
+    if (!COACH_STEPS[i].want()){ COACH.i = i; return coachPaint(); }
+  }
+  coachStop();                       /* everything taught */
+}
+function coachPaint(){
+  var step = COACH_STEPS[COACH.i], el = coachEl();
+  var target = coachPick(step);
+  if (!target){ coachStop(); return; }
+  var r = target.getBoundingClientRect();
+  var pad = 8, H = window.innerHeight;
+  var top = Math.max(6, r.top - pad), left = Math.max(6, r.left - pad);
+  var w = Math.min(window.innerWidth - 12, r.width + pad * 2);
+  var h = r.height + pad * 2;
+
+  /* the copy goes on whichever side has the room */
+  var below = (H - (top + h)) > 240;
+  var pos = below ? "top:" + (top + h + 18).toFixed(0) + "px"
+                  : "bottom:" + (H - top + 18).toFixed(0) + "px";
+  var head = (COACH.tour && step.tourHead) || step.head;
+  var say  = (COACH.tour && step.tourSay)  || step.say;
+  var cue  = (COACH.tour && step.tourTap)  || step.tap;
+
+  el.innerHTML =
+      "<div class='catch'></div>"
+    + "<div class='spot' style='top:" + top.toFixed(0) + "px;left:" + left.toFixed(0)
+    +   "px;width:" + w.toFixed(0) + "px;height:" + h.toFixed(0) + "px'></div>"
+    + "<div class='say' style='" + pos + "'><b>" + esc(head) + "</b>"
+    +   "<span>" + esc(say) + "</span>"
+    +   "<em class='pips'>" + COACH_STEPS.map(function(_, n){
+          return "<i" + (n === COACH.i ? " class='on'" : "") + "></i>"; }).join("")
+    +   "</em><i>" + esc(cue) + "</i></div>"
+    + "<div class='skip'><button data-coachskip='1'>"
+    +   (COACH.tour ? "Close" : "Skip this") + "</button></div>";
+  el.className = "on";
+
+  /* The dimming lives on .spot, which never takes a tap; .catch takes it and
+     forwards to the element we are holding. Hit-testing through a mask does
+     not work - masks are paint-only - which is why the first version looped. */
+  COACH.target = target;
+  el.querySelector(".catch").onclick = function(ev){
+    ev.stopPropagation();
+    if (COACH.tour){ sfx("tap"); coachNext(); return; }
+    if (COACH.target) COACH.target.click();
+    /* The tap may have opened the pack stage on top of us. Stand down until
+       the board is the front-most thing again. */
+    setTimeout(coachSync, 60);
+  };
+}
+function coachStart(tour){
+  if (!tour && S.onboarded) return;
+  COACH.on = true; COACH.tour = !!tour; COACH.i = -1;
+  setTimeout(coachNext, 260);
+}
+/* Re-point after every render, because the thing it points at has moved. */
+function coachSync(){
+  if (!COACH.on) return;
+  requestAnimationFrame(function(){
+    if (ST || MODAL || sheetOpen()){ coachEl().className = ""; return; }
+    if (COACH.tour){ if (COACH.i >= 0) coachPaint(); return; }
+    coachNext();
+  });
+}
+
 /* ------------------------------------------------------------------- start */
 if (S.theme) document.documentElement.setAttribute("data-theme", S.theme);
+paintSky();
 render();
 paintHud();
 openGate();
@@ -3783,6 +4248,7 @@ openGate();
    only, never the screen. A full rebuild every minute silently ate anything
    half-typed into the day's one line. */
 setInterval(function(){
+  paintSky();
   if (tab !== "today" || ST || MODAL) return;
   var dial = document.querySelector("#screen .dial");
   if (!dial) return;
