@@ -753,6 +753,65 @@ ul{margin:9px 0; padding-left:20px} li{margin:6px 0} li::marker{color:var(--ink3
   #fx{display:none !important}
 }
 
+
+/* ============================================================ the compact board
+   Second round of this. The first pass got the top of Today right and then let
+   it become a document again: a freeze explainer, a paragraph about Malta, the
+   rationale for bedtime, and a full write-up of the place of the day, all
+   stacked down the home screen. Two thousand pixels.
+
+   Everything that is a THING YOU DO is now a row you tap. Everything that is a
+   REASON is behind it, in a sheet. The home screen is the board; the prose
+   still exists and is one tap away, which is where prose belongs in a game. */
+.tile{display:flex; align-items:center; gap:12px; width:100%; text-align:left; cursor:pointer;
+  padding:11px 13px; border-radius:14px; min-height:62px; margin:8px 0; color:var(--ink);
+  border:1px solid var(--line); background:var(--panel); font:inherit;
+  transition:transform .12s var(--tap), border-color .22s, background .22s}
+.tile:active{transform:scale(.985)}
+.tile .ic{flex:none; width:38px; height:38px; border-radius:12px; display:flex; align-items:center;
+  justify-content:center; background:var(--sunk); border:1px solid var(--line2); color:var(--ink3);
+  transition:all .22s}
+.tile .bd{flex:1; min-width:0}
+.tile .bd b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:700;
+  font-size:15.5px; letter-spacing:-.015em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.tile .bd span{display:block; font-size:12.5px; color:var(--ink3); line-height:1.3; margin-top:1px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.tile .rt{flex:none; display:flex; align-items:center; gap:7px; color:var(--ink3); font-size:13px;
+  font-weight:600}
+.tile.on{border-color:color-mix(in srgb,var(--jade) 45%,transparent);
+  background:linear-gradient(150deg,color-mix(in srgb,var(--jade) 11%,transparent),var(--panel) 62%)}
+.tile.on .ic{background:var(--jade); border-color:var(--jade); color:#05231A}
+.tile.on .bd b{color:var(--jadeInk)}
+.tile.warn{border-color:color-mix(in srgb,var(--crit) 45%,transparent)}
+.tile.warn .ic{color:var(--crit)}
+/* Bedtime is the keystone but it is not one of the three, and green would put
+   it in the same family as the tiles that earn the pack. Night is night. */
+.tile.night.on{border-color:color-mix(in srgb,var(--violet) 50%,transparent);
+  background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 14%,transparent),var(--panel) 62%)}
+.tile.night.on .ic{background:var(--violet); border-color:var(--violet); color:#0B0820}
+.tile.night.on .bd b{color:var(--violetInk)}
+
+/* The row of small things: freezes, the gap, where he is standing. Chips, not
+   panels - each is one number and a sheet behind it. */
+.mini{display:flex; gap:7px; margin:10px -14px 0; padding:0 14px; overflow-x:auto;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch}
+.mini::-webkit-scrollbar{display:none}
+.mini button{flex:none; display:flex; align-items:center; gap:7px; padding:8px 13px; min-height:44px;
+  border-radius:13px; border:1px solid var(--line); background:var(--panel); color:var(--ink2);
+  font:inherit; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;
+  transition:transform .12s var(--tap)}
+.mini button:active{transform:scale(.95)}
+.mini button svg{width:16px; height:16px; flex:none; color:var(--ink3)}
+.mini button b{font-family:"JetBrains Mono",monospace; font-weight:800; color:var(--ink)}
+.mini button.cold{border-color:color-mix(in srgb,var(--violet) 50%,transparent);
+  background:var(--violetSoft)}
+
+/* The shift, compact. It is the identity of the whole app, so it stays on the
+   board - but the paragraph explaining Malta moved into a sheet behind it. */
+.strip.tap{cursor:pointer; width:100%; text-align:left; font:inherit; color:var(--ink);
+  transition:transform .12s var(--tap)}
+.strip.tap:active{transform:scale(.99)}
+
 </style>
 </head>
 <body>
@@ -1720,7 +1779,12 @@ var ICONS = {
   pack:  "<rect x='4' y='6' width='18' height='15' rx='2.5' stroke='currentColor' stroke-width='2'/><path d='M4 11h18' stroke='currentColor' stroke-width='2'/><path d='M13 6v15' stroke='currentColor' stroke-width='2' opacity='.4'/>",
   lock:  "<rect x='5' y='9.5' width='12' height='8.5' rx='2' stroke='currentColor' stroke-width='1.9'/><path d='M8 9.5V7.4a3 3 0 0 1 6 0v2.1' stroke='currentColor' stroke-width='1.9'/>",
   spare: "<path d='M11 2.4 19.6 7v10L11 21.6 2.4 17V7z' stroke='currentColor' stroke-width='1.8' stroke-linejoin='round'/><path d='M11 7.3 15.4 10v4.4L11 16.8 6.6 14.4V10z' fill='currentColor' opacity='.4'/>",
-  arrow: "<path d='M7 4l6 6-6 6' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/>"
+  arrow: "<path d='M7 4l6 6-6 6' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/>",
+  moon:  "<path d='M17.4 12.6A7 7 0 0 1 9.4 4.6a7.2 7.2 0 1 0 8 8Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/>",
+  snow:  "<path d='M11 2.6v16.8M3.7 6.8l14.6 8.4M18.3 6.8 3.7 15.2' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><path d='M8.4 4.6 11 6.7l2.6-2.1M8.4 17.4 11 15.3l2.6 2.1' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' fill='none'/>",
+  gap:   "<rect x='3.2' y='4.6' width='15.6' height='13.8' rx='2.4' stroke='currentColor' stroke-width='1.9'/><path d='M3.2 9h15.6M7.3 2.8v3.4M14.7 2.8v3.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><rect x='8.6' y='11.4' width='4.8' height='4' rx='1' fill='currentColor' opacity='.55'/>",
+  pin:   "<path d='M11 19.4s6-5.1 6-9.6a6 6 0 1 0-12 0c0 4.5 6 9.6 6 9.6Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><circle cx='11' cy='9.6' r='2.2' stroke='currentColor' stroke-width='1.7'/>",
+  pen:   "<path d='M14.6 3.4 18.6 7.4 8 18H4v-4Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M12.6 5.4 16.6 9.4' stroke='currentColor' stroke-width='1.7'/>"
 };
 function svg(name, size){
   var s = size || 22;
@@ -2518,6 +2582,7 @@ function setBadge(tab, n, pulse){
 }
 
 /* ================================================================ the shift */
+/* The bar itself. The wrapper is a button on Today and a plain box elsewhere. */
 function trackHTML(){
   /* Always wake to midnight, so the proportions mean something. Opening it at
      three in the morning should not put the night inside the free segment. */
@@ -2542,7 +2607,7 @@ function trackHTML(){
     head = "Shift is done"; right = dur(Math.max(0, 1440 - s.now)) + " of evening";
   }
 
-  var h = "<div class='strip'><div class='striph'><b>" + esc(head) + "</b><span class='mono'>"
+  var h = "<div class='striph'><b>" + esc(head) + "</b><span class='mono'>"
         + esc(right) + "</span></div>";
   h += "<div class='track'>";
   if (inDay) h += "<div class='now' style='left:" + pct(from, s.now).toFixed(2) + "%'></div>";
@@ -2550,9 +2615,10 @@ function trackHTML(){
   if (workW > .5) h += "<div class='work' style='width:" + workW.toFixed(2) + "%'></div>";
   if (restW > .5) h += "<div class='rest' style='width:" + restW.toFixed(2) + "%'></div>";
   h += "</div><div class='tlab'><span>" + hhmm(from) + "</span><span class='mono'>"
-    + (s.weekend ? "yours" : s.startT + " – " + s.endT) + "</span><span>24:00</span></div></div>";
+    + (s.weekend ? "yours" : s.startT + " – " + s.endT) + "</span><span>24:00</span></div>";
   return h;
 }
+function trackInner(){ return trackHTML(); }
 
 /* ================================================================== TODAY
    The board. A claim you can see from the door, then three things to tap.
@@ -2560,11 +2626,11 @@ function trackHTML(){
    paragraph about Malta, the empty text field asking for his calendar gap -
    is below them now or gone. */
 function viewToday(){
-  var s = shape(), t = today(), d = day(t), y = day(shift(-1));
+  var t = today(), d = day(t), y = day(shift(-1));
   var w = packsWaiting(), packs = w.day + w.streak;
   var h = "";
 
-  /* --- the claim slab */
+  /* --- the claim. The one gold thing on the screen. */
   var near = nearestSet();
   if (packs){
     var sub = w.streak
@@ -2576,19 +2642,17 @@ function viewToday(){
       + "<span>" + esc(sub) + "</span></span>"
       + "<span class='arrow'>" + svg("arrow", 20) + "</span></span></button>";
   } else {
-    var got0 = PILLARS.filter(function(g){ return pDone(t, g[0]); }).length;
     var owed = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
     h += "<div class='claim idle'><span class='in'>"
       + "<span class='glyph'>" + svg("pack", 26) + "</span>"
       + "<span class='t'><b>" + (owed ? (owed === 1 ? "One more for a pack" : owed + " more for a pack")
                                       : "Today is in") + "</b>"
       + "<span>" + esc(owed
-          ? "A day with all three earns one. Every seventh in a row earns a bigger one."
-          : "Nothing left to claim. The next pack is tomorrow's.") + "</span></span>"
-      + "</span></div>";
+          ? "All three earns a pack. Every seventh day in a row earns a bigger one."
+          : "Nothing left to claim. The next pack is tomorrow's.") + "</span></span></span></div>";
   }
 
-  /* --- the three */
+  /* --- the three. Still the point of the screen. */
   var full = allThree(t);
   h += "<div class='bhead'><h2>The three</h2><div class='pips'>";
   PILLARS.forEach(function(g){
@@ -2606,117 +2670,51 @@ function viewToday(){
       + "</button>";
   });
 
-  /* --- freezes */
-  var left = freezesLeft(), yk = shift(-1), tFroz = frozen(t), yFroz = frozen(yk);
-  h += "<div class='frz" + (tFroz ? " cold" : "") + "'><div class='top'><span class='pips2'>";
-  for (var fi = 0; fi < FREEZES_PER_MONTH; fi++) h += "<i class='" + (fi < left ? "on" : "") + "'></i>";
-  h += "</span><span class='lbl'><b>" + left + " of " + FREEZES_PER_MONTH
-    + "</b> freezes left this month</span></div>";
-  h += "<p class='dim' style='margin:8px 0 0'>A frozen day carries the run across without counting "
-    + "toward it. Nothing is spent unless you press it.</p><div class='btns tight'>";
-  if (tFroz) h += "<button class='btn' data-freeze='" + t + "'>Today is frozen &middot; undo</button>";
-  else if (canFreeze(t)) h += "<button class='btn' data-freeze='" + t + "'>Freeze today</button>";
-  if (yFroz) h += "<button class='btn' data-freeze='" + yk + "'>Yesterday is frozen &middot; undo</button>";
-  else if (canFreeze(yk) && Object.keys(S.days).length)
-    h += "<button class='btn' data-freeze='" + yk + "'>Freeze yesterday</button>";
-  h += "</div>";
-  if (!left && !tFroz && !yFroz){
-    h += "<p class='dim' style='margin:9px 0 0'>None left until "
-      + nice(iso(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)))
-      + ". Which is the point of there being a number.</p>";
-  }
-  h += "</div>";
-
-  /* --- the shift */
-  h += trackHTML();
-  var summer = euSummer(new Date());
-  var alt = (function(){
-    var o = summer ? 60 : 120, camp = offset();
-    return hhmm(HQ_START_LOCAL - o + camp) + "–" + hhmm(HQ_END_LOCAL - o + camp);
-  })();
-  h += "<div class='panel'><div class='row'><b class='k'>HQ</b><div>Malta, " + hhmm(HQ_START_LOCAL)
-    + "–" + hhmm(HQ_END_LOCAL) + " their time &middot; " + (summer ? "CEST" : "CET") + "."
-    + "<br><span class='dim'>" + (summer ? "From 25 October the same hours become "
-      : "In summer the same hours become ") + alt + " here.</span></div></div>";
-  h += "<div class='row'><b class='k'>Standing</b><div>" + esc(S.camp)
-    + " <button class='btn quiet' data-camp='1' style='min-height:36px;padding:6px 12px;font-size:13px;margin-left:6px'>Change</button></div></div>";
-  if (d.gap){
-    h += "<div class='row'><b class='k'>Gap</b><div><strong>" + esc(d.gap) + "</strong> free inside the shift. "
-      + "<button class='btn quiet' data-gap='clear' style='min-height:36px;padding:6px 12px;font-size:13px'>Clear</button></div></div>";
-  } else {
-    h += "<div class='row'><b class='k'>Gap</b><div>The hole in today's calendar is where a routine "
-      + "can actually live. <button class='btn quiet' data-gap='set' style='min-height:36px;padding:6px 12px;font-size:13px'>Set it</button></div></div>";
-  }
-  h += "</div>";
-
-  /* --- bedtime, the keystone he named himself */
+  /* --- bedtime. The keystone he named himself, so it is a row you tap rather
+     than a panel with three paragraphs in it. Last night, not tonight. */
   var bt = S.bed || BED_DEFAULT;
-  var clash = s.end >= t2m(bt);
-  h += "<div class='panel" + (y.bedok ? " jade" : clash ? " crit" : "") + "'>"
-    + "<h3>Bed by " + esc(bt) + "</h3>"
-    + "<p class='dim' style='margin:6px 0 0'>Wake time follows from this, and everything else follows "
-    + "from wake time. You said it yourself: the thing to agree is simply a time.</p>";
-  if (clash){
-    h += "<p style='margin:9px 0 0'><strong>Not possible today.</strong> The shift ends at " + s.endT
-      + " and bed is " + esc(bt) + ". The time is not the thing that is wrong here.</p>"
-      + "<p class='dim' style='margin:6px 0 0'>Malta keeps you to 17:00 their time all year, so when "
-      + "their clocks go back on 25 October the same contract quietly moves your finish to midnight. "
-      + "Nobody chose that. It is a drafting defect, and it is the strongest thing you have to take "
-      + "into the October conversation.</p>";
-  }
-  if (y.bedok === undefined){
-    h += "<div class='btns'><button class='btn go' data-bed='1'>Made it last night</button>"
-      + "<button class='btn' data-bed='0'>Did not</button></div>";
-  } else {
-    h += "<p class='muted' style='margin:8px 0 0'>Last night: <strong>"
-      + (y.bedok ? "made it" : "missed it") + "</strong>."
-      + " <button class='btn quiet' data-bed='x' style='min-height:34px;padding:5px 11px;font-size:13px'>Change</button></p>";
-  }
-  h += "<div class='btns tight'><button class='btn quiet' data-bedtime='1'>Change the time</button></div></div>";
+  var bedState = y.bedok === undefined ? "not said" : y.bedok ? "made it" : "missed it";
+  h += "<button class='tile night" + (y.bedok ? " on" : "") + "' data-bedsheet='1'>"
+    + "<span class='ic'>" + svg(y.bedok ? "tick" : "moon", 20) + "</span>"
+    + "<span class='bd'><b>Bed by " + esc(bt) + "</b><span>Last night: " + bedState + "</span></span>"
+    + "<span class='rt'>" + svg("arrow", 16) + "</span></button>";
 
-  /* --- one line, kept because he uses it */
+  /* --- the shift. Compact, and the Malta explanation is behind it. */
+  h += "<button class='strip tap' data-hq='1'>" + trackInner() + "</button>";
+
+  /* --- the small numbers, as chips */
+  var left = freezesLeft(), tFroz = frozen(t);
+  h += "<div class='mini'>";
+  h += "<button class='" + (tFroz ? "cold" : "") + "' data-frzsheet='1'>" + svg("snow", 16)
+    + "<b>" + left + "</b> freezes</button>";
+  h += "<button data-gap='set'>" + svg("gap", 16) + (d.gap ? "<b>" + esc(d.gap) + "</b>" : "Set today's gap") + "</button>";
+  h += "<button data-camp='1'>" + svg("pin", 16) + esc(S.camp) + "</button>";
+  h += "</div>";
+
+  /* --- what is on. Two rows, both opening into the detail. */
+  h += "<h2>Also today</h2>";
+
   if (y.said && y.kept === undefined){
-    h += "<div class='panel ember'><h3>Yesterday you said</h3><p style='margin:7px 0 0'><strong>"
-      + esc(y.said) + "</strong></p>"
-      + "<div class='btns'><button class='btn go' data-kept='1'>It happened</button>"
-      + "<button class='btn' data-kept='0'>It did not</button></div></div>";
+    h += "<button class='tile warn' data-keptsheet='1'>"
+      + "<span class='ic'>" + svg("gap", 20) + "</span>"
+      + "<span class='bd'><b>Yesterday you said</b><span>" + esc(y.said) + "</span></span>"
+      + "<span class='rt'>Did it?</span></button>";
   }
-  if (!d.said){
-    h += "<div class='panel'><h3>One thing today</h3>"
-      + "<textarea id='said' placeholder='The one thing that would make today count'></textarea>"
-      + "<div class='btns'><button class='btn pri' data-say='1'>That is the one</button></div></div>";
-  } else {
-    h += "<div class='panel jade'><h3>Today</h3><p style='margin:7px 0 0'><strong>" + esc(d.said)
-      + "</strong></p><div class='btns tight'><button class='btn quiet' data-unsay='1'>Change it</button></div></div>";
-  }
+  h += "<button class='tile" + (d.said ? " on" : "") + "' data-saysheet='1'>"
+    + "<span class='ic'>" + svg(d.said ? "tick" : "pen", 20) + "</span>"
+    + "<span class='bd'><b>" + (d.said ? esc(d.said) : "One thing today") + "</b>"
+    + "<span>" + (d.said ? "Named. Tap to change it." : "The one thing that would make today count") + "</span></span>"
+    + "<span class='rt'>" + svg("arrow", 16) + "</span></button>";
 
-  /* --- somewhere to go */
   var p = pick();
   if (p){
-    var n = KIND[p[3]];
-    h += "<h2>Somewhere today</h2><div class='panel'>";
-    h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>";
-    h += "<div><h3>" + esc(p[0]) + "</h3><div class='dim'>" + esc(p[1]) + " &middot; " + esc(p[2]) + "</div></div>";
-    h += "<span class='tag " + n[0] + "'>" + esc(n[1]) + "</span></div>";
-    h += "<p class='muted' style='margin-top:10px'>" + esc(p[5]) + "</p>";
-    h += "<div class='row'><b class='k'>When</b><div>" + esc(p[4]) + "</div></div>";
-    h += "<div class='row'><b class='k'>Cost</b><div>" + esc(p[9]) + "</div></div>";
-    if (p[7]){
-      h += "<div class='row'><b class='k'>Say</b><div><strong style='font-size:16px'>" + esc(p[7]) + "</strong>"
-        + (p[8] ? "<br><span class='dim'>" + esc(p[8]) + "</span>" : "") + "</div></div>";
-    }
-    h += "<div class='btns'><button class='btn go' data-done='" + esc(p[0]) + "'>I went</button>"
-      + "<button class='btn' onclick=\"window.open('" + maps(p[0]) + "','_blank','noopener')\">Maps</button></div>";
-    h += "<div class='btns tight'>"
-      + (rerollsLeft()
-          ? "<button class='btn quiet' data-skip='1'>Somewhere else &middot; " + rerollsLeft() + " left today</button>"
-          : "<button class='btn quiet' disabled>That is today's. One swap a day.</button>")
-      + "<button class='btn quiet' data-easy='1'>"
-      + ["Everything", "Outdoors only", "Hawker only"][S.filter || 0] + "</button></div>";
-    h += "</div>";
+    h += "<button class='tile' data-place='1'>"
+      + "<span class='ic'>" + svg("pin", 20) + "</span>"
+      + "<span class='bd'><b>" + esc(p[0]) + "</b><span>" + esc(KIND[p[3]][1] + " · " + p[1]) + "</span></span>"
+      + "<span class='rt'>" + svg("arrow", 16) + "</span></button>";
   }
 
-  /* --- the season track: the locked sets, drawn as the ladder they are */
+  /* --- the ladder */
   h += seasonHTML();
   return h;
 }
@@ -3474,6 +3472,139 @@ async function askReset(){
   tab = "today"; render({ turn: true, animate: true });
 }
 
+
+/* ------------------------------------------------- the sheets behind the board
+   Everything below used to be a panel of prose sitting on the home screen. It
+   is all still here, word for word, one tap behind the row it belongs to. */
+
+async function bedSheet(){
+  var y = day(shift(-1)), bt = S.bed || BED_DEFAULT, s = shape();
+  var clash = s.end >= t2m(bt);
+  var say = "Wake time follows from this, and everything else follows from wake time. You said it "
+          + "yourself: the thing to agree is simply a time.";
+  if (clash){
+    say += "<br><br><strong>Not possible today.</strong> The shift ends at " + s.endT + " and bed is "
+        + esc(bt) + ". Malta keeps you to 17:00 their time all year, so when their clocks go back on "
+        + "25 October the same contract quietly moves your finish to midnight. Nobody chose that. It "
+        + "is a drafting defect, and it is the strongest thing you have to take into the October "
+        + "conversation.";
+  }
+  var opts = [];
+  if (y.bedok === undefined){
+    opts.push({ id: "yes", label: "Made it last night", pri: true });
+    opts.push({ id: "no", label: "Did not" });
+  } else {
+    opts.push({ id: "clear", label: "Last night: " + (y.bedok ? "made it" : "missed it"),
+                note: "Tap to change" });
+  }
+  opts.push({ id: "time", label: "Change the time", note: "Currently " + bt });
+  var v = await ask({ title: "Bed by " + bt, say: say, options: opts, cancel: "Close" });
+  if (v === "yes" || v === "no"){
+    day(shift(-1)).bedok = v === "yes"; save();
+    sfx(v === "yes" ? "tick" : "untick"); buzz(12);
+    render({ keepScroll: true });
+  } else if (v === "clear"){
+    delete day(shift(-1)).bedok; save(); render({ keepScroll: true });
+    bedSheet();
+  } else if (v === "time"){ askBedtime(); }
+}
+
+async function frzSheet(){
+  var t = today(), yk = shift(-1), left = freezesLeft();
+  var opts = [];
+  if (frozen(t)) opts.push({ id: "t", label: "Today is frozen", note: "Tap to give it back" });
+  else if (canFreeze(t)) opts.push({ id: "t", label: "Freeze today" });
+  if (frozen(yk)) opts.push({ id: "y", label: "Yesterday is frozen", note: "Tap to give it back" });
+  else if (canFreeze(yk) && Object.keys(S.days).length) opts.push({ id: "y", label: "Freeze yesterday" });
+  var say = "A frozen day carries the run across without counting toward it. The run survives; a day "
+          + "you did not do is not a day you did. Nothing is spent unless you press it — a safety net "
+          + "you cannot feel is not a safety net.";
+  if (!left && !opts.length){
+    say += "<br><br>None left until "
+        + nice(iso(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)))
+        + ". Which is the point of there being a number.";
+  }
+  var v = await ask({ title: left + " of " + FREEZES_PER_MONTH + " freezes left", say: say,
+                      options: opts, cancel: "Close" });
+  if (!v) return;
+  var fk = v === "t" ? t : yk;
+  if (frozen(fk)){ delete S.freezes[fk]; save(); sfx("tap"); toast("Freeze returned."); }
+  else if (canFreeze(fk)){
+    S.freezes = S.freezes || {}; S.freezes[fk] = 1; day(fk); save();
+    buzz([18, 40, 18]); sfx("flip");
+    toast((fk === t ? "Today" : "Yesterday") + " frozen. " + freezesLeft() + " left this month.");
+  }
+  render({ keepScroll: true, animate: true });
+}
+
+async function hqSheet(){
+  var s = shape(), summer = euSummer(new Date());
+  var alt = hhmm(HQ_START_LOCAL - (summer ? 60 : 120) + offset()) + "–"
+          + hhmm(HQ_END_LOCAL - (summer ? 60 : 120) + offset());
+  var say = "Malta, " + hhmm(HQ_START_LOCAL) + "–" + hhmm(HQ_END_LOCAL) + " their time, currently "
+    + (summer ? "CEST" : "CET") + ". Which lands here as <strong>" + s.startT + "–" + s.endT
+    + "</strong>.<br><br>" + (summer ? "From 25 October the same hours become " : "In summer the same hours become ")
+    + "<strong>" + alt + "</strong> here. Malta observes European daylight saving and Singapore does "
+    + "not, so the same contracted hours move an hour later every winter. That is a thing that "
+    + "happens to you rather than something anyone decided.";
+  var v = await ask({ title: s.weekend ? "No shift today" : "Fixed to Malta", say: say,
+    options: [{ id: "camp", label: "Standing in " + S.camp, note: "Tap to change" }],
+    cancel: "Close" });
+  if (v === "camp") askCamp();
+}
+
+async function saySheet(){
+  var d = day(today());
+  var v = await ask({
+    title: "One thing today",
+    say: "One line. In December it is the only part of this you cannot get anywhere else.",
+    field: { label: "The one thing", value: d.said || "",
+             placeholder: "The one thing that would make today count" },
+    confirm: d.said ? "Change it" : "That is the one", cancel: "Close"
+  });
+  if (v === null) return;
+  if (String(v).trim()){ d.said = String(v).trim(); sfx("done"); buzz(12); }
+  else delete d.said;
+  save(); render({ keepScroll: true });
+}
+
+async function keptSheet(){
+  var y = day(shift(-1));
+  var v = await ask({ title: "Yesterday you said", say: "<strong>" + esc(y.said) + "</strong>",
+    options: [{ id: "1", label: "It happened", pri: true }, { id: "0", label: "It did not" }],
+    cancel: "Later" });
+  if (v === null) return;
+  y.kept = v === "1"; save();
+  sfx(v === "1" ? "done" : "untick");
+  render({ keepScroll: true });
+}
+
+async function placeSheet(){
+  var p = pick();
+  if (!p) return;
+  var say = esc(p[5]) + "<br><br><strong>When</strong> " + esc(p[4]) + "<br><strong>Cost</strong> "
+          + esc(p[9]);
+  if (p[7]) say += "<br><br><strong>Say this</strong><br><span style='font-size:17px'>"
+    + esc(p[7]) + "</span>" + (p[8] ? "<br><span style='color:var(--ink3)'>" + esc(p[8]) + "</span>" : "");
+  var opts = [{ id: "went", label: "I went", pri: true }, { id: "maps", label: "Open in Maps" }];
+  if (rerollsLeft()) opts.push({ id: "skip", label: "Somewhere else",
+    note: rerollsLeft() + " swap left today" });
+  else opts.push({ id: "none", label: "That is today's", note: "One swap a day" });
+  opts.push({ id: "filter", label: ["Everything", "Outdoors only", "Hawker only"][S.filter || 0],
+    note: "What it picks from" });
+  var v = await ask({ title: p[0], say: say, options: opts, cancel: "Close" });
+  if (v === "went"){
+    S.done[p[0]] = today(); delete S.skip[today()]; save();
+    sfx("done"); buzz([16, 40, 16]);
+    toast("Logged. " + Object.keys(S.done).length + " places.");
+    render({ keepScroll: true, animate: true });
+  } else if (v === "maps"){ window.open(maps(p[0]), "_blank", "noopener"); }
+  else if (v === "skip"){ S.skip[today()] = (S.skip[today()] || 0) + 1; save(); sfx("tap");
+    render({ keepScroll: true }); }
+  else if (v === "filter"){ S.filter = ((S.filter || 0) + 1) % 3; delete S.skip[today()]; save();
+    sfx("tap"); render({ keepScroll: true }); }
+}
+
 /* --------------------------------------------------------------- the handler */
 document.addEventListener("click", function(ev){
   var b = ev.target.closest ? ev.target.closest("button, .tc, [data-card]") : null;
@@ -3492,6 +3623,12 @@ document.addEventListener("click", function(ev){
   if (ds.craft){ askCraft(ds.craft); return; }
   if (ds.claim){ askClaimTrophy(ds.claim); return; }
   if (ds.camp){ askCamp(); return; }
+  if (ds.bedsheet){ bedSheet(); return; }
+  if (ds.frzsheet){ frzSheet(); return; }
+  if (ds.hq){ hqSheet(); return; }
+  if (ds.saysheet){ saySheet(); return; }
+  if (ds.keptsheet){ keptSheet(); return; }
+  if (ds.place){ placeSheet(); return; }
   if (ds.gap === "set"){ askGap(); return; }
   if (ds.gap === "clear"){ delete d.gap; save(); sfx("tap"); render({ keepScroll: true }); return; }
   if (ds.bedtime){ askBedtime(); return; }
@@ -3592,9 +3729,7 @@ setInterval(function(){
   if (tab !== "today" || ST || MODAL) return;
   var strip = document.querySelector("#screen .strip");
   if (!strip) return;
-  var wrap = document.createElement("div");
-  wrap.innerHTML = trackHTML();
-  strip.replaceWith(wrap.firstChild);
+  strip.innerHTML = trackHTML();
 }, 60000);
 
 /* Hold the splash for a beat, then hand over. It covers the frame where the

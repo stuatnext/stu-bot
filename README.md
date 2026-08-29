@@ -141,6 +141,23 @@ the home screen and still opens with no signal.
 Reduced motion turns all of it off — no confetti, no transitions, no card flip — and every card is
 face up.
 
+#### And then the home screen was still too long
+
+First pass got the top of Today right — claim slab, three tiles — and then let it become a document
+again underneath: a freeze explainer with five dots and two paragraphs, a panel about Malta's hours,
+the rationale for bedtime, a full write-up of the place of the day with its own four buttons. Two
+thousand one hundred and eighty pixels. He looked at it and asked why it was not simple to digest and
+start playing, which was the right question.
+
+So: **anything that is a thing you do is a row you tap. Anything that is a reason is behind it.**
+
+The board is now the claim slab, the three, bedtime as one row, the shift bar, three chips
+(freezes, today's gap, where you are standing), two rows for the day's one line and the place of the
+day, and the ladder. Every one of them opens a sheet carrying the prose that used to be stacked on
+the screen — not a word of it was cut, it just stopped being the first thing you have to read.
+**1,224 pixels.** Bedtime is violet rather than green, because it is the keystone but it is not one
+of the three and it should not look like it earns the pack.
+
 #### The collection stopped being a filing cabinet
 
 The Cards tab used to be one column of all seventeen sets: **16,856 pixels** of mostly identical
