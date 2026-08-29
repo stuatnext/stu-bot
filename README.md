@@ -86,24 +86,34 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — streaks, badges, and the district collection.
 
-#### Cards, packs and rewards
+#### Cards, packs and progression
 
-The collection is **Singapore itself** — 62 cards across common, uncommon, rare and gold, every one a
-real thing he could eat, see or say. Kopi-o siew dai and the tissue chope at the common end; Chek
-Jawa and Baba House at the rare end. So the collection doubles as a reason to leave Tanjong Pagar,
-pulled one card at a time rather than pushed at him as a list of 178 ideas.
+**90 cards across 11 sets.** Singapore is most of it — Hawker, Kopitiam, Singlish, Everyday,
+Heritage, Green, Islands and Edges — but the deck deliberately reaches past it, because he is barely
+in Singapore between September and Christmas. **Two Hours Out** is weekend range he can work from:
+Batam, Bangkok, Penang, Yogyakarta, Luang Prabang. **The Road** is where this year actually takes
+him: Valletta, Sofia, Hudson Yards, Sheffield, the red-eye. **Home** is the things you notice you
+miss — and doubles as raw material for the nostalgia newsletter.
 
-**Packs** are earned by doing, not bought. A day with all three pillars earns one; every seventh
-consecutive full day earns another. Pack count is recomputed from the record rather than incremented,
-so it cannot drift. Pulls prefer cards not yet held, so opening a pack usually closes a gap instead of
-handing him a fourth kopi-o.
+**Sets are the hook.** Rarity tiers are a list; sets give you something to be *one card from
+finishing*, and the Cards screen leads with whichever that is. A completed set is worth 100.
 
-**Gold cards are never in packs.** They are claimed by hand, because they can only be earned by
-actually happening: a hawker order with no phrasebook, a first Hokkien exchange with his partner's
-family, his mum through the gate at Changi arrivals, the two days agreed, a second client signed.
+**Ranks, not levels.** XP comes from cards held, full days, places visited and completed sets, and
+the rank says something rather than being a number: *Just landed → Two months in → Finding your way →
+Regular → Local-ish → Knows a guy → Gives directions → Been here years → Institution.*
 
-**Rewards** are real-life treats at 7, 30 and 90 day streaks. He writes them himself — the app only
-decides when they are earned, because a treat granted on a Tuesday is not a reward.
+**Two kinds of pack.** A full day earns a standard pack of three. Every seventh consecutive full day
+earns a **streak pack** — five cards, better odds — so a streak feels different from a good day.
+Counts are recomputed from the record rather than incremented, so they cannot drift, and pulls prefer
+cards not yet held.
+
+**Gold cards are never in packs.** Seven of them, claimed by hand, because they can only be earned by
+happening: a hawker order with no phrasebook, a first Hokkien exchange with his partner's family, his
+mum through the gate at Changi, the hours agreed, a second client signed, the first thing he
+publishes that is his, and a thirty-day streak.
+
+**Rewards** are real treats at 7, 30 and 90 day streaks, written by him. The app only decides when
+they are earned, because a treat granted on a Tuesday is not a reward.
 
 #### On streaks
 
