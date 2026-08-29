@@ -86,6 +86,25 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — streaks, badges, and the district collection.
 
+#### Cards, packs and rewards
+
+The collection is **Singapore itself** — 62 cards across common, uncommon, rare and gold, every one a
+real thing he could eat, see or say. Kopi-o siew dai and the tissue chope at the common end; Chek
+Jawa and Baba House at the rare end. So the collection doubles as a reason to leave Tanjong Pagar,
+pulled one card at a time rather than pushed at him as a list of 178 ideas.
+
+**Packs** are earned by doing, not bought. A day with all three pillars earns one; every seventh
+consecutive full day earns another. Pack count is recomputed from the record rather than incremented,
+so it cannot drift. Pulls prefer cards not yet held, so opening a pack usually closes a gap instead of
+handing him a fourth kopi-o.
+
+**Gold cards are never in packs.** They are claimed by hand, because they can only be earned by
+actually happening: a hawker order with no phrasebook, a first Hokkien exchange with his partner's
+family, his mum through the gate at Changi arrivals, the two days agreed, a second client signed.
+
+**Rewards** are real-life treats at 7, 30 and 90 day streaks. He writes them himself — the app only
+decides when they are earned, because a treat granted on a Tuesday is not a reward.
+
 #### On streaks
 
 An earlier version refused streaks on principle. He asked for them, with *"rewards and collectibles

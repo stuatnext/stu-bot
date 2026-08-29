@@ -157,10 +157,10 @@ ul{margin:9px 0; padding-left:20px;} li{margin:6px 0;} li::marker{color:var(--in
 
 <nav>
   <button data-tab="today" aria-current="true"><span class="ic">&#9737;</span>Today</button>
+  <button data-tab="cards"><span class="ic">&#9830;</span>Cards</button>
+  <button data-tab="rewards"><span class="ic">&#9733;</span>Rewards</button>
   <button data-tab="next"><span class="ic">&#9654;</span>Next</button>
-  <button data-tab="trips"><span class="ic">&#9992;</span>Trips</button>
-  <button data-tab="say"><span class="ic">&#9786;</span>Say</button>
-  <button data-tab="log"><span class="ic">&#10003;</span>Log</button>
+  <button data-tab="log"><span class="ic">&#10003;</span>More</button>
 </nav>
 
 <script>
@@ -353,6 +353,85 @@ var BADGES = [
   [5,   "Clocked off",    "stop",   "Five days finished on time."],
   [20,  "Not a martyr",   "stop",   "Twenty. The shift ends when it ends."]
 ];
+/* The deck is Singapore. Every card is a real thing he could eat, see or say,
+   so the collection doubles as a reason to leave Tanjong Pagar - pulled rather
+   than pushed at him, one at a time.
+   [ name, rarity, note ]   rarity: 0 common, 1 uncommon, 2 rare, 3 gold */
+var CARDS = [
+["Kopi-o siew dai",0,"Black, a bit sweet. The most ordinary thing you can say at a stall."],
+["Kaya toast set",0,"Toast, soft eggs, kopi. About four dollars and a whole breakfast."],
+["Chwee kueh",0,"Steamed rice cakes with preserved radish. Two dollars, impossible to get wrong."],
+["Char kway teow",0,"Flat noodles, dark soy, lard. Ask for no cockles if you want."],
+["Chicken rice",0,"Thigh, not breast. This is not negotiable."],
+["Roti prata",0,"Two plain with curry. The lowest-risk order in Singapore."],
+["Teh tarik",0,"Pulled tea. Watch them do it from a height."],
+["Laksa",0,"Coconut, chilli, thick noodles. Katong does the famous one."],
+["Bak chor mee",0,"Minced pork noodles. Dry is the safer answer."],
+["Nasi lemak",0,"Coconut rice, fried chicken, egg, sambal. The one Malay dish to have."],
+["Bak kut teh",0,"Pork rib soup. Peppery here, herbal in Malaysia."],
+["Satay",0,"Ten sticks minimum. They will bring more."],
+["Ice kacang",0,"Shaved ice, syrup, beans. Absurd and correct in this heat."],
+["Yong tau foo",0,"Point at things in a tray. Pointing is the entire mechanic."],
+["Fried carrot cake",0,"No carrot. Black is sweet dark soy and nicer."],
+["Tissue chope",0,"A packet of tissues on a stool means the seat is taken."],
+["Can sit?",0,"The whole phrase for sharing a table with strangers."],
+["Shiok",0,"Singlish. Deeply satisfying. Use it about food."],
+["Lah",0,"The particle. You will start doing it without noticing."],
+["Alamak",0,"Oh no. Malay origin, universally used."],
+["Void deck",0,"The open ground floor of an HDB block. Weddings and funerals both."],
+["Wet market",0,"Underneath most hawker centres. Go early, it is a different world."],
+["Kopitiam uncle",0,"Will shout your order across the stall. Not a correction."],
+["Tray return",0,"Mandatory since 2021. Station is near the exit."],
+["Monsoon drain",0,"Concrete channels everywhere. They fill in minutes."],
+["Rain tree",0,"The wide flat canopies along the expressways. Folds its leaves at night."],
+["Mynah",0,"Loud, everywhere, walks like it pays rent."],
+["Durian",0,"Banned on the MRT. There is a sign with a picture."],
+["Calamansi",0,"Tiny lime. In everything, including your drink."],
+["MRT at 06:00",0,"Empty, cold, and the best time to cross the island."],
+
+["Tiong Bahru estate",1,"1930s art deco walk-ups. Curved balconies and an air raid shelter."],
+["Thian Hock Keng",1,"The oldest Hokkien temple here. Built by sailors giving thanks."],
+["Haw Par Villa",1,"Ten Courts of Hell, built by the Tiger Balm millionaire. Free and unsettling."],
+["Dragon Playground",1,"Toa Payoh. Mosaic dragon, 1979, and one of the last of its kind."],
+["Emerald Hill",1,"One street of Peranakan terraces hiding behind Orchard Road."],
+["Kampong Glam",1,"Textile shops, Haji Lane, and a golden dome."],
+["Katong shophouses",1,"Koon Seng Road. The colours are not exaggerated in photographs."],
+["Little India",1,"Loudest, best-smelling part of the island. Go on a Sunday."],
+["Botanic Gardens",1,"UNESCO listed, free, and there is real jungle in the middle."],
+["Southern Ridges",1,"Ten kilometres of connected parks and the Henderson Waves."],
+["MacRitchie",1,"Boardwalk, monkeys, and the reservoir at seven in the morning."],
+["Rail Corridor",1,"The old KTM line, now a green spine most of the length of the island."],
+["Fort Canning",1,"The tree tunnel everybody photographs. Spice gardens and a lot of history."],
+["Old Airport Road",1,"Widely held to be the best hawker centre, by people who care a great deal."],
+["Golden Mile",1,"Brutalist block, Thai food, and worth seeing for the building alone."],
+["Sri Mariamman",1,"Oldest Hindu temple here. Shoes off at the door."],
+["Peranakan tiles",1,"Look down at the five-foot ways. They are all different."],
+["Labrador tunnels",1,"Wartime gun emplacements on the southern coast."],
+
+["TreeTop Walk",2,"Suspension bridge over the canopy. You have to walk a long way to earn it."],
+["Coney Island",2,"Scrubby, rustic, almost empty on a weekday."],
+["Sungei Buloh",2,"Mangroves, mudskippers, monitor lizards, migratory birds."],
+["Pulau Ubin",2,"Boat over, hire a bike. Singapore forty years ago."],
+["Chek Jawa",2,"Intertidal flats on Ubin. Only at low tide, and worth planning for."],
+["Bukit Brown",2,"Overgrown Chinese cemetery. The most atmospheric place on the island."],
+["Kranji Marshes",2,"Far northwest, near the Johor Strait. Birds and almost nobody."],
+["Baba House",2,"A Peranakan home preserved exactly. Booking only, tiny groups."],
+["Pulau Hantu",2,"Ghost island. Reef diving, and you need your own boat."],
+
+["Kopi without looking",3,"Your first hawker order with no phrasebook. Claim it when it happens."],
+["Chiah pa boe",3,"Your first Hokkien exchange with his family. Claim it when it happens."],
+["Changi arrivals",3,"Your mum, through the gate. Claim it when it happens."],
+["Two days",3,"The hours agreed. Claim it when it happens."],
+["Client number two",3,"Someone other than NEXT pays Strait Up Growth. Claim it when it happens."]
+];
+
+var RARITY = [
+  ["Common",   "e", 62],
+  ["Uncommon", "m", 27],
+  ["Rare",     "l", 11],
+  ["Gold",     "hot", 0]     /* never pulled - these are claimed by doing the thing */
+];
+
 function totalDone(key){
   var n = 0;
   Object.keys(S.days).forEach(function(k){ if (pDone(k, key)) n++; });
@@ -419,7 +498,7 @@ var S = load();
 
 function load(){
   var d = { camp:"Singapore", wake:"08:30", bed:"23:45", done:{}, skip:{}, filter:0,
-            days:{}, threads:{}, theme:null };
+            days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, opened:0, theme:null };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
@@ -524,6 +603,75 @@ function maps(name){
 /* Not a difficulty ladder. What kind of place it is, so you know what you are
    walking into - which is information, not a warning. */
 var KIND = [["e","Outdoors"],["m","Counter service"],["l","Hawker stall"]];
+
+/* Packs. Earned by doing, opened by tapping, and the opening is the point -
+   anticipation, then a reveal, then a gap in the collection that closes. */
+var PACK_SIZE = 3;
+
+function allThree(iso){
+  return PILLARS.every(function(g){ return pDone(iso, g[0]); });
+}
+
+/* Recomputed rather than incremented, so it cannot drift or be double-counted.
+   A full day earns one pack; every seventh consecutive full day earns another. */
+function packsEarned(){
+  var full = Object.keys(S.days).filter(allThree).sort();
+  var bonus = 0, run = 0, prev = null;
+  full.forEach(function(k){
+    if (prev){
+      var gap = Math.round((new Date(k) - new Date(prev)) / 86400000);
+      run = gap === 1 ? run + 1 : 1;
+    } else run = 1;
+    if (run % 7 === 0) bonus++;
+    prev = k;
+  });
+  return full.length + bonus;
+}
+function packsWaiting(){ return Math.max(0, packsEarned() - (S.opened || 0)); }
+
+function rollRarity(r){
+  var pool = [], i;
+  for (i = 0; i < RARITY.length; i++){
+    for (var j = 0; j < RARITY[i][2]; j++) pool.push(i);
+  }
+  return pool[Math.floor(r * pool.length) % pool.length];
+}
+
+/* Pull PACK_SIZE cards. Prefers cards not yet held, so opening a pack usually
+   closes a gap rather than handing him a fourth kopi-o. */
+function openPack(){
+  var got = [], seed = Date.now();
+  for (var n = 0; n < PACK_SIZE; n++){
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    var rar = rollRarity((seed >>> 8) / 16777216);
+    var tier = CARDS.filter(function(c){ return c[1] === rar; });
+    if (!tier.length) tier = CARDS.filter(function(c){ return c[1] === 0; });
+    var fresh = tier.filter(function(c){ return !(S.cards || {})[c[0]] && got.indexOf(c[0]) < 0; });
+    var from = fresh.length ? fresh : tier.filter(function(c){ return got.indexOf(c[0]) < 0; });
+    if (!from.length) from = tier;
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    var card = from[seed % from.length];
+    got.push(card[0]);
+    S.cards = S.cards || {};
+    S.cards[card[0]] = (S.cards[card[0]] || 0) + 1;
+  }
+  S.opened = (S.opened || 0) + 1;
+  save();
+  return got;
+}
+
+function heldCount(){ return Object.keys(S.cards || {}).length; }
+
+/* Real-life rewards. He sets them; the app only decides when they are earned,
+   because a treat you granted yourself on a Tuesday is not a reward. */
+var REWARD_TIERS = [
+  [7,   "Weekly",    "Something small. A proper coffee somewhere new, a book."],
+  [30,  "Monthly",   "Something that costs a bit. A meal out, a massage, a day trip."],
+  [90,  "Quarterly", "Something you would otherwise talk yourself out of."]
+];
+function bestStreak(){
+  return Math.max.apply(null, PILLARS.map(function(g){ return streak(g[0]); }));
+}
 
 /* ---------------------------------------------------------------- the bar */
 function barHTML(){
@@ -837,6 +985,8 @@ function viewLog(){
     });
     h += "</div>";
   }
+  h += "<div class='btns'><button data-tab='trips'>Trips and UK days</button>"
+    + "<button data-tab='say'>Phrasebook</button></div>";
   h += "<div class='btns'><button data-reset='1'>Clear everything</button></div>";
   return h;
 }
@@ -898,13 +1048,104 @@ function viewTrips(){
   return h;
 }
 
+/* ---------------------------------------------------------------- collection */
+function viewCards(){
+  var waiting = packsWaiting(), held = heldCount();
+  var h = "";
+
+  if (S.reveal && S.reveal.length){
+    h += "<div class='card ok'><h3>You pulled</h3>";
+    S.reveal.forEach(function(name){
+      var c = CARDS.filter(function(x){ return x[0] === name; })[0];
+      if (!c) return;
+      h += "<div class='row'><b><span class='pill " + RARITY[c[1]][1] + "'>" + RARITY[c[1]][0] + "</span></b>"
+        + "<div><strong>" + esc(c[0]) + "</strong><br><span class='dim'>" + esc(c[2]) + "</span></div></div>";
+    });
+    h += "<div class='btns'><button data-reveal='clear'>Nice</button></div></div>";
+  }
+
+  h += "<div class='card" + (waiting ? " ok" : "") + "'>";
+  h += "<div style='display:flex;align-items:baseline;gap:14px'><span class='count'>" + waiting + "</span>"
+    + "<div><h3>" + (waiting === 1 ? "pack waiting" : "packs waiting") + "</h3>"
+    + "<div class='dim'>" + held + " of " + CARDS.length + " cards held</div></div></div>";
+  if (waiting){
+    h += "<div class='btns'><button class='pri' data-pack='1'>Open a pack</button></div>";
+  } else {
+    h += "<p class='muted' style='margin:10px 0 0'>A day with all three earns one. Every seventh "
+      + "consecutive full day earns another.</p>";
+  }
+  h += "</div>";
+
+  RARITY.forEach(function(r, ri){
+    var tier = CARDS.filter(function(c){ return c[1] === ri; });
+    var have = tier.filter(function(c){ return (S.cards || {})[c[0]]; }).length;
+    h += "<h2>" + r[0] + " <span class='dim' style='font-weight:400'>" + have + "/" + tier.length + "</span></h2>";
+    if (ri === 3){
+      h += "<p class='dim' style='margin:0 0 8px'>Not in packs. These only happen by happening.</p>";
+    }
+    h += "<div class='card'>";
+    tier.forEach(function(c){
+      var n = (S.cards || {})[c[0]];
+      h += "<div class='row' style='" + (n ? "" : "opacity:.42") + "'>"
+        + "<b>" + (n ? (n > 1 ? "x" + n : "&#10003;") : "&mdash;") + "</b>"
+        + "<div><strong>" + esc(c[0]) + "</strong>"
+        + (n ? "<br><span class='dim'>" + esc(c[2]) + "</span>" : "")
+        + (ri === 3 && !n ? " <button data-claim='" + esc(c[0]) + "' style='min-height:32px;padding:4px 10px;font-size:13px'>Claim</button>" : "")
+        + "</div></div>";
+    });
+    h += "</div>";
+  });
+  return h;
+}
+
+/* ---------------------------------------------------------------- rewards */
+function viewRewards(){
+  var best = bestStreak();
+  var h = "<p class='muted'>You set these. The app only decides when they are earned, because a treat "
+        + "you granted yourself on a Tuesday is not a reward.</p>";
+
+  h += "<div class='card'><div style='display:flex;align-items:baseline;gap:14px'>"
+    + "<span class='count'>" + best + "</span><div><h3>best current streak</h3>"
+    + "<div class='dim'>across the three</div></div></div></div>";
+
+  REWARD_TIERS.forEach(function(t){
+    var name = (S.rewards || {})[t[0]];
+    var unlocked = best >= t[0];
+    var claimed = ((S.claimed || {})[t[0]] || 0);
+    h += "<div class='card" + (unlocked && name ? " ok" : "") + "'>";
+    h += "<div style='display:flex;justify-content:space-between;gap:10px;align-items:flex-start'>"
+      + "<h3>" + t[1] + "</h3><span class='pill" + (unlocked ? " e" : "") + "'>" + t[0] + " days</span></div>";
+    h += "<p class='dim' style='margin:6px 0 0'>" + esc(t[2]) + "</p>";
+    if (name){
+      h += "<p style='margin:9px 0 0'><strong>" + esc(name) + "</strong>"
+        + (claimed ? " <span class='dim'>&middot; claimed " + claimed + "x</span>" : "") + "</p>";
+      h += "<div class='btns'>";
+      if (unlocked) h += "<button class='pri' data-claimreward='" + t[0] + "'>Earned it &mdash; claim</button>";
+      h += "<button data-setreward='" + t[0] + "'>Change</button></div>";
+      if (!unlocked) h += "<p class='dim' style='margin:8px 0 0'>" + (t[0] - best) + " days to go.</p>";
+    } else {
+      h += "<div class='btns'><button data-setreward='" + t[0] + "'>Set what this earns you</button></div>";
+    }
+    h += "</div>";
+  });
+
+  h += "<div class='card tip'><h3>Pick things you would otherwise not do</h3>"
+    + "<p style='margin:8px 0 0'>A reward you would have had anyway is not a reward. Given what you "
+    + "have told me: a coffee somewhere you have never been for the weekly, a proper meal out or a "
+    + "massage for the monthly, and for the quarterly &mdash; a weekend in Bangkok, or GTA VI, or "
+    + "the thing you keep deciding you cannot justify.</p></div>";
+  return h;
+}
+
 /* ---------------------------------------------------------------- shell */
 var TABS = {
-  today: ["Today", "A day fixed to head office", viewToday],
-  next:  ["Next", "What is actually going on", viewNext],
-  trips: ["Trips", "Where you will be, and the UK count", viewTrips],
-  say:   ["Say", "Read it in the queue", viewSay],
-  log:   ["Log", "The record, so you are not holding it", viewLog]
+  today:   ["Today", "A day fixed to head office", viewToday],
+  cards:   ["Cards", "Singapore, one card at a time", viewCards],
+  rewards: ["Rewards", "What consistency buys you", viewRewards],
+  next:    ["Next", "What is actually going on", viewNext],
+  trips:   ["Trips", "Where you will be, and the UK count", viewTrips],
+  say:     ["Say", "Read it in the queue", viewSay],
+  log:     ["Log", "The record, so you are not holding it", viewLog]
 };
 var tab = "today";
 
@@ -963,9 +1204,25 @@ document.addEventListener("click", function(ev){
   if (b.dataset.done){ S.done[b.dataset.done] = today(); delete S.skip[today()]; save(); tab = "log"; render(); return; }
   if (b.dataset.skip){ S.skip[today()] = (S.skip[today()] || 0) + 1; save(); render(); return; }
   if (b.dataset.easy){ S.filter = ((S.filter || 0) + 1) % 3; delete S.skip[today()]; save(); render(); return; }
+  if (b.dataset.pack){ S.reveal = openPack(); render(); return; }
+  if (b.dataset.reveal){ delete S.reveal; save(); render(); return; }
+  if (b.dataset.claim){
+    S.cards = S.cards || {}; S.cards[b.dataset.claim] = 1; save();
+    S.reveal = [b.dataset.claim]; render(); return;
+  }
+  if (b.dataset.setreward){
+    var tier = b.dataset.setreward;
+    var v = prompt("What does this one earn you?", (S.rewards || {})[tier] || "");
+    if (v !== null){ S.rewards = S.rewards || {}; if (v.trim()) S.rewards[tier] = v.trim(); else delete S.rewards[tier]; save(); render(); }
+    return;
+  }
+  if (b.dataset.claimreward){
+    var tr = b.dataset.claimreward;
+    S.claimed = S.claimed || {}; S.claimed[tr] = (S.claimed[tr] || 0) + 1; save(); render(); return;
+  }
   if (b.dataset.reset){
     if (confirm("Clear everything logged? This cannot be undone.")){
-      S.done = {}; S.skip = {}; S.days = {}; S.threads = {}; save(); render();
+      S.done = {}; S.skip = {}; S.days = {}; S.threads = {}; S.cards = {}; S.claimed = {}; S.opened = 0; delete S.reveal; save(); render();
     }
     return;
   }
