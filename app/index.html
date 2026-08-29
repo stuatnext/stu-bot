@@ -813,6 +813,43 @@ ul{margin:9px 0; padding-left:20px} li{margin:6px 0} li::marker{color:var(--ink3
   transition:transform .12s var(--tap)}
 .strip.tap:active{transform:scale(.99)}
 
+
+/* ====================================================== where do I start, then
+   Third round, and this one was a real bug rather than taste: the resting icon
+   for Trained was a checkmark and Family had no icon at all, so a fresh board
+   read as done / broken / unchecked and there was no way to tell which row
+   wanted a thumb. Fixed above. What is left is making the rows look pressable
+   before they have anything to show. */
+
+.startline{margin:2px 2px 10px; font-size:13.5px; color:var(--ink2)}
+
+/* An untapped pillar is an empty socket: dashed ring, muted glyph, waiting.
+   A tapped one is filled and solid. The difference has to be visible from
+   across the room, because it is the only feedback the tap gives. */
+.q .g{border-style:dashed; border-color:var(--line2)}
+.q.on .g{border-style:solid}
+.q:not(.on):active .g{border-color:var(--gold); color:var(--gold2)}
+
+/* The right-hand side when there is no run yet. Not a number, not a checkbox -
+   the target the tile is going to fill. */
+.q .n.dot{display:flex; align-items:center; justify-content:center; width:46px}
+.q .n.dot i{width:22px; height:22px; border-radius:50%; border:2px dashed var(--line2);
+  display:block; transition:all .22s var(--tap)}
+.q.on .n.dot i{border-style:solid; border-color:var(--jade); background:var(--jade);
+  box-shadow:0 0 12px color-mix(in srgb,var(--jade) 45%,transparent)}
+
+/* The three carry the screen, so they sit above everything around them. */
+.q{min-height:78px}
+.q .t b{font-size:17px}
+.q.on{box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 5%,transparent) inset,
+  0 6px 20px color-mix(in srgb,var(--jade) 12%,transparent)}
+
+/* The prize should look like a prize even before it is won, or the first thing
+   on a fresh board is a dead grey slab. */
+.claim.idle{border-color:color-mix(in srgb,var(--gold) 26%,transparent);
+  background:linear-gradient(150deg,color-mix(in srgb,var(--gold) 7%,transparent),var(--panel) 62%)}
+.claim.idle .glyph{color:var(--gold2); border-color:color-mix(in srgb,var(--gold) 34%,transparent)}
+
 </style>
 </head>
 <body>
@@ -1002,10 +1039,14 @@ function ukDays(includeOpen){
    Building a presence came fourth and is deliberately not here - it lives in
    Threads, not as something measured daily.
    [ key, label, icon key, what it means ] */
+/* The third field is the resting icon - what the pillar IS. A tick is what it
+   becomes. They were once "train" and "family", and "train" happened to be a
+   checkmark while "family" was not defined at all, so a fresh board showed one
+   row already ticked and one row blank. */
 var PILLARS = [
-  ["train",  "Trained", "train",  "Moving on purpose. Gym, a run, or a long walk."],
-  ["family", "Family",  "family", "A conversation with someone at home. A message does not count."],
-  ["stop",   "Stopped", "stop",   "Finished when the shift finished. Not burning out is a thing you do."]
+  ["train",  "Trained", "run",   "Moving on purpose. Gym, a run, or a long walk."],
+  ["family", "Family",  "phone", "A conversation with someone at home. A message does not count."],
+  ["stop",   "Stopped", "clock", "Finished when the shift finished. Not burning out is a thing you do."]
 ];
 
 var BED_DEFAULT = "23:45";
@@ -1772,7 +1813,7 @@ function ring(have, total, cls){
     + (C * k).toFixed(1) + " " + C.toFixed(1) + "'></circle></svg>";
 }
 var ICONS = {
-  train: "<path d='M4 12l5 5L18 6' stroke='currentColor' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/>",
+  clock: "<circle cx='11' cy='11.4' r='7.6' stroke='currentColor' stroke-width='1.9'/><path d='M11 6.8v4.8l3.2 2' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/>",
   tick:  "<path d='M4 12l5 5L18 6' stroke='currentColor' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/>",
   run:   "<path d='M12.6 4.6a1.7 1.7 0 1 0 0-.1M9 19l2.4-4.2-2-2.1L8 16M11.4 12.7 14 10l2.6 2.2 2.4.5M6.2 9.4 9.6 8l2.6.9 1.4 2.3' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/>",
   phone: "<path d='M6.6 3.8h3l1.5 3.7-1.9 1.3a11 11 0 0 0 4.9 4.9l1.3-1.9 3.7 1.5v3a1.7 1.7 0 0 1-1.9 1.7C10.4 17.3 5.9 12.8 5 5.7a1.7 1.7 0 0 1 1.6-1.9Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/>",
@@ -2661,13 +2702,24 @@ function viewToday(){
     h += "<i class='" + (on ? (full ? "on all" : "on") : carried ? "carried" : "") + "'></i>";
   });
   h += "</div></div>";
+  /* Until he has ever recorded one, say what to do. One line, and it never
+     comes back once the first day is on the board. */
+  var everLogged = PILLARS.some(function(g){ return !!firstDay(g[0]); });
+  if (!everLogged) h += "<p class='startline'>Tap one when you have done it. "
+    + "All three today earns a pack.</p>";
+
   PILLARS.forEach(function(g){
     var on = pDone(t, g[0]), st = streak(g[0]), req = required(g[0], t);
-    h += "<button class='q" + (on ? " on" : "") + (st >= 7 ? " hot" : "") + "' data-p='" + g[0] + "'>"
+    h += "<button class='q" + (on ? " on" : "") + (st >= 7 ? " hot" : "") + "' data-p='" + g[0] + "'"
+      + " aria-pressed='" + (on ? "true" : "false") + "'>"
       + "<span class='g'>" + svg(on ? "tick" : g[2], 22) + "</span>"
       + "<span class='t'><b>" + esc(g[1]) + "</b><span>"
       + esc(req ? g[3] : "No shift today, so this one is carried.") + "</span></span>"
-      + "<span class='n'><b>" + st + "</b><span>" + (st === 1 ? "day" : "days") + "</span></span>"
+      /* A zero is not worth the biggest type on the row. Until there is a run
+         to show, the right-hand side is the state of the thing, not a count. */
+      + (st > 0
+          ? "<span class='n'><b>" + st + "</b><span>" + (st === 1 ? "day" : "days") + "</span></span>"
+          : "<span class='n dot'><i></i></span>")
       + "</button>";
   });
 
