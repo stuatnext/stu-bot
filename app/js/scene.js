@@ -159,9 +159,6 @@ function viewToday(){
    still on - no navigation, no snackbar, and nothing opened on his behalf. */
 function tapPillar(key, btn){
   var t = today(), d = day(t), wasFull = allThree(t);
-  /* remember where the buddy is standing, so he can be seen to walk */
-  var was = document.querySelector("#screen .buddy");
-  var wasAt = was ? was.getBoundingClientRect() : null;
   if (d.p[key]) delete d.p[key]; else d.p[key] = 1;
   save();
   var nowFull = allThree(t);
@@ -177,10 +174,7 @@ function tapPillar(key, btn){
       burst(btn, "#3FD9A0");
       fly(btn, "#chipPot", "+" + money(rate()), "var(--gold2)");
     }
-    setTimeout(function(){
-      render({ keepScroll: true, animate: true });
-      buddyWalk(wasAt);
-    }, reduced() ? 0 : 620);
+    setTimeout(function(){ render({ keepScroll: true, animate: true }); }, reduced() ? 0 : 620);
     return;
   }
   if (d.p[key]){ buzz(14); sfx("tick");
@@ -190,24 +184,4 @@ function tapPillar(key, btn){
     }
   } else { sfx("untick"); }
   render({ keepScroll: true, animate: true });
-  buddyWalk(wasAt);
-}
-
-
-/* After a re-render the buddy simply appears at his new place; this slides
-   him there from where he was instead, with a hop. Pure presentation - the
-   state was already saved before the frame moved. */
-function buddyWalk(fromRect){
-  if (reduced() || !fromRect) return;
-  var el = document.querySelector("#screen .buddy");
-  if (!el || !el.animate) return;
-  var now = el.getBoundingClientRect();
-  var dx = fromRect.left - now.left, dy = fromRect.top - now.top;
-  if (!dx && !dy) return;
-  el.animate(
-    [{ transform: "translate(calc(-50% + " + dx.toFixed(0) + "px), calc(-96% + " + dy.toFixed(0) + "px))" },
-     { transform: "translate(-50%, -96%)" }],
-    { duration: 560, easing: "cubic-bezier(.3,.9,.4,1)" });
-  el.classList.add("hop");
-  setTimeout(function(){ el.classList.remove("hop"); }, 600);
 }
