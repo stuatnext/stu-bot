@@ -318,6 +318,29 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v8: the picture restarts
+
+v7 rebuilt the code from scratch and he said, correctly, that it looked
+exactly the same - because it did: the CSS was ported, and a redesign you
+cannot see in a screenshot is not a redesign. Ten rounds of dark, moody and
+glassy had been iterated, never questioned.
+
+v8 questions it. The register flips to **sticker-bright**: vivid flat skies
+that still follow the actual hour - a real blue day, a hot pink dawn, a
+proper indigo night with stars - with every surface a cream card carrying a
+thick ink outline and a hard shadow. Buttons are chunky and physically
+pressable; the three pillars are full-colour discs with white icons; the
+day's pack is a gold sticker that wiggles when it is ready; the sun is flat,
+bold and outlined; the dock is a cream slab with a sunny active pill. No
+glass, no grain, no grey-on-grey anywhere.
+
+Two colour systems keep it legible at every hour: the sky variables flip per
+phase (including the colour of anything written directly on the sky), while
+the cream card system is fixed, so the UI pops identically at noon and at
+midnight. The dark-mode/light-mode toggle is gone - the hour is the theme.
+The pack-opening stage keeps its dark room on purpose: a ceremony wants a
+spotlight.
+
 #### v7: delete everything and start again
 
 He looked at Today's book and the one-thing sheet and said: *confusing, not

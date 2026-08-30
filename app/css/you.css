@@ -7,7 +7,10 @@
 
 .yrank{display:flex; align-items:center; gap:15px}
 .yr-ring{position:relative; width:58px; height:58px; flex:none}
-.yr-ring .rg{width:58px; height:58px}
+.yr-ring .rg{width:58px; height:58px; transform:rotate(-90deg); display:block}
+.yr-ring .rg circle{fill:none; stroke-width:4}
+.yr-ring .rg .bg{stroke:var(--cardSunk)}
+.yr-ring .rg .fg{stroke:var(--gold); stroke-linecap:round}
 .yr-ring b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
   font-family:"JetBrains Mono",monospace; font-size:19px; font-weight:800}
 .yr-bd h3{margin:0; font-size:18px}

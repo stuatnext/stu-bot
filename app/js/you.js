@@ -60,7 +60,6 @@ function viewYou(){
   h += "<div class='menu'>"
     + mrow("replay", "1", "pack", "How this works", "The three-tap tour, again")
     + mrow("sound", "1", "spare", "Sound", S.mute ? "Off" : "On")
-    + mrow("theme", "1", "moon", "Appearance", isLight() ? "Light" : "Dark")
     + mrow("camp", "1", "pin", "Where you are", S.camp)
     + "</div>";
 
