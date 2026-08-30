@@ -56,6 +56,8 @@ function setBadge(tab, n, pulse){
 }
 
 
+var BUILD = "v10";
+
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewToday, cards: viewDeck, you: viewYou };
 var tab = "today";

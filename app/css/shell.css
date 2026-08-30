@@ -32,6 +32,9 @@
 #boot .sub{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.24em;
   text-transform:uppercase; color:var(--ink3); animation:bootin .5s var(--pop) both .2s}
 @keyframes bootin{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+#boot .bld{position:absolute; right:16px; bottom:calc(14px + env(safe-area-inset-bottom));
+  font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  letter-spacing:.14em; color:var(--ink3)}
 @media (prefers-reduced-motion:reduce){ #boot .mk,#boot .nm,#boot .sub{animation:none} }
 
 /* --------------------------------------------------------------------- HUD */
