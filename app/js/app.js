@@ -21,6 +21,10 @@ function paintHud(animate){
   /* Nothing in the HUD until it means something. Two chips reading zero on a
      first open is the app showing off furniture he has not earned. */
   var earnedAny = potTotal() > 0, hasSpares = sparesEarned() > 0;
+  var run = dayRun();
+  document.getElementById("chipFlame").hidden = fullDays() === 0;
+  document.getElementById("chipFlameN").textContent = run;
+  document.getElementById("chipFlame").classList.toggle("cold", run === 0);
   document.getElementById("chipPot").hidden = !earnedAny;
   document.getElementById("chipShard").hidden = !hasSpares;
   document.getElementById("hud").classList.toggle("bare", r.xp === 0);
@@ -56,7 +60,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v11";
+var BUILD = "v12";
 
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewToday, cards: viewDeck, you: viewYou };
@@ -127,6 +131,7 @@ document.addEventListener("click", function(ev){
   }
   if (ds.reset){ askReset(); return; }
   if (b.id === "crest"){ sfx("tap"); go("cards"); return; }
+  if (b.id === "chipFlame"){ sfx("tap"); go("today"); return; }
   if (b.id === "chipPot"){ sfx("tap"); go("you"); return; }
   if (b.id === "chipShard"){ sfx("tap"); go("cards"); return; }
 });
@@ -183,8 +188,8 @@ openGate();
 setInterval(function(){
   paintSky();
   if (tab !== "today" || ST || MODAL) return;
-  var sk = document.querySelector("#screen .sky");
-  if (sk) sk.innerHTML = skyHTML();
+  var sk = document.querySelector("#screen .skycard");
+  if (sk) sk.outerHTML = skyCardHTML();
 }, 60000);
 
 /* Hold the title card for a beat, then hand over. */

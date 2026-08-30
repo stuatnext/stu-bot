@@ -19,26 +19,25 @@
    out of step with the app: each one re-reads the real state to decide whether
    it is still needed. */
 var COACH_STEPS = [
-  { at: [".pil", ".trail"],
+  { at: [".pil", ".quests"],
     head: "Start here.",
     say: "Tap one of these if you have done it today. Moved on purpose, spoke to someone at "
        + "home, or finished when the shift finished.",
     tap: "Tap one", tourTap: "Next",
     want: function(){ return PILLARS.some(function(g){ return pDone(today(), g[0]); }); } },
 
-  { at: [".pil:not(.on)", ".trail"],
+  { at: [".pil:not(.on)", ".quests"],
     head: "Now the rest.",
     say: "Three of them is a full day. A full day is a pack of cards, and money in the pot.",
     tap: "Keep going", tourTap: "Next",
     want: function(){ return allThree(today()); } },
 
-  { at: [".gem", ".trail"],
+  { at: [".gem", ".quests"],
     head: "That is a pack.",
     say: "Earned, not given. Tap it and turn the cards over yourself.",
-    tourHead: "The sky is the clock.",
-    tourSay: "The arc above is your whole day - midnight to midnight, noon at the top - with "
-           + "Malta's shift as the bright band and the sun riding it at now. Tick the three "
-           + "and this becomes a pack.",
+    tourHead: "The chest is the payout.",
+    tourSay: "Three ticks fill it; a full day earns a pack and money in the pot. "
+           + "The sky card above keeps Malta\u2019s hours in view - the rest is up to you.",
     tap: "Open it", tourTap: "Got it",
     want: function(){ return !packsTotal(); } }
 ];

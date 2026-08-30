@@ -26,6 +26,7 @@ function ring(have, total, cls){
     + (C * k).toFixed(1) + " " + C.toFixed(1) + "'></circle></svg>";
 }
 var ICONS = {
+  flame: "<path d='M12 2.6c.6 3.4-1.2 5-2.8 6.8C7.4 11.4 6 13.2 6 16a6 6 0 0 0 12 0c0-2.3-1-4.2-2.4-5.8-.4 1.2-1 2-2 2.6.6-3.6-.4-7.6-1.6-10.2Z' stroke='currentColor' stroke-width='2' stroke-linejoin='round'/>",
   clock: "<circle cx='11' cy='11.4' r='7.6' stroke='currentColor' stroke-width='1.9'/><path d='M11 6.8v4.8l3.2 2' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/>",
   tick:  "<path d='M4 12l5 5L18 6' stroke='currentColor' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/>",
   run:   "<path d='M12.6 4.6a1.7 1.7 0 1 0 0-.1M9 19l2.4-4.2-2-2.1L8 16M11.4 12.7 14 10l2.6 2.2 2.4.5M6.2 9.4 9.6 8l2.6.9 1.4 2.3' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/>",
@@ -136,6 +137,7 @@ function tell(title, say){ return ask({ title: title, say: say, cancel: "Right" 
    The third pillar landing is the most important moment in the app. It used to
    be a re-render and a green snackbar. */
 function celebrate(headline, sub){
+  confetti();
   if (reduced()){ toast(headline, true); return; }
   var el = document.getElementById("fx");
   var cols = ["#F2B735","#FFE38A","#3FD9A0","#7C6BFF","#FF7A3D","#EEF3F8"];
@@ -213,4 +215,43 @@ function burst(el, color){
   setTimeout(function(){
     while (fx.firstChild && fx.firstChild.className === "mote") fx.removeChild(fx.firstChild);
   }, 700);
+}
+
+
+/* Real confetti: a one-shot canvas burst, 120 pieces, gravity and spin.
+   Rides on top of the celebrate() flash; gone in under two seconds. */
+function confetti(){
+  if (reduced()) return;
+  var cv = document.createElement("canvas");
+  cv.style.cssText = "position:fixed;inset:0;width:100%;height:100%;z-index:210;pointer-events:none";
+  cv.width = innerWidth * 2; cv.height = innerHeight * 2;
+  document.body.appendChild(cv);
+  var ctx = cv.getContext("2d"); ctx.scale(2, 2);
+  var colors = ["#58CC02", "#1CB0F6", "#FF6B8A", "#FFC800", "#CE82FF", "#FF9600"];
+  var bits = [], W = innerWidth, H = innerHeight;
+  for (var i = 0; i < 120; i++){
+    var a = -Math.PI / 2 + (Math.random() - .5) * 1.5;
+    var v = 7 + Math.random() * 9;
+    bits.push({ x: W / 2, y: H * .42,
+      vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+      w: 5 + Math.random() * 6, h: 8 + Math.random() * 6,
+      r: Math.random() * Math.PI, vr: (Math.random() - .5) * .3,
+      c: colors[i % colors.length] });
+  }
+  var t0 = performance.now();
+  (function tick(now){
+    var dt = Math.min(32, now - t0) / 16.7; t0 = now;
+    ctx.clearRect(0, 0, W, H);
+    var live = 0;
+    bits.forEach(function(b){
+      b.vy += .34 * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.r += b.vr * dt;
+      if (b.y < H + 30){ live++;
+        ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r);
+        ctx.fillStyle = b.c; ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+        ctx.restore();
+      }
+    });
+    if (live) requestAnimationFrame(tick); else cv.remove();
+  })(t0);
+  setTimeout(function(){ if (cv.parentNode) cv.remove(); }, 2600);
 }

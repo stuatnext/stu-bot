@@ -1,139 +1,88 @@
 /* ==========================================================================
-   tokens.css - the new palette: sticker-bright.
+   tokens.css - v12: the consistency-training app.
 
-   Ten rounds of dark, moody and glassy kept getting the same verdict, so
-   the register flips: vivid flat skies that change with the actual hour,
-   cream card surfaces with thick ink outlines and hard shadows, and text
-   that is always either ink-on-cream or ink-on-sky. Two colour systems:
-
-     - the SKY vars (--sky1/2/3, --glow, --ink) change per phase; --ink is
-       the colour of anything written directly on the sky and flips from
-       deep ink on bright skies to cream on the night ones.
-     - the CARD vars are fixed: every panel, button, dialog and menu is the
-       same cream sticker whatever the hour, so the UI always pops.
-
-   Card surfaces re-pin the generic --ink/--line/--panel names, so every
-   rule downstream keeps working without knowing about the flip.
+   He answered the questions himself this time: "like a training app - a
+   consistency training app - probably a little like Duolingo", keeping the
+   unlockables, the pot, and every recorded day. So the register is the
+   Duolingo school: clean light ground, white cards with soft borders, one
+   heavy rounded face on everything interactive, saturated feature colours,
+   and buttons with a hard bottom edge that physically press. The
+   time-of-day sky - Daylight's soul - survives as one living card on
+   Today instead of painting the whole world.
    ========================================================================== */
 
 :root{
-  /* fixed card system */
-  --card:#FFF9EC; --card2:#F6ECD6; --cardSunk:#EFE4CA;
-  --cardInk:#33285A; --cardInk2:#6A5F97; --cardInk3:#7F77A6;
-  --cardLine:#E7DCC2; --cardLine2:#D6C8A6;
-  --outline:#33285A;
-  --shadow:0 5px 0 #2A2148;
-  --shadowSoft:0 12px 26px rgba(42,33,72,.18);
+  /* the ground and the cards */
+  --bg:#F7F7F4;
+  --card:#FFFFFF; --card2:#F4F2EC; --sunk:#EFEDE6;
+  --edge:#E5E2D9; --edge2:#D8D4C7;
+  --ink:#3B3A36; --ink2:#6F6D63; --ink3:#85836F;
 
-  /* accents - saturated, outlined, game-loud */
-  --gold:#FFC93C; --gold2:#FFB01F; --goldInk:#4A3305; --goldSoft:#FFEFC2;
-  --jade:#2FBF6B; --jadeSoft:#D8F5E3; --jadeInk:#0F5C31;
-  --ember:#FF6B5E; --emberSoft:#FFE1DC;
-  --violet:#7A6BFF; --violetSoft:#E6E1FF; --violetInk:#4437B8;
-  --crit:#E5484D; --critSoft:#FADCDD;
+  /* feature colours, saturated and few */
+  --green:#58CC02; --greenEdge:#46A302; --greenSoft:#E8F8DB; --greenInk:#3F8F06;
+  --blue:#1CB0F6; --blueEdge:#1899D6; --blueSoft:#DDF4FF;
+  --rose:#FF6B8A; --roseEdge:#E04F6E; --roseSoft:#FFE4EA;
+  --gold:#FFC800; --goldEdge:#E6A800; --goldSoft:#FFF4CC; --goldInk:#7A5B00;
+  --flame:#FF9600; --flameEdge:#E07E00; --flameSoft:#FFE9CC;
+  --violet:#CE82FF; --violetEdge:#A855E8; --violetSoft:#F3E5FF; --violetInk:#8549BA;
+  --crit:#FF4B4B; --critSoft:#FFDFDF;
 
-  --r:16px; --r2:22px;
+  /* compatibility aliases for the screens that still speak the old names */
+  --panel:var(--card); --panel2:var(--card2);
+  --line:var(--edge); --line2:var(--edge2);
+  --cardInk:var(--ink); --cardInk2:var(--ink2); --cardInk3:var(--ink3);
+  --cardLine:var(--edge); --cardLine2:var(--edge2); --cardSunk:var(--sunk);
+  --outline:var(--edge2);
+  --jade:var(--green); --jadeSoft:var(--greenSoft); --jadeInk:var(--greenInk);
+  --gold2:var(--goldEdge); --ember:var(--flame); --emberSoft:var(--flameSoft);
+  --violetInk2:var(--violetInk);
+
+  --r:16px; --r2:20px;
   --tap:cubic-bezier(.2,.9,.3,1);
   --pop:cubic-bezier(.2,1.5,.4,1);
-  --hud:64px;
-
-  /* generic names default to the on-sky system (night, the default phase) */
-  --panel:var(--card); --panel2:var(--card2); --sunk:var(--cardSunk);
-  --line:var(--cardLine); --line2:var(--cardLine2);
+  --hud:60px;
 }
 
-/* ------------------------------------------------------------------ the sky
-   Vivid, not murky. Set by paintSky() on load and on the minute; the sun on
-   the arc and the browser chrome follow the same variables. */
+/* the sky lives on in one card: vivid, hour-driven, watch-face sized */
 :root{
-  --sky1:#2C2A6E; --sky2:#1E1D52; --sky3:#141239; --glow:#4A3E96;
-  --ink:#F3EFFF;
-  --ink2:color-mix(in srgb, var(--ink) 76%, transparent);
-  --ink3:color-mix(in srgb, var(--ink) 55%, transparent);
-  --city:#241E52;
+  --sky1:#2C2A6E; --sky2:#1E1D52; --skyInk:#F3EFFF;
 }
-:root[data-sky="deepnight"]{ --sky1:#1A1B4B; --sky2:#111233; --sky3:#0B0C26; --glow:#2E2866;
-  --ink:#E9E5FA; --city:#14133A; }
-:root[data-sky="dawn"]     { --sky1:#FF9F8E; --sky2:#F76FA8; --sky3:#7B5BD6; --glow:#FFD08A;
-  --ink:#471E55; --city:#5C2E6B; }
-:root[data-sky="morning"]  { --sky1:#A5E3FF; --sky2:#7ED0FF; --sky3:#4BAEF0; --glow:#FFF0AE;
-  --ink:#1E3E68; --city:#2E5580; }
-:root[data-sky="day"]      { --sky1:#8FD9FF; --sky2:#5FBDF7; --sky3:#2E9BE8; --glow:#EAF9FF;
-  --ink:#14365E; --city:#245081; }
-:root[data-sky="gold"]     { --sky1:#FFB25E; --sky2:#FF7E5F; --sky3:#C6539B; --glow:#FFE08A;
-  --ink:#4A1D3F; --city:#6B2A50; }
-:root[data-sky="dusk"]     { --sky1:#A66BD8; --sky2:#7550C8; --sky3:#3D2E86; --glow:#FF8E9E;
-  --ink:#FFF3E8; --city:#3A2C70; }
-:root[data-sky="night"]    { --sky1:#2C2A6E; --sky2:#1E1D52; --sky3:#141239; --glow:#4A3E96;
-  --ink:#F3EFFF; --city:#241E52; }
-
-/* Every cream surface re-pins the generic names, so anything written inside
-   a card is automatically ink-on-cream whatever the sky is doing. */
-.panel,.vault,.rec,.menu,.door,.empty,.filters button,.rail button,.btn,
-#modal .mw,#toast,#coach .say,#nav,.chip,.season{
-  --ink:var(--cardInk); --ink2:var(--cardInk2); --ink3:var(--cardInk3);
-  --line:var(--cardLine); --line2:var(--cardLine2);
-  --panel:var(--card); --panel2:var(--card2); --sunk:var(--cardSunk);
-}
+:root[data-sky="deepnight"]{ --sky1:#1A1B4B; --sky2:#111233; --skyInk:#E9E5FA }
+:root[data-sky="dawn"]     { --sky1:#FF9F8E; --sky2:#B76BC4; --skyInk:#47204F }
+:root[data-sky="morning"]  { --sky1:#8FDBFF; --sky2:#4BAEF0; --skyInk:#14456F }
+:root[data-sky="day"]      { --sky1:#6FC8FF; --sky2:#2E9BE8; --skyInk:#0E3C66 }
+:root[data-sky="gold"]     { --sky1:#FFB25E; --sky2:#E85D74; --skyInk:#54172E }
+:root[data-sky="dusk"]     { --sky1:#A66BD8; --sky2:#4A3796; --skyInk:#FFF3E8 }
+:root[data-sky="night"]    { --sky1:#2C2A6E; --sky2:#1E1D52; --skyInk:#F3EFFF }
 
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 [hidden]{display:none !important}
-html{-webkit-text-size-adjust:100%; text-size-adjust:100%; height:100%}
-
-html{background:var(--sky1)}
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%; height:100%; background:var(--bg)}
 body{
   margin:0; min-height:100%;
-  background-color:var(--sky1);
-  background:
-    radial-gradient(130% 42% at 50% 100%, var(--glow) 0%, transparent 74%),
-    linear-gradient(180deg, var(--sky3) 0%, var(--sky2) 42%, var(--sky1) 100%);
-  background-attachment:fixed;
+  background:var(--bg);
   color:var(--ink);
-  font-family:"Instrument Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  font-family:"Nunito","Instrument Sans",system-ui,-apple-system,sans-serif;
+  font-size:16px; font-weight:600; line-height:1.45;
+  -webkit-font-smoothing:antialiased;
   overscroll-behavior-y:none;
-  transition:background 1.6s linear;
 }
 #hud,#screen,#nav{position:relative; z-index:1}
 #nav{position:fixed}
 
-/* Today is one viewport, no scrolling */
+/* Today fits one viewport; the other tabs scroll like lists */
 body.scene{height:100dvh; overflow:hidden; display:flex; flex-direction:column}
 body.scene #screen{flex:1; min-height:0; display:flex; flex-direction:column;
-  overflow:hidden; padding:0 16px calc(96px + env(safe-area-inset-bottom)); width:100%}
-
-/* the city on the horizon: one bold flat silhouette in the phase's own tone */
-#scene{position:fixed; left:0; right:0;
-  bottom:calc(26px + env(safe-area-inset-bottom, 0px));
-  z-index:0; pointer-events:none}
-#scene svg{display:block; width:100%; height:clamp(104px,17vh,150px)}
-#scene .far{fill:var(--city); opacity:.45; transition:fill 1.6s linear}
-#scene .near,#scene .neardot{fill:var(--city); transition:fill 1.6s linear}
-#scene .wire{stroke:var(--city); transition:stroke 1.6s linear}
-
-/* stars, when the sky has them */
-#stars{position:fixed; left:0; top:0; right:0; height:58vh; z-index:0;
-  pointer-events:none; opacity:0; transition:opacity 1.6s linear;
-  -webkit-mask-image:linear-gradient(180deg,#000 55%,transparent);
-  mask-image:linear-gradient(180deg,#000 55%,transparent)}
-#stars svg{width:100%; height:100%}
-:root[data-sky="deepnight"] #stars{opacity:.95}
-:root[data-sky="night"] #stars{opacity:.85}
-:root[data-sky="dusk"] #stars{opacity:.4}
-#stars .tw{animation:tw 3.4s ease-in-out infinite}
-#stars .tw2{animation:tw 4.7s ease-in-out 1.2s infinite}
-@keyframes tw{0%,100%{opacity:1} 50%{opacity:.25}}
-@media (prefers-reduced-motion:reduce){ #stars .tw,#stars .tw2{animation:none} }
+  overflow:hidden; padding:0 14px calc(84px + env(safe-area-inset-bottom)); width:100%}
 
 .mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums}
-.disp{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; letter-spacing:-.03em}
+.disp{font-family:"Nunito",sans-serif; font-weight:800}
 .zh{font-family:"PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Source Han Sans SC",
     "Microsoft YaHei",sans-serif}
-h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif; margin:0; letter-spacing:-.025em;
-  text-wrap:balance}
-h2{font-size:13px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--ink2);
-  margin:26px 2px 10px}
-h3{font-size:16.5px; font-weight:700}
+h1,h2,h3{font-family:"Nunito",sans-serif; margin:0; letter-spacing:-.01em; text-wrap:balance}
+h2{font-size:12.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3);
+  margin:24px 2px 10px}
+h3{font-size:16.5px; font-weight:800}
 p{margin:9px 0}
-a{color:var(--violetInk)}
-.dim{color:var(--ink3); font-size:13px}
+a{color:var(--blue)}
+.dim{color:var(--ink2); font-size:13px}

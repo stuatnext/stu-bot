@@ -72,7 +72,7 @@ function viewYou(){
 
   h += "<div class='btns'><button class='btn quiet' data-reset='1'>Clear everything</button></div>";
   h += "<p class='dim' style='text-align:center;margin:16px 0 4px'>Daylight " + BUILD
-    + " &middot; the world build</p>";
+    + " &middot; the training build</p>";
   return h;
 }
 

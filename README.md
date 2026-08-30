@@ -318,6 +318,31 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v12: his brief, at last
+
+Thirteen rounds in, he was asked instead of guessed at. His answers, in his
+own words: *"like a training app - a consistency training app - probably a
+little like Duolingo"*; keep *"definitely the unlockables and the money
+pot"*; the cards, the pot and the history are sacred; and it is allowed to
+get as heavy as it needs.
+
+So v12 is a consistency-training app in the Duolingo school. Clean light
+ground, white cards with soft borders, Nunito (one variable file) heavy and
+rounded on everything interactive, and buttons with a hard bottom edge that
+physically collapses under the thumb. The stat bar carries the **streak
+flame** (consecutive full days, frozen days carrying), the pot and the
+spares. Today is the daily session: a greeting, **the sky card** (Daylight's
+hour-driven soul, demoted from world to watch face - mini arc, sun or moon
+at now, Malta's band), **the week strip** (seven days: green tick, ice, or
+hollow), the **three things as big pressable quest rows** with their
+definitions and per-pillar flames, and **the pack card** with a progress bar
+that becomes the gold open-me button when the day lands. Full days now end
+in real canvas confetti.
+
+The world experiment (buddy, phone booth, hills) lasted one round; it was a
+guess, and the owner's answer was better. Cards and You restyled to match;
+the coach and every mechanic untouched; build stamped v12.
+
 #### v11: a world, and someone living in it
 
 With delivery fixed, the deeper verdict still stood: every version had been

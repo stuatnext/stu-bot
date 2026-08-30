@@ -116,9 +116,9 @@
   min-height:44px; border-radius:99px; border:3px solid var(--cardLine2);
   background:var(--card); color:var(--cardInk2); font:inherit; font-size:13.5px;
   font-weight:800; font-family:"Bricolage Grotesque",system-ui,sans-serif; cursor:pointer;
-  white-space:nowrap; box-shadow:0 3px 0 rgba(42,33,72,.25)}
-.rail button[aria-current="true"]{color:var(--cardInk); border-color:var(--outline);
-  background:var(--gold); box-shadow:0 3px 0 #2A2148;
+  white-space:nowrap; box-shadow:0 2px 0 var(--edge)}
+.rail button[aria-current="true"]{color:var(--goldInk); border-color:var(--goldEdge);
+  background:var(--gold);
   background:linear-gradient(150deg,var(--goldSoft),var(--panel) 70%)}
 .rail button:active{transform:scale(.95)}
 .rail .rg{flex:none; width:26px; height:26px}
@@ -142,7 +142,7 @@
 .filters button{flex:1; padding:10px 6px; min-height:46px; border-radius:14px;
   border:3px solid var(--cardLine2); background:var(--card); color:var(--cardInk2);
   font:inherit; font-size:13.5px; font-weight:800; cursor:pointer;
-  box-shadow:0 3px 0 rgba(42,33,72,.25)}
+  box-shadow:0 2px 0 var(--edge)}
 .filters button[aria-pressed="true"]{color:var(--ink); border-color:var(--line2);
   background:var(--panel2)}
 

@@ -13,7 +13,7 @@
   backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px)}
 #modal.on{display:flex; animation:fadein .18s ease-out both}
 #modal .mw{width:100%; max-width:560px; background:var(--card); color:var(--cardInk);
-  border:3px solid var(--outline); border-bottom:0; border-radius:26px 26px 0 0;
+  border:2px solid var(--edge); border-bottom:0; border-radius:26px 26px 0 0;
   padding:12px 18px calc(20px + env(safe-area-inset-bottom));
   animation:sheetup .32s var(--pop) both}
 @keyframes sheetup{from{transform:translateY(36px); opacity:0}}
@@ -32,7 +32,7 @@
 #toast{position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom));
   transform:translateX(-50%); z-index:160; max-width:82vw; padding:12px 18px;
   border-radius:16px; background:var(--card); color:var(--cardInk);
-  border:3px solid var(--outline); box-shadow:0 5px 0 #2A2148;
+  border:2px solid var(--edge); box-shadow:0 2px 0 var(--edge);
   font-size:14px; font-weight:700; text-align:center; opacity:0; pointer-events:none}
 #toast.on{animation:toast 2.9s ease-out both}
 #toast.gold{background:var(--gold); color:var(--goldInk)}
@@ -99,8 +99,8 @@
 @keyframes spot{from{opacity:0; transform:scale(.9)}to{opacity:1; transform:none}}
 #coach .say{position:absolute; left:16px; right:16px; pointer-events:none;
   background:var(--card); color:var(--cardInk);
-  border:3px solid var(--outline); border-radius:22px; padding:20px 20px 18px;
-  box-shadow:0 6px 0 #2A2148, 0 18px 40px rgba(20,14,50,.45);
+  border:2px solid var(--edge); border-radius:22px; padding:20px 20px 18px;
+  box-shadow:0 2px 0 var(--edge);
   animation:coachin .42s var(--pop) both .12s}
 #coach .say b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
   font-size:23px; letter-spacing:-.03em; text-wrap:balance}
