@@ -111,6 +111,18 @@ function allThree(k){
 }
 function monthOf(k){ return k.slice(0, 7); }
 
+/* The number the flame wears: consecutive full days ending today or
+   yesterday, frozen days carrying the run without counting. */
+function dayRun(){
+  var n = 0, d = new Date(), k = iso(d);
+  if (!allThree(k)){ d.setDate(d.getDate() - 1); k = iso(d); }
+  while (allThree(k) || frozen(k)){
+    if (allThree(k)) n++;
+    d.setDate(d.getDate() - 1); k = iso(d);
+  }
+  return n;
+}
+
 /* The first day this pillar was ever recorded. Nothing before it counts as a
    miss - days before he started using the app are not failures. */
 function firstDay(key){

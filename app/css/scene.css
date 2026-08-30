@@ -1,208 +1,141 @@
 /* ==========================================================================
-   scene.css - the play screen, and how it arrives.
+   scene.css - v12: the daily session.
 
-   The sky arc, the gem, the three ability buttons, and the entrance: the
-   arc draws itself, the sun blooms, the gem drops, the orbs rise in turn.
-   Entrance animations only run when the tab is arrived at (#screen.arrive),
-   never on the re-render a tap causes, and never under reduced motion.
+   The greeting, the sky card, the week strip, three pressable quest rows,
+   and the chest that fills as they land. Duolingo-school physics: every
+   interactive element has a bottom edge that collapses under the thumb.
    ========================================================================== */
 
+body.scene #screen{justify-content:flex-start; gap:0}
 
+/* the greeting */
+.hello{text-align:left; margin:6px 2px 10px}
+.ask{font-family:"Nunito",sans-serif; font-weight:900; font-size:26px;
+  letter-spacing:-.015em; margin:0; line-height:1.12; color:var(--ink); text-wrap:balance}
+.ask.gold{color:var(--ink)}
+.asksub{font-size:14.5px; font-weight:700; color:var(--ink2); margin:5px 0 0}
 
-/* ================================================================ the scene
-   Today's furniture: the sky arc, the gem, the ask, the book. */
-.sky{flex:none; position:relative; margin-top:2px}
-.sky svg{display:block; width:100%; height:auto}
-.sky .arc{fill:none; stroke:color-mix(in srgb,var(--ink) 30%,transparent);
-  stroke-width:3.5; stroke-linecap:round; stroke-dasharray:.1 11}
-.sky .band{fill:none; stroke:var(--violet); stroke-width:8; stroke-linecap:round}
-.sky .hr{fill:color-mix(in srgb,var(--ink) 45%,transparent); r:2.6px}
-.sky .orb{fill:#FFD335; stroke:#F59E1B; stroke-width:2.5;
-  filter:drop-shadow(0 3px 0 rgba(42,33,72,.25))}
-.sky .orb.moon{fill:#FFF6E8; stroke:#D9CBEB; stroke-width:2.5;
-  filter:drop-shadow(0 3px 0 rgba(20,15,50,.4))}
-.sky .ray{stroke:#FFD335; stroke-width:4; stroke-linecap:round}
-.sky .cut{fill:var(--sky2)}
-.sky .dtime{display:block; text-align:center; margin-top:0;
-  font-family:"JetBrains Mono",monospace; font-size:10.5px; font-weight:700;
-  letter-spacing:.16em; text-transform:uppercase; color:var(--ink2)}
+/* ------------------------------------------------------------- the sky card
+   The one place the hour still paints. */
+.skycard{display:flex; align-items:center; gap:14px; padding:12px 16px;
+  border-radius:var(--r2); margin:0 0 10px;
+  background:linear-gradient(135deg, var(--sky1), var(--sky2));
+  border:2px solid rgba(0,0,0,.08);
+  transition:background 1.6s linear}
+.skycard svg{width:108px; height:56px; flex:none; display:block}
+.skycard .arc{fill:none; stroke:color-mix(in srgb, var(--skyInk) 38%, transparent);
+  stroke-width:2.5; stroke-linecap:round; stroke-dasharray:.1 7}
+.skycard .band{fill:none; stroke:#8F7BFF; stroke-width:5; stroke-linecap:round; opacity:.95}
+.skycard .orb{fill:#FFD335; stroke:#F59E1B; stroke-width:2}
+.skycard .orb.moon{fill:#FFF6E8; stroke:#D9CBEB; stroke-width:2}
+.skycard .ray{stroke:#FFD335; stroke-width:2.6; stroke-linecap:round}
+.skycard .cut{fill:var(--sky2); transition:fill 1.6s linear}
+.skycard .skybd{flex:1; min-width:0; color:var(--skyInk); transition:color 1.6s linear}
+.skycard .skybd b{display:block; font-family:"Nunito",sans-serif; font-weight:900; font-size:16px}
+.skycard .skybd span{display:block; font-family:"JetBrains Mono",monospace; font-size:10px;
+  font-weight:700; letter-spacing:.12em; text-transform:uppercase; opacity:.75; margin-top:3px}
 
+/* ------------------------------------------------------------ the week strip */
+.week{display:flex; gap:6px; margin:0 0 12px}
+.wd{flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:8px 0 7px; border-radius:14px; background:var(--card); border:2px solid var(--edge)}
+.wd i{width:22px; height:22px; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; background:var(--sunk); color:transparent}
+.wd b{font-family:"Nunito",sans-serif; font-size:10px; font-weight:900; color:var(--ink3);
+  letter-spacing:.04em}
+.wd.on i{background:var(--green); color:#FFFFFF}
+.wd.on{border-color:#BEE8A0; background:var(--greenSoft)}
+.wd.on b{color:var(--greenInk)}
+.wd.ice i{background:var(--blueSoft); color:var(--blue)}
+.wd.now{border-color:var(--gold); border-width:2.5px}
+.wd.off{opacity:.45}
 
-/* the burst a pillar makes when it lands: eight motes of its own colour */
+/* --------------------------------------------------------- the three quests */
+.quests{display:flex; flex-direction:column; gap:10px; margin:2px 0 12px}
+.pil{display:flex; align-items:center; gap:13px; width:100%; text-align:left;
+  font:inherit; font-family:"Nunito",sans-serif; cursor:pointer;
+  padding:13px 14px; min-height:76px; border-radius:18px;
+  background:var(--card); color:var(--ink);
+  border:2px solid var(--edge); border-bottom-width:5px;
+  transition:transform .08s var(--tap), border-bottom-width .08s var(--tap),
+    background .25s, border-color .25s}
+.pil:active{transform:translateY(3px); border-bottom-width:2px}
+.qic{flex:none; width:48px; height:48px; border-radius:15px; display:flex;
+  align-items:center; justify-content:center; background:var(--pil); color:#FFFFFF}
+.qbd{flex:1; min-width:0}
+.qbd b{display:block; font-size:17px; font-weight:900; letter-spacing:-.01em}
+.qbd span{display:block; font-size:12.5px; font-weight:700; color:var(--ink2); margin-top:1px}
+.qst{flex:none; display:flex; align-items:center; gap:3px; padding:4px 8px;
+  border-radius:10px; background:var(--flameSoft); color:#B26800;
+  font-size:12px; font-weight:900}
+.qst svg{color:var(--flame)}
+.qchk{flex:none; width:34px; height:34px; border-radius:11px;
+  border:2.5px solid var(--edge2); background:var(--card); color:#FFFFFF;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .22s var(--pop)}
+.pil.on{background:var(--greenSoft); border-color:#BEE8A0}
+.pil.on .qchk{background:var(--green); border-color:var(--greenEdge)}
+.pil.on .qbd b{color:var(--greenInk)}
+.pil.carried{opacity:.6}
+.pil.carried .qic{background:var(--sunk); color:var(--ink3)}
+.pil.pop .qchk{animation:qpop .45s var(--pop)}
+@keyframes qpop{0%{transform:scale(1)}45%{transform:scale(1.35) rotate(8deg)}100%{transform:scale(1)}}
+
+/* ---------------------------------------------------------------- the chest */
+.gem{display:flex; align-items:center; gap:13px; width:100%; text-align:left;
+  font:inherit; font-family:"Nunito",sans-serif; padding:14px;
+  border-radius:18px; border:2px solid var(--edge); border-bottom-width:5px;
+  background:var(--card); color:var(--ink); flex-wrap:wrap}
+button.gem{cursor:pointer; transition:transform .08s var(--tap), border-bottom-width .08s var(--tap)}
+button.gem:active{transform:translateY(3px); border-bottom-width:2px}
+.gem .gcore{position:relative; flex:none; width:52px; height:52px; border-radius:16px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--sunk); color:var(--ink3)}
+.gem.won{background:var(--goldSoft); border-color:#EDD27E}
+.gem.won .gcore{background:var(--gold); color:var(--goldInk);
+  animation:gemwiggle 2.4s ease-in-out infinite}
+@keyframes gemwiggle{0%,100%{transform:rotate(0)}6%{transform:rotate(-5deg) scale(1.05)}
+  12%{transform:rotate(4deg)}18%{transform:rotate(-2deg)}24%{transform:rotate(0)}}
+@media (prefers-reduced-motion:reduce){ .gem.won .gcore{animation:none} }
+.gem .gn{position:absolute; top:-8px; right:-8px; min-width:24px; height:24px;
+  border-radius:12px; padding:0 6px; display:grid; place-items:center;
+  background:var(--crit); color:#FFFFFF; border:2.5px solid var(--card);
+  font-size:12px; font-weight:900}
+.gem .gbd{flex:1; min-width:0}
+.gem .gbd b{display:block; font-size:16px; font-weight:900}
+.gem .dcount{display:block; font-size:12.5px; font-weight:700; color:var(--ink2); margin-top:1px}
+.gem .dcount i{font-style:normal}
+.gem.won .gbd b{color:var(--goldInk)}
+.gem .gbar{flex:1 0 100%; height:12px; border-radius:8px; background:var(--sunk);
+  overflow:hidden; margin-top:2px}
+.gem .gbar i{display:block; height:100%; border-radius:8px; background:var(--green);
+  transition:width .5s var(--pop); min-width:0}
+
+/* ------------------------------------------------------------- the entrance */
+#screen.arrive .hello{animation:riseup .4s var(--pop) both}
+#screen.arrive .skycard{animation:riseup .4s var(--pop) both .06s}
+#screen.arrive .week{animation:riseup .4s var(--pop) both .12s}
+#screen.arrive .pil:nth-child(1){animation:riseup .4s var(--pop) both .18s}
+#screen.arrive .pil:nth-child(2){animation:riseup .4s var(--pop) both .24s}
+#screen.arrive .pil:nth-child(3){animation:riseup .4s var(--pop) both .30s}
+#screen.arrive .gem{animation:riseup .4s var(--pop) both .38s}
+@keyframes riseup{from{opacity:0; transform:translateY(14px)}to{opacity:1; transform:none}}
+@media (prefers-reduced-motion:reduce){
+  #screen.arrive .hello,#screen.arrive .skycard,#screen.arrive .week,
+  #screen.arrive .pil,#screen.arrive .gem{animation:none !important}
+}
+
+/* the burst a quest makes when it lands */
 .mote{position:fixed; width:8px; height:8px; border-radius:50%; pointer-events:none;
-  z-index:160; box-shadow:0 0 0 2px rgba(42,33,72,.3);
-  animation:mote .62s cubic-bezier(.15,.65,.35,1) both}
+  z-index:160; animation:mote .62s cubic-bezier(.15,.65,.35,1) both}
 @keyframes mote{from{opacity:1; transform:translate(0,0) scale(1)}
   to{opacity:0; transform:translate(var(--mx), var(--my)) scale(.4)}}
 
-
-/* ================================================================= the trail
-   The saga-map screen. The sky is the backdrop across the top; the trail
-   fills the rest; the stops, the chest, the walker and the bubble are all
-   absolutely placed on it from one set of coordinates in scene.js. */
-body.scene #screen{padding:0 0 calc(88px + env(safe-area-inset-bottom))}
-body.scene .sky{padding:0 16px}
-.trail{position:relative; flex:1; min-height:0; margin-top:-6px}
-.tpath{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
-.tpath path{fill:none; stroke:color-mix(in srgb, var(--ink) 38%, transparent);
-  stroke-width:4; stroke-linecap:round; stroke-dasharray:.5 12}
-
-/* a place on the trail */
-.pil.node{position:absolute; transform:translate(-50%,-50%); border:0; padding:0;
-  background:none; font:inherit; cursor:pointer; display:flex; flex-direction:column;
-  align-items:center; gap:5px; width:124px}
-.prop{position:relative; width:96px; height:100px;
-  filter:drop-shadow(0 5px 0 rgba(42,33,72,.32));
-  transition:transform .14s var(--tap)}
-.prop svg{width:100%; height:100%; display:block}
-.pil:active .prop{transform:translateY(4px)}
-.pil.pop .prop{animation:qpop .45s var(--pop)}
-.tickb{position:absolute; top:-4px; right:2px; width:30px; height:30px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  background:var(--jade); color:#FFFFFF; border:3px solid var(--outline);
-  animation:tickpop .4s var(--pop) both}
-@keyframes tickpop{from{transform:scale(0)}to{transform:scale(1)}}
-/* the office window goes dark once he has stopped */
-.pil.on .win{fill:#4A4370}
-.pil.carried .prop{opacity:.55; filter:grayscale(.35) drop-shadow(0 4px 0 rgba(42,33,72,.25))}
-.pil .nlb{display:flex; flex-direction:column; align-items:center; gap:1px;
-  background:var(--card); color:var(--cardInk); border:2.5px solid var(--outline);
-  border-radius:12px; padding:4px 10px 5px; box-shadow:0 3px 0 #2A2148;
-  max-width:130px; text-align:center}
-.pil .nlb b{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800;
-  font-size:13.5px; letter-spacing:-.01em; line-height:1.15}
-.pil .nlb span{font-size:9.5px; font-weight:600; color:var(--cardInk2); line-height:1.25}
-.pil.on .nlb{background:var(--jadeSoft)}
-
-/* the chest at the end */
-.gem{position:absolute; transform:translate(-50%,-50%); display:flex; flex-direction:column;
-  align-items:center; gap:8px; border:0; background:none; padding:0; font:inherit;
-  color:var(--ink); width:130px}
-button.gem{cursor:pointer}
-button.gem:active .gcore{transform:translateY(4px); box-shadow:0 2px 0 #2A2148}
-.gem::before{content:""; position:absolute; left:50%; bottom:8px; width:118px; height:30px;
-  transform:translateX(-50%); border-radius:50%; z-index:-1;
-  background:color-mix(in srgb, var(--sky1) 40%, #74C46A);
-  border:3px solid color-mix(in srgb, var(--outline) 55%, transparent);
-  transition:background 1.6s linear}
-.gem .gcore{position:relative; width:84px; height:84px; border-radius:26px;
-  display:flex; align-items:center; justify-content:center; color:var(--cardInk3);
-  border:3.5px solid color-mix(in srgb, var(--ink) 55%, transparent);
-  background:color-mix(in srgb, var(--ink) 10%, transparent);
-  transition:all .3s var(--pop)}
-.gem.won .gcore{color:var(--goldInk); border-color:var(--outline);
-  background:var(--gold);
-  box-shadow:0 6px 0 #2A2148, 0 0 0 7px color-mix(in srgb,#FFFFFF 30%,transparent) inset;
-  animation:gemwiggle 2.4s ease-in-out infinite}
-@keyframes gemwiggle{0%,100%{transform:rotate(0)}6%{transform:rotate(-4deg) scale(1.03)}
-  12%{transform:rotate(3deg)}18%{transform:rotate(-2deg) scale(1.02)}24%{transform:rotate(0)}}
-@media (prefers-reduced-motion:reduce){ .gem.won .gcore{animation:none} }
-.gem .gn{position:absolute; top:-10px; right:-10px; min-width:27px; height:27px;
-  border-radius:14px; padding:0 7px; display:grid; place-items:center;
-  background:var(--ember); color:#FFF6EA; border:3px solid var(--outline);
-  font-family:"JetBrains Mono",monospace; font-size:13px; font-weight:800}
-.gem .dcount{font-family:"JetBrains Mono",monospace; font-size:9.5px; font-weight:700;
-  letter-spacing:.1em; text-transform:uppercase; color:var(--cardInk2);
-  background:var(--card); border:2.5px solid var(--outline); border-radius:10px;
-  padding:4px 9px; box-shadow:0 3px 0 #2A2148; white-space:nowrap}
-.gem .dcount i{font-style:normal}
-.gem.won .dcount{background:var(--gold); color:var(--goldInk)}
-
-/* the buddy, alive in the scene */
-.buddy{position:absolute; transform:translate(-50%,-96%); width:46px; height:60px;
-  z-index:3; pointer-events:none;
-  filter:drop-shadow(0 3px 0 rgba(42,33,72,.3))}
-.buddy svg{width:100%; height:100%; display:block; transform-origin:50% 100%;
-  animation:breathe 3.2s ease-in-out infinite}
-@keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.035) translateY(-1px)}}
-.buddy.cheer svg{animation:cheer 1.4s var(--pop) infinite}
-@keyframes cheer{0%,100%{transform:translateY(0)}28%{transform:translateY(-12px) rotate(-4deg)}
-  46%{transform:translateY(0)}64%{transform:translateY(-7px) rotate(3deg)}80%{transform:translateY(0)}}
-.buddy.cheer .b-armL{transform:rotate(38deg); transform-origin:17px 46px}
-.buddy.cheer .b-armR{transform:rotate(-38deg); transform-origin:43px 46px}
-.buddy.hop svg{animation:hop .55s var(--pop)}
-@keyframes hop{0%{transform:translateY(0)}45%{transform:translateY(-14px)}100%{transform:translateY(0)}}
-@media (prefers-reduced-motion:reduce){ .buddy svg,.buddy.cheer svg{animation:none} }
-
-/* the speech bubble beside him */
-.bubble{position:absolute; z-index:4; width:max-content; max-width:210px;
-  background:var(--card); color:var(--cardInk); border:3px solid var(--outline);
-  border-radius:18px; padding:10px 15px 11px; box-shadow:0 5px 0 #2A2148;
-  pointer-events:none; text-align:center;
-  transform:translate(-50%, calc(-100% - 96px))}
-.bubble::after{content:""; position:absolute; bottom:-9px;
-  left:calc(50% + var(--tailx, 0px) - 8px); width:15px; height:15px;
-  background:var(--card); border:3px solid var(--outline); border-top:0; border-right:0;
-  transform:rotate(-45deg)}
-.ask{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800;
-  font-size:17px; letter-spacing:-.02em; margin:0; line-height:1.15}
-.ask.gold{color:var(--cardInk)}
-.asksub{font-size:11.5px; font-weight:600; color:var(--cardInk2); margin:3px 0 0; line-height:1.3}
-
-/* ------------------------------------------------------------- the entrance
-   Only when the tab is arrived at: the path fades in, the stops pop up the
-   trail in order, the chest lands, the walker and bubble arrive last. */
-#screen.arrive .sky .arc{stroke-dashoffset:900; stroke-dasharray:900;
-  animation:arcdraw 1s cubic-bezier(.4,0,.2,1) both}
-@keyframes arcdraw{to{stroke-dashoffset:0}}
-#screen.arrive .sky .band{opacity:0; animation:bandin .5s ease both .55s}
-@keyframes bandin{to{opacity:1}}
-#screen.arrive .sky .orb,#screen.arrive .sky .ray,#screen.arrive .sky .cut{
-  opacity:0; animation:sunbloom .55s var(--pop) both .6s}
-@keyframes sunbloom{from{opacity:0; transform:scale(.4); transform-origin:center}
-  to{opacity:1; transform:none}}
-#screen.arrive .tpath{opacity:0; animation:fadein .6s ease both .2s}
-@keyframes fadein{to{opacity:1}}
-#screen.arrive .pil.node{opacity:0; animation:nodepop .5s var(--pop) both}
-#screen.arrive .trail > .pil.node:nth-child(3){animation-delay:.35s}
-#screen.arrive .trail > .pil.node:nth-child(4){animation-delay:.47s}
-#screen.arrive .trail > .pil.node:nth-child(5){animation-delay:.59s}
-@keyframes nodepop{from{opacity:0; transform:translate(-50%,-50%) scale(.55)}
-  to{opacity:1; transform:translate(-50%,-50%) scale(1)}}
-#screen.arrive .gem{opacity:0; animation:chestdrop .55s var(--pop) both .72s}
-@keyframes chestdrop{from{opacity:0; transform:translate(-50%,-70%)}
-  to{opacity:1; transform:translate(-50%,-50%)}}
-#screen.arrive .buddy,#screen.arrive .bubble{opacity:0; animation:fadein .4s ease both .95s}
-@media (prefers-reduced-motion:reduce){
-  #screen.arrive .sky .arc,#screen.arrive .sky .band,#screen.arrive .sky .orb,
-  #screen.arrive .sky .ray,#screen.arrive .sky .cut,#screen.arrive .tpath,
-  #screen.arrive .pil.node,#screen.arrive .gem,#screen.arrive .buddy,
-  #screen.arrive .bubble{animation:none !important; opacity:1}
-}
-
-@keyframes qpop{0%{transform:none}40%{transform:scale(1.12)}100%{transform:none}}
-
 /* small phones */
-@media (max-height:760px){
-  .sky svg{width:82%; margin:0 auto}
-  .pil .disc{width:62px; height:62px}
-  .gem .gcore{width:70px; height:70px; border-radius:22px}
+@media (max-height:740px){
+  .ask{font-size:22px}
+  .pil{min-height:66px; padding:10px 12px}
+  .qic{width:42px; height:42px}
+  .skycard{padding:9px 14px}
+  .skycard svg{width:92px; height:48px}
 }
-
-.bubble.sr{position:absolute; left:-9999px; top:0; transform:none; box-shadow:none}
-
-
-/* ------------------------------------------------------------- the ground
-   Rolling bands the path runs through, tinted by the hour: greener under a
-   blue sky, dusky under gold, near-ink at night. */
-.ground{position:absolute; inset:0; width:100%; height:100%; z-index:0}
-.ground path{transition:fill 1.6s linear}
-.ground .g2{fill:color-mix(in srgb, var(--sky1) 62%, #4E9E5C); opacity:.55}
-.ground .g1{fill:color-mix(in srgb, var(--sky1) 48%, #63B863); opacity:.75}
-.ground .g0{fill:color-mix(in srgb, var(--sky1) 38%, #74C46A)}
-.tpath{z-index:1}
-.pil.node,.gem,.buddy,.bubble{z-index:2}
-.buddy{z-index:3}
-.bubble{z-index:4}
-
-/* clouds, while the sky is light */
-.cloud{position:absolute; width:86px; opacity:0; transition:opacity 1.6s linear;
-  pointer-events:none; filter:drop-shadow(0 4px 0 rgba(42,33,72,.18))}
-.cloud svg{width:100%; height:auto; display:block}
-.cloud.c1{left:6%; top:14%; animation:drift 34s ease-in-out infinite alternate}
-.cloud.c2{right:5%; top:46%; width:64px; animation:drift 26s ease-in-out infinite alternate -8s}
-@keyframes drift{from{transform:translateX(0)}to{transform:translateX(26px)}}
-:root[data-sky="dawn"] .cloud, :root[data-sky="morning"] .cloud,
-:root[data-sky="day"] .cloud, :root[data-sky="gold"] .cloud{opacity:1}
-:root[data-sky="dusk"] .cloud{opacity:.4}
-@media (prefers-reduced-motion:reduce){ .cloud{animation:none} }

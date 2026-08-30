@@ -1,157 +1,133 @@
 /* ==========================================================================
-   shell.css - the world and the furniture.
+   shell.css - v12: the app furniture, Duolingo school.
 
-   The stars and the city, the title card, the HUD that never leaves, the
-   floating dock, the toast, and the front gate. Nothing screen-specific
-   lives here.
+   A stat bar that never leaves (streak flame, pot, spares), white cards
+   with soft borders, buttons with a hard bottom edge that physically
+   press, a flat light tab bar, and a light title card.
    ========================================================================== */
 
-/* ===================================================================== shell */
-#screen{padding:2px 14px calc(104px + env(safe-area-inset-bottom)); max-width:600px; margin:0 auto}
-#screen.turn{animation:turn .26s var(--tap) both}
-@keyframes turn{from{opacity:0; transform:translateY(9px) scale(.995)} to{opacity:1; transform:none}}
-#screen.turn-back{animation:turnb .26s var(--tap) both}
-@keyframes turnb{from{opacity:0; transform:translateY(-7px)} to{opacity:1; transform:none}}
+#screen{padding:2px 14px calc(96px + env(safe-area-inset-bottom)); max-width:560px; margin:0 auto}
+#screen.turn{animation:turn .24s var(--tap) both}
+@keyframes turn{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+#screen.turn-back{animation:turnb .24s var(--tap) both}
+@keyframes turnb{from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none}}
 
-/* ------------------------------------------------------------------- boot
-   A game announces itself for a beat before it hands you a screen. It also
-   covers the one frame where the save is read and the shift is computed. */
+/* ------------------------------------------------------------------- boot */
 #boot{position:fixed; inset:0; z-index:200; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:18px;
-  background:
-    radial-gradient(125% 40% at 50% 99%, var(--glow) 0%, transparent 72%),
-    radial-gradient(120% 54% at 50% -12%, var(--sky3) 0%, transparent 68%),
-    linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 56%, var(--sky1) 100%);
-  transition:opacity .42s ease, visibility .42s, background 1.6s linear}
+  align-items:center; justify-content:center; gap:14px; background:var(--bg);
+  transition:opacity .38s ease, visibility .38s}
 #boot.gone{opacity:0; visibility:hidden; pointer-events:none}
-#boot .mk{width:124px; height:124px; animation:bootmk .7s var(--pop) both;
-  filter:drop-shadow(0 8px 0 rgba(42,33,72,.25))}
+#boot .mk{width:112px; height:112px; animation:bootmk .7s var(--pop) both}
 @keyframes bootmk{from{opacity:0; transform:scale(.55)} to{opacity:1; transform:none}}
-#boot .nm{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:44px;
-  letter-spacing:-.03em; animation:bootin .5s var(--pop) both .12s}
-#boot .sub{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.24em;
-  text-transform:uppercase; color:var(--ink3); animation:bootin .5s var(--pop) both .2s}
+#boot .nm{font-family:"Nunito",sans-serif; font-weight:900; font-size:42px;
+  letter-spacing:-.02em; color:var(--ink); animation:bootin .5s var(--pop) both .1s}
+#boot .sub{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--ink3); animation:bootin .5s var(--pop) both .18s}
 @keyframes bootin{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
 #boot .bld{position:absolute; right:16px; bottom:calc(14px + env(safe-area-inset-bottom));
   font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
   letter-spacing:.14em; color:var(--ink3)}
 @media (prefers-reduced-motion:reduce){ #boot .mk,#boot .nm,#boot .sub{animation:none} }
 
-/* --------------------------------------------------------------------- HUD */
-#hud{position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:10px;
+/* ------------------------------------------------------ the stat bar (HUD) */
+#hud{position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:8px;
   padding:calc(10px + env(safe-area-inset-top)) 14px 8px;
-  width:100%; max-width:600px; margin:0 auto}
-.crest{position:relative; width:48px; height:48px; flex:none; border:0; padding:0;
+  width:100%; max-width:560px; margin:0 auto; background:var(--bg)}
+.crest{position:relative; width:44px; height:44px; flex:none; border:0; padding:0;
   cursor:pointer; background:var(--card); border-radius:50%;
-  box-shadow:0 0 0 3px var(--outline), 0 4px 0 #2A2148}
-.crest svg{width:48px; height:48px; transform:rotate(-90deg); display:block}
+  border:2px solid var(--edge)}
+.crest svg{width:40px; height:40px; transform:rotate(-90deg); display:block; margin:0 auto}
 .crest circle{fill:none; stroke-width:4}
-.crest .bg{stroke:var(--cardSunk)}
+.crest .bg{stroke:var(--sunk)}
 .crest .fg{stroke:var(--gold); stroke-linecap:round; transition:stroke-dasharray .9s var(--tap)}
 .crest b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-family:"JetBrains Mono",monospace; font-size:17px; font-weight:800; color:var(--cardInk)}
+  font-family:"Nunito",sans-serif; font-size:16px; font-weight:900; color:var(--ink)}
 .crest.up{animation:crestpop .7s var(--pop)}
 @keyframes crestpop{0%{transform:none}40%{transform:scale(1.22)}100%{transform:none}}
-.who{flex:1; min-width:0}
-.who .rk{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:14.5px;
-  line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.who .xpbar{margin-top:5px; height:9px; border-radius:6px; overflow:hidden; position:relative;
-  background:color-mix(in srgb, var(--ink) 16%, transparent);
-  box-shadow:0 0 0 2px color-mix(in srgb, var(--ink) 22%, transparent)}
-.who .xpbar i{position:absolute; inset:0 auto 0 0; border-radius:6px;
-  background:var(--gold); transition:width .9s var(--tap)}
-.who .xpn{margin-top:4px; font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--ink3)}
 .hudgap{flex:1}
 .chips{display:flex; gap:6px; flex:none}
-.chip{display:flex; align-items:center; gap:5px; padding:7px 11px; border-radius:99px;
-  background:var(--card); border:3px solid var(--outline); min-height:44px; color:var(--cardInk);
-  font:inherit; cursor:pointer; transition:transform .12s var(--tap);
-  box-shadow:0 4px 0 #2A2148}
-.chip:active{transform:scale(.94)}
-.chip svg{width:16px; height:16px; flex:none; display:block}
-.chip b{font-family:"JetBrains Mono",monospace; font-size:13px; font-weight:800; letter-spacing:-.02em}
-.chip.gold b{color:#B07600} .chip.jade b{color:var(--jadeInk)} .chip.ember b{color:var(--ember)}
+.chip{display:flex; align-items:center; gap:6px; padding:6px 11px; border-radius:14px;
+  background:var(--card); border:2px solid var(--edge); min-height:42px; color:var(--ink);
+  font:inherit; cursor:pointer; transition:transform .12s var(--tap)}
+.chip:active{transform:scale(.93)}
+.chip svg{width:17px; height:17px; flex:none; display:block}
+.chip b{font-family:"Nunito",sans-serif; font-size:15px; font-weight:900}
+.chip.flame b{color:var(--flame)} .chip.gold b{color:var(--goldInk)} .chip.jade b{color:var(--greenInk)}
 .chip.bump{animation:bump .5s var(--pop)}
 @keyframes bump{0%{transform:none}35%{transform:scale(1.18)}100%{transform:none}}
 
 /* --------------------------------------------------------------------- nav */
-/* a floating dock, the way a game draws its tab bar - the city shows behind
-   and beneath it instead of being cut off by a full-width slab */
-#nav{position:fixed; left:12px; right:12px; bottom:calc(10px + env(safe-area-inset-bottom));
-  z-index:40; display:flex; gap:2px; padding:6px 8px;
-  max-width:560px; margin:0 auto; border-radius:26px;
-  background:var(--card); border:3px solid var(--outline);
-  box-shadow:0 6px 0 #2A2148, 0 16px 30px rgba(42,33,72,.25)}
-#nav button{flex:1; border:0; background:none; padding:8px 2px 6px; min-height:58px; cursor:pointer;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
-  color:var(--cardInk3); font:inherit; font-size:10.5px; font-weight:700; letter-spacing:.04em;
-  position:relative; border-radius:16px; transition:color .18s}
-#nav button svg{width:23px; height:23px; display:block; position:relative; z-index:1}
+#nav{left:0; right:0; bottom:0; z-index:40; display:flex; gap:2px;
+  padding:6px 10px calc(8px + env(safe-area-inset-bottom));
+  background:var(--card); border-top:2px solid var(--edge)}
+#nav button{flex:1; border:0; background:none; padding:7px 2px 5px; min-height:54px; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  color:var(--ink3); font:inherit; font-family:"Nunito",sans-serif; font-size:10.5px;
+  font-weight:800; letter-spacing:.03em; position:relative; border-radius:14px}
+#nav button svg{width:24px; height:24px; display:block; position:relative; z-index:1}
 #nav button span.lb{position:relative; z-index:1}
-#nav button[aria-current="true"]{color:var(--cardInk)}
-#nav button[aria-current="true"]::before{content:""; position:absolute; inset:3px 4px;
-  border-radius:16px; background:var(--gold);
-  box-shadow:0 0 0 2px #E5A81C inset; animation:navin .24s var(--pop) both}
-@keyframes navin{from{transform:scale(.82); opacity:0} to{transform:none; opacity:1}}
+#nav button[aria-current="true"]{color:var(--blue)}
+#nav button[aria-current="true"]::before{content:""; position:absolute; inset:2px 6px;
+  border-radius:14px; background:var(--blueSoft); border:2px solid #B8E5FB;
+  animation:navin .22s var(--pop) both}
+@keyframes navin{from{transform:scale(.85); opacity:0} to{transform:none; opacity:1}}
 #nav button:active svg{transform:scale(.88); transition:transform .1s}
-.badge{position:absolute; top:5px; right:calc(50% - 21px); min-width:18px; height:18px;
-  border-radius:9px; background:var(--ember); color:#FFF6EA; font-family:"JetBrains Mono",monospace;
-  font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center;
-  border:2px solid var(--card); padding:0 3px; z-index:2}
+.badge{position:absolute; top:3px; right:calc(50% - 22px); min-width:18px; height:18px;
+  border-radius:9px; background:var(--crit); color:#FFFFFF; font-family:"Nunito",sans-serif;
+  font-size:11px; font-weight:900; display:flex; align-items:center; justify-content:center;
+  border:2px solid var(--card); padding:0 4px; z-index:2}
 .badge.pulse{animation:bpulse 1.9s ease-in-out infinite}
 @keyframes bpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
 
 /* ==================================================================== pieces */
-.panel{background:var(--card); border:3px solid var(--outline); border-radius:var(--r2);
-  padding:15px 16px; margin:13px 0; color:var(--cardInk);
-  box-shadow:var(--shadow), var(--shadowSoft)}
-.panel.jade{border-color:color-mix(in srgb,var(--jade) 45%,transparent);
-  background:linear-gradient(150deg,var(--jadeSoft),var(--panel) 68%)}
-.panel.ember{border-color:color-mix(in srgb,var(--ember) 45%,transparent);
-  background:linear-gradient(150deg,var(--emberSoft),var(--panel) 68%)}
-.panel.violet{border-color:color-mix(in srgb,var(--violet) 45%,transparent);
-  background:linear-gradient(150deg,var(--violetSoft),var(--panel) 68%)}
-.panel.crit{border-color:color-mix(in srgb,var(--crit) 45%,transparent);
-  background:linear-gradient(150deg,var(--critSoft),var(--panel) 68%)}
+.panel{background:var(--card); border:2px solid var(--edge); border-radius:var(--r2);
+  padding:15px 16px; margin:12px 0; color:var(--ink)}
+.panel.jade{border-color:#BEE8A0; background:var(--greenSoft)}
+.panel.ember{border-color:#F5CF9B; background:var(--flameSoft)}
+.panel.violet{border-color:#E3C6F8; background:var(--violetSoft)}
+.panel.crit{border-color:#F5B9B9; background:var(--critSoft)}
 
 .row{display:flex; gap:10px; align-items:flex-start; padding:10px 0;
-  border-bottom:1px solid var(--line)}
+  border-bottom:2px solid var(--sunk)}
 .row:last-child{border-bottom:none}
 .row b.k{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.11em;
   text-transform:uppercase; color:var(--ink3); flex:none; width:78px; padding-top:3px}
 .row div{flex:1; min-width:0; font-size:14.5px}
 
 .tag{display:inline-block; font-family:"JetBrains Mono",monospace; font-size:9.5px;
-  letter-spacing:.1em; text-transform:uppercase; padding:4px 8px; border-radius:6px;
-  background:var(--sunk); color:var(--ink2); border:1px solid var(--line)}
-.tag.jade{background:var(--jadeSoft); color:var(--jade); border-color:transparent}
-.tag.gold{background:var(--goldSoft); color:var(--gold2); border-color:transparent}
-.tag.ember{background:var(--emberSoft); color:var(--ember); border-color:transparent}
-.tag.violet{background:var(--violetSoft); color:var(--violetInk); border-color:transparent}
-.tag.crit{background:var(--critSoft); color:var(--crit); border-color:transparent}
+  letter-spacing:.1em; text-transform:uppercase; padding:4px 8px; border-radius:8px;
+  background:var(--sunk); color:var(--ink2); border:0; font-weight:700}
+.tag.jade{background:var(--greenSoft); color:var(--greenInk)}
+.tag.gold{background:var(--goldSoft); color:var(--goldInk)}
+.tag.ember{background:var(--flameSoft); color:#B26800}
+.tag.violet{background:var(--violetSoft); color:var(--violetInk)}
+.tag.crit{background:var(--critSoft); color:#C0342F}
 
-/* Buttons have physics. A flat rectangle that changes colour is a link. */
-button.btn{font:inherit; cursor:pointer; border-radius:16px; border:3px solid var(--outline);
-  background:var(--card); color:var(--cardInk);
+/* Buttons press. The bottom edge is the whole trick: 4px of darker colour
+   that collapses under the thumb. */
+button.btn{font:inherit; font-family:"Nunito",sans-serif; cursor:pointer; border-radius:16px;
+  border:2px solid var(--edge); border-bottom-width:4px;
+  background:var(--card); color:var(--ink2);
   padding:12px 15px; min-height:50px; font-weight:800; font-size:15px;
-  font-family:"Bricolage Grotesque",system-ui,sans-serif; letter-spacing:-.01em;
-  box-shadow:0 5px 0 #2A2148;
-  transition:transform .1s var(--tap), box-shadow .1s var(--tap)}
-button.btn:active{transform:translateY(4px); box-shadow:0 1px 0 #2A2148}
-button.btn.pri{background:var(--gold); color:var(--goldInk)}
-button.btn.go{background:var(--jade); color:#06341B}
-button.btn.quiet{background:var(--cardSunk); box-shadow:0 4px 0 #2A2148; font-weight:700;
-  color:var(--cardInk2)}
-button.btn.quiet:active{transform:translateY(3px); box-shadow:0 1px 0 #2A2148}
+  letter-spacing:.02em; text-transform:uppercase;
+  transition:transform .08s var(--tap), border-bottom-width .08s var(--tap)}
+button.btn:active{transform:translateY(2px); border-bottom-width:2px}
+button.btn.pri{background:#46A302; border-color:#3A8702; color:#FFFFFF}
+button.btn.go{background:#1899D6; border-color:#137CB0; color:#FFFFFF}
+button.btn.quiet{background:var(--card); border-color:var(--edge); color:var(--ink3);
+  text-transform:none; font-weight:800}
 button.btn[disabled]{opacity:.4; pointer-events:none}
 .btns{display:flex; gap:9px; margin-top:12px; flex-wrap:wrap}
 .btns button.btn{flex:1 1 auto; min-width:120px}
-.btns.tight button.btn{min-height:42px; font-size:13.5px; padding:8px 12px}
+.btns.tight button.btn{min-height:42px; font-size:13px; padding:8px 12px}
 
 input[type=text],input[type=number],textarea{width:100%; font:inherit; padding:13px 14px;
-  border-radius:14px; border:3px solid var(--cardLine2); background:#FFFFFF; color:var(--cardInk);
-  resize:vertical; font-size:16px}
-input:focus,textarea:focus{outline:none; border-color:var(--outline)}
+  border-radius:14px; border:2px solid var(--edge2); background:var(--card); color:var(--ink);
+  resize:vertical; font-size:16px; font-weight:600}
 textarea{min-height:70px}
+input:focus,textarea:focus{outline:none; border-color:var(--blue)}
 input::placeholder,textarea::placeholder{color:var(--ink3)}
+
+/* a flame with no live run sits grey until the next full day relights it */
+.chip.cold b{color:var(--ink3)}
+.chip.cold svg{opacity:.4; filter:grayscale(1)}

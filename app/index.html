@@ -16,60 +16,16 @@
 <meta name="apple-mobile-web-app-title" content="Daylight">
 <!-- Self-hosted. The game keeps its typeface on a plane, and opening it tells
      Google nothing. Regenerate with: node scripts/fetch-fonts.mjs -->
-<link rel="stylesheet" href="fonts.css?v=11">
-<link rel="stylesheet" href="css/tokens.css?v=11">
-<link rel="stylesheet" href="css/shell.css?v=11">
-<link rel="stylesheet" href="css/scene.css?v=11">
-<link rel="stylesheet" href="css/cards.css?v=11">
-<link rel="stylesheet" href="css/you.css?v=11">
-<link rel="stylesheet" href="css/overlays.css?v=11">
+<link rel="stylesheet" href="fonts.css?v=12">
+<link rel="stylesheet" href="css/tokens.css?v=12">
+<link rel="stylesheet" href="css/shell.css?v=12">
+<link rel="stylesheet" href="css/scene.css?v=12">
+<link rel="stylesheet" href="css/cards.css?v=12">
+<link rel="stylesheet" href="css/you.css?v=12">
+<link rel="stylesheet" href="css/overlays.css?v=12">
 </head>
 <body>
 
-<!-- The place. Every beautiful mobile game is set somewhere; this one is set
-     in Singapore, so Singapore stands on the horizon - Esplanade, the CBD,
-     Marina Bay Sands, the Flyer, the supertrees - tinted by the same sky
-     variables as everything else. Stars come out when the sky does. -->
-<div id="stars" aria-hidden="true">
-  <svg viewBox="0 0 390 480" preserveAspectRatio="xMidYMin slice">
-    <g fill="#CBD6FF">
-      <circle cx="23" cy="64" r="1.1"/><circle cx="58" cy="142" r=".8"/>
-      <circle class="tw" cx="86" cy="38" r="1.4"/><circle cx="121" cy="96" r=".9"/>
-      <circle cx="149" cy="201" r=".8"/><circle class="tw2" cx="176" cy="54" r="1.6"/>
-      <circle cx="204" cy="150" r=".9"/><circle cx="238" cy="88" r="1.2"/>
-      <circle cx="262" cy="32" r=".8"/><circle cx="291" cy="120" r="1"/>
-      <circle class="tw" cx="317" cy="70" r="1.5"/><circle cx="346" cy="178" r=".8"/>
-      <circle cx="368" cy="44" r="1"/><circle cx="31" cy="232" r=".9"/>
-      <circle cx="95" cy="262" r="1.1"/><circle cx="163" cy="286" r=".8"/>
-      <circle class="tw2" cx="228" cy="244" r="1"/><circle cx="300" cy="268" r=".9"/>
-      <circle cx="355" cy="236" r="1.2"/><circle cx="12" cy="150" r=".8"/>
-      <circle cx="137" cy="20" r=".9"/><circle cx="258" cy="196" r="1.1"/>
-      <circle cx="43" cy="300" r=".8"/><circle class="tw" cx="190" cy="330" r="1"/>
-      <circle cx="330" cy="320" r=".8"/><circle cx="74" cy="192" r="1.2"/>
-      <circle cx="283" cy="352" r=".9"/><circle cx="222" cy="20" r="1.1"/>
-      <circle cx="350" cy="120" r=".9"/><circle cx="110" cy="340" r=".9"/>
-    </g>
-  </svg>
-</div>
-<div id="scene" aria-hidden="true">
-  <svg viewBox="0 0 390 120" preserveAspectRatio="xMidYMax slice">
-    <path class="far" d="M0 120 V88 H22 V80 H40 V92 H60 V74 H84 V90 H106 V68 H128
-      V86 H150 V72 H172 V90 H196 V66 H220 V84 H244 V76 H268 V92 H290 V70 H314
-      V88 H338 V78 H362 V94 H390 V120 Z"/>
-    <path class="near" d="M0 120 V102 H14 V96 H30 V120 Z
-      M34 120 A21 21 0 0 1 76 120 Z  M64 120 A18 18 0 0 1 100 120 Z
-      M104 120 V52 H118 V46 H122 V52 H136 V120 Z
-      M140 120 V36 H158 V120 Z  M162 120 V58 H176 V120 Z  M176 120 V88 H188 V120 Z
-      M196 120 V54 H210 V120 Z  M216 120 V54 H230 V120 Z  M236 120 V54 H250 V120 Z
-      M188 54 V50 Q188 44 196 44 H252 Q262 44 262 52 V54 Z  M188 52 L177 46 L188 44 Z
-      M330 62 L340 44 L350 62 L343 120 H337 Z
-      M352 70 L360 54 L368 70 L363 120 H357 Z
-      M371 76 L378 62 L385 76 L381 120 H375 Z"/>
-    <circle class="wire" cx="296" cy="74" r="21" stroke-width="5" fill="none"/>
-    <path class="wire" d="M296 74 L284 120 M296 74 L308 120" stroke-width="4" fill="none"/>
-    <circle class="neardot" cx="296" cy="74" r="4"/>
-  </svg>
-</div>
 
 <div id="boot">
   <svg class="mk" viewBox="0 0 100 100" fill="none" aria-hidden="true">
@@ -79,7 +35,7 @@
   </svg>
   <div class="nm">Daylight</div>
   <div class="sub">Fixed to Malta &middot; lived in Singapore</div>
-  <div class="bld">v11</div>
+  <div class="bld">v12</div>
 </div>
 
 <header id="hud">
@@ -91,6 +47,12 @@
   </button>
   <div class="hudgap"></div>
   <div class="chips">
+    <button class="chip flame" id="chipFlame" title="Streak">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="color:#FF9600">
+        <path d="M12 2.6c.6 3.4-1.2 5-2.8 6.8C7.4 11.4 6 13.2 6 16a6 6 0 0 0 12 0c0-2.3-1-4.2-2.4-5.8-.4 1.2-1 2-2 2.6.6-3.6-.4-7.6-1.6-10.2Z"
+          stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="#FFB84D"/></svg>
+      <b id="chipFlameN">0</b>
+    </button>
     <button class="chip gold" id="chipPot" title="The pot">
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.6" style="color:var(--gold)"/>
@@ -150,17 +112,17 @@
 
 <!-- The game, one concern per file, loaded in dependency order. No build
      step, no framework: what is in this folder is what runs. -->
-<script src="js/data.js?v=11"></script>
-<script src="js/state.js?v=11"></script>
-<script src="js/audio.js?v=11"></script>
-<script src="js/sky.js?v=11"></script>
-<script src="js/fx.js?v=11"></script>
-<script src="js/art.js?v=11"></script>
-<script src="js/cardui.js?v=11"></script>
-<script src="js/scene.js?v=11"></script>
-<script src="js/collection.js?v=11"></script>
-<script src="js/you.js?v=11"></script>
-<script src="js/coach.js?v=11"></script>
-<script src="js/app.js?v=11"></script>
+<script src="js/data.js?v=12"></script>
+<script src="js/state.js?v=12"></script>
+<script src="js/audio.js?v=12"></script>
+<script src="js/sky.js?v=12"></script>
+<script src="js/fx.js?v=12"></script>
+<script src="js/art.js?v=12"></script>
+<script src="js/cardui.js?v=12"></script>
+<script src="js/scene.js?v=12"></script>
+<script src="js/collection.js?v=12"></script>
+<script src="js/you.js?v=12"></script>
+<script src="js/coach.js?v=12"></script>
+<script src="js/app.js?v=12"></script>
 </body>
 </html>
