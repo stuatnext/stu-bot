@@ -19,20 +19,20 @@
    out of step with the app: each one re-reads the real state to decide whether
    it is still needed. */
 var COACH_STEPS = [
-  { at: [".pil", ".triad"],
+  { at: [".pil", ".trail"],
     head: "Start here.",
     say: "Tap one of these if you have done it today. Moved on purpose, spoke to someone at "
        + "home, or finished when the shift finished.",
     tap: "Tap one", tourTap: "Next",
     want: function(){ return PILLARS.some(function(g){ return pDone(today(), g[0]); }); } },
 
-  { at: [".pil:not(.on)", ".triad"],
+  { at: [".pil:not(.on)", ".trail"],
     head: "Now the rest.",
     say: "Three of them is a full day. A full day is a pack of cards, and money in the pot.",
     tap: "Keep going", tourTap: "Next",
     want: function(){ return allThree(today()); } },
 
-  { at: [".gem", ".gemwrap"],
+  { at: [".gem", ".trail"],
     head: "That is a pack.",
     say: "Earned, not given. Tap it and turn the cards over yourself.",
     tourHead: "The sky is the clock.",

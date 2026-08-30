@@ -318,6 +318,30 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v9: the layout restarts too
+
+v8 changed the paint and kept the body: header bar, arc, centred thing,
+headline, three-in-a-row, tab bar. A centred column is web grammar however
+it is coloured. Mobile-game grammar is a world with UI in the corners and a
+journey through the middle - so the column is gone.
+
+**The day is a saga map.** A dotted trail winds up the screen through the
+three things as zigzag stops - each a big colour disc with its name and its
+definition on a plate under it - from where he starts at the bottom to the
+chest at the top by the city. Cleared stops turn green behind him. A red
+"you are here" pin bobs on the next stop, and the day's one line is a
+speech bubble above the pin, not a headline floating in space. When the
+three are cleared the pin reaches the chest and the chest goes gold,
+wiggles, and says so on its own tag.
+
+**UI in the corners.** The level crest sits top-left, the currency pills
+top-right; the full-width header bar and the XP strip are deleted (the XP
+ring lives on the crest, the rank name in You). The dock stays.
+
+**The entrance is staged along the path**: the trail fades in, the stops
+pop bottom-to-top, the chest lands, the pin and bubble arrive last, and
+none of it replays on a mid-play re-render or under reduced motion.
+
 #### v8: the picture restarts
 
 v7 rebuilt the code from scratch and he said, correctly, that it looked

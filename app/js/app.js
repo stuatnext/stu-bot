@@ -23,7 +23,6 @@ function paintHud(animate){
   var earnedAny = potTotal() > 0, hasSpares = sparesEarned() > 0;
   document.getElementById("chipPot").hidden = !earnedAny;
   document.getElementById("chipShard").hidden = !hasSpares;
-  document.getElementById("hudXpN").hidden = r.xp === 0;
   document.getElementById("hud").classList.toggle("bare", r.xp === 0);
 
   var crest = document.getElementById("crest");
@@ -32,10 +31,6 @@ function paintHud(animate){
   if (animate && r.level > HUD.level && HUD.level){
     crest.classList.remove("up"); void crest.offsetWidth; crest.classList.add("up");
   }
-  document.getElementById("hudRank").textContent = r.name;
-  document.getElementById("hudXpBar").style.width = (pct * 100).toFixed(1) + "%";
-  document.getElementById("hudXpN").textContent = r.to
-    ? num(r.xp) + " / " + num(r.to) + " XP" : num(r.xp) + " XP · top rank";
 
   var potEl = document.getElementById("chipPotN"), spEl = document.getElementById("chipShardN");
   if (animate) countTo(potEl, HUD.pot, pt, function(v){ return num(v); });
