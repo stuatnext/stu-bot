@@ -1,0 +1,136 @@
+/* ==========================================================================
+   overlays.css - everything that sits on top of the game.
+
+   The one dialog, the toast, the full-screen celebration, the coach mark,
+   and the glass treatment that lets the sky read through every panel.
+   ========================================================================== */
+
+/* ============================================================ the modal system
+   Every native prompt() and confirm() is gone. Those dialogs say "web page" in
+   the system font of whatever browser you happen to be holding. */
+#modal{position:fixed; inset:0; z-index:150; display:none; align-items:flex-end;
+  justify-content:center; background:rgba(4,7,12,.72);
+  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px)}
+#modal.on{display:flex; animation:fadein .18s ease-out both}
+#modal .mw{width:100%; max-width:560px; background:var(--panel);
+  border:1px solid var(--line2); border-bottom:0;
+  border-radius:24px 24px 0 0; padding:8px 18px calc(20px + env(safe-area-inset-bottom));
+  box-shadow:0 -14px 44px rgba(0,0,0,.5); animation:sheetup .3s var(--tap) both;
+  max-height:88vh; overflow-y:auto; -webkit-overflow-scrolling:touch}
+@keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
+#modal .grab{width:38px; height:4px; border-radius:2px; background:var(--line2);
+  margin:6px auto 14px}
+#modal h3{font-size:20px; margin-bottom:4px}
+#modal .say{color:var(--ink2); font-size:14px; margin:6px 0 14px}
+#modal label{display:block; font-family:"JetBrains Mono",monospace; font-size:9.5px;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); margin:12px 0 6px}
+#modal .opts{display:grid; gap:8px; margin:12px 0}
+#modal .opts button{width:100%; text-align:left; padding:14px 15px; min-height:52px}
+#modal .pre{font-family:"JetBrains Mono",monospace; font-size:26px; font-weight:800;
+  text-align:center; padding:10px 0 2px; color:var(--gold2)}
+
+/* ==================================================================== toast */
+#toast{position:fixed; left:50%; bottom:calc(88px + env(safe-area-inset-bottom));
+  transform:translateX(-50%) translateY(20px); z-index:130; opacity:0; pointer-events:none;
+  background:linear-gradient(180deg,#5CE8B5,var(--jade)); color:#05231A; border-radius:14px;
+  padding:12px 18px; font-weight:700; font-size:14.5px; box-shadow:0 8px 26px rgba(0,0,0,.4);
+  max-width:88vw; text-align:center}
+#toast.on{animation:toast 2.9s ease-out both}
+#toast.gold{background:linear-gradient(180deg,var(--gold2),var(--gold)); color:var(--goldInk)}
+@keyframes toast{0%{opacity:0; transform:translateX(-50%) translateY(20px)}
+  10%,80%{opacity:1; transform:translateX(-50%) translateY(0)}
+  100%{opacity:0; transform:translateX(-50%) translateY(-8px)}}
+
+/* ================================================== the full-screen celebration
+   The third pillar landing is the single most important moment in the app. It
+   used to be a re-render and a toast. */
+#fx{position:fixed; inset:0; z-index:140; pointer-events:none; display:none}
+#fx.on{display:block}
+#fx .flash{position:absolute; inset:0; background:radial-gradient(60% 45% at 50% 42%,
+  rgba(255,227,138,.5),transparent 70%); animation:flash .8s ease-out forwards}
+@keyframes flash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+#fx .conf{position:absolute; top:-14px; width:8px; height:13px; border-radius:2px;
+  animation:fall linear forwards}
+@keyframes fall{0%{transform:translateY(0) rotate(0); opacity:1}
+  100%{transform:translateY(102vh) rotate(var(--spin)); opacity:.9}}
+#fx .ann{position:absolute; left:0; right:0; top:34%; text-align:center; padding:0 24px; isolation:isolate}
+#fx .ann::before{content:""; position:absolute; inset:-56px -10px; z-index:-1;
+  background:radial-gradient(58% 100% at 50% 50%,
+    color-mix(in srgb,var(--bg) 94%,transparent),
+    color-mix(in srgb,var(--bg) 66%,transparent) 52%, transparent 76%)}
+#fx .ann b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
+  font-size:clamp(30px,10vw,44px); letter-spacing:-.04em; color:var(--gold2);
+  text-shadow:0 4px 24px rgba(242,183,53,.5); animation:annin .6s var(--pop) both}
+#fx .ann span{display:block; margin-top:8px; font-size:15px; color:var(--ink);
+  animation:annin .6s var(--pop) both .1s}
+@keyframes annin{from{opacity:0; transform:scale(.65) translateY(14px)}to{opacity:1; transform:none}}
+/* A number that flies from where it was earned to the HUD chip that holds it. */
+.fly{position:fixed; z-index:145; pointer-events:none; font-family:"JetBrains Mono",monospace;
+  font-weight:800; font-size:17px; color:var(--gold2); text-shadow:0 2px 10px rgba(0,0,0,.6);
+  transition:transform .72s cubic-bezier(.4,0,.25,1), opacity .72s ease}
+
+/* ================================================================ reduced motion
+   Off, not slower. Everything stays legible and every card is face up. */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important;
+    transition-duration:.001ms !important; scroll-behavior:auto !important}
+  #toast.on{opacity:1}
+  .tc-i{transition:none !important}
+  #fx{display:none !important}
+}
+
+/* ------------------------------------------------------- glass over the sky
+   The surfaces are translucent now, so they have to blur what is behind them
+   or they read as dirty rectangles rather than panes. */
+.panel,.row,.strip2 button,.chip,.rail button,.filters button,.ware,.trk,.rec,.q,.ye,
+.season,.door,.frz,.pil,#modal .mw{
+  backdrop-filter:blur(16px) saturate(1.25); -webkit-backdrop-filter:blur(16px) saturate(1.25)}
+.gem .gcore{backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
+.medals .disc,.tc,.pk{backdrop-filter:none; -webkit-backdrop-filter:none}
+
+
+/* =================================================================== the coach
+   A reduced screen is not a tutorial. This points at the thing, says one
+   sentence on its own ground, and will not advance until it is pressed.
+
+   The hole is a rectangle cut with a 9999px spread shadow rather than a masked
+   circle: it matches the shape of what it is pointing at, it cannot spill off
+   the edge of the screen, and hit-testing stays simple because the dimming
+   element never receives the tap. */
+#coach{position:fixed; inset:0; z-index:170; display:none}
+#coach.on{display:block}
+#coach .catch{position:absolute; inset:0}
+/* Shadow order is paint order: the 9999px veil has to be listed LAST or it
+   paints over its own ring and the highlight comes out muddy. */
+#coach .spot{position:absolute; border-radius:24px; pointer-events:none;
+  box-shadow:0 0 0 2px var(--gold2),
+    0 0 26px 5px color-mix(in srgb,var(--gold) 50%,transparent),
+    0 0 0 9999px rgba(3,5,11,.9);
+  animation:spot .38s var(--pop) both}
+@keyframes spot{from{opacity:0; transform:scale(.9)}to{opacity:1; transform:none}}
+#coach .say{position:absolute; left:16px; right:16px; pointer-events:none;
+  background:linear-gradient(165deg,rgba(26,34,52,.97),rgba(14,19,32,.97));
+  border:1px solid var(--line2); border-radius:22px; padding:20px 20px 18px;
+  box-shadow:0 18px 44px rgba(0,0,0,.6);
+  backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  animation:coachin .42s var(--pop) both .12s}
+#coach .say b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
+  font-size:23px; letter-spacing:-.03em; text-wrap:balance}
+#coach .say span{display:block; margin-top:7px; font-size:14px; color:var(--ink2);
+  line-height:1.5; text-wrap:balance}
+#coach .say i{display:block; margin-top:15px; font-family:"JetBrains Mono",monospace;
+  font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold2);
+  font-style:normal; animation:gatepulse 2s ease-in-out infinite}
+#coach .say .pips{display:flex; gap:6px; margin-top:16px; font-style:normal}
+#coach .say .pips i{display:block; width:6px; height:6px; border-radius:50%; margin:0;
+  background:var(--line2); animation:none}
+#coach .say .pips i.on{background:var(--gold2);
+  box-shadow:0 0 9px color-mix(in srgb,var(--gold) 60%,transparent)}
+#coach .say .pips + i{margin-top:11px}
+@keyframes coachin{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+#coach .skip{position:absolute; left:0; right:0; bottom:calc(84px + env(safe-area-inset-bottom));
+  text-align:center}
+#coach .skip button{background:none; border:0; color:var(--ink3); font:inherit; font-size:13px;
+  padding:12px 18px; min-height:44px; cursor:pointer; text-decoration:underline;
+  text-underline-offset:3px}
+@media (prefers-reduced-motion:reduce){ #coach .say i{animation:none !important} }

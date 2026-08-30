@@ -318,6 +318,40 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v7: delete everything and start again
+
+He looked at Today's book and the one-thing sheet and said: *confusing, not
+useful, not built as a real mobile game — delete everything and start again,
+build each element and animation an individual beautiful file.* All three
+orders are carried out in v7.
+
+**Deleted.** The five-tab planner is gone. Threads, Trips, the Phrasebook,
+the Recap, the book, gaps, bedtime, kept-promises, the place of the day,
+badges, rewards — every surface written in riddles is out of the game. The
+save is untouched (same key, same fields, a nine-generation-old save opens
+with its days, cards, pot and freezes intact), and the paper lives on at
+`docs/` and `cal/`, linked from inside the game.
+
+**Three screens.** *Today* — the scene: the sky arc, the gem, three ability
+buttons that carry their own definitions. *Cards* — the collection, the
+packs, the doors, the ladder. *You* — rank, the pot, the three streaks with
+their freezes, and the switches. Every string on all three passes the
+stranger test.
+
+**Individual files.** The single 4,500-line `index.html` is gone. The game
+is now `app/css/*` and `app/js/*` — one concern per file, each readable on
+its own, loaded in dependency order, still buildless: what is in the folder
+is what runs. `data.js` says what exists; `state.js` is every rule;
+`scene.js`, `collection.js`, `you.js` are the screens; `fx.js` is everything
+the player feels; `sky.js` is the hour; `coach.js` is the tutorial;
+`app.js` is wiring.
+
+**Choreography.** Arriving on Today stages its entrance — the arc draws
+itself, the sun blooms, the gem drops, the orbs rise one after another. A
+pillar landing bursts in its own colour; the third is the full ceremony.
+Re-renders mid-play never replay the entrance, and reduced motion skips all
+of it.
+
 #### The teardown: Today became a scene
 
 He asked for a redesign from scratch three times, and got increments three

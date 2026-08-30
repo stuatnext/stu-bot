@@ -1,0 +1,87 @@
+/* ==========================================================================
+   you.css - the player's screen.
+
+   Rank, pot, streaks, switches. Calm on purpose: this is the one screen in
+   the game that is allowed to look like furniture.
+   ========================================================================== */
+
+.yrank{display:flex; align-items:center; gap:15px}
+.yr-ring{position:relative; width:58px; height:58px; flex:none}
+.yr-ring .rg{width:58px; height:58px}
+.yr-ring b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:"JetBrains Mono",monospace; font-size:19px; font-weight:800}
+.yr-bd h3{margin:0; font-size:18px}
+.yr-bd .dim{font-size:12.5px; margin-top:3px}
+
+.vault{position:relative; overflow:hidden; padding:22px 20px; margin:14px 0; border-radius:var(--r2);
+  border:1px solid color-mix(in srgb,var(--jade) 45%,transparent);
+  background:linear-gradient(150deg,var(--jadeSoft),var(--panel) 72%)}
+.vault .amt{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:clamp(42px,13vw,62px); font-weight:800; letter-spacing:-.05em; line-height:1;
+  color:var(--jade)}
+.vault .cap{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink3); margin-top:9px}
+.vault p{margin:10px 0 0; font-size:13.5px; color:var(--ink2)}
+.vault .fine{margin:14px 0 0; font-size:12.5px; line-height:1.5; color:var(--ink3)}
+.vault .btns{margin-top:16px}
+
+/* spending history as receipts rather than rows of a table */
+.recs{display:grid; gap:7px; margin:10px 0 4px}
+.rec{display:grid; grid-template-columns:auto 1fr auto; align-items:baseline; gap:11px;
+  padding:11px 14px; border-radius:13px; border:1px solid var(--line); background:var(--panel)}
+.rec .rd{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink3)}
+.rec .rt{font-size:13.5px; color:var(--ink2)}
+.rec .rv{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:14px; color:var(--ink)}
+
+   row on the screen instead of the last thing under forty rows of history. */
+.menu{display:grid; gap:1px; margin:14px 0; border-radius:var(--r2); overflow:hidden;
+  border:1px solid var(--line); background:var(--line)}
+.mi{display:grid; grid-template-columns:38px 1fr 18px; align-items:center; gap:13px; width:100%;
+  padding:14px 15px; border:0; background:var(--panel); color:var(--ink); font:inherit;
+  text-align:left; cursor:pointer}
+.mi:active{background:var(--tap)}
+.mic{display:grid; place-items:center; width:38px; height:38px; border-radius:12px;
+  background:var(--sunk); color:var(--ink2)}
+.menu:first-of-type .mi:first-child .mic{background:color-mix(in srgb,var(--gold) 17%,transparent); color:var(--gold)}
+.mib{display:grid; gap:2px; min-width:0}
+.mib b{font-size:15px; font-weight:650; letter-spacing:-.01em}
+.mib span{font-size:12.5px; color:var(--ink3)}
+.mia{color:var(--ink3); display:grid; place-items:center}
+.mia svg{width:15px; height:15px}
+
+.str3{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px}
+.s1{text-align:center; padding:10px 4px}
+.s1 .si{color:var(--ink3); display:flex; justify-content:center}
+.s1 .sn{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:28px; font-weight:800; letter-spacing:-.04em; margin-top:4px}
+.s1 .sl{font-size:11px; color:var(--ink3)}
+.sgh{display:flex; align-items:baseline; gap:12px}
+.sgn{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:32px; font-weight:800; letter-spacing:-.04em}
+.sgn small{font-size:17px; color:var(--ink3)}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.tag.off{opacity:.42}
+.vault::after{content:""; position:absolute; right:-46px; top:-56px; width:200px; height:200px;
+  border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle,color-mix(in srgb,var(--jade) 24%,transparent),transparent 68%)}
+
+.row{display:flex; align-items:center; gap:12px; width:100%; text-align:left; cursor:pointer;
+  padding:12px 13px; border-radius:16px; min-height:62px; margin:8px 0; color:var(--ink);
+  border:1px solid var(--line); background:var(--panel); font:inherit;
+  transition:transform .12s var(--tap)}
+.row:active{transform:scale(.985)}
+.row .ic{flex:none; width:36px; height:36px; border-radius:11px; display:flex;
+  align-items:center; justify-content:center; background:var(--sunk);
+  border:1px solid var(--line2); color:var(--ink3)}
+.row .bd{flex:1; min-width:0}
+.row .bd b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:700;
+  font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.row .bd span{display:block; font-size:12.5px; color:var(--ink3); margin-top:1px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.row .ch{flex:none; color:var(--ink3)}
+.row.on{border-color:color-mix(in srgb,var(--jade) 42%,transparent)}
+.row.on .ic{background:var(--jade); border-color:var(--jade); color:#05231A}
+.row.warn{border-color:color-mix(in srgb,var(--ember) 45%,transparent)}
+.row.warn .ic{color:var(--ember)}
