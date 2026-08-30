@@ -318,6 +318,26 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v13: cards that explain themselves
+
+Happy with v12, he asked the two questions the cards had never answered:
+what do they do, and why are they ugly. Both were the product's fault.
+
+**What they do is now on the screen.** A dismissible card at the top of the
+Cards tab says it once, plainly: souvenirs of the Singapore year that do
+nothing except get collected - full days earn packs, duplicates melt into
+spares, spares craft missing cards, finished sets pay the pot - with the two
+exceptions named (Mandarin is real vocabulary; Trophies are claimed, never
+pulled).
+
+**The faces stopped being generated squiggles.** All 158 non-Mandarin cards
+now wear one big glyph from the platform's own emoji set - drawn by
+professionals, familiar at a glance, zero bytes shipped - over the tint
+hashed from the card's name: the crab on Chilli crab, the phone on A
+Wednesday call, the pot on Bak kut teh. Mandarin keeps the character as its
+face with the tone underneath, because there the face is the lesson. Rarity
+frames, foil, spares and crafting untouched.
+
 #### v12: his brief, at last
 
 Thirteen rounds in, he was asked instead of guessed at. His answers, in his

@@ -23,6 +23,10 @@
 .tc-f{padding:5px; background:linear-gradient(155deg,var(--fa),var(--fb) 38%,var(--fc) 62%,var(--fb))}
 .tc-pane{position:absolute; inset:5px; border-radius:7px; overflow:hidden; background:var(--pane);
   display:flex; flex-direction:column; box-shadow:0 0 0 1px rgba(0,0,0,.18) inset}
+.tc-glyph{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:34cqw; line-height:1; padding-bottom:4%;
+  text-shadow:0 2px 0 rgba(0,0,0,.06)}
+.tc.lg .tc-glyph{font-size:36cqw}
 .tc-art{position:relative; flex:1 1 auto; min-height:0; overflow:hidden; color:var(--cink);
   background:radial-gradient(120% 90% at 50% 20%,var(--artA),var(--artB));
   border-top:1px solid rgba(0,0,0,.2); border-bottom:1px solid rgba(0,0,0,.2);

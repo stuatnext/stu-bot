@@ -303,6 +303,103 @@ var RARITY = [
   ["Gold",     "ember",   0, 250,  0,   0]
 ];
 
+/* ------------------------------------------------------------- the card art
+   The faces stop being generated squiggles. Every card wears one big glyph
+   from the platform's own emoji set - professionally drawn, instantly
+   readable, zero bytes to ship - on a tint hashed from its name. Mandarin
+   is the exception with a purpose: the character IS the face. */
+var CARD_ART = {
+  /* hawker */
+  "Chicken rice":"\uD83C\uDF57","Char kway teow":"\uD83C\uDF5C","Bak chor mee":"\uD83C\uDF5C",
+  "Roti prata":"\uD83E\uDD5E","Laksa":"\uD83C\uDF36\uFE0F","Nasi lemak":"\uD83C\uDF5B",
+  "Satay":"\uD83C\uDF62","Bak kut teh":"\uD83C\uDF72","Yong tau foo":"\uD83E\uDD62",
+  "Fried carrot cake":"\uD83C\uDF73","Chilli crab":"\uD83E\uDD80",
+  /* kopitiam */
+  "Kopi-o siew dai":"\u2615","Kaya toast set":"\uD83C\uDF5E","Chwee kueh":"\uD83E\uDD5F",
+  "Teh tarik":"\uD83E\uDED6","Kopi peng":"\uD83E\uDDCA","Milo dinosaur":"\uD83E\uDD64",
+  "Ice kacang":"\uD83C\uDF67",
+  /* singlish */
+  "Shiok":"\uD83E\uDD29","Lah":"\uD83D\uDCAC","Alamak":"\uD83E\uDD2D","Can sit?":"\uD83E\uDE91",
+  "Chope":"\uD83E\uDDFB","Kiasu":"\uD83C\uDFC3","Makan":"\uD83C\uDF7D\uFE0F",
+  /* everyday */
+  "Void deck":"\uD83C\uDFE2","Wet market":"\uD83D\uDC1F","Tray return":"\uD83E\uDDFA",
+  "Monsoon drain":"\uD83C\uDF27\uFE0F","Rain tree":"\uD83C\uDF33","Mynah":"\uD83D\uDC26",
+  "Durian sign":"\uD83D\uDEAB","MRT at 06:00":"\uD83D\uDE87","Calamansi":"\uD83C\uDF4B",
+  /* heritage */
+  "Tiong Bahru estate":"\uD83C\uDFDA\uFE0F","Thian Hock Keng":"\uD83C\uDFEE",
+  "Sri Mariamman":"\uD83D\uDED5","Kampong Glam":"\uD83D\uDD4C","Koon Seng Road":"\uD83C\uDFE0",
+  "Emerald Hill":"\uD83C\uDFE1","Dragon Playground":"\uD83D\uDC09","Haw Par Villa":"\uD83C\uDFAD",
+  "Baba House":"\uD83D\uDECB\uFE0F","Peranakan tiles":"\uD83E\uDDE9",
+  /* green */
+  "Botanic Gardens":"\uD83C\uDF3A","Fort Canning":"\uD83C\uDF3F","MacRitchie":"\uD83D\uDC12",
+  "Southern Ridges":"\uD83C\uDF09","Rail Corridor":"\uD83D\uDEE4\uFE0F",
+  "Labrador tunnels":"\uD83D\udd26","TreeTop Walk":"\uD83C\uDF32","Sungei Buloh":"\uD83E\uDDA9",
+  /* islands */
+  "Coney Island":"\uD83D\uDEB2","Pulau Ubin":"\uD83D\uDEA3","Chek Jawa":"\uD83E\uDDAA",
+  "Bukit Brown":"\uD83E\uDEA6","Kranji Marshes":"\uD83E\uDEBF","Pulau Hantu":"\uD83D\uDC20",
+  /* two hours out */
+  "Batam":"\u26F4\uFE0F","Kuala Lumpur":"\uD83D\uDDFC","Bangkok":"\uD83D\uDEFA",
+  "Ho Chi Minh City":"\uD83D\uDEF5","Penang":"\uD83E\uDD5F","Bali":"\uD83C\uDF34",
+  "Yogyakarta":"\uD83D\uDED5","Hanoi":"\uD83C\uDF5C","Lombok":"\uD83C\uDFDD\uFE0F",
+  "Luang Prabang":"\uD83E\uDDD8","Raja Ampat":"\uD83E\uDD3F",
+  /* the road */
+  "Valletta":"\uD83C\uDFF0","Sofia":"\u26EA","Hudson Yards":"\uD83D\uDDFD",
+  "Sheffield":"\uD83C\uDFD4\uFE0F","London":"\uD83C\uDF02","Paris":"\uD83D\uDDFC",
+  "Changi Jewel":"\uD83D\uDCA7","The red-eye":"\uD83D\uDEEB",
+  /* home */
+  "A proper roast":"\uD83E\uDD69","Cold tap water":"\uD83D\uDEB0","Real autumn":"\uD83C\uDF42",
+  "A Wednesday call":"\uD83D\uDCDE","The Sheffield hills":"\u26F0\uFE0F",
+  "A pub with no aircon":"\uD83C\uDF7A",
+  /* trophies */
+  "Kopi without looking":"\u2615","Chiah pa boe":"\uD83D\uDDE3\uFE0F",
+  "Changi arrivals":"\uD83D\uDEEC","Two days":"\uD83E\uDD1D","Client number two":"\uD83D\uDCBC",
+  "Issue one":"\uD83D\uDCF0","Thirty":"\uD83D\uDD25",
+  /* coffee */
+  "Flat white":"\u2615","Long black":"\u2615","Cortado":"\uD83E\uDD5B",
+  "Filter, black":"\uD83E\uDED7","Cold brew":"\uD83E\uDDCA","Espresso standing up":"\uD83C\uDDEE\uD83C\uDDF9",
+  "Single origin":"\uD83C\uDF31","Washed or natural":"\uD83C\uDF52","One without sugar":"\uD83D\uDEAB",
+  "A bag at home":"\uD83D\uDCE6","Roast date":"\uD83D\uDCC5","A roaster you follow":"\uD83D\uDD25",
+  /* deep cuts */
+  "The reservoir at six":"\uD83C\uDF05","Fruit by the kilo":"\uD83C\uDF4A",
+  "The night bus":"\uD83D\uDE8C","A hawker you go back to":"\uD83E\uDD62",
+  "Getai season":"\uD83C\uDFA4","Thaipusam":"\uD83E\uDE94",
+  "Second day of the new year":"\uD83E\uDDE7","A void deck funeral":"\uD83C\uDFF3\uFE0F",
+  "Your estate's old name":"\uD83D\uDCDC","Invited into a flat":"\uD83D\uDEAA",
+  "Ordering for two":"\uD83E\uDD62","An uncle who knows your order":"\uD83D\uDC74",
+  /* sheffield and before */
+  "The Peak District":"\uD83C\uDFDE\uFE0F","Scraps":"\uD83C\uDF5F",
+  "A beer garden in June":"\uD83C\uDF7B","The walk from the station":"\uD83D\uDEB6",
+  "The group chat":"\uD83D\uDCF1","The accent coming back":"\uD83D\uDDE3\uFE0F",
+  "A call, not a text":"\u260E\uFE0F","Germany":"\uD83C\uDDE9\uD83C\uDDEA",
+  "Christmas at home":"\uD83C\uDF84","Someone's wedding":"\uD83D\uDC8D","2018":"\uD83D\uDCF8",
+  /* the industry */
+  "The five-minute version":"\u23F1\uFE0F","A market resolving":"\u2705",
+  "The order book":"\uD83D\uDCCA","Sports, not politics":"\u26BD",
+  "The liquidity problem":"\uD83D\uDCA7","One regulator, properly":"\uD83D\uDCDC",
+  "Kalshi":"\uD83D\uDCC8","Polymarket":"\uD83D\uDD2E","A speaker who said yes":"\uD83C\uDF99\uFE0F",
+  "The take you held back":"\uD83E\uDD10","Quoted without prompting":"\uD83D\uDCAC",
+  /* straight up growth */
+  "The financial year end":"\uD83D\uDCC6","A written scope":"\uD83D\uDCDD",
+  "Books actually current":"\uD83D\uDCD7","Paid yourself on time":"\uD83D\uDCB8",
+  "The annual return":"\uD83D\uDCEE","The first tax filing":"\uD83E\uDDFE",
+  "Cover that follows you":"\uD83D\uDEE1\uFE0F","The day rate, out loud":"\uD83D\uDCE3",
+  "A second signature":"\u270D\uFE0F","The first hire":"\uD83E\uDDD1\u200D\uD83D\uDCBC",
+  "An intern from here":"\uD83C\uDF93",
+  /* the newsletter */
+  "Before the shift":"\uD83C\uDF05","Not about work":"\uD83C\uDFA8",
+  "A draft you sat on":"\uD83D\uDCC4","An idea off a card":"\uD83D\uDCA1",
+  "A name you committed to":"\u2712\uFE0F","Your byline, not theirs":"\uD83D\uDCDB",
+  "A reply from someone you rate":"\uD83D\uDC8C","The first hundred":"\uD83D\uDCAF",
+  "Somewhere that is not rented":"\uD83C\uDF10","Ten in a row":"\uD83D\uDD1F",
+  "Published anyway":"\uD83D\uDE80"
+};
+var SET_ART = { hawk:"\uD83C\uDF5C", kopi:"\u2615", slang:"\uD83D\uDCAC",
+  every:"\uD83C\uDFD9\uFE0F", herit:"\uD83C\uDFEE", green:"\uD83C\uDF3F",
+  isles:"\uD83C\uDFDD\uFE0F", region:"\u2708\uFE0F", road:"\uD83E\uDDF3",
+  home:"\uD83C\uDFE1", zh:"\u6C49", bean:"\u2615", deep:"\uD83D\uDD0D",
+  sheff:"\uD83C\uDFD4\uFE0F", post:"\uD83D\uDCF0", sug:"\uD83D\uDCBC",
+  mkt:"\uD83D\uDCC8", gold:"\uD83C\uDFC6" };
+
 /* Ranks rather than bare numbers - a level should say something about you. */
 var RANKS = [
   [0,     "Just landed"],
