@@ -1,82 +1,52 @@
 /* Daylight, offline.
 
-   The point is not saving bandwidth. It is that a game opens instantly and
-   still opens on a plane, in a lift, and in the seventh hour of a Singapore to
-   London red-eye — and that a thing you install on your home screen should not
-   go blank the moment the signal does.
-
-   The shell is cache-first because the fonts and icons never change within a
-   version. index.html is network-first with a cache fallback, so a push to
-   Pages lands on the next open rather than the next cache eviction.
-
-   Bump VERSION whenever the app changes. Old caches are dropped on activate. */
-var VERSION = "daylight-v5";
+   The shell is cache-first because fonts and code do not change within a
+   version; HTML is network-first with a cache fallback so a push to Pages
+   lands on the next open. Bump VERSION with every release - old caches are
+   dropped on activate. */
+var VERSION = "daylight-v7";
 var SHELL = [
-  "./",
-  "./index.html",
+  "./", "./index.html",
+  "./css/tokens.css", "./css/shell.css", "./css/scene.css",
+  "./css/cards.css", "./css/you.css", "./css/overlays.css",
+  "./js/data.js", "./js/state.js", "./js/audio.js", "./js/sky.js",
+  "./js/fx.js", "./js/art.js", "./js/cardui.js", "./js/scene.js",
+  "./js/collection.js", "./js/you.js", "./js/coach.js", "./js/app.js",
   "./fonts.css",
-  "./fonts/bricolage-latin.woff2",
-  "./fonts/bricolage-latin-ext.woff2",
-  "./fonts/instrument-latin.woff2",
-  "./fonts/instrument-latin-ext.woff2",
-  "./fonts/jbmono-latin.woff2",
-  "./fonts/jbmono-latin-ext.woff2",
-  "./manifest.webmanifest",
-  "./icon-180.png",
-  "./icon-512.png"
+  "./fonts/bricolage-latin.woff2", "./fonts/bricolage-latin-ext.woff2",
+  "./fonts/instrument-latin.woff2", "./fonts/instrument-latin-ext.woff2",
+  "./fonts/jbmono-latin.woff2", "./fonts/jbmono-latin-ext.woff2",
+  "./manifest.webmanifest", "./icon-180.png", "./icon-512.png"
 ];
 
 self.addEventListener("install", function(e){
   e.waitUntil(
-    caches.open(VERSION)
-      /* One miss must not fail the whole install, or a renamed icon takes the
-         service worker down with it. */
-      .then(function(c){ return Promise.all(SHELL.map(function(u){
-        return c.add(u).catch(function(){});
-      })); })
+    caches.open(VERSION).then(function(c){ return c.addAll(SHELL); })
       .then(function(){ return self.skipWaiting(); })
   );
 });
-
 self.addEventListener("activate", function(e){
   e.waitUntil(
     caches.keys().then(function(keys){
-      return Promise.all(keys.map(function(k){
-        return k === VERSION ? null : caches.delete(k);
-      }));
+      return Promise.all(keys.map(function(k){ if (k !== VERSION) return caches.delete(k); }));
     }).then(function(){ return self.clients.claim(); })
   );
 });
-
 self.addEventListener("fetch", function(e){
-  var req = e.request;
-  if (req.method !== "GET") return;
-  var url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
-
-  var isPage = req.mode === "navigate" || /\.html?$/.test(url.pathname);
-  if (isPage){
-    /* Newest wins when there is a network; the cache is the fallback. */
+  if (e.request.method !== "GET") return;
+  var isHTML = e.request.mode === "navigate"
+    || (e.request.headers.get("accept") || "").indexOf("text/html") >= 0;
+  if (isHTML){
     e.respondWith(
-      fetch(req).then(function(res){
-        var copy = res.clone();
-        caches.open(VERSION).then(function(c){ c.put(req, copy); });
-        return res;
-      }).catch(function(){
-        return caches.match(req).then(function(m){ return m || caches.match("./index.html"); });
-      })
+      fetch(e.request).then(function(r){
+        var copy = r.clone();
+        caches.open(VERSION).then(function(c){ c.put(e.request, copy); });
+        return r;
+      }).catch(function(){ return caches.match(e.request); })
     );
     return;
   }
   e.respondWith(
-    caches.match(req).then(function(m){
-      return m || fetch(req).then(function(res){
-        if (res && res.status === 200 && res.type === "basic"){
-          var copy = res.clone();
-          caches.open(VERSION).then(function(c){ c.put(req, copy); });
-        }
-        return res;
-      });
-    })
+    caches.match(e.request).then(function(hit){ return hit || fetch(e.request); })
   );
 });

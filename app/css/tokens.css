@@ -1,0 +1,144 @@
+/* ==========================================================================
+   tokens.css - the palette, the type, and the sky.
+
+   Everything else in the game is painted with these variables. The seven
+   sky palettes are the app's identity: Daylight is lit by the actual time
+   of day, and every panel is glass over that sky.
+   ========================================================================== */
+
+/* ===================================================================== tokens
+   Night is the default and the only default. A game is a lit object in a dark
+   room; a light-mode game is a document. Light mode survives as a legibility
+   escape hatch, not as a second design. */
+:root{
+  --bg:#05060F; --bg2:#0A0E1C;
+  --panel:rgba(24,32,48,.62); --panel2:rgba(32,42,62,.58); --sunk:rgba(8,11,20,.55);
+  --line:rgba(150,180,220,.14); --line2:rgba(150,180,220,.26);
+  --ink:#EEF3F8; --ink2:#9AAAC0; --ink3:#61738C;
+  --gold:#F2B735; --gold2:#FFE38A; --goldInk:#3A2A05; --goldSoft:#2A2008;
+  --jade:#3FD9A0; --jadeSoft:#0E2C24; --jadeInk:#8FF0CB;
+  --ember:#FF7A3D; --emberSoft:#2C1710;
+  --violet:#7C6BFF; --violetSoft:#1A1636; --violetInk:#C9BEFF;
+  --crit:#FF5D5D; --critSoft:#2C1214;
+  --r:16px; --r2:22px;
+  --tap:cubic-bezier(.2,.9,.3,1);
+  --pop:cubic-bezier(.2,1.5,.4,1);
+  --hud:64px;
+}
+/* The escape hatch. Same structure, lifted ground, so nothing reflows. */
+:root[data-theme="light"]{
+  --bg:#EEF1F5; --bg2:#E4E9F0; --panel:#FFFFFF; --panel2:#F3F6FA; --sunk:#E1E7EF;
+  --line:#D3DCE7; --line2:#B9C6D6;
+  --ink:#0F1720; --ink2:#41505F; --ink3:#6D7D8F;
+  --gold:#B87F0A; --gold2:#8A5E05; --goldInk:#FFF6DE; --goldSoft:#FBEDCB;
+  --jade:#0E8C60; --jadeSoft:#DDF3EA; --jadeInk:#0A5C40;
+  --ember:#C4501A; --emberSoft:#FAE6DB;
+  --violet:#5442D8; --violetSoft:#E7E3FB; --violetInk:#3B2CA8;
+  --crit:#C0342F; --critSoft:#FAE0DF;
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+/* A display value in a class beats the user-agent [hidden] rule, so hiding a
+   flex element by attribute silently does nothing. This is why the two zeroed
+   currency chips kept showing after they were told to hide. */
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%; height:100%}
+/* ===================================================================== the sky
+   The app is called Daylight and it was painted the colour of a bank. The
+   games people call beautiful - Alto's Odyssey, Monument Valley - get it from
+   atmosphere and confident colour rather than ornament, and Alto's whole
+   palette moves with the time of day. His day IS the subject, so the sky
+   behind everything is the actual hour in the place he is standing.
+
+   It stays dark at every hour: he opens this thing at eleven at night, so
+   night is the room it lives in and the rest are moods of it. Set by
+   paintSky() on load and on the minute. */
+:root{
+  --sky1:#05060E; --sky2:#0C1226; --sky3:#191634; --glow:#2A2350;
+  --skyInk:#EEF2F8;
+}
+:root[data-sky="deepnight"]{ --sky1:#04050E; --sky2:#0A0F22; --sky3:#141636; --glow:#262052; }
+:root[data-sky="dawn"]    { --sky1:#0A0B1E; --sky2:#2A1738; --sky3:#171A3E; --glow:#8C3B4E; }
+:root[data-sky="morning"] { --sky1:#06111C; --sky2:#0F2C3A; --sky3:#123048; --glow:#2C7C78; }
+:root[data-sky="day"]     { --sky1:#07161F; --sky2:#10394A; --sky3:#123A58; --glow:#2E8F84; }
+:root[data-sky="gold"]    { --sky1:#150D14; --sky2:#3A1C22; --sky3:#2A1430; --glow:#B4632A; }
+:root[data-sky="dusk"]    { --sky1:#08071A; --sky2:#241435; --sky3:#1A1440; --glow:#7A2E58; }
+:root[data-sky="night"]   { --sky1:#050614; --sky2:#0D1330; --sky3:#181542; --glow:#382E70; }
+
+html{background:var(--sky1)}
+body{
+  margin:0; min-height:100%;
+  background-color:var(--sky1);   /* under the gradients: no white past the fold */
+  /* Three layers, the way a sky actually stacks: a band of light sitting on
+     the horizon, a wash coming down from the zenith, and the body of the sky
+     between them. The horizon used to be centred a screen-and-a-bit below the
+     bottom edge, which meant golden hour arrived as a brown rectangle. */
+  background:
+    radial-gradient(125% 40% at 50% 99%, var(--glow) 0%, transparent 72%),
+    radial-gradient(120% 54% at 50% -12%, var(--sky3) 0%, transparent 68%),
+    linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 56%, var(--sky1) 100%);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:"Instrument Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+  transition:background 1.6s linear;
+}
+/* Grain. A flat gradient reads as a CSS gradient; a grained one reads as air.
+   One inline SVG turbulence, no request, invisible until you look for it. */
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#hud,#screen,#nav{position:relative; z-index:1}
+#nav{position:fixed}
+
+/* Today is one viewport, no scrolling; the HUD sits on the sky as glass-free
+   furniture rather than a bar */
+body.scene{height:100dvh; overflow:hidden; display:flex; flex-direction:column}
+body.scene #hud{background:none; backdrop-filter:none; -webkit-backdrop-filter:none}
+body.scene #screen{flex:1; min-height:0; display:flex; flex-direction:column;
+  overflow:hidden; padding:0 16px calc(96px + env(safe-area-inset-bottom)); width:100%}
+
+/* the horizon: fixed to the bottom of the viewport, behind every screen */
+/* The nav is 71px of glass at the bottom; the city stands on top of it, not
+   behind it, or the whole horizon disappears under the tab bar. */
+#scene{position:fixed; left:0; right:0;
+  bottom:calc(26px + env(safe-area-inset-bottom, 0px));
+  z-index:0; pointer-events:none}
+#scene svg{display:block; width:100%; height:clamp(104px,17vh,150px)}
+#scene .far{fill:color-mix(in srgb, var(--sky2) 52%, var(--sky1)); opacity:.9;
+  transition:fill 1.6s linear}
+#scene .near,#scene .neardot{fill:color-mix(in srgb, var(--sky1) 58%, #010208);
+  transition:fill 1.6s linear}
+#scene .wire{stroke:color-mix(in srgb, var(--sky1) 58%, #010208);
+  transition:stroke 1.6s linear}
+
+/* stars, when the sky has them */
+#stars{position:fixed; left:0; top:0; right:0; height:58vh; z-index:0;
+  pointer-events:none; opacity:0; transition:opacity 1.6s linear;
+  -webkit-mask-image:linear-gradient(180deg,#000 55%,transparent);
+  mask-image:linear-gradient(180deg,#000 55%,transparent)}
+#stars svg{width:100%; height:100%}
+:root[data-sky="deepnight"] #stars{opacity:.95}
+:root[data-sky="night"] #stars{opacity:.8}
+:root[data-sky="dusk"] #stars{opacity:.45}
+:root[data-sky="dawn"] #stars{opacity:.28}
+#stars .tw{animation:tw 3.4s ease-in-out infinite}
+#stars .tw2{animation:tw 4.7s ease-in-out 1.2s infinite}
+@keyframes tw{0%,100%{opacity:1} 50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){ #stars .tw,#stars .tw2{animation:none} }
+.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums}
+.disp{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; letter-spacing:-.03em}
+.zh{font-family:"PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Source Han Sans SC",
+    "Microsoft YaHei",sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif; margin:0; letter-spacing:-.025em;
+  text-wrap:balance}
+h2{font-size:13px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--ink3);
+  margin:26px 2px 10px}
+h3{font-size:16.5px; font-weight:700}
+p{margin:9px 0}
+a{color:var(--violetInk)}
+.dim{color:var(--ink3); font-size:13px}
+.muted{color:var(--ink2); font-size:14px}
+:focus-visible{outline:2px solid var(--gold); outline-offset:3px; border-radius:8px}
