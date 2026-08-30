@@ -299,6 +299,33 @@ things you can actually do is at the top now, as a proper settings list with
 icons and chevrons; the last ten days show, the rest fold away. 4,113px →
 2,255px.
 
+#### The front door was a document
+
+After all of that, opening `stuatnext.github.io/stu-bot/` still landed on a
+landing page — cards, prose, a link to the app somewhere in the middle. Every
+judgment of "does this feel like a game" started on a page that wasn't one.
+
+The root redirects straight into the game now. What the landing page linked —
+the calendars, the plan, the paperwork — is a menu group in More, and the
+October draft was already in Threads. The files themselves stay where they
+were (`docs/`, `cal/`), so nothing shared or bookmarked breaks.
+
+Two more things a game does that this didn't:
+
+**A title card on every launch.** The boot screen was a spinner, which says
+"website loading". It is the title now — the sun mark over the sky the app is
+about to open onto, the wordmark, the one line — held for a beat and dissolved.
+The spinner is gone.
+
+**A place, not a gradient.** Singapore stands on the horizon behind every
+screen — the Esplanade domes, the CBD, Marina Bay Sands, the Flyer, the
+supertrees — drawn as one inline-SVG silhouette, tinted by the same sky
+variables as everything else, standing on top of the tab bar. Stars come out
+through dusk, night and deep night, three of them twinkling (none under
+reduced motion). The browser chrome follows too: `theme-color` is re-set to
+the sky's own base colour every minute, so even Safari's frame is part of the
+scene.
+
 #### The collection stopped being a filing cabinet
 
 The Cards tab used to be one column of all seventeen sets: **16,856 pixels** of mostly identical
@@ -438,9 +465,10 @@ State lives in `localStorage` under `daylight.v4`.
 
 ### GitHub Pages
 
-The repository is already laid out for it: `index.html` at the root redirects to `app/`,
-`.nojekyll` stops Jekyll processing, and `.github/workflows/pages.yml` deploys the root on every
-push to `main`.
+The repository is laid out for it: `index.html` at the root redirects straight
+into the game at `app/` (the landing page it used to be is gone — its links live
+under More), `.nojekyll` stops Jekyll processing, and
+`.github/workflows/pages.yml` deploys the root on every push to `main`.
 
 To switch it on: **Settings → Pages → Source → GitHub Actions**. Merge this branch to `main`
 first, or point Pages at this branch directly under *Deploy from a branch* if you would rather not
