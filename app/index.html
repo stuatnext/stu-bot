@@ -101,12 +101,20 @@ body::before{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 #hud,#screen,#nav{position:relative; z-index:1}
+#nav{position:fixed}
+
+/* Today is one viewport, no scrolling; the HUD sits on the sky as glass-free
+   furniture rather than a bar */
+body.scene{height:100dvh; overflow:hidden; display:flex; flex-direction:column}
+body.scene #hud{background:none; backdrop-filter:none; -webkit-backdrop-filter:none}
+body.scene #screen{flex:1; min-height:0; display:flex; flex-direction:column;
+  overflow:hidden; padding:0 16px calc(96px + env(safe-area-inset-bottom)); width:100%}
 
 /* the horizon: fixed to the bottom of the viewport, behind every screen */
 /* The nav is 71px of glass at the bottom; the city stands on top of it, not
    behind it, or the whole horizon disappears under the tab bar. */
 #scene{position:fixed; left:0; right:0;
-  bottom:calc(66px + env(safe-area-inset-bottom, 0px));
+  bottom:calc(26px + env(safe-area-inset-bottom, 0px));
   z-index:0; pointer-events:none}
 #scene svg{display:block; width:100%; height:clamp(104px,17vh,150px)}
 #scene .far{fill:color-mix(in srgb, var(--sky2) 52%, var(--sky1)); opacity:.9;
@@ -211,12 +219,15 @@ a{color:var(--violetInk)}
 @keyframes bump{0%{transform:none}35%{transform:scale(1.18)}100%{transform:none}}
 
 /* --------------------------------------------------------------------- nav */
-#nav{position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; gap:2px;
-  padding:6px 8px calc(6px + env(safe-area-inset-bottom));
-  max-width:600px; margin:0 auto;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 60%,transparent),var(--bg) 42%);
+/* a floating dock, the way a game draws its tab bar - the city shows behind
+   and beneath it instead of being cut off by a full-width slab */
+#nav{position:fixed; left:12px; right:12px; bottom:calc(10px + env(safe-area-inset-bottom));
+  z-index:40; display:flex; gap:2px; padding:6px 8px;
+  max-width:560px; margin:0 auto; border-radius:26px;
+  background:color-mix(in srgb,var(--bg) 74%,transparent);
   backdrop-filter:blur(18px) saturate(1.4); -webkit-backdrop-filter:blur(18px) saturate(1.4);
-  border-top:1px solid color-mix(in srgb,var(--ink) 7%,transparent)}
+  border:1px solid color-mix(in srgb,var(--ink) 9%,transparent);
+  box-shadow:0 12px 34px rgba(0,0,0,.45)}
 #nav button{flex:1; border:0; background:none; padding:8px 2px 6px; min-height:58px; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
   color:var(--ink3); font:inherit; font-size:10px; letter-spacing:.04em; position:relative;
@@ -770,87 +781,44 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 @keyframes gatein{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
 @keyframes gatepulse{0%,100%{opacity:.4}50%{opacity:1}}
 
-/* ==================================================================== the dial
-   His day is set by a clock two continents away, so the day is a clock: the
-   outer ring is twenty-four hours with Malta's shift shaded onto it and a hand
-   at now; the inner ring is the three things he does; the middle is what they
-   pay. One object where there used to be four stacked blocks. */
-.stage{display:flex; justify-content:center; padding:10px 0 0}
-.dial{position:relative; width:min(74vw,286px); aspect-ratio:1; border:0; padding:0;
-  background:none; font:inherit; color:inherit}
-.dial[data-open]{cursor:pointer; transition:transform .14s var(--tap)}
-.dial[data-open]:active{transform:scale(.97)}
-.dial svg{width:100%; height:100%; display:block; transform:rotate(-90deg)}
-.dial .track{fill:none; stroke:#131C2A; stroke-width:9}
-.dial .shift{fill:none; stroke:#3B348C; stroke-width:9}
-.dial .tick{stroke:#243247; stroke-width:2; stroke-linecap:round}
-.dial .tick.six{stroke:#33455E}
-.dial .orb{fill:#FFD98A; filter:drop-shadow(0 0 12px rgba(255,196,90,.85))}
-.dial .orb.moon{fill:#DCE6F5; filter:drop-shadow(0 0 11px rgba(200,220,255,.6))}
-.dial .ray{stroke:#FFD98A; stroke-width:2.2; stroke-linecap:round; opacity:.8;
-  filter:drop-shadow(0 0 5px rgba(255,196,90,.7))}
-.dial .cut{fill:var(--sky2)}
-.dial .slot{fill:none; stroke:#182437; stroke-width:17; stroke-linecap:round}
-.dial .lit{fill:none; stroke:var(--jade); stroke-width:17; stroke-linecap:round;
-  filter:drop-shadow(0 0 9px color-mix(in srgb,var(--jade) 50%,transparent))}
-.dial .core{position:absolute; inset:0; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:3px}
-.dial .prize{width:78px; height:78px; border-radius:28px; display:flex; align-items:center;
-  justify-content:center; border:1px solid var(--line2); color:var(--ink3);
-  background:linear-gradient(160deg,#19222F,#101724); box-shadow:0 10px 26px rgba(0,0,0,.55);
-  opacity:.55; transition:opacity .3s}
-.dial.won .prize{opacity:1; border-color:#C99417; color:var(--goldInk);
-  background:linear-gradient(160deg,var(--gold2),var(--gold) 55%,#D08F10);
-  box-shadow:0 0 0 7px color-mix(in srgb,var(--gold) 12%,transparent),
-    0 12px 34px color-mix(in srgb,var(--gold) 38%,transparent);
-  animation:breathe 2.4s ease-in-out infinite}
-@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-.dial .dcount{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:34px;
-  letter-spacing:-.05em; line-height:1; margin-top:8px}
-.dial .dcount i{font-style:normal; color:var(--ink3); font-size:21px}
-.dial.won .dcount{color:var(--gold2)}
-.dial .dcap{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.18em;
-  text-transform:uppercase; color:var(--ink3)}
-.dial .dtime{position:absolute; left:0; right:0; bottom:-24px; text-align:center;
-  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.14em;
-  text-transform:uppercase; color:var(--ink3)}
+/* (the dial is gone; the sky arc and the gem replaced it - see the scene) */
+
 
 /* the one line on the screen */
 .ask{text-align:center; font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
-  font-size:24px; letter-spacing:-.03em; margin:44px 0 0; text-wrap:balance}
+  font-size:24px; letter-spacing:-.03em; margin:0; text-wrap:balance}
 .ask.gold{color:var(--gold2)}
 .asksub{text-align:center; color:var(--ink3); font-size:14px; margin:7px 0 0; text-wrap:balance}
 
-/* the three, as objects */
-.triad{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:22px}
-.pil{border:0; padding:15px 5px 13px; border-radius:24px; cursor:pointer; font:inherit;
-  display:flex; flex-direction:column; align-items:center; gap:9px; color:var(--ink2);
-  background:linear-gradient(175deg,#18222F,#0F1622);
-  box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 -3px 0 rgba(0,0,0,.5) inset,
-    0 7px 18px rgba(0,0,0,.45);
-  transition:transform .14s var(--tap), background .25s}
-.pil:active{transform:translateY(3px) scale(.98)}
-.pil .disc{width:60px; height:60px; border-radius:50%; display:flex; align-items:center;
+/* the three, as ability buttons: a game control tells you what it is, on
+   itself, in its own colour */
+.triad{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:4px 0 8px}
+.pil{border:0; padding:8px 2px 6px; cursor:pointer; font:inherit; background:none;
+  display:flex; flex-direction:column; align-items:center; gap:7px; color:var(--ink2);
+  transition:transform .14s var(--tap); border-radius:20px}
+.pil:active{transform:translateY(2px) scale(.97)}
+.pil .disc{width:64px; height:64px; border-radius:50%; display:flex; align-items:center;
   justify-content:center; transition:all .28s var(--pop);
   background:radial-gradient(70% 70% at 35% 25%,
-    color-mix(in srgb,var(--pil) 17%,#1D2939), color-mix(in srgb,var(--pil) 7%,#111927));
-  box-shadow:0 0 0 2px color-mix(in srgb,var(--pil) 34%,#22314A) inset,
-    0 4px 10px rgba(0,0,0,.55)}
-.pil .disc svg{color:color-mix(in srgb,var(--pil) 74%,var(--ink3)); transition:color .2s}
-.pil .lb{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:15px}
-.pil .st{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.09em;
+    color-mix(in srgb,var(--pil) 22%,#141E2C), color-mix(in srgb,var(--pil) 9%,#0D1420));
+  box-shadow:0 0 0 2.5px color-mix(in srgb,var(--pil) 55%,transparent),
+    0 6px 16px rgba(0,0,0,.5),
+    0 0 22px color-mix(in srgb,var(--pil) 18%,transparent)}
+.pil .disc svg{color:color-mix(in srgb,var(--pil) 82%,#fff); transition:color .2s}
+.pil .lb{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:14px;
+  color:var(--ink)}
+.pil .gl{font-size:10.5px; line-height:1.3; color:var(--ink2); text-align:center;
+  max-width:112px; text-wrap:balance}
+.pil .st{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.08em;
   text-transform:uppercase; color:var(--ink3)}
-.pil.on{background:linear-gradient(175deg,#164030,#0D2A20);
-  box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 -3px 0 rgba(0,0,0,.45) inset,
-    0 7px 22px color-mix(in srgb,var(--jade) 22%,transparent)}
 .pil.on .disc{background:radial-gradient(70% 70% at 35% 25%,#7DF0C4,var(--jade) 55%,#1B9B6E);
-  box-shadow:0 0 0 2px rgba(125,240,196,.55) inset,
-    0 0 20px color-mix(in srgb,var(--jade) 55%,transparent)}
+  box-shadow:0 0 0 2.5px rgba(125,240,196,.6),
+    0 0 26px color-mix(in srgb,var(--jade) 55%,transparent)}
 .pil.on .disc svg{color:#04241A}
-.pil.carried .disc svg{color:var(--ink3)}
 .pil.on .lb{color:var(--jadeInk)}
 .pil.on .st{color:var(--jade)}
-.pil.carried .disc{opacity:.5}
+.pil.carried .disc{opacity:.45; box-shadow:0 0 0 2px color-mix(in srgb,var(--ink3) 40%,transparent)}
+.pil.carried .disc svg{color:var(--ink3)}
 .pil.pop{animation:qpop .45s var(--pop)}
 @keyframes qpop{0%{transform:none}40%{transform:scale(1.06)}100%{transform:none}}
 
@@ -905,9 +873,7 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 .panel,.row,.strip2 button,.chip,.rail button,.filters button,.ware,.trk,.rec,.q,.ye,
 .season,.door,.frz,.pil,#modal .mw{
   backdrop-filter:blur(16px) saturate(1.25); -webkit-backdrop-filter:blur(16px) saturate(1.25)}
-.pil{background:linear-gradient(175deg,rgba(30,42,62,.72),rgba(14,20,34,.66))}
-.pil.on{background:linear-gradient(175deg,rgba(22,64,48,.82),rgba(13,42,32,.74))}
-.dial .prize{backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
+.gem .gcore{backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
 .medals .disc,.tc,.pk{backdrop-filter:none; -webkit-backdrop-filter:none}
 
 
@@ -1060,6 +1026,97 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
   border-radius:50%; pointer-events:none;
   background:radial-gradient(circle,color-mix(in srgb,var(--jade) 24%,transparent),transparent 68%)}
 
+
+/* ================================================================ the scene
+   Today's furniture: the sky arc, the gem, the ask, the book. */
+.sky{flex:none; position:relative; margin-top:2px}
+.sky svg{display:block; width:100%; height:auto}
+.sky .arc{fill:none; stroke:color-mix(in srgb,var(--ink) 15%,transparent);
+  stroke-width:2.5; stroke-linecap:round}
+.sky .band{fill:none; stroke:#5A50C8; stroke-width:7; stroke-linecap:round; opacity:.85;
+  filter:drop-shadow(0 0 8px rgba(90,80,200,.45))}
+.sky .hr{fill:color-mix(in srgb,var(--ink) 30%,transparent)}
+.sky .orb{fill:#FFD98A; filter:drop-shadow(0 0 12px rgba(255,196,90,.85))}
+.sky .orb.moon{fill:#DCE6F5; filter:drop-shadow(0 0 11px rgba(200,220,255,.6))}
+.sky .ray{stroke:#FFD98A; stroke-width:2.2; stroke-linecap:round; opacity:.85}
+.sky .cut{fill:var(--sky2)}
+.sky .dtime{display:block; text-align:center; margin-top:0;
+  font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink3)}
+
+.gemwrap{flex:1; min-height:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:20px}
+.gem{position:relative; display:flex; flex-direction:column; align-items:center; gap:11px;
+  border:0; background:none; padding:0; font:inherit; color:var(--ink)}
+button.gem{cursor:pointer; transition:transform .14s var(--tap)}
+button.gem:active{transform:scale(.95)}
+.gem .gcore{position:relative; width:96px; height:96px; border-radius:32px;
+  display:flex; align-items:center; justify-content:center; color:var(--ink3);
+  border:2px solid color-mix(in srgb,var(--ink) 15%,transparent);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--ink) 7%,transparent),transparent 70%);
+  transition:all .3s var(--pop)}
+.gem.won .gcore{color:var(--goldInk); border-color:#C99417;
+  background:linear-gradient(160deg,#FFDF8E,var(--gold) 55%,#C98F17);
+  box-shadow:0 0 0 6px color-mix(in srgb,var(--gold) 20%,transparent),
+    0 0 44px color-mix(in srgb,var(--gold) 45%,transparent);
+  animation:gembeat 2.6s ease-in-out infinite}
+@keyframes gembeat{0%,100%{transform:none}50%{transform:scale(1.045)}}
+@media (prefers-reduced-motion:reduce){ .gem.won .gcore{animation:none} }
+.gem .gn{position:absolute; top:-8px; right:-8px; min-width:25px; height:25px;
+  border-radius:13px; padding:0 6px; display:grid; place-items:center;
+  background:var(--ember); color:#FFF6EA; border:2px solid var(--sky1);
+  font-family:"JetBrains Mono",monospace; font-size:12.5px; font-weight:700}
+.gem .pips{display:flex; gap:9px}
+.gem .pips i{width:10px; height:10px; border-radius:50%;
+  background:color-mix(in srgb,var(--pil,#8B93A9) 30%,transparent);
+  border:1.5px solid color-mix(in srgb,var(--pil,#8B93A9) 75%,transparent)}
+.gem .pips i.on{background:var(--jade); border-color:var(--jade);
+  box-shadow:0 0 10px color-mix(in srgb,var(--jade) 60%,transparent)}
+.gem .pips i.na{background:none; border-style:dashed; opacity:.5}
+.gem .dcount{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink3)}
+.gem .dcount i{font-style:normal}
+.gem.won .dcount{color:var(--gold2)}
+
+.askwrap{text-align:center}
+
+.bookbtn{flex:none; align-self:center; position:relative; display:inline-flex;
+  align-items:center; gap:8px; padding:10px 20px; min-height:42px; border-radius:99px;
+  border:1px solid var(--line2); background:var(--panel); color:var(--ink2);
+  font:inherit; font-size:13.5px; font-weight:600; cursor:pointer;
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px)}
+.bookbtn svg{color:var(--ink3)}
+.bookbtn:active{transform:scale(.96)}
+.bookbtn .dot{position:absolute; top:5px; right:9px; width:8px; height:8px;
+  border-radius:50%; background:var(--ember);
+  box-shadow:0 0 8px color-mix(in srgb,var(--ember) 70%,transparent)}
+
+/* the book: a bottom sheet of the day's paperwork */
+#book{position:fixed; inset:0; z-index:130; display:none;
+  background:rgba(3,6,12,.55); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px)}
+#book.on{display:flex; align-items:flex-end}
+#book .bk{width:100%; max-width:600px; margin:0 auto; max-height:76vh; overflow:auto;
+  background:linear-gradient(170deg,rgba(26,34,52,.98),rgba(13,18,30,.98));
+  border:1px solid var(--line2); border-bottom:0; border-radius:26px 26px 0 0;
+  padding:16px 16px calc(20px + env(safe-area-inset-bottom));
+  animation:bookup .34s var(--pop)}
+@keyframes bookup{from{transform:translateY(36px); opacity:0}}
+@media (prefers-reduced-motion:reduce){ #book .bk{animation:none} }
+#book .bkh{display:flex; align-items:center; justify-content:space-between; margin:0 2px 8px}
+#book .bkh b{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:20px;
+  letter-spacing:-.02em}
+#book .bkx{background:none; border:0; color:var(--ink3); font:inherit; font-size:13px;
+  padding:10px; min-height:44px; cursor:pointer; text-decoration:underline;
+  text-underline-offset:3px}
+
+/* small phones: the scene compresses rather than scrolls */
+@media (max-height:760px){
+  .sky svg{width:88%; margin:0 auto}
+  .gem .gcore{width:78px; height:78px; border-radius:26px}
+  .pil .disc{width:56px; height:56px}
+  .pil .gl{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -1178,6 +1235,7 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 <div id="fx" aria-hidden="true"></div>
 <div id="stage" aria-live="polite"></div>
 <div id="sheet"></div>
+<div id="book"></div>
 <div id="modal" role="dialog" aria-modal="true"></div>
 
 <!-- The front door. A game says who it is before it hands you anything, and
@@ -1316,10 +1374,17 @@ function ukDays(includeOpen){
 /* key, label, resting icon, what it means, and the colour it wears when it is
    waiting. Three identical grey slabs read as three disabled controls; three
    colours read as three things. Done is always jade, whichever one it is. */
+/* key, label, resting icon, what it means in full, the colour it wears, and
+   the gloss that sits on the button itself. He looked at "Trained" and asked
+   what it constitutes - a label without its definition is a quiz, and a game
+   never quizzes you on its own controls. */
 var PILLARS = [
-  ["train",  "Trained", "run",   "Moving on purpose. Gym, a run, or a long walk.", "#5AC8F5"],
-  ["family", "Family",  "phone", "A conversation with someone at home. A message does not count.", "#FF8FA3"],
-  ["stop",   "Stopped", "clock", "Finished when the shift finished. Not burning out is a thing you do.", "#F2B735"]
+  ["train",  "Trained", "run",   "Moving on purpose. Gym, a run, or a long walk.", "#5AC8F5",
+    "Gym, a run, or a long walk"],
+  ["family", "Family",  "phone", "A conversation with someone at home. A message does not count.", "#FF8FA3",
+    "A real talk with home"],
+  ["stop",   "Stopped", "clock", "Finished when the shift finished. Not burning out is a thing you do.", "#F2B735",
+    "Ended when the shift did"]
 ];
 
 var BED_DEFAULT = "23:45";
@@ -2931,177 +2996,193 @@ function setBadge(tab, n, pulse){
   b.appendChild(s);
 }
 
-/* ================================================================== the dial
-   The one idea worth having here. His day is set by a clock two continents
-   away, so the day is drawn as a clock: twenty-four hours round the outside
-   with Malta's shift shaded onto it and a hand at now; the three things he
-   does on an inner ring; and what they pay in the middle.
-
-   One object instead of four stacked blocks - a shift bar, a progress ring, a
-   count and a claim button - which is most of why the old screen read as a
-   list of information rather than a game. */
-function dialHTML(done, packs){
+/* =============================================================== the sky arc
+   The dial is gone. Its outer ring is unrolled across the sky itself: one arc
+   from midnight to midnight with noon at the apex, Malta's shift drawn along
+   it as the bright band, and the sun - the moon, once it is down - riding it
+   at now. A widget parked on the world was still a widget; in a game the
+   world is the instrument. */
+function arcPt(u){
+  var x0 = 22, y0 = 150, cx = 195, cy = 4, x1 = 368, y1 = 150, v = 1 - u;
+  return [v*v*x0 + 2*v*u*cx + u*u*x1, v*v*y0 + 2*v*u*cy + u*u*y1];
+}
+function arcSeg(a, b){
+  var pts = [], n = Math.max(2, Math.round((b - a) * 90));
+  for (var i = 0; i <= n; i++){
+    var q = arcPt(a + (b - a) * i / n);
+    pts.push(q[0].toFixed(1) + "," + q[1].toFixed(1));
+  }
+  return pts.join(" ");
+}
+function skyHTML(){
   var s = shape();
-  var R1 = 132, R2 = 106, C1 = 2 * Math.PI * R1, C2 = 2 * Math.PI * R2;
-  /* Quarter turn, so the ring reads as a sky and not a gauge: midnight at the
-     bottom, noon at the top, and the sun therefore rising on the left and
-     setting on the right the way it does out of the window. */
-  var Q = Math.PI / 2;
-  var i, h = "<svg viewBox='0 0 300 300' aria-hidden='true'>";
-
-  h += "<circle class='track' cx='150' cy='150' r='" + R1 + "'></circle>";
+  var h = "<svg viewBox='0 0 390 166' aria-hidden='true'>";
+  h += "<polyline class='arc' points='" + arcSeg(0, 1) + "'/>";
   if (!s.weekend && s.end > s.start){
-    var from = (s.start / 1440) * C1, len = ((s.end - s.start) / 1440) * C1;
-    h += "<circle class='shift' cx='150' cy='150' r='" + R1 + "' stroke-dasharray='"
-      + len.toFixed(1) + " " + (C1 - len).toFixed(1) + "' stroke-dashoffset='"
-      + (-(from + C1 / 4)).toFixed(1) + "'></circle>";
+    h += "<polyline class='band' points='"
+      + arcSeg(s.start / 1440, Math.min(s.end, 1439) / 1440) + "'/>";
   }
-  /* Twenty-four ticks, longer every six hours, so it reads as a whole day
-     rather than a twelve-hour clock face. */
-  for (i = 0; i < 24; i++){
-    var ang = (i / 24) * 2 * Math.PI + Q;
-    var out = i % 6 === 0 ? 16 : 11;
-    h += "<line class='tick" + (i % 6 === 0 ? " six" : "") + "' x1='"
-      + (150 + Math.cos(ang) * (R1 + 9)).toFixed(1) + "' y1='" + (150 + Math.sin(ang) * (R1 + 9)).toFixed(1)
-      + "' x2='" + (150 + Math.cos(ang) * (R1 + out)).toFixed(1) + "' y2='"
-      + (150 + Math.sin(ang) * (R1 + out)).toFixed(1) + "'></line>";
-  }
-  /* Not a clock hand - the sun, or the moon after it has gone down. It is what
-     makes the dial read as a sky rather than a gauge, and it is the one thing
-     on the screen that is always moving. */
-  var na = (s.now / 1440) * 2 * Math.PI + Q;
-  var ox = 150 + Math.cos(na) * R1, oy = 150 + Math.sin(na) * R1;
-  var night = skyPhase() === "night" || skyPhase() === "deepnight" || skyPhase() === "dusk";
-  h += "<circle class='orb" + (night ? " moon" : "") + "' cx='" + ox.toFixed(1) + "' cy='"
-    + oy.toFixed(1) + "' r='9'></circle>";
+  [360, 720, 1080].forEach(function(m){
+    var q = arcPt(m / 1440);
+    h += "<circle class='hr' cx='" + q[0].toFixed(1) + "' cy='" + q[1].toFixed(1) + "' r='2.1'/>";
+  });
+  var now = arcPt(s.now / 1440), ph = skyPhase();
+  var night = ph === "night" || ph === "deepnight" || ph === "dusk";
+  h += "<circle class='orb" + (night ? " moon" : "") + "' cx='" + now[0].toFixed(1)
+    + "' cy='" + now[1].toFixed(1) + "' r='9'/>";
   if (!night){
     for (var k = 0; k < 8; k++){
       var ra = k * Math.PI / 4;
-      h += "<line class='ray' x1='" + (ox + Math.cos(ra) * 12).toFixed(1) + "' y1='"
-        + (oy + Math.sin(ra) * 12).toFixed(1) + "' x2='" + (ox + Math.cos(ra) * 16).toFixed(1)
-        + "' y2='" + (oy + Math.sin(ra) * 16).toFixed(1) + "'></line>";
+      h += "<line class='ray' x1='" + (now[0] + Math.cos(ra) * 12.5).toFixed(1)
+        + "' y1='" + (now[1] + Math.sin(ra) * 12.5).toFixed(1)
+        + "' x2='" + (now[0] + Math.cos(ra) * 16.5).toFixed(1)
+        + "' y2='" + (now[1] + Math.sin(ra) * 16.5).toFixed(1) + "'/>";
     }
   } else {
-    /* a crescent, cut by offsetting a disc of the sky over it */
-    h += "<circle class='cut' cx='" + (ox + 5).toFixed(1) + "' cy='" + (oy - 3.5).toFixed(1)
-      + "' r='8'></circle>";
+    h += "<circle class='cut' cx='" + (now[0] + 5).toFixed(1) + "' cy='"
+      + (now[1] - 3.5).toFixed(1) + "' r='8'/>";
   }
-
-  var gap = 18, seg = (C2 - 3 * gap) / 3;
-  for (i = 0; i < 3; i++){
-    h += "<circle class='slot' cx='150' cy='150' r='" + R2 + "' stroke-dasharray='"
-      + seg.toFixed(1) + " " + (C2 - seg).toFixed(1) + "' stroke-dashoffset='"
-      + (-(i * (seg + gap))).toFixed(1) + "'></circle>";
-  }
-  for (i = 0; i < done; i++){
-    h += "<circle class='lit' cx='150' cy='150' r='" + R2 + "' stroke-dasharray='"
-      + seg.toFixed(1) + " " + (C2 - seg).toFixed(1) + "' stroke-dashoffset='"
-      + (-(i * (seg + gap))).toFixed(1) + "'></circle>";
-  }
-  h += "</svg>";
-  h += "<span class='core'><span class='prize'>" + svg("pack", 42) + "</span>"
-    + "<span class='dcount'>" + (packs ? packs : done + "<i>/3</i>") + "</span>"
-    + "<span class='dcap'>" + (packs ? (packs === 1 ? "pack ready" : "packs ready") : "for a pack")
-    + "</span></span>";
-  h += "<span class='dtime'>" + esc(dialLabel(s)) + "</span>";
+  h += "</svg><span class='dtime'>" + esc(dialLabel(s)) + "</span>";
   return h;
 }
 function dialLabel(s){
   if (s.weekend) return "No shift today";
   if (s.working) return "Malta until " + s.endT;
-  if (s.now < s.start) return "Malta has " + s.startT + " – " + s.endT;
+  if (s.now < s.start) return "Malta has " + s.startT + " \u2013 " + s.endT;
   return "Done at " + s.endT;
 }
 
+/* ================================================================== the gem
+   What the day pays, floating in the middle of the scene. Three pips - one a
+   pillar, in its own colour - light jade as each lands; all of them turns the
+   centre gold and it becomes the button that opens the pack. */
+function gemHTML(done, packs){
+  var t = today();
+  var h = "<span class='gcore'>" + svg("pack", 40)
+    + (packs > 1 ? "<b class='gn'>" + packs + "</b>" : "") + "</span>";
+  h += "<span class='pips'>";
+  PILLARS.forEach(function(g){
+    var on = pDone(t, g[0]), carried = !on && !required(g[0], t);
+    h += "<i class='" + (on ? "on" : carried ? "na" : "") + "' style='--pil:" + g[4] + "'></i>";
+  });
+  h += "</span>";
+  if (!packs) h += "<span class='dcount'>" + done + "<i>/3</i> for a pack</span>";
+  return h;
+}
+
 /* ================================================================== TODAY
-   Fifth pass, and the first one that starts from a person who has never seen
-   the app. The board only ever grows: nothing appears until it means
-   something, so a first open is a dial, a question and three buttons, and by
-   the time the chips and the ladder arrive he already knows what they are for. */
+   Not a page any more. One viewport, no scrolling: the sky with the sun on
+   it, the gem, one line, three buttons that say what they mean, and a book
+   for everything else. A real game's home screen is a scene you stand in,
+   not a column you read down. */
 function viewToday(){
   var t = today(), d = day(t), y = day(shift(-1));
   var w = packsWaiting(), packs = w.day + w.streak;
   var done = PILLARS.filter(function(g){ return pDone(t, g[0]); }).length;
-  /* The tutorial board lasts until he has done the loop once and been paid for
-     it - not until his first tap. Otherwise the chips and the ladder land
-     halfway through learning what the three are. */
   var green = !S.onboarded;
   var h = "";
 
-  /* the dial */
-  h += "<div class='stage'><" + (packs ? "button" : "div") + " class='dial"
-    + (packs ? " won" : "") + "'" + (packs ? " data-open='1'" : "") + ">"
-    + dialHTML(done, packs) + "</" + (packs ? "button" : "div") + "></div>";
+  h += "<div class='sky'>" + skyHTML() + "</div>";
 
-  /* one line, and only one. What it says depends on where he is. */
+  h += "<div class='gemwrap'><" + (packs ? "button" : "div") + " class='gem"
+    + (packs ? " won" : "") + "'" + (packs ? " data-open='1'" : "") + ">"
+    + gemHTML(done, packs) + "</" + (packs ? "button" : "div") + ">";
+
+  /* one line, and only one - it sits with the gem, not somewhere below it */
+  var owed = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
   var ask, sub;
   if (packs){
     ask = packs === 1 ? "That is a pack." : packs + " packs.";
     sub = "Tap it to open.";
   } else if (allThree(t)){
-    ask = "Today is in."; sub = "Come back tomorrow for the next one.";
-  } else if (green && !done){
-    ask = "Three things make a day."; sub = "Tap the ones you have done.";
+    ask = "Today is in."; sub = "Back tomorrow for the next one.";
+  } else if (!done){
+    if (owed === 3){ ask = "Three things make a day."; sub = "Tap what you have done."; }
+    else { ask = "Two things make a " + dayName(t) + ".";
+           sub = "No shift to stop today. The other two still count."; }
   } else {
-    var owed = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
     ask = owed === 1 ? "One more." : owed + " to go.";
-    sub = green ? "All three earns a pack." : "All three earns a pack.";
+    sub = "All of them earns a pack.";
   }
-  h += "<p class='ask" + (packs ? " gold" : "") + "'>" + esc(ask) + "</p>"
-    + "<p class='asksub'>" + esc(sub) + "</p>";
+  h += "<div class='askwrap'><p class='ask" + (packs ? " gold" : "") + "'>" + esc(ask) + "</p>"
+    + "<p class='asksub'>" + esc(sub) + "</p></div></div>";
 
-  /* the three */
+  /* the three, with their definitions on them */
   h += "<div class='triad'>";
   PILLARS.forEach(function(g){
     var on = pDone(t, g[0]), st = streak(g[0]), carried = !on && !required(g[0], t);
     h += "<button class='pil" + (on ? " on" : "") + (carried ? " carried" : "") + "' data-p='"
       + g[0] + "' style='--pil:" + g[4] + "' aria-pressed='" + (on ? "true" : "false") + "'>"
-      + "<span class='disc'>" + svg(on ? "tick" : g[2], 29) + "</span>"
+      + "<span class='disc'>" + svg(on ? "tick" : g[2], 27) + "</span>"
       + "<span class='lb'>" + esc(g[1]) + "</span>"
+      + "<span class='gl'>" + esc(g[5]) + "</span>"
       + (st > 0 || carried
-          ? "<span class='st'>" + (carried ? "carried" : st + (st === 1 ? " day" : " days")) + "</span>"
+          ? "<span class='st'>" + (carried ? "no shift today" : st + (st === 1 ? " day" : " days")) + "</span>"
           : "")
       + "</button>";
   });
   h += "</div>";
 
-  /* On the very first day, that is the whole screen. Everything below has to
-     earn its place by being about something he has actually got. */
+  /* On the very first day, that is the whole screen. */
   if (green) return h;
 
-  var bt = S.bed || BED_DEFAULT;
-  h += "<div class='strip2'>";
-  h += "<button data-bedsheet='1' class='" + (y.bedok ? "on" : "") + "'>" + svg("moon", 16)
-    + "Bed <b>" + esc(bt) + "</b></button>";
-  h += "<button data-frzsheet='1'>" + svg("snow", 16) + "<b>" + freezesLeft() + "</b> freezes</button>";
-  h += "<button data-gap='set'>" + svg("gap", 16) + (d.gap ? "<b>" + esc(d.gap) + "</b>" : "Gap") + "</button>";
-  h += "<button data-hq='1'>" + svg("pin", 16) + esc(S.camp) + "</button>";
-  h += "</div>";
+  var alert = y.said && y.kept === undefined;
+  h += "<button class='bookbtn' data-bookopen='1'>" + svg("pen", 15)
+    + "<span>Today\u2019s book</span>" + (alert ? "<i class='dot'></i>" : "") + "</button>";
+  return h;
+}
+function dayName(k){
+  return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+    [new Date(k + "T00:00:00").getDay()];
+}
 
-  h += "<div class='also'><div class='alsoh'>Also today</div>";
+/* ============================================================ today's book
+   Everything that used to sit under the fold - the chips and the Also-today
+   rows - behind one button. Tapping any row closes the book and opens that
+   row's own sheet; the book itself changes nothing. */
+function bookHTML(){
+  var t = today(), d = day(t), y = day(shift(-1)), bt = S.bed || BED_DEFAULT;
+  var h = "<div class='bk'><div class='bkh'><b>Today\u2019s book</b>"
+    + "<button class='bkx' data-bookclose='1'>Close</button></div>";
   if (y.said && y.kept === undefined){
     h += "<button class='row warn' data-keptsheet='1'><span class='ic'>" + svg("gap", 20) + "</span>"
       + "<span class='bd'><b>Yesterday you said</b><span>" + esc(y.said) + "</span></span>"
       + "<span class='ch'>" + svg("arrow", 16) + "</span></button>";
-  }
-  var p = pick();
-  if (p){
-    h += "<button class='row' data-place='1'><span class='ic'>" + svg("pin", 20) + "</span>"
-      + "<span class='bd'><b>" + esc(p[0]) + "</b><span>" + esc(KIND[p[3]][1] + " · " + p[1])
-      + "</span></span><span class='ch'>" + svg("arrow", 16) + "</span></button>";
   }
   h += "<button class='row" + (d.said ? " on" : "") + "' data-saysheet='1'>"
     + "<span class='ic'>" + svg(d.said ? "tick" : "pen", 20) + "</span>"
     + "<span class='bd'><b>" + (d.said ? esc(d.said) : "One thing today") + "</b>"
     + "<span>" + (d.said ? "Named. Tap to change it." : "Name it and it counts.") + "</span></span>"
     + "<span class='ch'>" + svg("arrow", 16) + "</span></button>";
+  var p = pick();
+  if (p){
+    h += "<button class='row' data-place='1'><span class='ic'>" + svg("pin", 20) + "</span>"
+      + "<span class='bd'><b>" + esc(p[0]) + "</b><span>" + esc(KIND[p[3]][1] + " \u00b7 " + p[1])
+      + "</span></span><span class='ch'>" + svg("arrow", 16) + "</span></button>";
+  }
+  h += "<button class='row" + (y.bedok ? " on" : "") + "' data-bedsheet='1'>"
+    + "<span class='ic'>" + svg("moon", 20) + "</span>"
+    + "<span class='bd'><b>Bed by " + esc(bt) + "</b><span>"
+    + (y.bedok === true ? "Made it last night." : y.bedok === false ? "Missed it last night."
+       : "The keystone. Say how last night went.") + "</span></span>"
+    + "<span class='ch'>" + svg("arrow", 16) + "</span></button>";
+  h += "<button class='row' data-frzsheet='1'><span class='ic'>" + svg("snow", 20) + "</span>"
+    + "<span class='bd'><b>" + freezesLeft() + " freezes left</b>"
+    + "<span>Spent by hand, never for you.</span></span>"
+    + "<span class='ch'>" + svg("arrow", 16) + "</span></button>";
+  h += "<button class='row" + (d.gap ? " on" : "") + "' data-gap='set'>"
+    + "<span class='ic'>" + svg("gap", 20) + "</span>"
+    + "<span class='bd'><b>" + (d.gap ? esc(d.gap) : "Today\u2019s gap") + "</b>"
+    + "<span>" + (d.gap ? "Declared. Tap to change it." : "Where the routine can live today.")
+    + "</span></span><span class='ch'>" + svg("arrow", 16) + "</span></button>";
+  h += "<button class='row' data-hq='1'><span class='ic'>" + svg("pin", 20) + "</span>"
+    + "<span class='bd'><b>Standing in " + esc(S.camp) + "</b>"
+    + "<span>The shift moves when you do.</span></span>"
+    + "<span class='ch'>" + svg("arrow", 16) + "</span></button>";
   h += "</div>";
-
-  /* The ladder is a reason to come back, which is meaningless before there is
-     anything to come back to. Three full days in. */
-  if (fullDays() >= 3) h += seasonHTML();
   return h;
 }
+
 
 /* The doors were always a progression track; they were just never drawn as
    one. Nothing new is being invented here - these are the same six gates. */
@@ -3248,6 +3329,8 @@ function viewDeck(){
       + " cards, sealed. They cannot turn up in a pack before then.</span></span>"
       + "<span class='at'>" + dleft + " full<br>" + (dleft === 1 ? "day" : "days") + "</span></div>";
   }
+  /* the ladder lived on Today; progression belongs with the collection */
+  if (fd >= 3) h += seasonHTML();
   return h;
 }
 
@@ -3715,6 +3798,10 @@ function render(opts){
   opts = opts || {};
   var el = document.getElementById("screen");
   var keep = opts.keepScroll ? window.scrollY : null;
+  /* Today is a scene: one viewport, no scrolling. Every other tab is a list
+     and scrolls like one. */
+  document.body.classList.toggle("scene", tab === "today");
+  closeBook();
   el.innerHTML = TABS[tab]();
   if (opts.turn){
     el.classList.remove("turn", "turn-back");
@@ -4049,6 +4136,9 @@ document.addEventListener("click", function(ev){
   if (!b) return;
   var t = today(), d = day(t), ds = b.dataset || {};
 
+  /* a row tapped inside the book closes the book, then runs as itself */
+  if (b.closest && b.closest("#book") && !ds.bookclose) closeBook();
+
   if (ds.coachskip){ coachSkip(); return; }
   if (ds.tab){ go(ds.tab); return; }
   if (ds.go){ location.href = ds.go; return; }
@@ -4148,6 +4238,8 @@ document.addEventListener("click", function(ev){
     coachStart(true);
     return;
   }
+  if (ds.bookopen){ sfx("tap"); openBook(); return; }
+  if (ds.bookclose){ closeBook(); return; }
   if (ds.reset){ askReset(); return; }
   if (b.id === "crest"){ sfx("tap"); go("deck"); return; }
   if (b.id === "chipPot"){ sfx("tap"); go("pot"); return; }
@@ -4159,6 +4251,7 @@ window.addEventListener("keydown", function(ev){
   if (ev.key !== "Escape") return;
   if (MODAL) MODAL.close(null);
   else if (document.getElementById("sheet").className) closeSheet();
+  else if (bookOpen()) closeBook();
   else if (ST) closeStage();
 });
 
@@ -4211,17 +4304,27 @@ var COACH_STEPS = [
     tap: "Keep going", tourTap: "Next",
     want: function(){ return allThree(today()); } },
 
-  { at: [".dial"],
+  { at: [".gem", ".gemwrap"],
     head: "That is a pack.",
     say: "Earned, not given. Tap it and turn the cards over yourself.",
-    tourHead: "The dial is the day.",
-    tourSay: "The outer ring is the clock, with your Malta hours marked on it and the sun where "
-           + "it actually is. The inner one fills as you tick the three. Fill it and the middle "
-           + "becomes a pack.",
+    tourHead: "The sky is the clock.",
+    tourSay: "The arc above is your whole day - midnight to midnight, noon at the top - with "
+           + "Malta's shift as the bright band and the sun riding it at now. Tick the three "
+           + "and this becomes a pack.",
     tap: "Open it", tourTap: "Got it",
     want: function(){ return !packsTotal(); } }
 ];
 var COACH = { i: -1, on: false, tour: false };
+
+function openBook(){
+  var el = document.getElementById("book");
+  el.innerHTML = bookHTML(); el.className = "on";
+}
+function closeBook(){
+  var el = document.getElementById("book");
+  if (el && el.className){ el.className = ""; el.innerHTML = ""; }
+}
+function bookOpen(){ return document.getElementById("book").className === "on"; }
 
 function coachEl(){ return document.getElementById("coach"); }
 function sheetOpen(){ return !!document.getElementById("sheet").className; }
@@ -4320,13 +4423,16 @@ function coachStart(tour){
 function coachSync(){
   if (!COACH.on) return;
   requestAnimationFrame(function(){
-    if (ST || MODAL || sheetOpen()){ coachEl().className = ""; return; }
+    if (ST || MODAL || sheetOpen() || bookOpen()){ coachEl().className = ""; return; }
     if (COACH.tour){ if (COACH.i >= 0) coachPaint(); return; }
     coachNext();
   });
 }
 
 /* ------------------------------------------------------------------- start */
+document.getElementById("book").addEventListener("click", function(ev){
+  if (ev.target === this) closeBook();
+});
 if (S.theme) document.documentElement.setAttribute("data-theme", S.theme);
 paintSky();
 render();
@@ -4339,12 +4445,8 @@ openGate();
 setInterval(function(){
   paintSky();
   if (tab !== "today" || ST || MODAL) return;
-  var dial = document.querySelector("#screen .dial");
-  if (!dial) return;
-  var t = today();
-  dial.innerHTML = dialHTML(
-    PILLARS.filter(function(g){ return pDone(t, g[0]); }).length,
-    packsTotal());
+  var sk = document.querySelector("#screen .sky");
+  if (sk) sk.innerHTML = skyHTML();
 }, 60000);
 
 /* Hold the splash for a beat, then hand over. It covers the frame where the

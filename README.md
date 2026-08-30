@@ -216,21 +216,13 @@ there is XP, the ladder until three full days. The board grows as he does.
 An existing save skips all of it: any save with days in it is treated as already
 onboarded.
 
-#### The dial
+#### The dial (since unrolled into the sky)
 
-The hero is no longer a generic progress ring. His day is set by a clock two
-continents away, so the day is drawn as a clock: twenty-four hours round the
-outside with **Malta's shift shaded onto the rim**, the three things he does on
-an inner ring, and what they pay in the middle. One object where there used to
-be four stacked blocks — a shift bar, a progress ring, a count and a claim
-button. When the third lands the whole thing lights and the centre turns gold
-and becomes the button.
-
-The hand at *now* is not a hand. It is the sun, or the moon once it has gone
-down, and the ring is turned a quarter so that **noon is at the top and midnight
-at the bottom** — which puts sunrise on the left and sunset on the right, the way
-it happens out of the window. It is the one thing on the screen that is always
-moving, and it is why the dial reads as a sky rather than a gauge.
+For two versions the hero was a 24-hour dial — Malta's shift shaded onto the
+rim, the three on an inner ring, the payout in the middle, the sun as the
+hand. It was the right idea drawn as the wrong object: a circular widget
+parked on top of a sky that was already there. The teardown (below) unrolled
+it — the arc across the sky *is* the clock now, and the payout is the gem.
 
 #### "There's still no tutorial"
 
@@ -325,6 +317,42 @@ through dusk, night and deep night, three of them twinkling (none under
 reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
+
+#### The teardown: Today became a scene
+
+He asked for a redesign from scratch three times, and got increments three
+times — each round rebuilt the worst screen, which quietly rebuilt most of
+the app, but the play screen kept its webpage bones: a header bar, a widget,
+a headline, buttons, then more page below the fold. A real mobile game's home
+screen is a scene you stand in, not a column you read down. So the column is
+gone:
+
+**One viewport, no scrolling.** Today is exactly the height of the screen.
+The sky fills it, the city stands on the horizon, and nothing is below the
+fold because there is no fold.
+
+**The sky is the instrument.** The dial is gone; its outer ring is unrolled
+across the sky — one arc from midnight to midnight with noon at the apex,
+Malta's shift drawn along it as the bright band, and the sun (the moon, once
+it is down) riding it at *now*. A widget parked on the world was still a
+widget. The world tells you the state.
+
+**The gem.** What the day pays floats in the middle: three pips, one per
+pillar in its own colour, lighting jade as each lands; all three turns it
+gold and it becomes the button that opens the pack.
+
+**The three say what they mean.** He looked at "Trained" and asked what it
+constitutes — a label without its definition is a quiz. The pillars are
+ability buttons now: a coloured disc, the label, and the definition on the
+button itself. *Trained — gym, a run, or a long walk. Family — a real talk
+with home. Stopped — ended when the shift did.* On weekends "Stopped" says
+"no shift today" instead of the jargon "carried".
+
+**Everything else is in the book.** The chips and the Also-today rows —
+bed, freezes, the gap, the place, one thing today — live behind one button,
+"Today's book", a bottom sheet where every row opens its own ask. The season
+ladder moved to the Deck, where progression belongs. The tab bar became a
+floating dock with the city showing behind it.
 
 #### The collection stopped being a filing cabinet
 
