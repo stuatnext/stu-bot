@@ -1,82 +1,92 @@
 /* ==========================================================================
-   tokens.css - the palette, the type, and the sky.
+   tokens.css - the new palette: sticker-bright.
 
-   Everything else in the game is painted with these variables. The seven
-   sky palettes are the app's identity: Daylight is lit by the actual time
-   of day, and every panel is glass over that sky.
+   Ten rounds of dark, moody and glassy kept getting the same verdict, so
+   the register flips: vivid flat skies that change with the actual hour,
+   cream card surfaces with thick ink outlines and hard shadows, and text
+   that is always either ink-on-cream or ink-on-sky. Two colour systems:
+
+     - the SKY vars (--sky1/2/3, --glow, --ink) change per phase; --ink is
+       the colour of anything written directly on the sky and flips from
+       deep ink on bright skies to cream on the night ones.
+     - the CARD vars are fixed: every panel, button, dialog and menu is the
+       same cream sticker whatever the hour, so the UI always pops.
+
+   Card surfaces re-pin the generic --ink/--line/--panel names, so every
+   rule downstream keeps working without knowing about the flip.
    ========================================================================== */
 
-/* ===================================================================== tokens
-   Night is the default and the only default. A game is a lit object in a dark
-   room; a light-mode game is a document. Light mode survives as a legibility
-   escape hatch, not as a second design. */
 :root{
-  --bg:#05060F; --bg2:#0A0E1C;
-  --panel:rgba(24,32,48,.62); --panel2:rgba(32,42,62,.58); --sunk:rgba(8,11,20,.55);
-  --line:rgba(150,180,220,.14); --line2:rgba(150,180,220,.26);
-  --ink:#EEF3F8; --ink2:#9AAAC0; --ink3:#61738C;
-  --gold:#F2B735; --gold2:#FFE38A; --goldInk:#3A2A05; --goldSoft:#2A2008;
-  --jade:#3FD9A0; --jadeSoft:#0E2C24; --jadeInk:#8FF0CB;
-  --ember:#FF7A3D; --emberSoft:#2C1710;
-  --violet:#7C6BFF; --violetSoft:#1A1636; --violetInk:#C9BEFF;
-  --crit:#FF5D5D; --critSoft:#2C1214;
+  /* fixed card system */
+  --card:#FFF9EC; --card2:#F6ECD6; --cardSunk:#EFE4CA;
+  --cardInk:#33285A; --cardInk2:#6A5F97; --cardInk3:#7F77A6;
+  --cardLine:#E7DCC2; --cardLine2:#D6C8A6;
+  --outline:#33285A;
+  --shadow:0 5px 0 #2A2148;
+  --shadowSoft:0 12px 26px rgba(42,33,72,.18);
+
+  /* accents - saturated, outlined, game-loud */
+  --gold:#FFC93C; --gold2:#FFB01F; --goldInk:#4A3305; --goldSoft:#FFEFC2;
+  --jade:#2FBF6B; --jadeSoft:#D8F5E3; --jadeInk:#0F5C31;
+  --ember:#FF6B5E; --emberSoft:#FFE1DC;
+  --violet:#7A6BFF; --violetSoft:#E6E1FF; --violetInk:#4437B8;
+  --crit:#E5484D; --critSoft:#FADCDD;
+
   --r:16px; --r2:22px;
   --tap:cubic-bezier(.2,.9,.3,1);
   --pop:cubic-bezier(.2,1.5,.4,1);
   --hud:64px;
+
+  /* generic names default to the on-sky system (night, the default phase) */
+  --panel:var(--card); --panel2:var(--card2); --sunk:var(--cardSunk);
+  --line:var(--cardLine); --line2:var(--cardLine2);
 }
-/* The escape hatch. Same structure, lifted ground, so nothing reflows. */
-:root[data-theme="light"]{
-  --bg:#EEF1F5; --bg2:#E4E9F0; --panel:#FFFFFF; --panel2:#F3F6FA; --sunk:#E1E7EF;
-  --line:#D3DCE7; --line2:#B9C6D6;
-  --ink:#0F1720; --ink2:#41505F; --ink3:#6D7D8F;
-  --gold:#B87F0A; --gold2:#8A5E05; --goldInk:#FFF6DE; --goldSoft:#FBEDCB;
-  --jade:#0E8C60; --jadeSoft:#DDF3EA; --jadeInk:#0A5C40;
-  --ember:#C4501A; --emberSoft:#FAE6DB;
-  --violet:#5442D8; --violetSoft:#E7E3FB; --violetInk:#3B2CA8;
-  --crit:#C0342F; --critSoft:#FAE0DF;
+
+/* ------------------------------------------------------------------ the sky
+   Vivid, not murky. Set by paintSky() on load and on the minute; the sun on
+   the arc and the browser chrome follow the same variables. */
+:root{
+  --sky1:#2C2A6E; --sky2:#1E1D52; --sky3:#141239; --glow:#4A3E96;
+  --ink:#F3EFFF;
+  --ink2:color-mix(in srgb, var(--ink) 76%, transparent);
+  --ink3:color-mix(in srgb, var(--ink) 55%, transparent);
+  --city:#241E52;
+}
+:root[data-sky="deepnight"]{ --sky1:#1A1B4B; --sky2:#111233; --sky3:#0B0C26; --glow:#2E2866;
+  --ink:#E9E5FA; --city:#14133A; }
+:root[data-sky="dawn"]     { --sky1:#FF9F8E; --sky2:#F76FA8; --sky3:#7B5BD6; --glow:#FFD08A;
+  --ink:#471E55; --city:#5C2E6B; }
+:root[data-sky="morning"]  { --sky1:#A5E3FF; --sky2:#7ED0FF; --sky3:#4BAEF0; --glow:#FFF0AE;
+  --ink:#1E3E68; --city:#2E5580; }
+:root[data-sky="day"]      { --sky1:#8FD9FF; --sky2:#5FBDF7; --sky3:#2E9BE8; --glow:#EAF9FF;
+  --ink:#14365E; --city:#245081; }
+:root[data-sky="gold"]     { --sky1:#FFB25E; --sky2:#FF7E5F; --sky3:#C6539B; --glow:#FFE08A;
+  --ink:#4A1D3F; --city:#6B2A50; }
+:root[data-sky="dusk"]     { --sky1:#A66BD8; --sky2:#7550C8; --sky3:#3D2E86; --glow:#FF8E9E;
+  --ink:#FFF3E8; --city:#3A2C70; }
+:root[data-sky="night"]    { --sky1:#2C2A6E; --sky2:#1E1D52; --sky3:#141239; --glow:#4A3E96;
+  --ink:#F3EFFF; --city:#241E52; }
+
+/* Every cream surface re-pins the generic names, so anything written inside
+   a card is automatically ink-on-cream whatever the sky is doing. */
+.panel,.vault,.rec,.menu,.door,.empty,.filters button,.rail button,.btn,
+#modal .mw,#toast,#coach .say,#nav,.chip,.season{
+  --ink:var(--cardInk); --ink2:var(--cardInk2); --ink3:var(--cardInk3);
+  --line:var(--cardLine); --line2:var(--cardLine2);
+  --panel:var(--card); --panel2:var(--card2); --sunk:var(--cardSunk);
 }
 
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-/* A display value in a class beats the user-agent [hidden] rule, so hiding a
-   flex element by attribute silently does nothing. This is why the two zeroed
-   currency chips kept showing after they were told to hide. */
 [hidden]{display:none !important}
 html{-webkit-text-size-adjust:100%; text-size-adjust:100%; height:100%}
-/* ===================================================================== the sky
-   The app is called Daylight and it was painted the colour of a bank. The
-   games people call beautiful - Alto's Odyssey, Monument Valley - get it from
-   atmosphere and confident colour rather than ornament, and Alto's whole
-   palette moves with the time of day. His day IS the subject, so the sky
-   behind everything is the actual hour in the place he is standing.
-
-   It stays dark at every hour: he opens this thing at eleven at night, so
-   night is the room it lives in and the rest are moods of it. Set by
-   paintSky() on load and on the minute. */
-:root{
-  --sky1:#05060E; --sky2:#0C1226; --sky3:#191634; --glow:#2A2350;
-  --skyInk:#EEF2F8;
-}
-:root[data-sky="deepnight"]{ --sky1:#04050E; --sky2:#0A0F22; --sky3:#141636; --glow:#262052; }
-:root[data-sky="dawn"]    { --sky1:#0A0B1E; --sky2:#2A1738; --sky3:#171A3E; --glow:#8C3B4E; }
-:root[data-sky="morning"] { --sky1:#06111C; --sky2:#0F2C3A; --sky3:#123048; --glow:#2C7C78; }
-:root[data-sky="day"]     { --sky1:#07161F; --sky2:#10394A; --sky3:#123A58; --glow:#2E8F84; }
-:root[data-sky="gold"]    { --sky1:#150D14; --sky2:#3A1C22; --sky3:#2A1430; --glow:#B4632A; }
-:root[data-sky="dusk"]    { --sky1:#08071A; --sky2:#241435; --sky3:#1A1440; --glow:#7A2E58; }
-:root[data-sky="night"]   { --sky1:#050614; --sky2:#0D1330; --sky3:#181542; --glow:#382E70; }
 
 html{background:var(--sky1)}
 body{
   margin:0; min-height:100%;
-  background-color:var(--sky1);   /* under the gradients: no white past the fold */
-  /* Three layers, the way a sky actually stacks: a band of light sitting on
-     the horizon, a wash coming down from the zenith, and the body of the sky
-     between them. The horizon used to be centred a screen-and-a-bit below the
-     bottom edge, which meant golden hour arrived as a brown rectangle. */
+  background-color:var(--sky1);
   background:
-    radial-gradient(125% 40% at 50% 99%, var(--glow) 0%, transparent 72%),
-    radial-gradient(120% 54% at 50% -12%, var(--sky3) 0%, transparent 68%),
-    linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 56%, var(--sky1) 100%);
+    radial-gradient(130% 42% at 50% 100%, var(--glow) 0%, transparent 74%),
+    linear-gradient(180deg, var(--sky3) 0%, var(--sky2) 42%, var(--sky1) 100%);
   background-attachment:fixed;
   color:var(--ink);
   font-family:"Instrument Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -84,35 +94,22 @@ body{
   overscroll-behavior-y:none;
   transition:background 1.6s linear;
 }
-/* Grain. A flat gradient reads as a CSS gradient; a grained one reads as air.
-   One inline SVG turbulence, no request, invisible until you look for it. */
-body::before{
-  content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.055;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-}
 #hud,#screen,#nav{position:relative; z-index:1}
 #nav{position:fixed}
 
-/* Today is one viewport, no scrolling; the HUD sits on the sky as glass-free
-   furniture rather than a bar */
+/* Today is one viewport, no scrolling */
 body.scene{height:100dvh; overflow:hidden; display:flex; flex-direction:column}
-body.scene #hud{background:none; backdrop-filter:none; -webkit-backdrop-filter:none}
 body.scene #screen{flex:1; min-height:0; display:flex; flex-direction:column;
   overflow:hidden; padding:0 16px calc(96px + env(safe-area-inset-bottom)); width:100%}
 
-/* the horizon: fixed to the bottom of the viewport, behind every screen */
-/* The nav is 71px of glass at the bottom; the city stands on top of it, not
-   behind it, or the whole horizon disappears under the tab bar. */
+/* the city on the horizon: one bold flat silhouette in the phase's own tone */
 #scene{position:fixed; left:0; right:0;
   bottom:calc(26px + env(safe-area-inset-bottom, 0px));
   z-index:0; pointer-events:none}
 #scene svg{display:block; width:100%; height:clamp(104px,17vh,150px)}
-#scene .far{fill:color-mix(in srgb, var(--sky2) 52%, var(--sky1)); opacity:.9;
-  transition:fill 1.6s linear}
-#scene .near,#scene .neardot{fill:color-mix(in srgb, var(--sky1) 58%, #010208);
-  transition:fill 1.6s linear}
-#scene .wire{stroke:color-mix(in srgb, var(--sky1) 58%, #010208);
-  transition:stroke 1.6s linear}
+#scene .far{fill:var(--city); opacity:.45; transition:fill 1.6s linear}
+#scene .near,#scene .neardot{fill:var(--city); transition:fill 1.6s linear}
+#scene .wire{stroke:var(--city); transition:stroke 1.6s linear}
 
 /* stars, when the sky has them */
 #stars{position:fixed; left:0; top:0; right:0; height:58vh; z-index:0;
@@ -121,24 +118,22 @@ body.scene #screen{flex:1; min-height:0; display:flex; flex-direction:column;
   mask-image:linear-gradient(180deg,#000 55%,transparent)}
 #stars svg{width:100%; height:100%}
 :root[data-sky="deepnight"] #stars{opacity:.95}
-:root[data-sky="night"] #stars{opacity:.8}
-:root[data-sky="dusk"] #stars{opacity:.45}
-:root[data-sky="dawn"] #stars{opacity:.28}
+:root[data-sky="night"] #stars{opacity:.85}
+:root[data-sky="dusk"] #stars{opacity:.4}
 #stars .tw{animation:tw 3.4s ease-in-out infinite}
 #stars .tw2{animation:tw 4.7s ease-in-out 1.2s infinite}
 @keyframes tw{0%,100%{opacity:1} 50%{opacity:.25}}
 @media (prefers-reduced-motion:reduce){ #stars .tw,#stars .tw2{animation:none} }
+
 .mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums}
 .disp{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800; letter-spacing:-.03em}
 .zh{font-family:"PingFang SC","Hiragino Sans GB","Noto Sans CJK SC","Source Han Sans SC",
     "Microsoft YaHei",sans-serif}
 h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif; margin:0; letter-spacing:-.025em;
   text-wrap:balance}
-h2{font-size:13px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--ink3);
+h2{font-size:13px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--ink2);
   margin:26px 2px 10px}
 h3{font-size:16.5px; font-weight:700}
 p{margin:9px 0}
 a{color:var(--violetInk)}
 .dim{color:var(--ink3); font-size:13px}
-.muted{color:var(--ink2); font-size:14px}
-:focus-visible{outline:2px solid var(--gold); outline-offset:3px; border-radius:8px}

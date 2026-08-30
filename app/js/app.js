@@ -64,7 +64,6 @@ function setBadge(tab, n, pulse){
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewToday, cards: viewDeck, you: viewYou };
 var tab = "today";
-function isLight(){ return document.documentElement.getAttribute("data-theme") === "light"; }
 
 function render(opts){
   opts = opts || {};
@@ -123,13 +122,6 @@ document.addEventListener("click", function(ev){
     S.mute = !S.mute; save(); if (!S.mute) sfx("done");
     render({ keepScroll: true }); return;
   }
-  if (ds.theme){
-    var nx = isLight() ? null : "light";
-    if (nx) document.documentElement.setAttribute("data-theme", nx);
-    else document.documentElement.removeAttribute("data-theme");
-    S.theme = nx; save(); sfx("tap");
-    render({ keepScroll: true }); return;
-  }
   if (ds.replay){
     sfx("tap");
     tab = "today"; render();
@@ -184,7 +176,6 @@ function graduate(){
 }
 
 /* ------------------------------------------------------------------- start */
-if (S.theme) document.documentElement.setAttribute("data-theme", S.theme);
 paintSky();
 render({ first: true });
 paintHud();
