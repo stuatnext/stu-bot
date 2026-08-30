@@ -318,6 +318,30 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v11: a world, and someone living in it
+
+With delivery fixed, the deeper verdict still stood: every version had been
+the same five nouns rearranged - sun-on-arc, a pack box, three labelled
+circles, a skyline, a dock. Recoloured, recomposed, still the same
+furniture. What separates an app with game styling from a game is that a
+game has a world with someone in it.
+
+**The buddy.** A small round fellow in a coral tee and a sun cap. He
+breathes while he waits, hops along the path to whichever place is tapped
+(the state saves first; the walk is presentation), and cheers with his arms
+up when the day lands. The speech bubble is his now - the app stops
+narrating and the character talks.
+
+**Places, not circles.** Trained is a blue-awning gym kiosk, Family is a
+rose phone booth, Stopped is the office - whose windows go dark when he has
+actually stopped. Done pops a jade tick over the building; a no-shift day
+greys the office out.
+
+**Ground and weather.** Rolling hill bands the path winds through, tinted
+by the hour - green under a blue sky, dusky at golden hour, near-ink at
+night; outlined clouds drift while the sky is light; the chest sits on a
+grass knoll. The city and the stars stay.
+
 #### v10: the round where nothing was redesigned
 
 He reviewed v8 and said only the colours changed; he reviewed v9 and called

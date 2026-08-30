@@ -47,17 +47,24 @@ body.scene .sky{padding:0 16px}
 .tpath path{fill:none; stroke:color-mix(in srgb, var(--ink) 38%, transparent);
   stroke-width:4; stroke-linecap:round; stroke-dasharray:.5 12}
 
-/* a stop on the trail */
+/* a place on the trail */
 .pil.node{position:absolute; transform:translate(-50%,-50%); border:0; padding:0;
   background:none; font:inherit; cursor:pointer; display:flex; flex-direction:column;
-  align-items:center; gap:7px; width:120px}
-.pil .disc{width:74px; height:74px; border-radius:50%; display:flex; align-items:center;
-  justify-content:center; transition:all .28s var(--pop);
-  background:var(--pil);
-  box-shadow:0 0 0 3.5px var(--outline), 0 6px 0 #2A2148,
-    0 0 0 7px color-mix(in srgb,#FFFFFF 24%, transparent) inset}
-.pil:active .disc{transform:translateY(4px); box-shadow:0 0 0 3.5px var(--outline), 0 2px 0 #2A2148}
-.pil .disc svg{color:#FFFFFF; filter:drop-shadow(0 2px 0 rgba(42,33,72,.35))}
+  align-items:center; gap:5px; width:124px}
+.prop{position:relative; width:96px; height:100px;
+  filter:drop-shadow(0 5px 0 rgba(42,33,72,.32));
+  transition:transform .14s var(--tap)}
+.prop svg{width:100%; height:100%; display:block}
+.pil:active .prop{transform:translateY(4px)}
+.pil.pop .prop{animation:qpop .45s var(--pop)}
+.tickb{position:absolute; top:-4px; right:2px; width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--jade); color:#FFFFFF; border:3px solid var(--outline);
+  animation:tickpop .4s var(--pop) both}
+@keyframes tickpop{from{transform:scale(0)}to{transform:scale(1)}}
+/* the office window goes dark once he has stopped */
+.pil.on .win{fill:#4A4370}
+.pil.carried .prop{opacity:.55; filter:grayscale(.35) drop-shadow(0 4px 0 rgba(42,33,72,.25))}
 .pil .nlb{display:flex; flex-direction:column; align-items:center; gap:1px;
   background:var(--card); color:var(--cardInk); border:2.5px solid var(--outline);
   border-radius:12px; padding:4px 10px 5px; box-shadow:0 3px 0 #2A2148;
@@ -65,13 +72,7 @@ body.scene .sky{padding:0 16px}
 .pil .nlb b{font-family:"Bricolage Grotesque",system-ui,sans-serif; font-weight:800;
   font-size:13.5px; letter-spacing:-.01em; line-height:1.15}
 .pil .nlb span{font-size:9.5px; font-weight:600; color:var(--cardInk2); line-height:1.25}
-.pil.on .disc{background:var(--jade)}
 .pil.on .nlb{background:var(--jadeSoft)}
-.pil.carried .disc{background:color-mix(in srgb, var(--pil) 28%, #9A93B5);
-  box-shadow:0 0 0 3.5px color-mix(in srgb, var(--outline) 45%, transparent),
-    0 5px 0 rgba(42,33,72,.35)}
-.pil.carried .disc svg{opacity:.75}
-.pil.pop .disc{animation:qpop .45s var(--pop)}
 
 /* the chest at the end */
 .gem{position:absolute; transform:translate(-50%,-50%); display:flex; flex-direction:column;
@@ -79,6 +80,11 @@ body.scene .sky{padding:0 16px}
   color:var(--ink); width:130px}
 button.gem{cursor:pointer}
 button.gem:active .gcore{transform:translateY(4px); box-shadow:0 2px 0 #2A2148}
+.gem::before{content:""; position:absolute; left:50%; bottom:8px; width:118px; height:30px;
+  transform:translateX(-50%); border-radius:50%; z-index:-1;
+  background:color-mix(in srgb, var(--sky1) 40%, #74C46A);
+  border:3px solid color-mix(in srgb, var(--outline) 55%, transparent);
+  transition:background 1.6s linear}
 .gem .gcore{position:relative; width:84px; height:84px; border-radius:26px;
   display:flex; align-items:center; justify-content:center; color:var(--cardInk3);
   border:3.5px solid color-mix(in srgb, var(--ink) 55%, transparent);
@@ -102,15 +108,21 @@ button.gem:active .gcore{transform:translateY(4px); box-shadow:0 2px 0 #2A2148}
 .gem .dcount i{font-style:normal}
 .gem.won .dcount{background:var(--gold); color:var(--goldInk)}
 
-/* the walker: standing at the next thing to do */
-.walker{position:absolute; transform:translate(-50%,-100%); margin-top:-46px;
-  width:34px; height:38px; display:flex; align-items:center; justify-content:center;
-  z-index:3; filter:drop-shadow(0 3px 0 rgba(42,33,72,.35));
-  animation:walkerbob 2.2s ease-in-out infinite; pointer-events:none}
-.walker svg{width:100%; height:100%; display:block}
-@keyframes walkerbob{0%,100%{transform:translate(-50%,-100%) translateY(0)}
-  50%{transform:translate(-50%,-100%) translateY(-7px)}}
-@media (prefers-reduced-motion:reduce){ .walker{animation:none} }
+/* the buddy, alive in the scene */
+.buddy{position:absolute; transform:translate(-50%,-96%); width:46px; height:60px;
+  z-index:3; pointer-events:none;
+  filter:drop-shadow(0 3px 0 rgba(42,33,72,.3))}
+.buddy svg{width:100%; height:100%; display:block; transform-origin:50% 100%;
+  animation:breathe 3.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.035) translateY(-1px)}}
+.buddy.cheer svg{animation:cheer 1.4s var(--pop) infinite}
+@keyframes cheer{0%,100%{transform:translateY(0)}28%{transform:translateY(-12px) rotate(-4deg)}
+  46%{transform:translateY(0)}64%{transform:translateY(-7px) rotate(3deg)}80%{transform:translateY(0)}}
+.buddy.cheer .b-armL{transform:rotate(38deg); transform-origin:17px 46px}
+.buddy.cheer .b-armR{transform:rotate(-38deg); transform-origin:43px 46px}
+.buddy.hop svg{animation:hop .55s var(--pop)}
+@keyframes hop{0%{transform:translateY(0)}45%{transform:translateY(-14px)}100%{transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){ .buddy svg,.buddy.cheer svg{animation:none} }
 
 /* the speech bubble beside him */
 .bubble{position:absolute; z-index:4; width:max-content; max-width:210px;
@@ -150,11 +162,11 @@ button.gem:active .gcore{transform:translateY(4px); box-shadow:0 2px 0 #2A2148}
 #screen.arrive .gem{opacity:0; animation:chestdrop .55s var(--pop) both .72s}
 @keyframes chestdrop{from{opacity:0; transform:translate(-50%,-70%)}
   to{opacity:1; transform:translate(-50%,-50%)}}
-#screen.arrive .walker,#screen.arrive .bubble{opacity:0; animation:fadein .4s ease both .95s}
+#screen.arrive .buddy,#screen.arrive .bubble{opacity:0; animation:fadein .4s ease both .95s}
 @media (prefers-reduced-motion:reduce){
   #screen.arrive .sky .arc,#screen.arrive .sky .band,#screen.arrive .sky .orb,
   #screen.arrive .sky .ray,#screen.arrive .sky .cut,#screen.arrive .tpath,
-  #screen.arrive .pil.node,#screen.arrive .gem,#screen.arrive .walker,
+  #screen.arrive .pil.node,#screen.arrive .gem,#screen.arrive .buddy,
   #screen.arrive .bubble{animation:none !important; opacity:1}
 }
 
@@ -168,3 +180,29 @@ button.gem:active .gcore{transform:translateY(4px); box-shadow:0 2px 0 #2A2148}
 }
 
 .bubble.sr{position:absolute; left:-9999px; top:0; transform:none; box-shadow:none}
+
+
+/* ------------------------------------------------------------- the ground
+   Rolling bands the path runs through, tinted by the hour: greener under a
+   blue sky, dusky under gold, near-ink at night. */
+.ground{position:absolute; inset:0; width:100%; height:100%; z-index:0}
+.ground path{transition:fill 1.6s linear}
+.ground .g2{fill:color-mix(in srgb, var(--sky1) 62%, #4E9E5C); opacity:.55}
+.ground .g1{fill:color-mix(in srgb, var(--sky1) 48%, #63B863); opacity:.75}
+.ground .g0{fill:color-mix(in srgb, var(--sky1) 38%, #74C46A)}
+.tpath{z-index:1}
+.pil.node,.gem,.buddy,.bubble{z-index:2}
+.buddy{z-index:3}
+.bubble{z-index:4}
+
+/* clouds, while the sky is light */
+.cloud{position:absolute; width:86px; opacity:0; transition:opacity 1.6s linear;
+  pointer-events:none; filter:drop-shadow(0 4px 0 rgba(42,33,72,.18))}
+.cloud svg{width:100%; height:auto; display:block}
+.cloud.c1{left:6%; top:14%; animation:drift 34s ease-in-out infinite alternate}
+.cloud.c2{right:5%; top:46%; width:64px; animation:drift 26s ease-in-out infinite alternate -8s}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(26px)}}
+:root[data-sky="dawn"] .cloud, :root[data-sky="morning"] .cloud,
+:root[data-sky="day"] .cloud, :root[data-sky="gold"] .cloud{opacity:1}
+:root[data-sky="dusk"] .cloud{opacity:.4}
+@media (prefers-reduced-motion:reduce){ .cloud{animation:none} }
