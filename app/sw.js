@@ -1,10 +1,16 @@
 /* Daylight, offline.
 
-   The shell is cache-first because fonts and code do not change within a
-   version; HTML is network-first with a cache fallback so a push to Pages
-   lands on the next open. Bump VERSION with every release - old caches are
-   dropped on activate. */
-var VERSION = "daylight-v7";
+   LESSON LEARNED THE HARD WAY: this file shipped two full redesigns without
+   its VERSION changing, so returning browsers kept serving the old design
+   from cache-first CSS/JS forever - the owner reviewed a three-round-old
+   build twice and was told he was looking at new work. Never again:
+
+   - Everything same-origin is NETWORK-FIRST now. The cache exists so the
+     game still opens on a plane, not to save requests. One player, tiny
+     files: freshness wins.
+   - VERSION changes with every release, and the build number is painted on
+     the title card and the You screen so what the phone runs is visible. */
+var VERSION = "daylight-v10";
 var SHELL = [
   "./", "./index.html",
   "./css/tokens.css", "./css/shell.css", "./css/scene.css",
@@ -34,19 +40,18 @@ self.addEventListener("activate", function(e){
 });
 self.addEventListener("fetch", function(e){
   if (e.request.method !== "GET") return;
-  var isHTML = e.request.mode === "navigate"
-    || (e.request.headers.get("accept") || "").indexOf("text/html") >= 0;
-  if (isHTML){
-    e.respondWith(
-      fetch(e.request).then(function(r){
+  var url = new URL(e.request.url);
+  if (url.origin !== location.origin) return;
+  e.respondWith(
+    fetch(e.request).then(function(r){
+      if (r && r.ok){
         var copy = r.clone();
         caches.open(VERSION).then(function(c){ c.put(e.request, copy); });
-        return r;
-      }).catch(function(){ return caches.match(e.request); })
-    );
-    return;
-  }
-  e.respondWith(
-    caches.match(e.request).then(function(hit){ return hit || fetch(e.request); })
+      }
+      return r;
+    }).catch(function(){
+      /* offline: the cache answers, ignoring any ?v= cache-buster */
+      return caches.match(e.request, { ignoreSearch: true });
+    })
   );
 });

@@ -318,6 +318,30 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v10: the round where nothing was redesigned
+
+He reviewed v8 and said only the colours changed; he reviewed v9 and called
+it mild layout changes - while the builds on `main` were unrecognisable from
+one another. The explanation was not taste. `sw.js` carries the comment
+"Bump VERSION with every release" and it read `daylight-v7` through both
+redesigns: his browser's service worker served CSS and JS cache-first by
+URL, the URLs never changed, `sw.js` itself never changed, so **his phone
+kept rendering the three-round-old build while being told it was new work.**
+
+So v10 ships no design at all. It ships delivery:
+
+- the service worker is **network-first for everything** (the cache exists
+  so the game opens on a plane, not to save requests - one player, tiny
+  files, freshness wins);
+- every asset URL carries a **`?v=` build stamp**, so even a stale
+  cache-first worker misses its cache on the very next page load;
+- the **build number is painted on the title card** (bottom-right) and at
+  the foot of You - what the phone is running is now visible, to him and
+  to whoever ships the next round.
+
+The rule for every future release: bump `VERSION` in `sw.js`, bump the
+`?v=` stamp, bump `BUILD` in `app.js`. Three places, one number.
+
 #### v9: the layout restarts too
 
 v8 changed the paint and kept the body: header bar, arc, centred thing,
