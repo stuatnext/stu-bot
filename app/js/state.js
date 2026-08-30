@@ -18,7 +18,7 @@ function load(){
   var d = { camp:"Singapore", wake:"08:30", bed:"23:45", done:{}, skip:{}, filter:0,
             days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, openedDay:0, openedStreak:0,
             theme:null, mute:false, rate:0, spends:[], freezes:{},
-            crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0 };
+            crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0 };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }

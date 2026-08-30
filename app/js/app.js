@@ -60,7 +60,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v12";
+var BUILD = "v13";
 
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewToday, cards: viewDeck, you: viewYou };
@@ -110,6 +110,7 @@ document.addEventListener("click", function(ev){
   if (ds.pack){ sfx("tap"); openStage(ds.pack); return; }
   if (ds.set){ DECKSET = ds.set; DECKFILTER = 0; sfx("tap"); render({ keepScroll: true }); return; }
   if (ds.df !== undefined){ DECKFILTER = Number(ds.df); sfx("tap"); render({ keepScroll: true }); return; }
+  if (ds.cardswhy){ S.cardsWhy = 1; save(); sfx("done"); render({ keepScroll: true }); return; }
   if (ds.card){ openSheet(ds.card); return; }
   if (ds.craftit){ closeSheet(); askCraftOne(ds.craftit); return; }
   if (ds.craft){ askCraft(ds.craft); return; }

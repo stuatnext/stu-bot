@@ -19,6 +19,21 @@ var DECKSET = null, DECKFILTER = 0;   /* 0 all, 1 missing, 2 held */
 function viewDeck(){
   var fd = fullDays(), w = packsWaiting(), h = "";
 
+  /* He asked, reasonably, what the cards actually do. The answer belongs on
+     the screen, once, dismissible - not in a chat thread. */
+  if (!S.cardsWhy){
+    h += "<div class='panel whycards'><h3>What cards are</h3>"
+      + "<p>Souvenirs of your Singapore year \u2014 real dishes, places, phrases and "
+      + "milestones. They do nothing except get collected, which is the point: full days "
+      + "earn packs, duplicates melt into spares, spares make cards you are missing, and "
+      + "finishing a set pays the pot.</p>"
+      + "<p>Two exceptions: the <strong>Mandarin</strong> set is real vocabulary \u2014 the "
+      + "character, its tone drawn underneath, your own mnemonic on the back. And "
+      + "<strong>Trophies</strong> are never in packs: you claim one yourself when the real "
+      + "thing happens.</p>"
+      + "<div class='btns tight'><button class='btn pri' data-cardswhy='1'>Got it</button></div></div>";
+  }
+
   /* packs first, because that is what he came for */
   if (w.streak || w.day){
     h += "<div style='display:flex;gap:11px;justify-content:center;margin:8px 0 4px'>";

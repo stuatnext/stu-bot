@@ -106,150 +106,21 @@ function toneArt(pinyin, hanzi){
    are identical and every card still reads as belonging somewhere.
    Memoised: this used to regenerate 5,144 SVG nodes on every single render. */
 var ART_CACHE = {};
+/* The face. "Plus they're ugly" ended the generated-squiggle era: every card
+   now wears one big glyph from the platform's own emoji set - drawn by
+   professionals, familiar at a glance, zero bytes shipped - over the tint
+   hashed from its name. Mandarin keeps the character as the face, with its
+   tone drawn underneath, because there the face is also the lesson. */
 function cardArt(c){
   if (ART_CACHE[c[0]]) return ART_CACHE[c[0]];
-  var h = hashOf(c[0]), k = c[2];
-  var a = h % 97, b = (h >>> 7) % 89, d = (h >>> 13) % 73;
-  var o = "<svg viewBox='0 0 100 100' preserveAspectRatio='xMidYMid meet' aria-hidden='true'>";
-  o += backdrop(h);
-
-  /* Mandarin: the character is the picture, and the tone is drawn under it. */
-  if (k === "zh"){
-    o += toneArt(c[0], c[4]);
-    o += "</svg>";
-    return (ART_CACHE[c[0]] = o);
-  }
-
-  var tx = ((h >>> 3) % 11) - 5, ty = ((h >>> 9) % 11) - 5;
-  var rot = ((h >>> 17) % 13) - 6, sc = (0.82 + ((h >>> 21) % 18) / 100).toFixed(2);
-  o += "<g transform='translate(" + (50 + tx) + " " + (50 + ty) + ") rotate(" + rot
-     + ") scale(" + sc + ") translate(-50 -50)'>";
-  var S1 = "stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'";
-  var i, x, y;
-
-  if (k === "hawk"){
-    o += "<path " + S1 + " stroke-width='2.4' opacity='.85' d='M16 58 Q50 " + (86 + a % 7) + " 84 58 Z'/>";
-    o += "<path " + S1 + " stroke-width='1.8' opacity='.5' d='M16 58 h68'/>";
-    for (i = 0; i < 3; i++){
-      x = 34 + i * 16;
-      o += "<path " + S1 + " stroke-width='1.9' opacity='" + (.5 - i * .08) + "' d='M" + x + " 44 q" +
-        (6 - (a + i * 5) % 11) + " -8 0 -15 q" + ((b + i * 7) % 11 - 5) + " -7 0 -13'/>";
-    }
-  } else if (k === "kopi"){
-    o += "<circle " + S1 + " stroke-width='2.4' opacity='.8' cx='50' cy='52' r='" + (25 + a % 5) + "'/>";
-    o += "<circle " + S1 + " stroke-width='1.5' opacity='.5' cx='50' cy='52' r='" + (17 + b % 5) + "'/>";
-    o += "<circle " + S1 + " stroke-width='1.1' opacity='.32' cx='" + (26 + a % 9) + "' cy='" +
-      (24 + b % 9) + "' r='" + (8 + d % 6) + "'/>";
-    o += "<path " + S1 + " stroke-width='2' opacity='.55' d='M75 44 q11 3 11 11 t-11 11'/>";
-  } else if (k === "slang"){
-    o += "<rect " + S1 + " stroke-width='2.3' opacity='.8' x='14' y='22' rx='9' width='" +
-      (52 + a % 14) + "' height='30'/>";
-    o += "<path " + S1 + " stroke-width='2.3' opacity='.8' d='M26 52 l-3 12 l13 -12'/>";
-    o += "<rect " + S1 + " stroke-width='1.8' opacity='.42' x='" + (34 + b % 10) +
-      "' y='62' rx='7' width='" + (38 + d % 12) + "' height='22'/>";
-  } else if (k === "every"){
-    for (i = 0; i < 20; i++){
-      x = 20 + (i % 5) * 14; y = 24 + Math.floor(i / 5) * 14;
-      var lit = ((h >>> i) & 1) === 1;
-      o += "<rect x='" + x + "' y='" + y + "' width='9' height='10' rx='1.5' " +
-        (lit ? "fill='currentColor' opacity='.42'" : "fill='none' stroke='currentColor' stroke-width='1.3' opacity='.4'") + "/>";
-    }
-  } else if (k === "herit"){
-    for (i = 0; i < 3; i++){
-      x = 20 + i * 22;
-      o += "<path " + S1 + " stroke-width='2.1' opacity='.75' d='M" + x + " 74 v-22 a10 10 0 0 1 20 0 v22'/>";
-    }
-    o += "<path " + S1 + " stroke-width='2.4' opacity='.85' d='M12 74 h76'/>";
-    o += "<path " + S1 + " stroke-width='2' opacity='.55' d='M14 34 l36 -" + (14 + a % 8) + " l36 " + (14 + a % 8) + "'/>";
-  } else if (k === "green"){
-    for (i = 0; i < 5; i++){
-      x = 22 + ((h >>> (i * 3)) % 56); y = 30 + ((h >>> (i * 5)) % 42);
-      o += "<path " + S1 + " stroke-width='1.9' opacity='" + (.34 + (i % 3) * .14) +
-        "' d='M" + x + " " + y + " q" + (9 + i) + " -" + (13 + i * 2) + " " + (18 + i * 2) + " 0 q-" +
-        (9 + i) + " " + (13 + i * 2) + " -" + (18 + i * 2) + " 0 Z'/>";
-    }
-  } else if (k === "isles"){
-    o += "<path " + S1 + " stroke-width='2.2' opacity='.7' d='M22 44 q10 -12 22 -4 q11 7 26 1 q8 -3 10 5 l-2 16 h-56 Z'/>";
-    for (i = 0; i < 4; i++){
-      y = 68 + i * 8;
-      o += "<path " + S1 + " stroke-width='1.7' opacity='" + (.5 - i * .09) + "' d='M8 " + y + " q11 -5 22 0 t22 0 t22 0 t22 0'/>";
-    }
-  } else if (k === "region"){
-    o += "<path " + S1 + " stroke-width='1.9' opacity='.55' stroke-dasharray='4 5' d='M16 74 Q50 " +
-      (14 + a % 14) + " 84 44'/>";
-    o += "<circle cx='16' cy='74' r='4' fill='currentColor' opacity='.7'/>";
-    o += "<path d='M84 44 l-11 5 l3 -6 l-3 -6 Z' fill='currentColor' opacity='.75'/>";
-    o += "<circle " + S1 + " stroke-width='1.4' opacity='.3' cx='50' cy='52' r='" + (30 + b % 7) + "'/>";
-  } else if (k === "road"){
-    var px = 14, py = 78, path = "M14 78";
-    for (i = 0; i < 4; i++){
-      px = 14 + (i + 1) * 18; py = 78 - (i + 1) * 12 + ((h >>> (i * 4)) % 13) - 6;
-      path += " L" + px + " " + py;
-    }
-    o += "<path " + S1 + " stroke-width='2.3' opacity='.7' d='" + path + "'/>";
-    for (i = 0; i < 5; i++){
-      o += "<circle cx='" + (14 + i * 18) + "' cy='" + (78 - i * 12 + (i ? ((h >>> ((i - 1) * 4)) % 13) - 6 : 0)) +
-        "' r='" + (i === 4 ? 4.5 : 3) + "' fill='currentColor' opacity='" + (i === 4 ? .8 : .45) + "'/>";
-    }
-  } else if (k === "home"){
-    o += "<path " + S1 + " stroke-width='2.4' opacity='.8' d='M22 76 v-26 l28 -18 l28 18 v26'/>";
-    o += "<rect " + S1 + " stroke-width='1.9' opacity='.5' x='42' y='58' width='16' height='18'/>";
-    for (i = 0; i < 7; i++){
-      x = 12 + i * 12 + (h >>> i) % 6;
-      o += "<path " + S1 + " stroke-width='1.5' opacity='.3' d='M" + x + " " + (10 + (i * 5) % 14) +
-        " l-3 " + (9 + i % 5) + "'/>";
-    }
-  } else if (k === "bean"){
-    o += "<path " + S1 + " stroke-width='2.3' opacity='.8' d='M30 26 h40 l-9 22 h-22 Z'/>";
-    o += "<path " + S1 + " stroke-width='1.6' opacity='.45' d='M50 48 v" + (10 + a % 7) + "'/>";
-    o += "<path " + S1 + " stroke-width='2.3' opacity='.75' d='M32 66 h30 a4 4 0 0 1 0 -0 v10 " +
-      "a8 8 0 0 1 -8 8 h-14 a8 8 0 0 1 -8 -8 Z'/>";
-    o += "<path " + S1 + " stroke-width='1.9' opacity='.5' d='M62 68 q9 2 9 8 t-9 8'/>";
-    o += "<ellipse " + S1 + " stroke-width='1.6' opacity='.4' cx='" + (22 + b % 10) + "' cy='" +
-      (34 + d % 10) + "' rx='7' ry='4.5' transform='rotate(-28 " + (22 + b % 10) + " " + (34 + d % 10) + ")'/>";
-  } else if (k === "deep"){
-    o += "<path " + S1 + " stroke-width='2.2' opacity='.8' d='M38 30 h24 M50 30 v6'/>";
-    o += "<ellipse " + S1 + " stroke-width='2.4' opacity='.8' cx='50' cy='54' rx='" +
-      (17 + a % 5) + "' ry='18'/>";
-    for (i = 0; i < 3; i++)
-      o += "<path " + S1 + " stroke-width='1.3' opacity='.34' d='M" + (43 + i * 7) + " 37 v34'/>";
-    o += "<path " + S1 + " stroke-width='2' opacity='.6' d='M50 72 v" + (8 + b % 8) + "'/>";
-  } else if (k === "sheff"){
-    o += "<path " + S1 + " stroke-width='2.3' opacity='.75' d='M6 70 q18 -" + (18 + a % 10) +
-      " 34 -4 q16 -" + (14 + b % 9) + " 30 2 q12 5 24 -2'/>";
-    o += "<path " + S1 + " stroke-width='1.8' opacity='.45' d='M6 82 q22 -12 42 -3 q18 8 46 -4'/>";
-    o += "<path " + S1 + " stroke-width='2.1' opacity='.7' d='M" + (36 + d % 14) + " 62 v-12 h12 v12'/>";
-    o += "<path " + S1 + " stroke-width='1.6' opacity='.4' d='M" + (40 + d % 14) + " 50 v-9'/>";
-  } else if (k === "post"){
-    o += "<path " + S1 + " stroke-width='2.3' opacity='.8' d='M28 20 h34 l12 12 v48 h-46 Z'/>";
-    o += "<path " + S1 + " stroke-width='1.8' opacity='.5' d='M62 20 v12 h12'/>";
-    for (i = 0; i < 5; i++)
-      o += "<path " + S1 + " stroke-width='1.5' opacity='" + (.42 - i * .05) +
-        "' d='M35 " + (44 + i * 8) + " h" + (20 + ((h >>> (i * 3)) % 22)) + "'/>";
-  } else if (k === "sug"){
-    for (i = 0; i < 4; i++){
-      var bh = 12 + i * 13 + ((h >>> (i * 4)) % 9);
-      o += "<rect " + S1 + " stroke-width='2' opacity='" + (.42 + i * .12) + "' x='" + (20 + i * 16) +
-        "' y='" + (78 - bh) + "' width='11' height='" + bh + "'/>";
-    }
-    o += "<path " + S1 + " stroke-width='2.2' opacity='.75' d='M18 " + (52 + a % 8) + " L82 22'/>";
-    o += "<path d='M82 22 l-12 1 l7 6 Z' fill='currentColor' opacity='.75'/>";
-  } else if (k === "mkt"){
-    o += "<path " + S1 + " stroke-width='1.5' opacity='.4' stroke-dasharray='5 5' d='M12 50 h76'/>";
-    o += "<path " + S1 + " stroke-width='2.4' opacity='.8' d='M14 74 q18 2 26 -12 q9 -15 20 -4 q10 10 26 -30'/>";
-    o += "<circle cx='" + (60 + a % 12) + "' cy='" + (30 + b % 14) + "' r='4.5' fill='currentColor' opacity='.75'/>";
-    o += "<path " + S1 + " stroke-width='1.4' opacity='.32' d='M28 18 v64 M72 18 v64'/>";
+  var o;
+  if (c[2] === "zh"){
+    o = toneArt(c[0], c[4]);
   } else {
-    for (i = 0; i < 8; i++){
-      var ang = i * 45 + (a % 20);
-      var rad = ang * Math.PI / 180;
-      o += "<path " + S1 + " stroke-width='2' opacity='.6' d='M50 50 L" +
-        (50 + Math.cos(rad) * 34).toFixed(1) + " " + (50 + Math.sin(rad) * 34).toFixed(1) + "'/>";
-    }
-    o += "<circle cx='50' cy='50' r='13' fill='currentColor' opacity='.55'/>";
-    o += "<circle " + S1 + " stroke-width='2' opacity='.7' cx='50' cy='50' r='20'/>";
+    var g = CARD_ART[c[0]] || SET_ART[c[2]] || "\u2B50";
+    o = "<span class='tc-glyph'>" + g + "</span>";
   }
-  return (ART_CACHE[c[0]] = o + "</g></svg>");
+  return (ART_CACHE[c[0]] = o);
 }
 
 /* The frame is the rarity and the art window is the card. Without this the
