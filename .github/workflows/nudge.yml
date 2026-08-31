@@ -1,0 +1,27 @@
+# The evening nudge: one push a day at ~22:15 Singapore (14:15 UTC - Singapore
+# has no DST, so the offset never moves). The payload is dumb; app/sw.js on
+# the phone reads the mirrored day-state and writes the actual words.
+# No-ops cleanly until the two secrets exist (see scripts/send-push.mjs).
+name: evening-nudge
+
+on:
+  schedule:
+    - cron: "15 14 * * *"
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  nudge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install web-push@3 --no-audit --no-fund
+      - run: node scripts/send-push.mjs
+        env:
+          PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}

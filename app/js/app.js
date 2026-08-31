@@ -60,7 +60,18 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v14";
+var BUILD = "v15";
+
+/* Chrome/Android hand over an install prompt; hold it for the You row. */
+var INSTALL_PROMPT = null;
+window.addEventListener("beforeinstallprompt", function(e){
+  e.preventDefault();
+  INSTALL_PROMPT = e;
+});
+window.addEventListener("appinstalled", function(){
+  INSTALL_PROMPT = null;
+  toast("On the Home Screen. Open it from there.", true);
+});
 
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewToday, cards: viewDeck, you: viewYou };
@@ -117,6 +128,16 @@ document.addEventListener("click", function(ev){
   if (ds.claim){ askClaimTrophy(ds.claim); return; }
   if (ds.questdone){ questDone(b); return; }
   if (ds.questswap){ questSwap(); return; }
+  if (ds.monthok){
+    S.monthSeen = S.monthSeen || {};
+    S.monthSeen[ds.monthok] = 1;
+    save(); sfx("done"); buzz(10);
+    render({ keepScroll: true, animate: true });
+    return;
+  }
+  if (ds.install){ askInstall(); return; }
+  if (ds.push){ askPush(); return; }
+  if (ds.coachx){ doCoachExport(); return; }
   if (ds.chipdone){ closeChip(); return; }
   if (ds.chipreward){ askChipReward(Number(ds.chipreward)); return; }
   if (ds.backup){ doBackup(); return; }
@@ -191,6 +212,26 @@ paintSky();
 render({ first: true });
 paintHud();
 openGate();
+
+/* Opening the app answers the badge; keep the mirror warm for tonight. */
+try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch(e){}
+mirrorState();
+
+/* If the phone quietly revoked the nudge (permission pulled, subscription
+   gone), the switch should say so rather than lie. */
+if (S.pushOn && "serviceWorker" in navigator && "PushManager" in window){
+  (async function(){
+    try {
+      if (Notification.permission !== "granted") throw 0;
+      var reg = await navigator.serviceWorker.ready;
+      var sub = await reg.pushManager.getSubscription();
+      if (!sub) throw 0;
+    } catch(e){
+      S.pushOn = 0; save();
+      if (tab === "you") render({ keepScroll: true });
+    }
+  })();
+}
 
 /* The sun moves whether he does or not - but repaint only the sky, never the
    screen: a full rebuild every minute silently eats anything half-typed. */
