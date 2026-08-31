@@ -122,3 +122,31 @@
   padding:12px 18px; min-height:44px; cursor:pointer; text-decoration:underline;
   text-underline-offset:3px}
 @media (prefers-reduced-motion:reduce){ #coach .say i{animation:none !important} }
+
+/* =========================================================== the chip moment
+   The AA medallion, taken seriously: a dark room, one coin, his own named
+   reward, and a single way out. Bigger than a pack on purpose - packs happen
+   daily, this happens six times a year at best. Confetti rides above it. */
+#chip{position:fixed; inset:0; z-index:170; display:none; align-items:center;
+  justify-content:center; padding:24px calc(24px + env(safe-area-inset-right))
+  calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
+  background:radial-gradient(85% 60% at 50% 38%, #2B2415, #171310 74%)}
+#chip.on{display:flex; animation:fadein .3s ease-out both}
+.chipw{text-align:center; color:#FBF8F0; max-width:330px}
+.chipw .chipk{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  letter-spacing:.28em; text-transform:uppercase; color:#D8B24A}
+.chipw .medal.big{width:172px; height:172px; margin:20px auto 8px; display:block;
+  filter:drop-shadow(0 16px 34px rgba(0,0,0,.5));
+  animation:medalin .7s var(--pop) both .12s}
+@keyframes medalin{from{transform:scale(.4) rotate(-14deg); opacity:0}
+  62%{transform:scale(1.07) rotate(3deg)}to{transform:scale(1) rotate(0); opacity:1}}
+.chipw h2{font-family:"Nunito",sans-serif; font-weight:900; font-size:31px;
+  line-height:1.08; letter-spacing:-.01em; margin:10px 0 9px; color:#FBF8F0;
+  text-transform:none}
+.chipw p{font-family:"Nunito",sans-serif; font-weight:700; font-size:14.5px;
+  line-height:1.5; color:rgba(251,248,240,.82); margin:0 0 24px; text-wrap:balance}
+.chipw .btn.pri{min-width:210px}
+@media (prefers-reduced-motion:reduce){
+  #chip.on{animation:none}
+  .chipw .medal.big{animation:none}
+}

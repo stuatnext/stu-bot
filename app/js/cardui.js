@@ -194,8 +194,17 @@ function openSheet(name){
   }
 
   var can = canCraft(c), cost = craftCost(c);
+  /* A held card asks something of you - otherwise it is wallpaper. The ask
+     lives here on the sheet, and one of them is the day's side quest. */
+  var lived = (S.lived || {})[name];
+  var tryLine = held
+    ? "<div class='try" + (lived ? " done" : "") + "'><b>"
+      + (lived ? "Lived · " + esc(nice(lived)) : "Try") + "</b>"
+      + esc(cardDo(c)) + "</div>"
+    : "";
   el.innerHTML = "<div class='slot' id='shSlot'></div>"
     + "<div class='meta'>" + meta + "</div>"
+    + tryLine
     + "<div class='acts'>"
     + (!held && c[1] !== 3 && setOpen(c[2])
         ? "<button class='" + (can ? "pri" : "") + "' " + (can ? "" : "disabled ")

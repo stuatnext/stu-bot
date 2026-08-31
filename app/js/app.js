@@ -60,7 +60,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v13";
+var BUILD = "v14";
 
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewToday, cards: viewDeck, you: viewYou };
@@ -115,6 +115,12 @@ document.addEventListener("click", function(ev){
   if (ds.craftit){ closeSheet(); askCraftOne(ds.craftit); return; }
   if (ds.craft){ askCraft(ds.craft); return; }
   if (ds.claim){ askClaimTrophy(ds.claim); return; }
+  if (ds.questdone){ questDone(b); return; }
+  if (ds.questswap){ questSwap(); return; }
+  if (ds.chipdone){ closeChip(); return; }
+  if (ds.chipreward){ askChipReward(Number(ds.chipreward)); return; }
+  if (ds.backup){ doBackup(); return; }
+  if (ds.restore){ askRestore(); return; }
   if (ds.spend){ askSpend(); return; }
   if (ds.rate){ askRate(); return; }
   if (ds.freeze){ askFreeze(); return; }
@@ -142,6 +148,7 @@ window.addEventListener("keydown", function(ev){
   if (ev.key !== "Escape") return;
   if (MODAL) MODAL.close(null);
   else if (document.getElementById("sheet").className) closeSheet();
+  else if (document.getElementById("chip").className) closeChip();
   else if (ST) closeStage();
 });
 
@@ -179,6 +186,7 @@ function graduate(){
 }
 
 /* ------------------------------------------------------------------- start */
+backfillChips();
 paintSky();
 render({ first: true });
 paintHud();

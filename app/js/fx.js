@@ -40,7 +40,9 @@ var ICONS = {
   snow:  "<path d='M11 2.6v16.8M3.7 6.8l14.6 8.4M18.3 6.8 3.7 15.2' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><path d='M8.4 4.6 11 6.7l2.6-2.1M8.4 17.4 11 15.3l2.6 2.1' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' fill='none'/>",
   gap:   "<rect x='3.2' y='4.6' width='15.6' height='13.8' rx='2.4' stroke='currentColor' stroke-width='1.9'/><path d='M3.2 9h15.6M7.3 2.8v3.4M14.7 2.8v3.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><rect x='8.6' y='11.4' width='4.8' height='4' rx='1' fill='currentColor' opacity='.55'/>",
   pin:   "<path d='M11 19.4s6-5.1 6-9.6a6 6 0 1 0-12 0c0 4.5 6 9.6 6 9.6Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><circle cx='11' cy='9.6' r='2.2' stroke='currentColor' stroke-width='1.7'/>",
-  pen:   "<path d='M14.6 3.4 18.6 7.4 8 18H4v-4Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M12.6 5.4 16.6 9.4' stroke='currentColor' stroke-width='1.7'/>"
+  pen:   "<path d='M14.6 3.4 18.6 7.4 8 18H4v-4Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M12.6 5.4 16.6 9.4' stroke='currentColor' stroke-width='1.7'/>",
+  save:  "<path d='M11 3.2v9.2M7.2 8.8 11 12.6l3.8-3.8' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/><path d='M3.8 14.6v1.9a2.3 2.3 0 0 0 2.3 2.3h9.8a2.3 2.3 0 0 0 2.3-2.3v-1.9' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
+  load:  "<path d='M11 12.4V3.2M7.2 6.8 11 3l3.8 3.8' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/><path d='M3.8 14.6v1.9a2.3 2.3 0 0 0 2.3 2.3h9.8a2.3 2.3 0 0 0 2.3-2.3v-1.9' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>"
 };
 function svg(name, size){
   var s = size || 22;

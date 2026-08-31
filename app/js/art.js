@@ -155,6 +155,7 @@ function tcard(c, count, opts){
   if (r >= 2 && count) h += "<div class='tc-holo'></div>";
   if (count > 1) h += "<span class='tc-cnt'>x" + count + "</span>";
   if (count && (S.seen || {})[c[0]] === 0) h += "<span class='tc-new'></span>";
+  if (count && (S.lived || {})[c[0]]) h += "<span class='tc-lived'>" + svg("tick", 10) + "</span>";
   h += "<div class='tc-gem'></div></div>";
   h += "<div class='tc-nt'>" + esc(c[3]) + "</div>";
   h += "<div class='tc-glare'></div>";

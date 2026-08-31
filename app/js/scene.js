@@ -132,15 +132,20 @@ function viewToday(){
   h += skyCardHTML();
   h += weekHTML();
 
-  /* the session: three big pressable rows */
+  /* the session: three big pressable rows. The hour points at one of them -
+     that row wears the arrow and speaks, so "what now?" never needs asking. */
+  var up = nextUp();
   h += "<div class='quests'>";
   PILLARS.forEach(function(g){
     var on = pDone(t, g[0]), st = streak(g[0]), carried = !on && !required(g[0], t);
+    var isUp = g[0] === up && !on && !carried;
     h += "<button class='pil q" + g[0] + (on ? " on" : "") + (carried ? " carried" : "")
+      + (isUp ? " up" : "")
       + "' data-p='" + g[0] + "' style='--pil:" + g[4] + "' aria-pressed='" + (on ? "true" : "false") + "'>"
       + "<span class='qic'>" + svg(g[2], 24) + "</span>"
-      + "<span class='qbd'><b>" + esc(g[1]) + "</b><span>"
-      + esc(carried ? "No shift today \u2014 carried" : g[5]) + "</span></span>"
+      + "<span class='qbd'><b>" + esc(g[1])
+      + (isUp ? "<i class='now'>Now</i>" : "") + "</b><span>"
+      + esc(carried ? "No shift today \u2014 carried" : isUp ? tipFor(g[0]) : g[5]) + "</span></span>"
       + (st > 0 && !carried ? "<span class='qst'>" + svg("flame" in ICONS ? "flame" : "tick", 12) + st + "</span>" : "")
       + "<span class='qchk'>" + (on ? svg("tick", 20) : "") + "</span>"
       + "</button>";
@@ -151,6 +156,28 @@ function viewToday(){
   h += "<" + (packs ? "button" : "div") + " class='gem" + (packs ? " won" : "") + "'"
     + (packs ? " data-open='1'" : "") + ">" + gemHTML(done, packs)
     + "</" + (packs ? "button" : "div") + ">";
+
+  /* the side quest: one held card asks something of him. This is what makes
+     the collection a deck instead of wallpaper - his call, his words. */
+  if (S.onboarded){
+    var q = questFor(t);
+    if (q){
+      var qa = q.card[2] === "zh" ? (q.card[4] || "\u8bcd")
+        : (CARD_ART[q.card[0]] || SET_ART[q.card[2]] || "\u2b50");
+      h += "<div class='quest" + (q.done ? " qdone" : "") + "'>"
+        + "<span class='qgl" + (q.card[2] === "zh" ? " zh" : "") + "'>" + esc(qa) + "</span>"
+        + "<span class='qtx'><b>" + (q.done ? "Side quest \u00b7 lived" : "Side quest \u00b7 " + esc(q.card[0])) + "</b>"
+        + "<span>" + esc(q.done
+            ? "+10 spares, +20 XP \u00b7 " + q.card[0] + " is a lived card now."
+            : q.text) + "</span></span>"
+        + (q.done
+            ? "<span class='qwin'>" + svg("tick", 18) + "</span>"
+            : "<span class='qact'><button class='qgo' data-questdone='1'>Did it</button>"
+              + (q.swaps ? "" : "<button class='qswap' data-questswap='1'>Swap</button>")
+              + "</span>")
+        + "</div>";
+    }
+  }
   return h;
 }
 
@@ -167,8 +194,26 @@ function tapPillar(key, btn){
     var w = packsWaiting();
     buzz([28, 60, 28, 60, 55]);
     sfx("full");
-    celebrate(w.streak ? "Seven in a row" : "All three",
-      w.streak ? "A streak pack. Five cards, better odds." : "That is a pack, and " + money(rate()) + " in the pot.");
+    /* A run crossing a chip threshold outranks the daily fanfare: the
+       medallion ceremony takes the screen instead, and is never repeated.
+       Except during the tutorial - the first pack is the lesson there, so
+       day one's chip is minted quietly and waits in the case. */
+    var due = chipDue();
+    if (due && !S.onboarded){
+      S.chips = S.chips || {};
+      S.chips[due[0]] = t;
+      save();
+      due = null;
+    }
+    if (due){
+      S.chips = S.chips || {};
+      S.chips[due[0]] = t;
+      save();
+      setTimeout(function(){ showChip(due); }, reduced() ? 0 : 420);
+    } else {
+      celebrate(w.streak ? "Seven in a row" : "All three",
+        w.streak ? "A streak pack. Five cards, better odds." : "That is a pack, and " + money(rate()) + " in the pot.");
+    }
     if (btn){
       btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
       burst(btn, "#3FD9A0");
@@ -183,5 +228,78 @@ function tapPillar(key, btn){
       burst(btn, PILLARS.filter(function(g){ return g[0] === key; })[0][4]);
     }
   } else { sfx("untick"); }
+  render({ keepScroll: true, animate: true });
+}
+
+/* ------------------------------------------------------------ the side quest */
+function questDone(btn){
+  var t = today(), q = questFor(t);
+  if (!q || q.done){ sfx("no"); return; }
+  S.quests = S.quests || {};
+  S.quests[t] = { done: 1, swaps: q.swaps };
+  S.lived = S.lived || {};
+  if (!S.lived[q.card[0]]) S.lived[q.card[0]] = t;
+  save();
+  sfx("rare"); buzz([16, 40, 20]);
+  if (btn) burst(btn, "#FFC800");
+  render({ keepScroll: true, animate: true });
+}
+/* One swap a day. A quest you can reroll forever is a quest you never do. */
+function questSwap(){
+  var t = today(), q = questFor(t);
+  if (!q || q.done || q.swaps){ sfx("no"); return; }
+  S.quests = S.quests || {};
+  S.quests[t] = { done: 0, swaps: 1 };
+  save();
+  sfx("tap"); buzz(10);
+  render({ keepScroll: true, animate: true });
+}
+
+/* ================================================================= the chips
+   The AA idea: a medallion for the run, handed over once, never taken back.
+   Drawn inline so each chip's own metal carries through app and case. */
+function medalSVG(chip, extra){
+  var t = chip[0], face = chip[2], edge = chip[3], ink = chip[4];
+  return "<svg class='medal" + (extra ? " " + extra : "") + "' viewBox='0 0 120 120' aria-hidden='true'>"
+    + "<circle cx='60' cy='60' r='56' fill='" + edge + "'/>"
+    + "<circle cx='60' cy='60' r='47' fill='" + face + "'/>"
+    + "<circle cx='60' cy='60' r='41.5' fill='none' stroke='" + edge
+      + "' stroke-width='1.8' stroke-dasharray='2.2 4.4'/>"
+    + "<text x='60' y='" + (t > 99 ? 68 : 70) + "' text-anchor='middle' fill='" + ink
+      + "' style='font:900 " + (t > 99 ? 34 : 40) + "px Nunito,sans-serif'>" + t + "</text>"
+    + "<text x='60' y='88' text-anchor='middle' fill='" + ink
+      + "' opacity='.72' style='font:800 10.5px Nunito,sans-serif;letter-spacing:.24em'>"
+    + (t === 1 ? "DAY" : "DAYS") + "</text></svg>";
+}
+
+/* The ceremony. Bigger than a pack on purpose: this is the sober-chip moment,
+   the thing he asked for by name, and it only ever happens live. */
+function showChip(chip){
+  var el = document.getElementById("chip");
+  if (!el) return;
+  var i = CHIPS.indexOf(chip);
+  var reward = (S.chipRewards || {})[chip[0]];
+  var line = reward
+    ? "You named the reward. Collect it: " + reward
+    : (CHIP_HINT[i]
+        ? "Worth a real reward - say, " + CHIP_HINT[i].toLowerCase() + ". Name it in You."
+        : "Chips are never taken back. This one is yours for good.");
+  el.innerHTML = "<div class='chipw'>"
+    + "<div class='chipk'>Chip earned</div>"
+    + medalSVG(chip, "big")
+    + "<h2>" + esc(chip[1]) + "</h2>"
+    + "<p>" + esc(line) + "</p>"
+    + "<button class='btn pri' data-chipdone='1'>Keep going</button></div>";
+  el.className = "on";
+  document.body.style.overflow = "hidden";
+  sfx("level"); buzz([30, 60, 30, 60, 90]);
+  confetti();
+}
+function closeChip(){
+  var el = document.getElementById("chip");
+  if (!el || !el.className) return;
+  el.className = ""; el.innerHTML = "";
+  document.body.style.overflow = "";
+  sfx("tap");
   render({ keepScroll: true, animate: true });
 }

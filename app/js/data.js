@@ -400,6 +400,99 @@ var SET_ART = { hawk:"\uD83C\uDF5C", kopi:"\u2615", slang:"\uD83D\uDCAC",
   sheff:"\uD83C\uDFD4\uFE0F", post:"\uD83D\uDCF0", sug:"\uD83D\uDCBC",
   mkt:"\uD83D\uDCC8", gold:"\uD83C\uDFC6" };
 
+/* ------------------------------------------------------------------ the chips
+   The AA idea, borrowed with respect: a medallion for the longest run you
+   have ever held, never taken back once earned. Each carries a reward he
+   names himself - a chip without a treat is a badge; a chip with one is a
+   reason. [ days, name, face colour, edge colour, ink ] */
+var CHIPS = [
+  [1,   "One day",    "#FFFFFF", "#D8D4C7", "#3B3A36"],
+  [7,   "One week",   "#E8A05D", "#B87333", "#4A2E10"],
+  [30,  "One month",  "#D9DEE6", "#9AA5B5", "#2F3844"],
+  [90,  "One quarter","#FFD35C", "#D89412", "#5A4200"],
+  [180, "Half a year","#5FD9A8", "#2FA57B", "#0C3B2A"],
+  [365, "The year",   "#9AD8FF", "#4FA8E8", "#0F3A5C"]
+];
+var CHIP_HINT = [
+  "", 
+  "A coffee somewhere you have never been",
+  "A proper meal out, or a massage",
+  "A weekend away - Penang, Bangkok",
+  "The flight that gets your brother here",
+  "Something you would call ridiculous"
+];
+
+/* ----------------------------------------------------------------- the tips
+   What the app says when it points at the next thing. Picked by day hash so
+   it does not repeat itself two mornings running. */
+var TIPS = {
+  train: [
+    "The hours before Malta wakes are the only ones nobody can take.",
+    "A long walk counts. It has always counted.",
+    "Gym, run or walk - decided the night before is twice as likely.",
+    "Twenty minutes is a tick. Perfect is not the standard."
+  ],
+  family: [
+    "About 07:00 in Sheffield right now - a good window.",
+    "A call, not a text. The accent comes back in minutes.",
+    "Wednesday is Mum's day. Walk while you talk.",
+    "Five minutes counts if it is a real five minutes."
+  ],
+  stop: [
+    "Malta is closed. Shut the laptop and take the point.",
+    "The shift ends when it ends. That is the whole skill.",
+    "Nothing after 23:00 is work; it is worry with a keyboard.",
+    "Stopping on time tonight is tomorrow's energy."
+  ]
+};
+
+/* ----------------------------------------------------- the card challenges
+   His call: a card should ask something of you, or it is wallpaper. Every
+   card carries a doable line - the specific ones here, the rest built from
+   the set template. Completing one marks the card "lived". */
+var SET_DO = {
+  hawk:  function(n){ return "Eat " + n + " this week, at a stall, no phone on the table."; },
+  kopi:  function(n){ return "Order " + n + " out loud, exactly like the card says."; },
+  slang: function(n){ return "Use \u201C" + n + "\u201D in a real sentence today, to a real person."; },
+  every: function(n){ return "Notice " + n + " today and stop for ten seconds. That is the whole task."; },
+  herit: function(n){ return "Go to " + n + " this month. Twenty minutes there counts."; },
+  green: function(n){ return "Walk " + n + " this month - it can be this weekend's Trained."; },
+  isles: function(n){ return "Plan " + n + " for a free Saturday. Put it in the calendar now."; },
+  region:function(n){ return "Price flights to " + n + " tonight. Looking costs nothing."; },
+  road:  function(n){ return "Message someone about " + n + " - a memory or a plan."; },
+  home:  function(n){ return "Tell someone at home you miss " + n + ". They want to hear it."; },
+  zh:    function(n){ return "Say \u201C" + n + "\u201D to someone who will understand it today."; },
+  bean:  function(n){ return "Order " + n + " somewhere new this week."; },
+  deep:  function(n){ return "Make " + n + " happen this month. It is why you live here."; },
+  sheff: function(n){ return "One message to the group chat about " + n + ". Today."; },
+  post:  function(n){ return "Thirty minutes before the shift on \u201C" + n + "\u201D."; },
+  sug:   function(n){ return "Book thirty minutes this week for \u201C" + n + "\u201D."; },
+  mkt:   function(n){ return "Write three sentences on \u201C" + n + "\u201D you could say out loud."; },
+  gold:  function(n){ return "You know what has to happen for this one. Move it one step."; }
+};
+var CARD_DO = {
+  "Chilli crab": "Book the chilli crab dinner - it needs two people, so ask.",
+  "MRT at 06:00": "Catch one train before 06:30 this week and watch the city wake.",
+  "Tray return": "Return the tray, and one that is not yours.",
+  "Chope": "Chope a table with a tissue packet, like a local, without smiling.",
+  "Kiasu": "Let one queue-jump go unpunished today. Notice how it feels.",
+  "The red-eye": "Check in online the moment it opens. Aisle, always.",
+  "A Wednesday call": "It is on the calendar. Walk while you talk.",
+  "Cold tap water": "Tell your mum what you miss this week. She keeps score.",
+  "The reservoir at six": "One sunrise at MacRitchie this week. Set the alarm now.",
+  "The night bus": "Stay out past the last train once this month, on purpose.",
+  "Getai season": "Find this month's getai schedule and put one in the diary.",
+  "An uncle who knows your order": "Go back to the same stall three times this week.",
+  "The group chat": "Send the photo you almost sent last week.",
+  "A call, not a text": "Call, do not text, the next time you reach for the keyboard.",
+  "The five-minute version": "Say your five-minute version to the mirror. Time it.",
+  "The take you held back": "Write the take down tonight. Publishing is a separate decision.",
+  "A written scope": "Draft the one-page scope before Friday. Ugly is fine.",
+  "The day rate, out loud": "Say the number out loud, alone, until it sounds normal.",
+  "Before the shift": "Tomorrow: thirty minutes of yours before Malta gets any.",
+  "Published anyway": "Ship the draft that is 80% done. Nobody sees the missing 20."
+};
+
 /* Ranks rather than bare numbers - a level should say something about you. */
 var RANKS = [
   [0,     "Just landed"],
