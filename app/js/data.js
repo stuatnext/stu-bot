@@ -493,6 +493,12 @@ var CARD_DO = {
   "Published anyway": "Ship the draft that is 80% done. Nobody sees the missing 20."
 };
 
+/* ------------------------------------------------------------ the push key
+   The public half of the VAPID pair - safe in the open by design. The
+   private half lives only in the repo's Actions secrets and signs the one
+   evening nudge a day. */
+var VAPID_PUBLIC = "BPzJd3TZ6bSeFIRWBVzeKKkJA6tkUxGFHMDbal6_JXLrjULbQg9REfSSISRnoOWvUghgNaTQfo4xTMdxO_XtvLI";
+
 /* Ranks rather than bare numbers - a level should say something about you. */
 var RANKS = [
   [0,     "Just landed"],

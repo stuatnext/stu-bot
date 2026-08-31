@@ -318,6 +318,46 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v15: it reaches out, and it remembers
+
+Three asks: a real game lives on the home screen and interrupts you; a bad
+month should be *remembered*, not reset, "so we can learn from it"; and the
+game should produce "something to download and give back to Claude to keep
+optimising."
+
+**The nudge.** You → *Put it on your Home Screen* (native prompt where the
+browser offers one, instruction sheet on iOS — where installing is also what
+unlocks push). Then *The evening nudge*: the phone mints a push subscription
+against the VAPID public key in `data.js`, copies it to the clipboard, and
+one paste into the repo secret `PUSH_SUBSCRIPTION` arms the scheduler —
+`.github/workflows/nudge.yml`, a cron at 14:15 UTC (22:15 Singapore, no DST
+to chase). The payload is deliberately dumb; the words are written on the
+device: the app mirrors today's shape into a cache the service worker can
+read, so the notification says "Family and Stopped are still open. 12 days
+on the line." — or, if the day is already in, says so and asks nothing. The
+sender (`scripts/send-push.mjs`) no-ops until the secrets exist and never
+learns anything about the day.
+
+**The months shelf.** Nothing resets and nothing is deleted. Every month
+derives its ledger from the record at render time — full days, the best run
+held (carried across month boundaries), misses split pillar × weekday, and
+one computed lesson line ("Family broke 2 times — 2 of them on Thursdays").
+On the 1st, the closed month is held up once on Today ("August, filed."),
+then lives permanently in You. A day still being played is never counted as
+broken.
+
+**The coach file.** You → *Send the record to Claude* writes
+`daylight-coach-<date>.md`: instructions at the top, one JSON block below —
+the full save plus derived analytics (month ledgers, quest completion,
+lived cards, chip rewards). Hand it to any Claude session and the file
+tells it what to do: find the pattern, judge the mechanics against the
+data, propose the smallest tuning. The contract lives in `docs/coaching.md`
+— tune, don't redesign; the record is never rewritten; the file never gets
+committed.
+
+Also fixed: the service-worker precache had missed the Nunito files since
+v12, so offline fell back off the app's own typeface.
+
 #### v14: the game starts giving orders
 
 His list, all four of it: make the app time-aware with real tips; make the

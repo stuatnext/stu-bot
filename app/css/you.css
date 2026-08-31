@@ -115,3 +115,17 @@
 .warnbar:active{transform:translateY(3px); border-bottom-width:2px}
 .warnbar b{display:block; font-size:14.5px; font-weight:900}
 .warnbar span{display:block; font-size:12.5px; font-weight:700; margin-top:2px; opacity:.9}
+
+/* --------------------------------------------------------- the months shelf
+   Kept, not reset: every month with data stays, bar and lesson line and all.
+   The bad ones earn their place - the pattern in them is the lesson. */
+.mons{display:flex; flex-direction:column; gap:9px; margin-top:12px}
+.mo{padding:10px 12px; border-radius:13px; background:var(--sunk); border:2px solid var(--edge)}
+.mo-t{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.mo-t b{font-family:"Nunito",sans-serif; font-size:13.5px; font-weight:900; color:var(--ink)}
+.mo-t span{font-family:"JetBrains Mono",monospace; font-size:10.5px; font-weight:700;
+  color:var(--ink2); white-space:nowrap}
+.mo-bar{height:8px; border-radius:6px; background:var(--card); border:1px solid var(--edge);
+  overflow:hidden; margin-top:7px}
+.mo-bar i{display:block; height:100%; background:var(--green); border-radius:6px; min-width:0}
+.mo-l{margin-top:7px; font-size:12px; font-weight:700; color:var(--ink2)}

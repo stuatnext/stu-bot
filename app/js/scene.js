@@ -129,6 +129,20 @@ function viewToday(){
   h += "<div class='hello'><p class='ask'>" + esc(ask) + "</p>"
     + "<p class='asksub'>" + esc(sub) + "</p></div>";
 
+  /* A month just closed: hold it up once before it is filed. Never deleted,
+     never reset - the pattern in a bad month is the lesson (his call). */
+  var rec = S.onboarded ? monthRecapDue() : null;
+  if (rec){
+    h += "<div class='mrecap'>"
+      + "<b>" + esc(monthName(rec.ym)) + ", filed.</b>"
+      + "<span>" + rec.full + " of " + rec.possible + " full days &middot; best run "
+      + rec.best + (rec.quests ? " &middot; " + rec.quests
+      + (rec.quests === 1 ? " quest lived" : " quests lived") : "") + "</span>"
+      + (rec.lesson ? "<span class='mles'>" + esc(rec.lesson) + "</span>" : "")
+      + "<button class='mok' data-monthok='" + esc(rec.ym) + "'>Noted &middot; it keeps</button>"
+      + "</div>";
+  }
+
   h += skyCardHTML();
   h += weekHTML();
 

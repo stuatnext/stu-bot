@@ -79,8 +79,32 @@ function viewYou(){
   h += "</div><p class='dim' style='margin:10px 0 0'>Your longest run ever mints these, and a chip "
     + "is never taken back. Each carries a reward you name &mdash; tap one to set it.</p></div>";
 
+  /* the months: nothing resets, nothing is deleted. A bad month stays on
+     the shelf because the pattern in it is the lesson - his call. */
+  var mos = monthsWithData();
+  if (mos.length){
+    h += "<div class='panel'><h3>Months</h3><div class='mons'>";
+    mos.slice().reverse().slice(0, 6).forEach(function(ym){
+      var L = monthLedger(ym), cur = ym === today().slice(0, 7);
+      var pct = L.possible ? Math.round(L.full / L.possible * 100) : 0;
+      h += "<div class='mo'>"
+        + "<div class='mo-t'><b>" + esc(monthName(ym)) + (cur ? " &middot; so far" : "") + "</b>"
+        + "<span>" + L.full + "/" + L.possible + " &middot; run " + L.best + "</span></div>"
+        + "<div class='mo-bar'><i style='width:" + pct + "%'></i></div>"
+        + (L.lesson ? "<div class='mo-l'>" + esc(L.lesson) + "</div>" : "")
+        + "</div>";
+    });
+    h += "</div><p class='dim' style='margin:10px 0 0'>Kept, not reset. The lesson line is computed "
+      + "from the record &mdash; where it broke and on which day of the week.</p></div>";
+  }
+
   /* the switches */
   h += "<div class='menu'>"
+    + (isStandalone() ? "" :
+        mrow("install", "1", "phone", "Put it on your Home Screen",
+          "Full screen, its own icon — and it unlocks the nudge"))
+    + mrow("push", "1", "clock", "The evening nudge",
+        S.pushOn ? "On — a 22:15 check-in" : "A 22:15 check-in when the day is still open")
     + mrow("replay", "1", "pack", "How this works", "The three-tap tour, again")
     + mrow("sound", "1", "spare", "Sound", S.mute ? "Off" : "On")
     + mrow("camp", "1", "pin", "Where you are", S.camp)
@@ -91,6 +115,8 @@ function viewYou(){
     + mrow("backup", "1", "save", "Back up the record",
         S.lastBackup ? "Last saved " + nice(S.lastBackup) : "Never saved out")
     + mrow("restore", "1", "load", "Restore a backup", "Paste a saved file back in")
+    + mrow("coachx", "1", "pen", "Send the record to Claude",
+        "A coach file — hand it back, get the next tuning")
     + "</div>";
 
   /* the paper that lives outside the game */
@@ -169,6 +195,159 @@ async function askChipReward(t){
   if (s) S.chipRewards[t] = s; else delete S.chipRewards[t];
   save(); sfx("done");
   render({ keepScroll: true });
+}
+
+/* --------------------------------------------------- the phone, properly
+   A real game lives on the home screen, not in a browser tab - and on iOS
+   the evening nudge is only allowed for installed apps, so this row is the
+   door to that one too. */
+function isStandalone(){
+  try {
+    return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  } catch(e){ return false; }
+}
+function isiOS(){ return /iPhone|iPad|iPod/.test(navigator.userAgent); }
+
+async function askInstall(){
+  if (typeof INSTALL_PROMPT !== "undefined" && INSTALL_PROMPT){
+    sfx("tap");
+    INSTALL_PROMPT.prompt();
+    try { await INSTALL_PROMPT.userChoice; } catch(e){}
+    INSTALL_PROMPT = null;
+    return;
+  }
+  await ask({
+    title: "Put Daylight on your Home Screen",
+    say: isiOS()
+      ? "In Safari: tap the Share button, then “Add to Home Screen”. Full screen, its own "
+        + "icon, and iOS will then allow the evening nudge."
+      : "In the browser menu, choose “Install app” or “Add to Home Screen”.",
+    cancel: "Close"
+  });
+}
+
+/* ---------------------------------------------------------- the nudge
+   Real games interrupt you; this one earns the right once a night. The
+   subscription is minted here, but the sender is the repo's scheduled
+   Action - so the last step is one paste into a repo secret. Honest about
+   its own architecture: no server, no account, nothing personal leaves
+   the phone except the push address itself. */
+function vapidKey(){
+  var s = VAPID_PUBLIC.replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  var raw = atob(s), arr = new Uint8Array(raw.length);
+  for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+async function askPush(){
+  if (S.pushOn){
+    var off = await ask({
+      title: "The evening nudge",
+      say: "On. Around 22:15 the game checks in - it names what is still open, or says the "
+         + "day is already in and asks nothing.",
+      confirm: "Turn it off", cancel: "Keep it"
+    });
+    if (!off) return;
+    try {
+      var reg0 = await navigator.serviceWorker.ready;
+      var old = await reg0.pushManager.getSubscription();
+      if (old) await old.unsubscribe();
+    } catch(e){}
+    S.pushOn = 0; save(); sfx("tap");
+    toast("Off. Nothing will arrive on this phone.");
+    render({ keepScroll: true });
+    return;
+  }
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)){
+    sfx("no");
+    toast(isiOS() ? "iOS only allows this once Daylight is on the Home Screen." : "This browser cannot do push.");
+    return;
+  }
+  if (isiOS() && !isStandalone()){
+    sfx("no");
+    toast("Home Screen first - iOS only allows the nudge for installed apps.");
+    return;
+  }
+  var go = await ask({
+    title: "The evening nudge",
+    say: "Once a night, around 22:15: the game names what is still open, or tells you the day "
+       + "is already in. Two steps - your phone asks permission now, then one paste into the "
+       + "repo so the scheduler can reach this phone.",
+    confirm: "Turn it on", cancel: "Not now"
+  });
+  if (!go) return;
+  try {
+    var perm = await Notification.requestPermission();
+    if (perm !== "granted"){
+      sfx("no"); toast("No permission, no nudge. Re-allow it in Settings if you change your mind.");
+      return;
+    }
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: vapidKey()
+    });
+    var json = JSON.stringify(sub);
+    var copied = false;
+    try { await navigator.clipboard.writeText(json); copied = true; } catch(e){}
+    if (!copied){
+      try {
+        var a = document.createElement("a");
+        a.href = "data:application/json;charset=utf-8," + encodeURIComponent(json);
+        a.download = "push-subscription.json";
+        document.body.appendChild(a); a.click(); a.remove();
+      } catch(e2){}
+    }
+    S.pushOn = 1; save(); sfx("done"); buzz(14);
+    await ask({
+      title: "One paste left",
+      say: (copied ? "This phone's push address is on your clipboard."
+                   : "This phone's push address downloaded as push-subscription.json.")
+         + " In GitHub: stu-bot → Settings → Secrets and variables → Actions → "
+         + "set PUSH_SUBSCRIPTION to it. From the next 22:15, the nudge is live.",
+      cancel: "Done"
+    });
+    render({ keepScroll: true });
+  } catch(e){
+    sfx("no");
+    toast("The phone refused the subscription. Nothing changed.");
+  }
+}
+
+/* ------------------------------------------------------ the coach file
+   The other half of the loop he asked for: a file the game writes about
+   itself, handed back to Claude, which comes back as the next tuning.
+   Instructions ride inside the file. */
+async function doCoachExport(){
+  var text = coachExport(), name = "daylight-coach-" + today() + ".md";
+  var how = null;
+  if (navigator.canShare && window.File){
+    try {
+      var f = new File([text], name, { type: "text/markdown" });
+      if (navigator.canShare({ files: [f] })){
+        await navigator.share({ files: [f], title: "Daylight coach file" });
+        how = "Sent. Hand it to Claude with a note on how the stretch felt.";
+      }
+    } catch(e){ if (e && e.name === "AbortError") return; }
+  }
+  if (!how){
+    try {
+      var a = document.createElement("a");
+      a.href = "data:text/markdown;charset=utf-8," + encodeURIComponent(text);
+      a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      how = "Downloaded. Hand it to Claude with a note on how the stretch felt.";
+    } catch(e2){}
+  }
+  if (!how && navigator.clipboard){
+    try {
+      await navigator.clipboard.writeText(text);
+      how = "Copied. Paste it to Claude with a note on how the stretch felt.";
+    } catch(e3){}
+  }
+  if (!how){ sfx("no"); toast("This browser will not hand the file over."); return; }
+  sfx("done"); buzz(14);
+  toast(how);
 }
 
 /* ------------------------------------------------------- the record, out

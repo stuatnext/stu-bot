@@ -19,7 +19,8 @@ function load(){
             days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, openedDay:0, openedStreak:0,
             theme:null, mute:false, rate:0, spends:[], freezes:{},
             crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0,
-            quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0 };
+            quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
+            monthSeen:{}, pushOn:0 };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
@@ -29,7 +30,27 @@ function load(){
   if (!d.onboarded && Object.keys(d.days).length) d.onboarded = 1;
   return d;
 }
-function save(){ FD = null; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function save(){
+  FD = null;
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+  mirrorState();
+}
+/* A copy of today's shape where the service worker can reach it (it cannot
+   read localStorage), so the evening push can say what is actually open
+   instead of guessing. Fire-and-forget; the app never waits on it. */
+function mirrorState(){
+  try {
+    if (typeof caches === "undefined") return;
+    var t = today();
+    var open = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); })
+                      .map(function(g){ return g[1]; });
+    caches.open("daylight-state").then(function(c){
+      return c.put("state", new Response(
+        JSON.stringify({ day: t, open: open, run: dayRun() }),
+        { headers: { "Content-Type": "application/json" } }));
+    }).catch(function(){});
+  } catch(e){}
+}
 
 /* days[iso] = { p:{}, said:"...", kept:bool, bedok:bool, gap:"..." } */
 function day(iso){
@@ -197,6 +218,141 @@ function tipFor(key){
   var k = today() + key, h = 0;
   for (var j = 0; j < k.length; j++) h = (h * 33 + k.charCodeAt(j)) >>> 0;
   return pool[h % pool.length];
+}
+
+/* ------------------------------------------------------------- the months
+   His call, against the clean-reset school: a bad month is not deleted, it
+   is remembered, because the pattern in it is the lesson. Everything here
+   derives from the record - nothing new is stored, so it can never drift. */
+function monthsWithData(){
+  var set = {};
+  Object.keys(S.days).forEach(function(k){ set[k.slice(0, 7)] = 1; });
+  Object.keys(S.freezes || {}).forEach(function(k){ set[k.slice(0, 7)] = 1; });
+  return Object.keys(set).sort();
+}
+function monthName(ym){
+  return ["January","February","March","April","May","June","July","August",
+    "September","October","November","December"][Number(ym.slice(5, 7)) - 1] + " " + ym.slice(0, 4);
+}
+function monthLedger(ym){
+  var t = today();
+  var first = null;
+  PILLARS.forEach(function(g){
+    var f = firstDay(g[0]);
+    if (f && (!first || f < first)) first = f;
+  });
+  var start = new Date(ym + "-01T00:00:00");
+  var end = new Date(start); end.setMonth(end.getMonth() + 1); end.setDate(0);
+  /* a run standing at the 1st carries in from last month - walk back so the
+     month is credited with the run he was actually on */
+  var run = 0, back = new Date(start);
+  for (;;){
+    back.setDate(back.getDate() - 1);
+    var bk = iso(back);
+    if (allThree(bk)) run++;
+    else if (!frozen(bk)) break;
+  }
+  var full = 0, possible = 0, best = run, frozenUsed = 0;
+  var missPW = { train:[0,0,0,0,0,0,0], family:[0,0,0,0,0,0,0], stop:[0,0,0,0,0,0,0] };
+  var d = new Date(start);
+  for (; d <= end; d.setDate(d.getDate() + 1)){
+    var k = iso(d);
+    if (k > t) break;
+    if (!first || k < first) continue;
+    /* today is still being played - it cannot have "broken" yet */
+    if (k === t && !allThree(k)) break;
+    possible++;
+    if (allThree(k)){ full++; run++; if (run > best) best = run; }
+    else if (frozen(k)){ frozenUsed++; }
+    else {
+      run = 0;
+      var dw = new Date(k + "T00:00:00").getDay();
+      PILLARS.forEach(function(g){
+        if (required(g[0], k) && !pDone(k, g[0])) missPW[g[0]][dw]++;
+      });
+    }
+  }
+  var quests = Object.keys(S.quests || {}).filter(function(k){
+    return k.slice(0, 7) === ym && S.quests[k].done;
+  }).length;
+  var chips = Object.keys(S.chips || {}).filter(function(c){
+    return String((S.chips || {})[c]).slice(0, 7) === ym;
+  }).map(Number).sort(function(a, b){ return a - b; });
+  return { ym: ym, full: full, possible: possible, best: best,
+           frozenUsed: frozenUsed, missPW: missPW, quests: quests, chips: chips,
+           lesson: monthLesson(missPW, possible) };
+}
+/* One deterministic sentence per month: which pillar broke, and whether the
+   breaks cluster on a weekday. Code, not model - the lesson never wobbles. */
+function monthLesson(missPW, possible){
+  if (!possible) return null;
+  var worst = null, worstN = 0, totals = {};
+  PILLARS.forEach(function(g){
+    var n = missPW[g[0]].reduce(function(a, b){ return a + b; }, 0);
+    totals[g[0]] = n;
+    if (n > worstN){ worstN = n; worst = g; }
+  });
+  if (!worstN) return "Clean. Nothing to fix.";
+  var w = missPW[worst[0]], top = 0;
+  for (var i = 1; i < 7; i++) if (w[i] > w[top]) top = i;
+  var line = worst[1] + " broke " + worstN + (worstN === 1 ? " time" : " times");
+  if (w[top] >= 2 && w[top] * 2 >= worstN){
+    line += " — " + w[top] + " of them on "
+      + ["Sundays","Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays"][top] + ".";
+  } else {
+    line += ", spread across the week.";
+  }
+  return line;
+}
+function prevMonthKey(){
+  var d = new Date(today() + "T00:00:00");
+  d.setDate(0);
+  return iso(d).slice(0, 7);
+}
+/* The recap that greets a new month, once: the month that just closed, held
+   up before it is filed. */
+function monthRecapDue(){
+  var pm = prevMonthKey();
+  if ((S.monthSeen || {})[pm]) return null;
+  if (monthsWithData().indexOf(pm) < 0) return null;
+  var L = monthLedger(pm);
+  return L.possible ? L : null;
+}
+
+/* --------------------------------------------------------- the coach file
+   The loop he asked for: download this, hand it to Claude, get the next
+   tuning of the game back. Instructions ride inside the file so any future
+   session knows what it is holding. */
+function coachExport(){
+  var derived = {
+    months: monthsWithData().map(monthLedger),
+    bestRunEver: bestRunEver(),
+    currentRun: dayRun(),
+    fullDays: fullDays(),
+    questDaysOffered: Object.keys(S.quests || {}).length,
+    questsDone: questsDone(),
+    swapsUsed: Object.keys(S.quests || {}).filter(function(k){ return S.quests[k].swaps; }).length,
+    livedCards: Object.keys(S.lived || {}),
+    chips: S.chips || {},
+    chipRewards: S.chipRewards || {},
+    heldCards: heldCount(),
+    totalCards: CARDS.length,
+    spends: S.spends || [],
+    rate: rate()
+  };
+  return "# Daylight coach file\n\n"
+    + "Exported " + today() + " from build " + (typeof BUILD !== "undefined" ? BUILD : "?") + ".\n\n"
+    + "**Stuart:** hand this file to Claude (claude.ai or Claude Code, repo stuatnext/stu-bot)\n"
+    + "with a sentence on how the last stretch actually felt.\n\n"
+    + "**Claude:** read `docs/coaching.md` in stuatnext/stu-bot if you can reach it. Either way:\n"
+    + "analyse the JSON below. Find the weakest pillar and any weekday pattern in the month\n"
+    + "ledgers; judge whether the tips, side quests and chips are pulling their weight (quest\n"
+    + "completion rate, lived cards, named rewards); then propose the smallest change to the\n"
+    + "game that would most improve his consistency. Tune, do not redesign - and check the\n"
+    + "proposal against what he has already approved before building anything.\n\n"
+    + "```json\n"
+    + JSON.stringify({ exported: today(), derived: derived, save: S }, null, 1)
+    + "\n```\n";
 }
 
 /* ------------------------------------------------------------- the record */

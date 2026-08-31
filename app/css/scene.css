@@ -15,6 +15,20 @@ body.scene #screen{justify-content:flex-start; gap:0}
 .ask.gold{color:var(--ink)}
 .asksub{font-size:14.5px; font-weight:700; color:var(--ink2); margin:5px 0 0}
 
+/* ------------------------------------------------------------ the month, filed
+   Shows once when a month closes, then lives on the shelf in You. */
+.mrecap{background:var(--card); border:2px solid var(--edge); border-bottom-width:5px;
+  border-radius:18px; padding:13px 14px; margin:0 0 10px}
+.mrecap b{display:block; font-family:"Nunito",sans-serif; font-size:16px; font-weight:900}
+.mrecap > span{display:block; font-size:12.5px; font-weight:700; color:var(--ink2); margin-top:2px}
+.mrecap .mles{display:block; margin-top:8px; padding:8px 11px; border-radius:11px;
+  background:var(--goldSoft); color:var(--goldInk); font-size:12.5px; font-weight:800}
+.mrecap .mok{margin-top:10px; font:900 13px/1 "Nunito",sans-serif; color:#FFFFFF;
+  background:#46A302; border:0; border-bottom:3px solid #3A8702; border-radius:11px;
+  padding:9px 14px 8px; cursor:pointer;
+  transition:transform .08s var(--tap), border-bottom-width .08s var(--tap)}
+.mrecap .mok:active{transform:translateY(2px); border-bottom-width:1px}
+
 /* ------------------------------------------------------------- the sky card
    The one place the hour still paints. */
 .skycard{display:flex; align-items:center; gap:14px; padding:12px 16px;
