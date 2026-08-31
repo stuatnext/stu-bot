@@ -18,7 +18,8 @@ function load(){
   var d = { camp:"Singapore", wake:"08:30", bed:"23:45", done:{}, skip:{}, filter:0,
             days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, openedDay:0, openedStreak:0,
             theme:null, mute:false, rate:0, spends:[], freezes:{},
-            crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0 };
+            crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0,
+            quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0 };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
@@ -113,6 +114,105 @@ function monthOf(k){ return k.slice(0, 7); }
 
 /* The number the flame wears: consecutive full days ending today or
    yesterday, frozen days carrying the run without counting. */
+/* ------------------------------------------------------------- side quests
+   One held card a day asks something of him. Completing it pays spares and
+   XP - never money, the pot stays consistency-only - and marks the card
+   "lived", which no pack can do. */
+function cardDo(c){
+  return CARD_DO[c[0]] || SET_DO[c[2]](c[0]);
+}
+function questFor(k){
+  var q = (S.quests || {})[k];
+  var held = CARDS.filter(function(c){ return (S.cards || {})[c[0]]; });
+  if (!held.length) return null;
+  var skip = q && q.swaps ? q.swaps : 0;
+  var h = 0, str = k + "~q" + skip;
+  for (var j = 0; j < str.length; j++) h = (h * 31 + str.charCodeAt(j)) >>> 0;
+  var c = held[h % held.length];
+  return { card: c, text: cardDo(c), done: !!(q && q.done), swaps: skip };
+}
+function questsDone(){
+  var n = 0;
+  Object.keys(S.quests || {}).forEach(function(k){ if (S.quests[k].done) n++; });
+  return n;
+}
+
+/* --------------------------------------------------------------- the chips
+   Earned at the longest run he has ever held; never taken back. */
+function bestRunEver(){
+  var keys = Object.keys(S.days).filter(allThree).sort();
+  if (!keys.length) return 0;
+  var best = 0, run = 0;
+  var d = new Date(keys[0] + "T00:00:00");
+  var end = new Date(keys[keys.length - 1] + "T00:00:00");
+  while (d <= end){
+    var k = iso(d);
+    if (allThree(k)){ run++; if (run > best) best = run; }
+    else if (!frozen(k)) run = 0;
+    d.setDate(d.getDate() + 1);
+  }
+  return best;
+}
+function chipsEarned(){
+  var b = Math.max(bestRunEver(), dayRun());
+  return CHIPS.filter(function(c){ return b >= c[0]; });
+}
+/* the next chip not yet celebrated, if the current run has reached it */
+function chipDue(){
+  var run = dayRun();
+  for (var i = 0; i < CHIPS.length; i++){
+    var t = CHIPS[i][0];
+    if (run >= t && !(S.chips || {})[t]) return CHIPS[i];
+  }
+  return null;
+}
+/* Chips earned before chips existed are marked quietly at startup - a
+   ceremony for something he did weeks ago would be the app applauding
+   itself. Only a run that crosses a threshold live gets the moment. */
+function backfillChips(){
+  var b = bestRunEver(), touched = 0;
+  S.chips = S.chips || {};
+  CHIPS.forEach(function(c){
+    if (b >= c[0] && !S.chips[c[0]]){ S.chips[c[0]] = today(); touched = 1; }
+  });
+  if (touched) save();
+}
+
+/* ---------------------------------------------------------------- next up
+   What the hour points at. The shift is the spine: train before Malta
+   wakes, family in the Sheffield-friendly window, stop when it closes. */
+function nextUp(){
+  var t = today(), sh = shape(), h = new Date().getHours(), dw = new Date().getDay();
+  var open = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); })
+                    .map(function(g){ return g[0]; });
+  if (!open.length) return null;
+  if (open.indexOf("stop") >= 0 && !sh.weekend && sh.now >= sh.end) return "stop";
+  if (open.indexOf("family") >= 0 && (dw === 3 || (h >= 13 && h < 19))) return "family";
+  if (open.indexOf("train") >= 0 && (sh.weekend || sh.now < sh.start)) return "train";
+  return open[0];
+}
+function tipFor(key){
+  var pool = TIPS[key] || [];
+  if (!pool.length) return "";
+  var k = today() + key, h = 0;
+  for (var j = 0; j < k.length; j++) h = (h * 33 + k.charCodeAt(j)) >>> 0;
+  return pool[h % pool.length];
+}
+
+/* ------------------------------------------------------------- the record */
+function exportSave(){ return JSON.stringify(S); }
+function importSave(text){
+  var p = JSON.parse(text);
+  if (!p || typeof p !== "object" || !p.days) throw new Error("not a Daylight save");
+  for (var k in S) if (k in p) S[k] = p[k];
+  save();
+}
+function backupOverdue(){
+  if (fullDays() < 7) return false;
+  if (!S.lastBackup) return true;
+  return (new Date(today() + "T00:00:00") - new Date(S.lastBackup + "T00:00:00")) / 86400000 > 30;
+}
+
 function dayRun(){
   var n = 0, d = new Date(), k = iso(d);
   if (!allThree(k)){ d.setDate(d.getDate() - 1); k = iso(d); }
@@ -269,6 +369,7 @@ function sparesEarned(){
     var have = held[c[0]] || 0;
     if (have > 1) n += (have - 1) * RARITY[c[1]][4];
   });
+  n += questsDone() * 10;
   return n;
 }
 function spares(){ return Math.max(0, sparesEarned() - (S.sparesSpent || 0)); }
@@ -339,6 +440,7 @@ function xp(){
   Object.keys(S.days).forEach(function(k){ if (allThree(k)) n += 15; });
   n += Object.keys(S.done || {}).length * 20;
   n += setsComplete() * 100;
+  n += questsDone() * 20;
   return n;
 }
 function rank(){

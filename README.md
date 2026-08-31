@@ -318,6 +318,41 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v14: the game starts giving orders
+
+His list, all four of it: make the app time-aware with real tips; make the
+cards *useful* — "a tip or an action or a challenge"; milestone ceremonies
+"like those alcoholics anonymous things", with bigger rewards beyond 90
+days; and protect the record.
+
+**The hour points at a row.** `nextUp()` reads the clock against the Malta
+shift — train before it wakes, family in the Sheffield-friendly window, stop
+when it closes — and that row wears a NOW pill and speaks an actual tip
+("About 07:00 in Sheffield right now - a good window") instead of its
+static gloss. Tips rotate by day hash so two mornings never repeat.
+
+**Every card now asks something.** One held card a day becomes the side
+quest under the chest — a dashed card with a doable line built from the
+card itself ("Return the tray, and one that is not yours"), one swap a day,
+and *Did it* pays +10 spares, +20 XP and marks the card **lived**: a gold
+tick on its face and its ask pinned to its sheet forever. ~20 cards carry
+hand-written challenges; the rest build theirs from their set's template.
+
+**Chips.** The AA medallion, taken seriously: 1 day white, 7 bronze,
+30 silver, 90 gold, 180 emerald, 365 diamond — minted by the longest run
+ever held and never taken back. Crossing a threshold live replaces the
+daily fanfare with a full-screen ceremony (dark room, one coin, confetti);
+chips already earned before v14 are backfilled quietly, and day one's chip
+stays quiet during the tutorial so the first pack remains the lesson. The
+case lives in You, and every chip carries a reward he names himself —
+a chip without a treat is a badge, and badges stop working.
+
+**The record survives the phone.** Back up = one tap in You (share sheet
+on iOS, download elsewhere, clipboard as the last door); restore = paste
+the file back, double-confirmed with the day count shown. Once the record
+holds a week and hasn't been saved out for a month, You opens with a
+banner saying exactly how many days live only on this phone.
+
 #### v13: cards that explain themselves
 
 Happy with v12, he asked the two questions the cards had never answered:

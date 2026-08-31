@@ -9,7 +9,7 @@
 body.scene #screen{justify-content:flex-start; gap:0}
 
 /* the greeting */
-.hello{text-align:left; margin:6px 2px 10px}
+.hello{text-align:left; margin:4px 2px 8px}
 .ask{font-family:"Nunito",sans-serif; font-weight:900; font-size:26px;
   letter-spacing:-.015em; margin:0; line-height:1.12; color:var(--ink); text-wrap:balance}
 .ask.gold{color:var(--ink)}
@@ -18,7 +18,7 @@ body.scene #screen{justify-content:flex-start; gap:0}
 /* ------------------------------------------------------------- the sky card
    The one place the hour still paints. */
 .skycard{display:flex; align-items:center; gap:14px; padding:12px 16px;
-  border-radius:var(--r2); margin:0 0 10px;
+  border-radius:var(--r2); margin:0 0 8px;
   background:linear-gradient(135deg, var(--sky1), var(--sky2));
   border:2px solid rgba(0,0,0,.08);
   transition:background 1.6s linear}
@@ -36,7 +36,7 @@ body.scene #screen{justify-content:flex-start; gap:0}
   font-weight:700; letter-spacing:.12em; text-transform:uppercase; opacity:.75; margin-top:3px}
 
 /* ------------------------------------------------------------ the week strip */
-.week{display:flex; gap:6px; margin:0 0 12px}
+.week{display:flex; gap:6px; margin:0 0 10px}
 .wd{flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
   padding:8px 0 7px; border-radius:14px; background:var(--card); border:2px solid var(--edge)}
 .wd i{width:22px; height:22px; border-radius:50%; display:flex; align-items:center;
@@ -51,10 +51,10 @@ body.scene #screen{justify-content:flex-start; gap:0}
 .wd.off{opacity:.45}
 
 /* --------------------------------------------------------- the three quests */
-.quests{display:flex; flex-direction:column; gap:10px; margin:2px 0 12px}
+.quests{display:flex; flex-direction:column; gap:9px; margin:2px 0 10px}
 .pil{display:flex; align-items:center; gap:13px; width:100%; text-align:left;
   font:inherit; font-family:"Nunito",sans-serif; cursor:pointer;
-  padding:13px 14px; min-height:76px; border-radius:18px;
+  padding:12px 14px; min-height:73px; border-radius:18px;
   background:var(--card); color:var(--ink);
   border:2px solid var(--edge); border-bottom-width:5px;
   transition:transform .08s var(--tap), border-bottom-width .08s var(--tap),
@@ -78,12 +78,19 @@ body.scene #screen{justify-content:flex-start; gap:0}
 .pil.on .qbd b{color:var(--greenInk)}
 .pil.carried{opacity:.6}
 .pil.carried .qic{background:var(--sunk); color:var(--ink3)}
+
+/* the row the hour points at: it wears the pill and speaks a real tip */
+.pil.up{border-color:#A6DFF7; background:var(--blueSoft)}
+.pil.up .qbd span{color:var(--ink)}
+.now{display:inline-block; vertical-align:2px; margin-left:7px; padding:2.5px 7px;
+  border-radius:8px; background:#0E6C9E; color:#FFFFFF; font-size:10px;
+  font-weight:900; font-style:normal; letter-spacing:.09em; text-transform:uppercase}
 .pil.pop .qchk{animation:qpop .45s var(--pop)}
 @keyframes qpop{0%{transform:scale(1)}45%{transform:scale(1.35) rotate(8deg)}100%{transform:scale(1)}}
 
 /* ---------------------------------------------------------------- the chest */
 .gem{display:flex; align-items:center; gap:13px; width:100%; text-align:left;
-  font:inherit; font-family:"Nunito",sans-serif; padding:14px;
+  font:inherit; font-family:"Nunito",sans-serif; padding:12px 14px;
   border-radius:18px; border:2px solid var(--edge); border-bottom-width:5px;
   background:var(--card); color:var(--ink); flex-wrap:wrap}
 button.gem{cursor:pointer; transition:transform .08s var(--tap), border-bottom-width .08s var(--tap)}
@@ -111,6 +118,30 @@ button.gem:active{transform:translateY(3px); border-bottom-width:2px}
 .gem .gbar i{display:block; height:100%; border-radius:8px; background:var(--green);
   transition:width .5s var(--pop); min-width:0}
 
+/* ------------------------------------------------------------ the side quest
+   One held card asks something of him. Dashed border: a dare, not a duty. */
+.quest{display:flex; align-items:center; gap:11px; padding:9px 12px; margin-top:9px;
+  border-radius:16px; background:var(--card); border:2px dashed var(--edge2)}
+.quest .qgl{flex:none; width:40px; height:40px; border-radius:12px; background:var(--goldSoft);
+  display:flex; align-items:center; justify-content:center; font-size:22px; line-height:1}
+.quest .qgl.zh{font-size:19px; font-weight:700; color:var(--goldInk)}
+.quest .qtx{flex:1; min-width:0}
+.quest .qtx b{display:block; font-size:10.5px; font-weight:900; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--goldInk);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.quest .qtx > span{display:block; font-size:12.5px; font-weight:700; color:var(--ink2);
+  margin-top:2px; line-height:1.32}
+.quest .qact{flex:none; display:flex; flex-direction:column; gap:3px; align-items:stretch}
+.quest .qgo{font:900 12.5px/1 "Nunito",sans-serif; color:#FFFFFF; background:#46A302;
+  border:0; border-bottom:3px solid #3A8702; border-radius:11px; padding:9px 13px 8px;
+  cursor:pointer; transition:transform .08s var(--tap), border-bottom-width .08s var(--tap)}
+.quest .qgo:active{transform:translateY(2px); border-bottom-width:1px}
+.quest .qswap{font:800 11px/1 "Nunito",sans-serif; color:var(--ink3); background:none;
+  border:0; padding:5px 2px 3px; cursor:pointer}
+.quest.qdone{border-style:solid; background:var(--goldSoft); border-color:#EDD27E}
+.quest .qwin{flex:none; width:34px; height:34px; border-radius:11px; background:var(--gold);
+  color:var(--goldInk); display:flex; align-items:center; justify-content:center}
+
 /* ------------------------------------------------------------- the entrance */
 #screen.arrive .hello{animation:riseup .4s var(--pop) both}
 #screen.arrive .skycard{animation:riseup .4s var(--pop) both .06s}
@@ -119,10 +150,11 @@ button.gem:active{transform:translateY(3px); border-bottom-width:2px}
 #screen.arrive .pil:nth-child(2){animation:riseup .4s var(--pop) both .24s}
 #screen.arrive .pil:nth-child(3){animation:riseup .4s var(--pop) both .30s}
 #screen.arrive .gem{animation:riseup .4s var(--pop) both .38s}
+#screen.arrive .quest{animation:riseup .4s var(--pop) both .46s}
 @keyframes riseup{from{opacity:0; transform:translateY(14px)}to{opacity:1; transform:none}}
 @media (prefers-reduced-motion:reduce){
   #screen.arrive .hello,#screen.arrive .skycard,#screen.arrive .week,
-  #screen.arrive .pil,#screen.arrive .gem{animation:none !important}
+  #screen.arrive .pil,#screen.arrive .gem,#screen.arrive .quest{animation:none !important}
 }
 
 /* the burst a quest makes when it lands */
@@ -138,4 +170,6 @@ button.gem:active{transform:translateY(3px); border-bottom-width:2px}
   .qic{width:42px; height:42px}
   .skycard{padding:9px 14px}
   .skycard svg{width:92px; height:48px}
+  .quest{padding:8px 10px; margin-top:8px}
+  .quest .qgl{width:34px; height:34px; font-size:19px}
 }

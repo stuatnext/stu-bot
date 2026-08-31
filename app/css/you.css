@@ -88,3 +88,30 @@
 .row.on .ic{background:var(--jade); border-color:var(--jade); color:#05231A}
 .row.warn{border-color:color-mix(in srgb,var(--ember) 45%,transparent)}
 .row.warn .ic{color:var(--ember)}
+
+/* ------------------------------------------------------------- the chip case
+   Six coins in a row of three: earned ones in their own metal, the rest in
+   ghost grey with the distance printed under them. */
+.chipcase{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px}
+.chp{display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 6px 10px;
+  font:inherit; font-family:"Nunito",sans-serif; background:var(--sunk);
+  border:2px solid var(--edge); border-radius:14px; cursor:pointer; min-width:0}
+.chp .medal{width:54px; height:54px; filter:grayscale(1); opacity:.35}
+.chp.got{background:var(--card)}
+.chp.got .medal{filter:none; opacity:1}
+.chp b{font-size:11.5px; font-weight:900; color:var(--ink3); max-width:100%;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.chp.got b{color:var(--ink)}
+.chp span{font-size:10.5px; font-weight:700; color:var(--ink3); max-width:100%;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.chp.got span{color:var(--goldInk)}
+
+/* the backup nag - shown only once the record is worth protecting */
+.warnbar{display:block; width:100%; text-align:left; font:inherit;
+  font-family:"Nunito",sans-serif; padding:12px 14px; margin:0 0 12px;
+  border-radius:16px; cursor:pointer; color:var(--goldInk);
+  background:var(--goldSoft); border:2px solid #EDD27E; border-bottom-width:5px;
+  transition:transform .08s var(--tap), border-bottom-width .08s var(--tap)}
+.warnbar:active{transform:translateY(3px); border-bottom-width:2px}
+.warnbar b{display:block; font-size:14.5px; font-weight:900}
+.warnbar span{display:block; font-size:12.5px; font-weight:700; margin-top:2px; opacity:.9}

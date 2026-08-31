@@ -13,6 +13,13 @@
 function viewYou(){
   var r = rank(), have = pot(), h = "";
 
+  /* the record is only real if it survives the phone */
+  if (backupOverdue()){
+    h += "<button class='warnbar' data-backup='1'>"
+      + "<b>" + num(fullDays()) + " days live only on this phone.</b>"
+      + "<span>Back the record up &mdash; one tap, keep the file anywhere.</span></button>";
+  }
+
   /* who the days have made him */
   var into = r.xp - r.from, span = r.to ? r.to - r.from : Math.max(1, into);
   h += "<div class='panel yrank'>"
@@ -56,11 +63,34 @@ function viewYou(){
   }
   h += "</div>";
 
+  /* the chip case: the longest run he has ever held, minted. AA got this
+     right decades ago - the medallion in the pocket outlasts the meeting. */
+  var bestR = Math.max(bestRunEver(), dayRun());
+  h += "<div class='panel'><h3>Chips</h3><div class='chipcase'>";
+  CHIPS.forEach(function(c){
+    var got = !!(S.chips || {})[c[0]] || bestR >= c[0];
+    var rw = (S.chipRewards || {})[c[0]];
+    h += "<button class='chp" + (got ? " got" : "") + "' data-chipreward='" + c[0] + "'>"
+      + medalSVG(c)
+      + "<b>" + esc(c[1]) + "</b>"
+      + "<span>" + esc(rw || (got ? "Earned" : (c[0] - bestR) + " to go")) + "</span>"
+      + "</button>";
+  });
+  h += "</div><p class='dim' style='margin:10px 0 0'>Your longest run ever mints these, and a chip "
+    + "is never taken back. Each carries a reward you name &mdash; tap one to set it.</p></div>";
+
   /* the switches */
   h += "<div class='menu'>"
     + mrow("replay", "1", "pack", "How this works", "The three-tap tour, again")
     + mrow("sound", "1", "spare", "Sound", S.mute ? "Off" : "On")
     + mrow("camp", "1", "pin", "Where you are", S.camp)
+    + "</div>";
+
+  /* the record itself */
+  h += "<div class='menu'>"
+    + mrow("backup", "1", "save", "Back up the record",
+        S.lastBackup ? "Last saved " + nice(S.lastBackup) : "Never saved out")
+    + mrow("restore", "1", "load", "Restore a backup", "Paste a saved file back in")
     + "</div>";
 
   /* the paper that lives outside the game */
@@ -113,6 +143,99 @@ async function askFreeze(){
   render({ keepScroll: true, animate: true });
 }
 
+
+/* Naming the reward is the whole trick: a chip that buys nothing is a badge,
+   and badges stop working. Works on chips not yet earned, on purpose - the
+   promise should be pulling before he gets there. */
+async function askChipReward(t){
+  var c = CHIPS.filter(function(x){ return x[0] === t; })[0];
+  if (!c) return;
+  var i = CHIPS.indexOf(c);
+  var bestR = Math.max(bestRunEver(), dayRun());
+  var got = !!(S.chips || {})[t] || bestR >= t;
+  var away = t - bestR;
+  var v = await ask({
+    title: c[1] + " · " + t + (t === 1 ? " day" : " days"),
+    say: got
+      ? "Earned, and it stays earned. Name what it buys you - then go collect it."
+      : away + (away === 1 ? " day" : " days") + " away. Name the reward now, so the chip is pulling before you reach it.",
+    field: { label: "The reward", value: (S.chipRewards || {})[t] || "",
+             placeholder: CHIP_HINT[i] || "Name it" },
+    confirm: "Save it", cancel: "Close"
+  });
+  if (v === null) return;
+  S.chipRewards = S.chipRewards || {};
+  var s = String(v).trim().slice(0, 80);
+  if (s) S.chipRewards[t] = s; else delete S.chipRewards[t];
+  save(); sfx("done");
+  render({ keepScroll: true });
+}
+
+/* ------------------------------------------------------- the record, out
+   Share sheet where the platform has one (iOS: straight into Files or
+   Telegram), a plain download elsewhere, the clipboard as the last door. */
+async function doBackup(){
+  var text = exportSave(), name = "daylight-" + today() + ".json";
+  var how = null;
+  if (navigator.canShare && window.File){
+    try {
+      var f = new File([text], name, { type: "application/json" });
+      if (navigator.canShare({ files: [f] })){
+        await navigator.share({ files: [f], title: "Daylight backup" });
+        how = "Saved out. Keep it somewhere that is not this phone.";
+      }
+    } catch(e){ if (e && e.name === "AbortError") return; }
+  }
+  if (!how){
+    try {
+      var a = document.createElement("a");
+      a.href = "data:application/json;charset=utf-8," + encodeURIComponent(text);
+      a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      how = "Downloaded. Keep it somewhere that is not this phone.";
+    } catch(e2){}
+  }
+  if (!how && navigator.clipboard){
+    try {
+      await navigator.clipboard.writeText(text);
+      how = "Copied instead. Paste it into notes or an email now.";
+    } catch(e3){}
+  }
+  if (!how){ sfx("no"); toast("This browser will not hand the file over."); return; }
+  S.lastBackup = today(); save();
+  sfx("done"); buzz(14);
+  toast(how);
+  render({ keepScroll: true });
+}
+
+async function askRestore(){
+  var v = await ask({
+    title: "Restore the record",
+    say: "Open the backup file, copy everything inside, and paste it here. "
+       + "What is on this phone now gets replaced.",
+    field: { label: "The backup", value: "", placeholder: "{\"days\":{…" },
+    confirm: "Check it", cancel: "Cancel"
+  });
+  if (v === null) return;
+  var p;
+  try {
+    p = JSON.parse(String(v));
+    if (!p || typeof p !== "object" || !p.days) throw 0;
+  } catch(e){ sfx("no"); toast("That does not read as a Daylight backup."); return; }
+  var nDays = Object.keys(p.days).length;
+  var ok = await ask({
+    title: "Replace everything?",
+    say: "The backup holds " + nDays + (nDays === 1 ? " logged day" : " logged days")
+       + ". Everything currently on this phone is overwritten, and there is no undo.",
+    confirm: "Restore it", cancel: "Keep what I have", danger: true
+  });
+  if (!ok) return;
+  importSave(String(v));
+  S.lastBackup = today(); save();
+  sfx("level"); buzz([20, 50, 30]);
+  toast("The record is back.");
+  tab = "today"; render({ turn: true, animate: true });
+}
 
 /* ------------------------------------------------------------- the asks */
 async function askSpend(){
@@ -167,8 +290,8 @@ async function askCamp(){
 async function askReset(){
   var ok = await ask({
     title: "Clear everything?",
-    say: "Every day logged, every card held, every place, the pot and the trophies. There is no undo "
-       + "and there is no backup.",
+    say: "Every day logged, every card held, every chip, the pot and the trophies. There is no undo "
+       + "&mdash; if you want a way back, back the record up first.",
     confirm: "Clear it all", cancel: "Keep it", danger: true
   });
   if (!ok) return;
@@ -182,6 +305,7 @@ async function askReset(){
   S.done = {}; S.skip = {}; S.days = {}; S.threads = {}; S.cards = {}; S.claimed = {};
   S.openedDay = 0; S.openedStreak = 0; S.crafted = {}; S.sparesSpent = 0; S.seen = {};
   S.spends = []; S.freezes = {};
+  S.quests = {}; S.lived = {}; S.chips = {}; S.chipRewards = {}; S.lastBackup = 0;
   save(); sfx("no");
   tab = "today"; render({ turn: true, animate: true });
 }

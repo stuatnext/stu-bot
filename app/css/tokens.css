@@ -73,7 +73,8 @@ body{
 /* Today fits one viewport; the other tabs scroll like lists */
 body.scene{height:100dvh; overflow:hidden; display:flex; flex-direction:column}
 body.scene #screen{flex:1; min-height:0; display:flex; flex-direction:column;
-  overflow:hidden; padding:0 14px calc(84px + env(safe-area-inset-bottom)); width:100%}
+  overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain;
+  padding:0 14px calc(84px + env(safe-area-inset-bottom)); width:100%}
 
 .mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums}
 .disp{font-family:"Nunito",sans-serif; font-weight:800}

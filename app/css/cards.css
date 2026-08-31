@@ -303,3 +303,19 @@
   box-shadow:0 0 0 3px color-mix(in srgb,var(--violet) 16%,transparent)}
 .node .l{font-size:9px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink3);
   margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+/* a lived card: the side quest was done in the world, not on the screen */
+.tc-lived{position:absolute; right:4px; top:4px; z-index:5; width:18px; height:18px;
+  border-radius:7px; background:var(--gold); color:#5A4200;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 1px 0 rgba(0,0,0,.25)}
+
+/* the ask a held card carries, on its sheet */
+#sheet .try{max-width:290px; text-align:center; font-family:"Nunito",sans-serif;
+  font-weight:700; font-size:13.5px; line-height:1.45; color:#FFE9AE;
+  background:rgba(255,200,0,.12); border:1px solid rgba(255,200,0,.35);
+  border-radius:13px; padding:10px 14px; text-wrap:balance}
+#sheet .try b{font-weight:900; color:#FFD35C; margin-right:6px}
+#sheet .try.done{color:#C9F3DE; background:rgba(63,217,160,.12);
+  border-color:rgba(63,217,160,.4)}
+#sheet .try.done b{color:#5CE8B5}
