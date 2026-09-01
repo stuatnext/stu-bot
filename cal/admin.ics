@@ -4,8 +4,8 @@ PRODID:-//stu-bot//Daylight//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 X-WR-CALNAME:Daylight - Admin
-X-WR-CALDESC:Filings\, insurance and the UK. Do not subscribe your partner 
- to this one.
+X-WR-CALDESC:Filings\, insurance and the UK. This is the one Tim does not g
+ et.
 X-PUBLISHED-TTL:PT12H
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 BEGIN:VEVENT

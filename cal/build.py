@@ -3,10 +3,10 @@
 Build the three calendar feeds.
 
 The point of this file: an app you have to open is a promise to yourself, and
-those fade. Apple Calendar is already open on his phone and his partner's, so
+those fade. Apple Calendar is already open on his phone and on Tim's, so
 the anchors belong in there rather than behind a tab he has to remember to
 visit. Three separate feeds so each can be subscribed to, or not, independently
-- and so the shared one can go to his partner without the admin coming too.
+- and so the shared ones can go to Tim without the admin coming too.
 
     python3 cal/build.py
 
@@ -160,7 +160,7 @@ def build_year():
         ("Company retreat", "Bulgaria", (2026,9,9), (2026,9,11), "End date assumed - correct it."),
         ("UK - family, September", "UK", (2026,9,12), (2026,9,23), "The twelve days. Protect these from work."),
         ("Singapore, before France", "Singapore", (2026,9,24), (2026,10,9), "TOKEN2049 in here. Longest settled run before January."),
-        ("France with partner", "France", (2026,10,10), (2026,10,16), "Not a working trip."),
+        ("France with Tim", "France", (2026,10,10), (2026,10,16), "Not a working trip."),
         ("UK - family, October", "UK", (2026,10,17), (2026,10,21), "A few days before New York."),
         ("UNDECIDED - UK week or home", "?", (2026,10,24), (2026,11,1), "Decide now, not at an airport. Home means seven unbroken weeks in Singapore. UK means the October conversation happens in a room at head office, four days after you launched their event."),
         ("Singapore - the seven weeks", "Singapore", (2026,11,2), (2026,12,19), "Seven weeks. Where the routine actually starts."),
@@ -222,7 +222,7 @@ def build_admin():
     evs += event("admin-cs", "Corporate tax - Form C-S", date(2026, 11, 30), all_day=True,
                  rrule="FREQ=YEARLY", desc="New companies get 75% off the first S$100,000 of chargeable income for the first three years.")
     return calendar("Daylight - Admin",
-                    "Filings, insurance and the UK. Do not subscribe your partner to this one.", evs)
+                    "Filings, insurance and the UK. This is the one Tim does not get.", evs)
 
 
 def main():
