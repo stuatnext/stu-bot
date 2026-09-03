@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Middle</title>
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#EDEFEC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1211" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --ground:#EDEFEC; --surface:#FBFCFA; --surface-2:#E4E8E3; --sunk:#E0E4DF;
+  --line:#D4D9D3; --line-strong:#B7BFB9;
+  --ink:#141B18; --ink-2:#4A5551; --ink-3:#79847F;
+  --accent:#1F4FE0; --accent-soft:#DDE4FB;
+  --signal:#B35C0C; --signal-soft:#F7E6D4;
+  --crit:#A03830; --crit-soft:#F3DEDC;
+  --good:#2C7A51; --good-soft:#DCEDE3;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1211; --surface:#151D1B; --surface-2:#1D2724; --sunk:#111917;
+    --line:#293430; --line-strong:#3C4945;
+    --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
+    --accent:#7C9BFF; --accent-soft:#1C2647;
+    --signal:#E09453; --signal-soft:#2E2317;
+    --crit:#E08A82; --crit-soft:#2C1C1C;
+    --good:#5CB585; --good-soft:#16261D;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1211; --surface:#151D1B; --surface-2:#1D2724; --sunk:#111917;
+  --line:#293430; --line-strong:#3C4945;
+  --ink:#E9EEEB; --ink-2:#A5B0AB; --ink-3:#77837E;
+  --accent:#7C9BFF; --accent-soft:#1C2647;
+  --signal:#E09453; --signal-soft:#2E2317;
+  --crit:#E08A82; --crit-soft:#2C1C1C;
+  --good:#5CB585; --good-soft:#16261D;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%;}
+body{margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;}
+.wrap{max-width:720px; margin:0 auto;
+  padding:44px max(20px, env(safe-area-inset-left)) 80px max(20px, env(safe-area-inset-right));}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif; margin:0; text-wrap:balance; letter-spacing:-.02em;}
+h1{font-size:clamp(30px,7vw,42px); font-weight:800; line-height:1.08;}
+h2{font-size:22px; font-weight:600; margin:46px 0 4px;}
+h3{font-size:16px; font-weight:600; margin:26px 0 4px;}
+p{margin:11px 0; max-width:62ch;}
+.eyebrow{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);}
+.mono{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;}
+.lede{font-size:18px; color:var(--ink-2); max-width:60ch;}
+.rule{border:none; border-top:1px solid var(--line); margin:38px 0 0;}
+strong{font-weight:600;}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px 20px; margin:16px 0;}
+.card.flag{background:var(--crit-soft); border-color:var(--crit);}
+.card.note{background:var(--signal-soft); border-color:var(--signal);}
+.card.win{background:var(--good-soft); border-color:var(--good);}
+.card h3{margin-top:0;}
+.card p:last-child{margin-bottom:0;}
+
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14.5px;}
+.scroll{overflow-x:auto;}
+th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
+th{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:400; white-space:nowrap;}
+td.mono{white-space:nowrap;}
+ul,ol{margin:11px 0; padding-left:22px; max-width:62ch;}
+li{margin:7px 0;}
+li::marker{color:var(--ink-3);}
+
+figure{margin:24px 0; padding:18px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r);}
+figure svg{display:block; width:100%; max-width:100%; height:auto; color:var(--ink-2);}
+figcaption{margin-top:14px; font-size:13.5px; color:var(--ink-3); line-height:1.5;}
+
+.stat{display:flex; gap:22px; flex-wrap:wrap; margin:18px 0;}
+.stat>div{flex:1; min-width:150px;}
+.stat b{display:block; font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-size:32px; font-weight:700; letter-spacing:-.03em; line-height:1.1;}
+.stat span{font-size:13px; color:var(--ink-3); display:block; margin-top:3px;}
+
+.kill{display:flex; gap:13px; align-items:flex-start; padding:13px 0; border-bottom:1px solid var(--line);}
+.kill:last-child{border-bottom:none;}
+.kill b{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; flex:none; width:78px; padding-top:3px; color:var(--crit);}
+.kill.keep b{color:var(--good);}
+.tag{display:inline-block; font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:5px; background:var(--sunk); color:var(--ink-2);}
+.tag.a{background:var(--accent-soft); color:var(--accent);}
+.tag.s{background:var(--signal-soft); color:var(--signal);}
+.tag.g{background:var(--good-soft); color:var(--good);}
+.q{padding:15px 0; border-bottom:1px solid var(--line);}
+.q:last-child{border-bottom:none;}
+.q p{margin:5px 0 0; font-size:14.5px; color:var(--ink-2);}
+.qn{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--ink-3); letter-spacing:.1em;}
+a{color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-soft);}
+a:hover{border-bottom-color:var(--accent);}
+.step{display:flex; gap:16px; align-items:flex-start; padding:16px 0; border-bottom:1px solid var(--line);}
+.step:last-child{border-bottom:none;}
+.step>b{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; flex:none; width:86px; padding-top:4px; color:var(--accent);}
+.step h3{margin:0 0 2px;}
+.step p{margin:4px 0 0; font-size:14.5px; color:var(--ink-2);}
+.src{font-size:13.5px; color:var(--ink-3); padding-left:20px;}
+.src li{margin:5px 0;}
+.big{font-size:19px; font-weight:600; color:var(--ink); max-width:56ch; line-height:1.45; margin:20px 0;}
+a:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<div class="eyebrow">Training &middot; v1 &middot; 1 September 2026</div>
+<h1>The Middle</h1>
+<p class="lede">You asked for a routine to lose belly fat and love handles. The routine is below and
+it is specific. But the first three sections are the ones that decide whether it works, because the
+thing you described is real and the fix is not the one you named.</p>
+
+<hr class="rule">
+
+<h2>You are not overweight</h2>
+
+<div class="stat">
+  <div><b>182</b><span>centimetres</span></div>
+  <div><b>71.5</b><span>kilograms, roughly</span></div>
+  <div><b>21.6</b><span>BMI &middot; healthy is 18.5&ndash;24.9</span></div>
+</div>
+
+<p>You are on the <strong>lean side of normal</strong>. Not borderline, not "technically fine" &mdash;
+comfortably inside it, with room below you. So the sentence "I definitely need to lose weight" is,
+as a matter of arithmetic, false.</p>
+
+<p>That is not me being nice about it. It matters because it changes the entire plan. If you eat
+less and run more from here, you lose the small amount of muscle you have alongside the fat, your
+face and shoulders go first, and the soft middle stays roughly where it is &mdash; only now it is
+sitting on a smaller frame, which reads as <em>worse</em>, not better. Plenty of men have chased
+this exact feeling down to 65kg and arrived looking softer than when they started.</p>
+
+<div class="card flag">
+<h3>What you actually have is a shape problem, not a weight problem</h3>
+<p>Normal weight, low muscle, fat sitting where men store it first. There is a gym term for it and
+it is not a kind one, so ignore the term and take the mechanism: at 182cm you are carrying very
+little structure. There is nothing under the skin to give the chest an edge or the waist a taper,
+so everything reads as soft &mdash; even at a weight most people would call slim.</p>
+<p>The fix is to <strong>add muscle</strong>, not subtract weight. Your bodyweight should go
+<strong>up</strong> over the next six months, and you should be pleased when it does.</p>
+</div>
+
+<h2>You cannot target belly fat. Nobody can.</h2>
+
+<p>This is the part I am not going to soften, because you will otherwise spend six months doing
+sit-ups and get nothing for it. <strong>Spot reduction is not a thing.</strong> There is no exercise,
+no routine and no supplement that takes fat off one named area. Fat comes off the whole body in an
+order your genetics chose, and for most men the abdomen and flanks are close to <em>last</em>. Doing
+a thousand crunches trains the muscle underneath and leaves the layer above it exactly where it was.</p>
+
+<p>So what actually changes how that area looks?</p>
+
+<div class="kill keep"><b>Muscle</b><div>Broader shoulders and a thicker upper back make the same
+waist look narrower. This is the single fastest visible change available to you, and it happens in
+months, not years.</div></div>
+<div class="kill keep"><b>Posture</b><div>You sit for a seven-hour shift. Tight hip flexors tilt the
+pelvis forward and push the lower belly out; rounded shoulders collapse the chest. Both are trainable
+and both change the silhouette <em>without a gram of fat moving</em>. For a lot of desk-bound men
+this is most of the effect in the first two months.</div></div>
+<div class="kill keep"><b>Bracing</b><div>The deep abdominal wall is a corset. Trained properly &mdash;
+carries, planks, anti-rotation &mdash; it holds the whole midsection in. Crunches do not do this.</div></div>
+<div class="kill"><b>Not this</b><div>Crunches, sit-ups, ab machines, waist trainers, HIIT "belly fat
+burners", anything sold as targeted. None of it does what it says.</div></div>
+
+<h2>The programme</h2>
+
+<p>Three full-body sessions a week, plus the parkrun you already have on Saturday. Full body rather
+than a body-part split for one reason that matters more than any other: <strong>if you miss a
+session, you have not missed a muscle group for the week.</strong> You told me travel and uprooting
+killed every routine you have had. This one is built to survive a missed Wednesday.</p>
+
+<p>Put them at <strong>09:30 on Monday, Wednesday and Friday</strong>. You wake around 08:30 and
+Malta does not start until 16:00, so you have a seven-and-a-half hour window that nobody else has a
+claim on. It is the only part of your day that cannot be taken off you, which is exactly why the
+thing you keep failing to do belongs in it.</p>
+
+<div class="card win">
+<h3>Ask Tim to come</h3>
+<p>He wakes early, he wants the gym, and he says he wants a community. You want a routine and a
+community. Saturday parkrun already does this for both of you. A weekday session together does it
+again, and it stops being your self-improvement project the moment it is something you both turn up
+to. The single strongest predictor of whether someone is still training in six months is whether
+somebody notices when they do not arrive.</p>
+</div>
+
+<h3>Session A &middot; Monday</h3>
+<div class="scroll">
+<table>
+<tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Note</th></tr>
+<tr><td>Goblet squat</td><td class="mono">3</td><td class="mono">8&ndash;10</td><td>One dumbbell at the chest. Easiest squat to learn alone.</td></tr>
+<tr><td>Dumbbell bench press</td><td class="mono">3</td><td class="mono">8&ndash;10</td><td>The chest exercise. This is the one that changes that area.</td></tr>
+<tr><td>One-arm dumbbell row</td><td class="mono">3</td><td class="mono">10 each</td><td>Upper back. Posture, and the V.</td></tr>
+<tr><td>Romanian deadlift</td><td class="mono">3</td><td class="mono">10</td><td>Dumbbells. Hamstrings and glutes; fixes the pelvic tilt.</td></tr>
+<tr><td>Pallof press</td><td class="mono">3</td><td class="mono">12 each</td><td>Cable, side on, press straight out and resist the twist. The waist exercise.</td></tr>
+<tr><td>Farmer's carry</td><td class="mono">3</td><td class="mono">40m</td><td>Heavy dumbbell each hand, walk, do not lean.</td></tr>
+</table>
+</div>
+
+<h3>Session B &middot; Wednesday</h3>
+<div class="scroll">
+<table>
+<tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Note</th></tr>
+<tr><td>Trap-bar or dumbbell deadlift</td><td class="mono">3</td><td class="mono">6&ndash;8</td><td>Trap bar if the gym has one. Flat back, drive the floor away.</td></tr>
+<tr><td>Lat pulldown</td><td class="mono">3</td><td class="mono">8&ndash;10</td><td>Width. This is what makes a waist look smaller.</td></tr>
+<tr><td>Incline dumbbell press</td><td class="mono">3</td><td class="mono">10</td><td>Upper chest, which is the part that reads as flat.</td></tr>
+<tr><td>Reverse lunge</td><td class="mono">3</td><td class="mono">8 each</td><td>Step back, not forward. Kinder on the knees.</td></tr>
+<tr><td>Side plank</td><td class="mono">3</td><td class="mono">30s each</td><td>Directly the love-handle muscles. Will not burn the fat off them.</td></tr>
+<tr><td>Dead bug</td><td class="mono">3</td><td class="mono">10 each</td><td>Lower back stays flat on the floor the whole time.</td></tr>
+</table>
+</div>
+
+<h3>Session C &middot; Friday</h3>
+<div class="scroll">
+<table>
+<tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Note</th></tr>
+<tr><td>Leg press</td><td class="mono">3</td><td class="mono">10</td><td>Or back squat if you have had someone show you.</td></tr>
+<tr><td>Seated cable row</td><td class="mono">3</td><td class="mono">10</td><td>Squeeze the shoulder blades, do not yank with the arms.</td></tr>
+<tr><td>Dumbbell shoulder press</td><td class="mono">3</td><td class="mono">8&ndash;10</td><td>Shoulders. Width again.</td></tr>
+<tr><td>Hip thrust</td><td class="mono">3</td><td class="mono">12</td><td>Glutes. The other half of the posture fix.</td></tr>
+<tr><td>Cable woodchop</td><td class="mono">3</td><td class="mono">12 each</td><td>Rotation, controlled. Do not swing it.</td></tr>
+<tr><td>Hanging knee raise</td><td class="mono">3</td><td class="mono">10</td><td>Or lying reverse crunch if the grip gives out first.</td></tr>
+</table>
+</div>
+
+<div class="card note">
+<h3>How to get stronger, written down so you do not have to remember it</h3>
+<p>Pick a weight you could do <strong>two or three more reps</strong> with than the bottom of the
+range. Every session, try to add one rep to each set. When you hit the top of the range on all three
+sets, add the smallest increment the gym has and drop back to the bottom of the range.</p>
+<p>That is the whole method. It is called double progression and it is the only thing you need to
+know for the first year. Five minutes of easy cardio to warm up, then two light sets of the first
+exercise. Sessions run about fifty minutes.</p>
+</div>
+
+<h2>The travel version</h2>
+
+<p>You are in the UK on the 8th and Bulgaria on the 9th for the retreat. This is precisely the point
+where every previous routine of yours has died, so it gets its own plan rather than a hope.</p>
+
+<p>Twenty minutes, hotel room, no equipment, on any day you cannot get to a gym:</p>
+
+<ul>
+<li><strong>Push-ups</strong> &mdash; 4 sets, stopping two reps short of failure</li>
+<li><strong>Split squats</strong> &mdash; 3 &times; 12 each leg</li>
+<li><strong>Single-leg Romanian deadlift</strong> &mdash; 3 &times; 10 each, bodyweight is enough</li>
+<li><strong>Row on a table edge or with a loaded backpack</strong> &mdash; 3 &times; 12</li>
+<li><strong>Side plank</strong> &mdash; 3 &times; 40s each side</li>
+<li><strong>Dead bug</strong> &mdash; 3 &times; 12 each</li>
+</ul>
+
+<p>This is not as good as the gym and it does not need to be. It exists so the run does not break,
+and so you come home having not lost the thread. Airport walking counts as walking.</p>
+
+<h2>Protein is the lever, not the treadmill</h2>
+
+<p>You cannot build the muscle that fixes this without the material to build it from, and almost
+nobody eats enough of it by accident.</p>
+
+<div class="stat">
+  <div><b>115&ndash;145g</b><span>protein per day &middot; 1.6&ndash;2.0g per kg</span></div>
+  <div><b>7&ndash;8h</b><span>sleep &middot; muscle is built there, not in the gym</span></div>
+  <div><b>+2&ndash;4kg</b><span>bodyweight by month six &mdash; that is the target, not a failure</span></div>
+</div>
+
+<p>Calories at maintenance or a little above. <strong>Do not run a deficit.</strong> At 21.6 you have
+nothing to spare, and eating under while training hard is how you end up smaller and softer at the
+same time &mdash; the exact outcome you are trying to avoid.</p>
+
+<p>Singapore makes this easy and you are already eating in the right places. Roughly, per serve:</p>
+
+<div class="scroll">
+<table>
+<tr><th>Order</th><th>Protein</th><th>Note</th></tr>
+<tr><td>Chicken rice</td><td class="mono">~30g</td><td>Ask for less rice, more chicken. Thigh is fine.</td></tr>
+<tr><td>Yong tau foo, soup, extra tofu and fish</td><td class="mono">~30g</td><td>Probably the single best-value order in the country for this.</td></tr>
+<tr><td>Sliced fish soup with bee hoon</td><td class="mono">~30g</td><td>Light, hot, and does not sit on you before a shift.</td></tr>
+<tr><td>Satay, ten sticks</td><td class="mono">~25g</td><td>You already have this card. It counts.</td></tr>
+<tr><td>Two eggs at the kopitiam</td><td class="mono">~12g</td><td>Cheapest top-up there is.</td></tr>
+<tr><td>Greek yoghurt tub</td><td class="mono">~15g</td><td>For the gap between waking and the shift.</td></tr>
+</table>
+</div>
+
+<p>Three real meals of that kind plus one top-up lands you in range without counting anything. If
+you want one number to hold in your head instead of six: <strong>put a palm-sized piece of protein
+in every meal, and add a fourth protein-only snack.</strong></p>
+
+<div class="card">
+<h3>The coffee</h3>
+<p>You take it with sugar and you drink several a day. Two teaspoons in three coffees is roughly a
+hundred calories of nothing at all &mdash; no protein, no fullness, no pleasure you would miss after
+a fortnight. I am not going to tell you to stop drinking coffee, which would be both miserable and
+pointless. Halve the sugar, or move to one sweet one in the morning and unsweetened after that. It
+is the only dietary change in this entire document, because it is the only one worth the friction.</p>
+<p>You do not drink alcohol. That is a genuinely large advantage here and you should know it is one.</p>
+</div>
+
+<h2>Stop weighing yourself</h2>
+
+<p>The scale is going to mislead you badly on this specific plan, because the plan is designed to
+make the number go up. Measure these instead:</p>
+
+<div class="kill keep"><b>Waist</b><div>Tape measure at the navel, Sunday morning, before eating,
+same conditions every week. <strong>This is the number that answers your actual question.</strong>
+It can fall while your weight rises. That is the whole point.</div></div>
+<div class="kill keep"><b>Photo</b><div>Same spot, same light, same time of day, once a month. You
+will not see change day to day and you will see it clearly across eight weeks. Your memory of what
+you looked like is not reliable evidence &mdash; and you have told me your short-term memory is
+genuinely a problem, so do not make it do this job.</div></div>
+<div class="kill keep"><b>The weights</b><div>Write down what you lifted. If your dumbbell bench
+goes from 12kg to 22kg over three months, your chest has changed whether or not you can see it yet.
+This is the most honest feedback in the whole system and it arrives every single session.</div></div>
+
+<h2>What to expect, honestly</h2>
+
+<div class="step"><b>Weeks 1&ndash;3</b><div><h3>Nothing visible, big strength jumps</h3>
+<p>Early gains are mostly your nervous system learning the movements. Add weight fast, expect the
+mirror to show nothing. This is the phase where people quit.</p></div></div>
+<div class="step"><b>Weeks 4&ndash;8</b><div><h3>Posture, then clothes</h3>
+<p>The first visible change is how you stand. Shirts sit differently across the shoulders before
+anything happens at the waist.</p></div></div>
+<div class="step"><b>Months 3&ndash;6</b><div><h3>The chest and shoulders</h3>
+<p>This is where the flatness you described actually resolves &mdash; not by losing anything, but by
+there finally being something there. Expect to be 2&ndash;4kg heavier and look considerably better.</p></div></div>
+<div class="step"><b>Last</b><div><h3>The waist and the flanks</h3>
+<p>They always go last, in every man, regardless of the programme. When they do start to change it
+will be because of everything above, not because of anything you did to them directly. If you get to
+month four and the belly is the only thing that has not moved, the programme is working normally.</p></div></div>
+
+<div class="card">
+<h3>One caveat and then I will stop</h3>
+<p>This is general training and nutrition guidance, not medical advice. You mentioned occasional
+headaches. If they get worse or change pattern once you start training, that is worth a GP
+appointment rather than a wait-and-see &mdash; and if anything hurts sharply in a joint during a
+lift, stop that lift rather than working through it.</p>
+</div>
+
+<hr class="rule">
+
+<p class="dim" style="font-size:13.5px;color:var(--ink-3)">Trained is already one of the three in the
+app. Monday, Wednesday, Friday at 09:30, Saturday at parkrun. That is four of seven, which is a real
+training week by any standard, and it fits entirely inside the part of the day that is yours.</p>
+
+</div>
+</body>
+</html>

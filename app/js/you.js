@@ -122,6 +122,7 @@ function viewYou(){
   /* the paper that lives outside the game */
   h += "<div class='menu'>"
     + mrow("go", "../cal/", "gap", "Calendars", "Subscribe once in Apple Calendar")
+    + mrow("go", "../docs/train.html", "run", "The training plan", "What Trained actually means")
     + mrow("go", "../docs/plan.html", "pen", "The plan on paper", "Why this app is shaped like this")
     + mrow("go", "../docs/admin.html", "clock", "The paperwork", "Company, pass, filings")
     + "</div>";
