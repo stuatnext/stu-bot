@@ -59,3 +59,18 @@
 .lift.on .lv{color:var(--greenInk)}
 
 .wst .pnum b{font-size:38px}
+
+/* the programme's own level, which climbs on sessions rather than on weeks */
+.stg{border:2px solid var(--edge); border-radius:var(--r2); background:var(--card2);
+  padding:13px 15px; margin:0 0 11px}
+.stg .sh{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.stg .sh b{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:17px;
+  letter-spacing:-.02em}
+.stg .sh span{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--ink3)}
+.stg .fine{margin:5px 0 0}
+.sbar{height:7px; border-radius:5px; background:var(--sunk); overflow:hidden; margin:10px 0 0}
+.sbar i{display:block; height:100%; border-radius:5px; background:var(--gold, #F2B735);
+  transition:width .55s cubic-bezier(.22,1,.36,1)}
+.hold{margin:9px 0 0; padding:11px 14px; border-radius:var(--r2); border:2px dashed var(--edge2);
+  background:var(--sunk); color:var(--ink3); font-size:12.5px; line-height:1.4}

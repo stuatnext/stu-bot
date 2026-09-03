@@ -60,7 +60,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v17";
+var BUILD = "v18";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;

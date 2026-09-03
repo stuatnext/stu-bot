@@ -568,4 +568,18 @@ var ANCHORS = [
   ["dinner",  "After the shift",  "Grab"]
 ];
 
+/* The programme unlocks rather than arriving whole. Six exercises on day one
+   is how a beginner bails; two easy sets and a look round the room is how one
+   comes back. Gated on sessions logged rather than weeks, so a bad fortnight
+   costs nothing and only turning up moves it.
+
+   [ sessions needed, name, exercises shown, sets each, what this stage is for ] */
+var STAGES = [
+  [0,  "Session zero",     3, 2, "Find the room. Two easy sets of three things, then leave."],
+  [1,  "Three moves",      3, 3, "Legs, a push and a pull. The whole body in twenty-five minutes."],
+  [3,  "Four moves",       4, 3, "A hinge goes in. This is where the posture work starts."],
+  [6,  "Five moves",       5, 3, "The waist work joins it - bracing, not crunches."],
+  [11, "The full session", 6, 3, "All six. From here nothing is added; the weight goes up instead."]
+];
+
 var KG_DEFAULT = 71.5;

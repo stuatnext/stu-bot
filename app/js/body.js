@@ -49,6 +49,32 @@ function suggestOrder(slot){
 
 /* -------------------------------------------------------------- the lifts */
 function liftDays(){ return Object.keys(S.lifts || {}).sort(); }
+/* Sessions that count. Today counts only once he has finished it, which does
+   two things: the stage cannot change under his feet halfway through a
+   workout, and the moment it does change is the moment he pressed Finish -
+   so the ceremony and the panel agree with each other. */
+function sessionsDone(){
+  return liftDays().filter(function(k){
+    if (!Object.keys(S.lifts[k].ex || {}).length) return false;
+    return k !== today() || !!day(k).p.train;
+  }).length;
+}
+function stageAt(n){
+  var s = STAGES[0];
+  STAGES.forEach(function(x){ if (n >= x[0]) s = x; });
+  return s;
+}
+function stage(){ return stageAt(sessionsDone()); }
+function nextStage(){
+  var n = sessionsDone();
+  for (var i = 0; i < STAGES.length; i++) if (STAGES[i][0] > n) return STAGES[i];
+  return null;
+}
+/* The exercises this stage actually shows, in programme order. */
+function stageLifts(sKey){
+  var s = sessionFor(sKey);
+  return s ? s[1].slice(0, stage()[2]) : [];
+}
 function sessionFor(key){
   return SESSIONS.filter(function(s){ return s[0] === key; })[0];
 }
@@ -77,9 +103,9 @@ function lastLift(name){
 /* Double progression, which is the only progression rule he needs this year:
    hold the weight until every set reaches the top of the range, then add. */
 function nextTarget(ex){
-  var last = lastLift(ex[0]);
+  var last = lastLift(ex[0]), sets = stage()[3];
   if (!last) return { first: true, say: "Pick something you could do two or three more than " + ex[2] + " with." };
-  var allTop = last.r.length >= ex[1] && last.r.every(function(n){ return n >= ex[3]; });
+  var allTop = last.r.length >= sets && last.r.every(function(n){ return n >= ex[3]; });
   if (allTop){
     var up = last.w + (last.w < 10 ? 1 : 2);
     return { w: up, reps: ex[2], say: "Up to " + up + "kg, back to " + ex[2] + ". Or the next dumbbell." };
@@ -107,17 +133,18 @@ function parseLift(text, sets){
 function askLift(sKey, idx){
   var s = sessionFor(sKey); if (!s) return;
   var ex = s[1][idx]; if (!ex) return;
+  var sets = stage()[3];
   var t = nextTarget(ex), had = loggedToday(ex[0]);
   var pre = had ? had.w + "kg x " + had.r.join(",") : (t.w ? t.w + " x " : "");
   ask({
     title: ex[0],
-    say: esc(ex[4]) + " &middot; " + ex[1] + " sets of " + (ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3])
+    say: esc(ex[4]) + " &middot; " + sets + " sets of " + (ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3])
        + "<br><b>" + esc(t.say) + "</b>",
     field: { label: "Weight and reps", value: pre, placeholder: "14 x 8,8,7", type: "number" },
     confirm: "Log it", cancel: "Not this one"
   }).then(function(v){
     if (v === null || v === "__no") return;
-    var got = parseLift(v, ex[1]);
+    var got = parseLift(v, sets);
     if (!got){ toast("Give me a weight and at least one rep count."); return; }
     var k = today();
     S.lifts = S.lifts || {};
@@ -134,8 +161,18 @@ function askLift(sKey, idx){
 function finishSession(){
   var t = today(), d = day(t);
   if (d.p.train){ toast("Already marked."); return; }
+  var before = stage();
   var btn = document.querySelector("[data-finish]");
   tapPillar("train", btn);
+  /* Marking Trained is what makes today count, so the stage is re-read after
+     it. Announced late so it does not compete with the pillar's own fanfare. */
+  setTimeout(function(){
+    var after = stage();
+    if (after !== before){
+      celebrate(after[1], after[4]);
+      render({ keepScroll: true });
+    }
+  }, reduced() ? 0 : 1500);
 }
 
 function askWaist(){
@@ -211,21 +248,42 @@ function viewBody(){
     h += "<div class='btns tight'><button class='btn quiet' data-undofood='1'>Undo the last one</button></div>";
   }
 
-  /* --- the session */
-  var open = todaySession(), key = open || nextSessionKey(), s = sessionFor(key);
+  /* --- the session, at whatever stage he has unlocked */
+  var open = todaySession(), key = open || nextSessionKey();
+  var st = stage(), nx = nextStage(), list = stageLifts(key);
   var doneN = 0;
-  s[1].forEach(function(ex){ if (loggedToday(ex[0])) doneN++; });
+  list.forEach(function(ex){ if (loggedToday(ex[0])) doneN++; });
 
   h += "<div class='rulehead'><h3>Session " + key + "</h3><span></span>"
-    + "<em>" + (open ? doneN + " of " + s[1].length + " logged" : "next up") + "</em></div>";
+    + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
 
-  if (!open && !doneN){
+  /* Where the programme itself has got to, and what the next one costs. */
+  var doneS = sessionsDone();
+  h += "<div class='stg'>"
+    + "<div class='sh'><b>" + esc(st[1]) + "</b>"
+    + "<span>" + list.length + (list.length === 1 ? " move" : " moves")
+    + " &middot; " + st[3] + " sets</span></div>"
+    + "<p class='fine'>" + esc(st[4]) + "</p>";
+  if (nx){
+    var need = nx[0] - doneS, span = Math.max(1, nx[0] - st[0]);
+    var pctS = Math.min(100, Math.round(100 * (doneS - st[0]) / span));
+    h += "<div class='sbar'><i style='width:" + pctS + "%'></i></div>"
+      + "<p class='fine'>" + need + " more " + (need === 1 ? "session" : "sessions")
+      + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
+  } else {
+    /* The stage note already says nothing more is added, so this says the one
+       thing it cannot: how many times he has turned up. */
+    h += "<p class='fine'>" + num(doneS) + " sessions logged.</p>";
+  }
+  h += "</div>";
+
+  if (!doneN && !doneS){
     h += "<p class='fine' style='margin:0 0 10px'>24/7 Fitness, Tanjong Pagar. Tap an exercise to "
       + "log it &mdash; the weight it suggests comes from what you did last time.</p>";
   }
 
   h += "<div class='lifts'>";
-  s[1].forEach(function(ex, i){
+  list.forEach(function(ex, i){
     var had = loggedToday(ex[0]), t2 = nextTarget(ex);
     h += "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
       + "<span class='lb2'><b>" + esc(ex[0]) + "</b>"
@@ -236,6 +294,13 @@ function viewBody(){
                   : "<span class='new'>new</span>")) + "</span></button>";
   });
   h += "</div>";
+
+  var held = sessionFor(key)[1].slice(list.length);
+  if (held.length){
+    h += "<div class='hold'>" + held.length + " more "
+      + (held.length === 1 ? "move" : "moves") + " in this session, still sealed &mdash; "
+      + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</div>";
+  }
 
   if (doneN){
     var already = day(t).p.train;
