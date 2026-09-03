@@ -582,4 +582,30 @@ var STAGES = [
   [11, "The full session", 6, 3, "All six. From here nothing is added; the weight goes up instead."]
 ];
 
+/* Hydration, in a country that is 30 degrees and humid all year, for someone
+   who eats once a day and so gets almost none of his water from food. Eight
+   glasses is 2.4 litres logged; the kopi and the one meal carry it to roughly
+   three. Deliberately countable rather than precise - the real check is the
+   colour, and the page says so. */
+var GLASS_ML = 300;
+var WATER_GLASSES = 8;
+var SLEEP_TARGET = 7;
+
+/* The five basics of a day, composed rather than added: two of them are
+   already tracked elsewhere, so this costs three new taps and not five.
+
+   Crucially these earn but cannot punish. The three pillars carry the streak
+   and the pack; if being tired also broke something, a bad week would become
+   five separate ways to have failed, and that is how a game turns into a
+   chore he deletes.
+
+   [ key, label, how it is met ] */
+var VITALS = [
+  ["water",   "Water",   "eight glasses"],
+  ["sleep",   "Sleep",   "seven hours"],
+  ["protein", "Protein", "the day's target"],
+  ["train",   "Moved",   "the Trained pillar"],
+  ["out",     "Outside", "left the flat"]
+];
+
 var KG_DEFAULT = 71.5;

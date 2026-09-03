@@ -74,3 +74,42 @@
   transition:width .55s cubic-bezier(.22,1,.36,1)}
 .hold{margin:9px 0 0; padding:11px 14px; border-radius:var(--r2); border:2px dashed var(--edge2);
   background:var(--sunk); color:var(--ink3); font-size:12.5px; line-height:1.4}
+
+/* the day's condition: one score, five basics, none of them able to punish */
+.cond{display:flex; align-items:center; gap:14px; padding:14px 16px; margin:0 0 11px;
+  border:2px solid var(--edge); border-radius:var(--r2); background:var(--card)}
+.cond.full{border-color:#F3D9A0; background:var(--flameSoft)}
+.cring{position:relative; width:46px; height:46px; flex:none}
+/* Every ring in this app declares its own circle styling - there is no global
+   rule - so leaving it out fills the disc solid black. */
+.cring .rg{width:46px; height:46px; transform:rotate(-90deg); display:block}
+.cring .rg circle{fill:none; stroke-width:4}
+.cring .rg .bg{stroke:var(--cardSunk)}
+.cring .rg .fg{stroke:var(--gold); stroke-linecap:round; transition:stroke-dasharray .6s var(--tap)}
+.cring .rg.done .fg{stroke:var(--jade)}
+.cring b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:"JetBrains Mono",monospace; font-size:16px; font-weight:700}
+.cbd h3{margin:0; font-size:16px}
+.cbd span{display:block; font-size:12.5px; color:var(--ink2); margin-top:2px}
+
+.vit{display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin:0 0 10px}
+.vc{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  padding:9px 4px; min-height:60px; border-radius:14px; border:2px solid var(--edge);
+  background:var(--card); color:var(--ink); font:inherit; font-family:"Nunito",sans-serif}
+button.vc{cursor:pointer}
+button.vc:active{transform:scale(.96)}
+.vc .vv{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-weight:700; font-size:13px; letter-spacing:-.02em}
+.vc .vl{font-size:9.5px; letter-spacing:.04em; color:var(--ink3); text-align:center; line-height:1.1}
+.vc.on{border-color:#BEE8A0; background:var(--greenSoft)}
+.vc.on .vv{color:var(--greenInk)}
+.vc.on .vl{color:var(--greenInk); opacity:.8}
+
+/* eight glasses, because eight taps is the entire interface */
+.glass{display:grid; grid-template-columns:repeat(8,1fr); gap:6px; margin:0 0 8px}
+.gl{padding:0; border:none; background:none; cursor:pointer; min-height:44px;
+  display:flex; align-items:center; justify-content:center}
+.gl i{display:block; width:100%; max-width:30px; aspect-ratio:.68; border-radius:3px 3px 8px 8px;
+  border:2px solid var(--edge2); background:var(--card); transition:background .18s, border-color .18s}
+.gl.on i{border-color:#7FC7EE; background:linear-gradient(180deg,#BFE4F7,#7FC7EE)}
+.gl:active i{transform:scale(.9)}
