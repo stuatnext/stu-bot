@@ -60,7 +60,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v16";
+var BUILD = "v17";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -74,7 +74,7 @@ window.addEventListener("appinstalled", function(){
 });
 
 /* ------------------------------------------------------------------ router */
-var TABS = { today: viewToday, cards: viewDeck, you: viewYou };
+var TABS = { today: viewToday, cards: viewDeck, body: viewBody, you: viewYou };
 var tab = "today";
 
 function render(opts){
@@ -101,7 +101,7 @@ function render(opts){
 }
 function go(next){
   if (next === tab) return;
-  var order = ["today", "cards", "you"];
+  var order = ["today", "cards", "body", "you"];
   var back = order.indexOf(next) < order.indexOf(tab);
   tab = next;
   sfx("nav"); buzz(8);
@@ -117,6 +117,11 @@ document.addEventListener("click", function(ev){
   if (ds.coachskip){ coachSkip(); return; }
   if (ds.tab){ go(ds.tab); return; }
   if (ds.p){ tapPillar(ds.p, b); return; }
+  if (ds.slot){ askAnchor(ds.slot); return; }
+  if (ds.undofood){ undoFood(); return; }
+  if (ds.lift){ var lp = ds.lift.split(":"); askLift(lp[0], Number(lp[1])); return; }
+  if (ds.finish){ finishSession(); return; }
+  if (ds.waist){ askWaist(); return; }
   if (ds.open){ sfx("tap"); openStage(packsWaiting().streak ? "streak" : "day"); return; }
   if (ds.pack){ sfx("tap"); openStage(ds.pack); return; }
   if (ds.set){ DECKSET = ds.set; DECKFILTER = 0; sfx("tap"); render({ keepScroll: true }); return; }

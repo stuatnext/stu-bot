@@ -20,7 +20,8 @@ function load(){
             theme:null, mute:false, rate:0, spends:[], freezes:{},
             crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0,
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
-            monthSeen:{}, pushOn:0 };
+            monthSeen:{}, pushOn:0,
+            lifts:{}, food:{}, waist:[], kg:0 };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }

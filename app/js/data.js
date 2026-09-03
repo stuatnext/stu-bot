@@ -512,3 +512,60 @@ var RANKS = [
   [9000,  "Institution"],
   [13000, "Ask him, he'll know"]
 ];
+
+/* ==================================================================== body
+   The training programme and the orders, kept as data so the Body tab can
+   suggest rather than ask him to remember. Mirrors docs/train.html - if one
+   changes, change the other.
+
+   Exercise: [ name, sets, repMin, repMax, cue ] */
+var SESSIONS = [
+  ["A", [
+    ["Goblet squat",         3,  8, 10, "One dumbbell at the chest"],
+    ["Dumbbell bench press", 3,  8, 10, "The chest exercise"],
+    ["One-arm dumbbell row", 3, 10, 10, "Each side. Upper back, posture"],
+    ["Romanian deadlift",    3, 10, 10, "Dumbbells, hinge at the hip"],
+    ["Pallof press",         3, 12, 12, "Each side. Resist the twist"],
+    ["Farmer's carry",       3, 40, 40, "Metres. Heavy, do not lean"]
+  ]],
+  ["B", [
+    ["Dumbbell deadlift",    3,  6,  8, "Flat back, drive the floor away"],
+    ["Lat pulldown",         3,  8, 10, "Width. Makes the waist look smaller"],
+    ["Incline dumbbell press", 3, 10, 10, "Upper chest, the part that reads flat"],
+    ["Reverse lunge",        3,  8,  8, "Each leg. Step back, not forward"],
+    ["Side plank",           3, 30, 30, "Seconds each side"],
+    ["Dead bug",             3, 10, 10, "Each side. Lower back stays flat"]
+  ]],
+  ["C", [
+    ["Leg press",            3, 10, 10, "Or a squat if someone has shown you"],
+    ["Seated cable row",     3, 10, 10, "Squeeze the shoulder blades"],
+    ["Dumbbell shoulder press", 3, 8, 10, "Shoulders. Width again"],
+    ["Hip thrust",           3, 12, 12, "Glutes. The other half of the posture fix"],
+    ["Cable woodchop",       3, 12, 12, "Each side. Controlled, do not swing"],
+    ["Hanging knee raise",   3, 10, 10, "Or a lying reverse crunch"]
+  ]]
+];
+
+/* [ what to order, grams of protein, where it fits ] */
+var ORDERS = [
+  ["Yong tau foo, tofu and fish", 30, "any"],
+  ["Chicken rice, extra chicken", 35, "any"],
+  ["Sliced fish soup",            30, "any"],
+  ["Pho, extra beef",             30, "dinner"],
+  ["Wonton mee, extra char siu",  35, "dinner"],
+  ["Thai grilled chicken",        35, "dinner"],
+  ["Salmon or chicken don",       32, "dinner"],
+  ["Bak kut teh",                 30, "dinner"],
+  ["Satay, ten sticks",           25, "any"],
+  ["Two eggs at the kopitiam",    12, "morning"],
+  ["Greek yoghurt",               18, "morning"],
+  ["Protein shake",               25, "morning"]
+];
+
+var ANCHORS = [
+  ["morning", "Before you train", "~09:00"],
+  ["midday",  "Before the shift", "~14:00"],
+  ["dinner",  "After the shift",  "Grab"]
+];
+
+var KG_DEFAULT = 71.5;
