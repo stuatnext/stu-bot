@@ -10,7 +10,7 @@
      files: freshness wins.
    - VERSION changes with every release, and the build number is painted on
      the title card and the You screen so what the phone runs is visible. */
-var VERSION = "daylight-v19";
+var VERSION = "daylight-v20";
 /* Written by the app on every save; read here when a push lands, because a
    service worker cannot see localStorage. Never versioned, never deleted. */
 var STATE_CACHE = "daylight-state";
@@ -20,7 +20,7 @@ var SHELL = [
   "./css/cards.css", "./css/body.css", "./css/you.css", "./css/overlays.css",
   "./js/data.js", "./js/state.js", "./js/audio.js", "./js/sky.js",
   "./js/fx.js", "./js/art.js", "./js/cardui.js", "./js/scene.js",
-  "./js/collection.js", "./js/body.js", "./js/you.js", "./js/coach.js", "./js/app.js",
+  "./js/collection.js", "./js/quest.js", "./js/body.js", "./js/you.js", "./js/coach.js", "./js/app.js",
   "./fonts.css",
   "./fonts/nunito-latin.woff2", "./fonts/nunito-latin-ext.woff2",
   "./fonts/bricolage-latin.woff2", "./fonts/bricolage-latin-ext.woff2",

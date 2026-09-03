@@ -288,6 +288,9 @@ function viewBody(){
   var pct = Math.min(100, Math.round(100 * got / target));
   var left = Math.max(0, target - got);
 
+  /* --- the week first: it is the frame the day sits inside */
+  h += questHTML();
+
   /* --- the day's condition, as one score rather than five checkboxes */
   var met = vitalsMet(t), clear = clearDays();
   h += "<div class='cond" + (met === VITALS.length ? " full" : "") + "'>"

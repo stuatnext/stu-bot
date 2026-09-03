@@ -608,4 +608,34 @@ var VITALS = [
   ["out",     "Outside", "left the flat"]
 ];
 
+/* ============================================================== challenges
+   The engine that stops this having an ending. Cards run out, stages cap and
+   ranks used to; a week never does. Three are drawn each Monday from the week
+   itself, so they are the same on every device and survive a reinstall
+   without anything being stored.
+
+   Targets climb with a tier taken from weeks already cleared, so a challenge
+   that was a stretch in September is the floor by Christmas.
+
+   [ id, what it says, metric, base target, per-tier growth, cap ] */
+var CHALLENGES = [
+  ["full",   "%n full days",              "full",    3, 0.5, 6],
+  ["train",  "%n gym sessions",           "sess",    2, 0.4, 5],
+  ["prot",   "Protein closed on %n days", "prot",    3, 0.5, 6],
+  ["water",  "Eight glasses on %n days",  "water",   3, 0.6, 7],
+  ["sleep",  "Seven hours on %n nights",  "sleep",   3, 0.5, 6],
+  ["clear",  "%n clear days",             "clear",   1, 0.4, 5],
+  ["out",    "Outside on %n days",        "out",     5, 0.3, 7],
+  ["bed",    "Bed on time %n nights",     "bed",     3, 0.5, 6],
+  ["fam",    "Talk to home %n times",     "fam",     2, 0.2, 4],
+  ["stop",   "Finish on time %n days",    "stop",    3, 0.4, 5],
+  ["place",  "Somewhere new, %n of them", "place",   1, 0.2, 3],
+  ["lift",   "Beat %n of your own lifts", "beatlift",1, 0.4, 5]
+];
+
+/* What a cleared challenge pays, as a multiple of his daily rate. Clearing
+   all three in a week pays the bonus on top. */
+var CH_PAY = 2;
+var CH_SWEEP = 3;
+
 var KG_DEFAULT = 71.5;

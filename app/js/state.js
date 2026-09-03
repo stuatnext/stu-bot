@@ -34,6 +34,7 @@ function load(){
 }
 function save(){
   FD = null;
+  if (typeof TIERS !== "undefined") TIERS = null;
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
   mirrorState();
 }
@@ -601,10 +602,37 @@ function xp(){
   n += questsDone() * 20;
   return n;
 }
+/* Ranks do not run out. Past the last named one they keep going in numbered
+   tiers, each costing half again as much as the last - because a healthy life
+   has no completion screen, and a level bar that fills for the final time and
+   then sits there is the app quietly announcing it is finished with you. */
+var RANK_TOP_STEP = 5500;
+function rankTier(n){
+  /* n is 1-based beyond the named list: Ask him he'll know II, III, ... */
+  var roman = ["II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+  return RANKS[RANKS.length - 1][1] + " " + (roman[n - 1] || (n + 1));
+}
+function rankFloor(n){
+  /* Threshold of the nth tier past the named list, growing 1.5x each time. */
+  var at = RANKS[RANKS.length - 1][0], step = RANK_TOP_STEP;
+  for (var i = 0; i < n; i++){ at += step; step = Math.round(step * 1.5); }
+  return at;
+}
 function rank(){
   var x = xp(), i = 0;
   for (var j = 0; j < RANKS.length; j++) if (x >= RANKS[j][0]) i = j;
+  var last = RANKS.length - 1;
+  if (i === last && x >= rankFloor(1)){
+    var n = 1;
+    while (x >= rankFloor(n + 1) && n < 60) n++;
+    return { level: RANKS.length + n, name: rankTier(n), xp: x,
+             from: rankFloor(n), to: rankFloor(n + 1), nextName: rankTier(n + 1) };
+  }
   var next = RANKS[i + 1] || null;
+  if (!next && i === last){
+    return { level: i + 1, name: RANKS[i][1], xp: x,
+             from: RANKS[i][0], to: rankFloor(1), nextName: rankTier(1) };
+  }
   return { level: i + 1, name: RANKS[i][1], xp: x,
            from: RANKS[i][0], to: next ? next[0] : null, nextName: next ? next[1] : null };
 }
@@ -620,18 +648,23 @@ function rate(){ var r = Number(S.rate); return r > 0 ? r : RATE_DEFAULT; }
 function potEarned(){
   var r = rate(), pc = packCounts();
   return {
-    days:     pc.day * r,
-    streaks:  pc.streak * r * 2,
-    sets:     setsComplete() * r * 3,
-    trophies: goldHeld() * r * 5
+    days:      pc.day * r,
+    streaks:   pc.streak * r * 2,
+    sets:      setsComplete() * r * 3,
+    trophies:  goldHeld() * r * 5,
+    challenges: typeof questEarned === "function" ? questEarned() : 0
   };
 }
 function potSpent(){
   return (S.spends || []).reduce(function(a, s){ return a + Number(s[1] || 0); }, 0);
 }
+/* Summed generically rather than by name. The first version listed the four
+   keys it knew about, so adding challenges put money in the breakdown that
+   never arrived in the pot - earned, displayed, and silently dropped. */
 function potTotal(){
-  var e = potEarned();
-  return e.days + e.streaks + e.sets + e.trophies;
+  var e = potEarned(), n = 0;
+  for (var k in e) if (Object.prototype.hasOwnProperty.call(e, k)) n += Number(e[k]) || 0;
+  return n;
 }
 function pot(){ return potTotal() - potSpent(); }
 function money(n){
