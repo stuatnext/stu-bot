@@ -319,3 +319,15 @@
 #sheet .try.done{color:#C9F3DE; background:rgba(63,217,160,.12);
   border-color:rgba(63,217,160,.4)}
 #sheet .try.done b{color:#5CE8B5}
+
+/* the deck is finished, so deal another one */
+.newseason{border-color:#F3D9A0; background:var(--flameSoft); text-align:center}
+.newseason .sn{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink3)}
+.newseason h3{margin:6px 0 0; font-size:19px}
+.newseason p{margin:8px 0 0; font-size:13.5px; color:var(--ink2); line-height:1.45}
+.seasonbar{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:10px 0 2px;
+  padding:9px 13px; border-radius:14px; background:var(--card2); border:2px solid var(--edge)}
+.seasonbar b{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:15px;
+  letter-spacing:-.02em}
+.seasonbar span{font-size:12px; color:var(--ink3)}

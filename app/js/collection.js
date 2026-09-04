@@ -34,6 +34,26 @@ function viewDeck(){
       + "<div class='btns tight'><button class='btn pri' data-cardswhy='1'>Got it</button></div></div>";
   }
 
+  /* The deck is finished, so deal another one. This is the only place in the
+     app where completing something starts it again rather than ending it. */
+  if (deckComplete()){
+    h += "<div class='panel newseason'>"
+      + "<div class='sn'>Season " + season() + " complete</div>"
+      + "<h3>All " + num(CARDS.filter(function(c){ return c[1] !== 3; }).length)
+      + " of them, every set open.</h3>"
+      + "<p>Deal a new deck and go again. Your trophies stay on the table, your rank, your "
+      + "pot and your spares do not move, and every card you have collected is already in the "
+      + "vault. The only thing that changes is that there is something to find again.</p>"
+      + "<div class='btns'><button class='btn pri' data-newseason='1'>Deal Season "
+      + (season() + 1) + "</button></div></div>";
+  }
+
+  if (season() > 1 || Object.keys(S.vault || {}).length){
+    h += "<div class='seasonbar'><b>Season " + season() + "</b>"
+      + "<span>" + num(Object.keys(S.vault || {}).length) + " in the vault &middot; "
+      + num(setsCompleteEver()) + " sets completed all time</span></div>";
+  }
+
   /* packs first, because that is what he came for */
   if (w.streak || w.day){
     h += "<div style='display:flex;gap:11px;justify-content:center;margin:8px 0 4px'>";
@@ -217,4 +237,28 @@ async function askCraft(setKey){
   sfx("craft"); buzz([16, 40, 16]);
   render({ keepScroll: true, animate: true });
   setTimeout(function(){ openSheet(v); }, 220);
+}
+
+/* Rolling the deck is irreversible, so it is asked for rather than tapped. */
+function askNewSeason(){
+  var n = season() + 1;
+  ask({
+    title: "Deal Season " + n + "?",
+    say: "Every card you hold goes into the vault and the deck starts again. "
+       + "<b>Nothing is lost</b> &mdash; trophies stay, rank and pot and spares do not move, "
+       + "and a card collected twice is worth more than a card collected once.",
+    confirm: "Deal them", cancel: "Not yet"
+  }).then(function(v){
+    /* A confirm with no field resolves to true, not to "__ok" - the house
+       convention elsewhere is a plain falsy check. */
+    if (!v) return;
+    var before = { xp: xp(), pot: pot(), spares: spares(), rank: rank().level };
+    if (!rollSeason()) return;
+    celebrate("Season " + n, "A new deck. Same life, more of it.");
+    render({ keepScroll: false, animate: true });
+    /* If any of these moved, the rollover ate something it should not have. */
+    if (xp() < before.xp || pot() < before.pot || spares() < before.spares){
+      toast("Something went backwards - tell Claude.");
+    }
+  });
 }

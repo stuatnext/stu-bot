@@ -81,7 +81,22 @@ var SETS = [
 ["gold","Trophies","Not in packs. These only happen by happening.",0]
 ];
 
-/* [ name, rarity, set, note, hanzi? ]   rarity: 0 common 1 uncommon 2 rare 3 gold */
+/* ------------------------------------------------------- adding cards later
+   He is going to keep telling me what happens in his life, and new cards get
+   written from it. The rules, so a future pass does not have to work them out:
+
+   - Append. Never renumber, never rename an existing card: S.cards, S.vault
+     and S.crafted are all keyed by name, so a rename orphans whatever he had.
+   - Adding to an existing set is safe. setsCompleteEver ratchets, so a card
+     appended to a set he has already finished cannot cost him XP or money -
+     it just gives him one more thing to find.
+   - A new set needs a day gate in SETS. Sets already open stay open.
+   - Trophies (rarity 3) are claimed by hand when the real thing happens, so
+     they never turn up in a pack. Milestones go there, not in the pack pool.
+   - Bump the build in index.html, app.js and sw.js or the phone keeps the old
+     deck.
+
+   [ name, rarity, set, note, hanzi? ]   rarity: 0 common 1 uncommon 2 rare 3 gold */
 var CARDS = [
 ["Chicken rice",0,"hawk","Thigh, not breast. This is not negotiable."],
 ["Char kway teow",0,"hawk","Flat noodles, dark soy, lard. No cockles if you prefer."],

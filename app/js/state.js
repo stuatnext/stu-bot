@@ -19,6 +19,7 @@ function load(){
             days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, openedDay:0, openedStreak:0,
             theme:null, mute:false, rate:0, spends:[], freezes:{},
             crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0,
+            season:1, vault:{}, setsEver:0,
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
             monthSeen:{}, pushOn:0,
             lifts:{}, food:{}, waist:[], kg:0,
@@ -524,6 +525,7 @@ function openPack(kind){
    everything else here, so the number cannot drift. */
 function sparesEarned(){
   var n = 0, held = S.cards || {};
+  /* Vault copies do not pay again - only what is in front of him now. */
   CARDS.forEach(function(c){
     var have = held[c[0]] || 0;
     if (have > 1) n += (have - 1) * RARITY[c[1]][4];
@@ -593,14 +595,93 @@ function nextDoor(){
 }
 
 /* --------------------------------------------------------------- progression */
+/* ------------------------------------------------------------- the vault
+   Everything ever collected, across every season. The current season lives in
+   S.cards and gets folded in here when the deck rolls over.
+
+   This exists because rank, XP and the pot were all read off S.cards, so
+   clearing it for a new season would have collapsed his level and shrunk the
+   pot. Nothing earned is allowed to go backwards. */
+function everHeld(name){
+  return ((S.vault || {})[name] || 0) + ((S.cards || {})[name] ? 1 : 0);
+}
+/* How many times a set has been completed across all seasons.
+
+   Monotonic against play, but NOT against me: he has asked me to keep writing
+   new cards as his life happens, and a single card added to an already
+   complete set drops that set's minimum back to zero. Measured, it cost 100 XP
+   and fifteen dollars the moment a card was appended. So the number ratchets -
+   a high-water mark he can only ever climb, because nothing I do to the deck
+   afterwards should take something off him. */
+function setsCompleteRaw(){
+  var n = 0;
+  SETS.forEach(function(s){
+    var cs = setCards(s[0]);
+    if (!cs.length) return;
+    var m = everHeld(cs[0][0]);
+    cs.forEach(function(c){ var v = everHeld(c[0]); if (v < m) m = v; });
+    n += m;
+  });
+  return n;
+}
+function setsCompleteEver(){
+  var n = setsCompleteRaw(), hi = Number(S.setsEver) || 0;
+  if (n > hi){ S.setsEver = n; hi = n; }   /* persisted by the next save */
+  return hi;
+}
+function season(){ return Math.max(1, Number(S.season) || 1); }
+
 function xp(){
-  var n = 0, held = S.cards || {};
-  CARDS.forEach(function(c){ if (held[c[0]]) n += RARITY[c[1]][3]; });
+  var n = 0;
+  /* A card is worth its full value the first time it is collected and a
+     quarter of it in every season after, so the ladder keeps climbing without
+     the second season being worth as much as the first. */
+  CARDS.forEach(function(c){
+    var times = everHeld(c[0]);
+    if (!times) return;
+    var v = RARITY[c[1]][3];
+    n += v + Math.round(v * 0.25) * (times - 1);
+  });
   Object.keys(S.days).forEach(function(k){ if (allThree(k)) n += 15; });
   n += Object.keys(S.done || {}).length * 20;
-  n += setsComplete() * 100;
+  n += setsCompleteEver() * 100;
   n += questsDone() * 20;
   return n;
+}
+
+/* Every non-gold card held, with every set open. Trophies are excluded: they
+   are claimed when a real thing happens and cannot be pulled. */
+function deckComplete(){
+  var open = SETS.every(function(s){ return s[0] === "gold" || setOpen(s[0]); });
+  if (!open) return false;
+  return CARDS.every(function(c){
+    return c[1] === 3 || c[2] === "gold" || (S.cards || {})[c[0]];
+  });
+}
+
+/* Fold the season into the vault and deal a fresh deck. Trophies stay on the
+   table, the spare balance is carried across exactly, and rank, pot and XP do
+   not move - the only thing that changes is that there are cards to find
+   again. A healthy life has no completion screen and neither does this. */
+function rollSeason(){
+  if (!deckComplete()) return false;
+  var balance = spares();
+  S.vault = S.vault || {};
+  var keep = {};
+  Object.keys(S.cards || {}).forEach(function(name){
+    var c = cardByName(name);
+    if (c && c[1] === 3){ keep[name] = S.cards[name]; return; }   /* trophies stay */
+    S.vault[name] = (S.vault[name] || 0) + 1;
+  });
+  S.cards = keep;
+  S.seen = {};
+  S.crafted = {};
+  S.season = season() + 1;
+  /* Spares are a balance, not a total, so it is restored by moving the spent
+     offset rather than by storing the balance anywhere. */
+  S.sparesSpent = sparesEarned() - balance;
+  save();
+  return true;
 }
 /* Ranks do not run out. Past the last named one they keep going in numbered
    tiers, each costing half again as much as the last - because a healthy life
@@ -650,7 +731,7 @@ function potEarned(){
   return {
     days:      pc.day * r,
     streaks:   pc.streak * r * 2,
-    sets:      setsComplete() * r * 3,
+    sets:      setsCompleteEver() * r * 3,
     trophies:  goldHeld() * r * 5,
     challenges: typeof questEarned === "function" ? questEarned() : 0
   };

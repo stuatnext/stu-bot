@@ -86,6 +86,29 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### Seasons, and why nothing here ends
+
+He put it plainly: *"there is no completing this game, because a healthy life and routine is
+something that always needs to keep going."* The app disagreed with him in four places — the deck
+finished, the stages capped, the ranks stopped at the last name on the list, and completing the
+collection left packs producing nothing but duplicates.
+
+Ranks continue in numbered tiers now, each costing half again as much as the last. And the deck rolls
+over: finish it and you deal a new season. Everything collected folds into a **vault**, and that
+vault — not the current deck — is what rank, XP and the pot are computed from. A card is worth full
+value the first time and a quarter of it every season after, so the ladder climbs forever without
+season two being worth as much as season one.
+
+The point of the rollover is that **nothing goes backwards**: trophies stay on the table, and rank,
+pot and the spare balance are preserved to the number. The test asserts that rather than trusting the
+code to have been careful.
+
+One hazard came out of his own request. He asked me to keep writing new cards as his life happens —
+and a single card appended to an already-complete set drops that set's minimum to zero. Measured, it
+cost 100 XP and fifteen dollars the instant a card was added. So the set count is a **high-water
+mark**: monotonic against play, and monotonic against me. The conventions for adding cards later are
+written at the top of the deck in `data.js`.
+
 #### It has to feel like a game
 
 He tried an earlier build and said it *"looks like a plain website"*, so the collectible half was
