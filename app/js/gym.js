@@ -48,7 +48,8 @@ function viewGym(){
       + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4]) + "</span></span>"
       + "<span class='lv'>" + (had
           ? had.w + "kg<em>" + had.r.join(" &middot; ") + "</em>"
-          : (t2.w ? t2.w + "kg<em>" + (t2.reps ? "x " + t2.reps : "add a rep") + "</em>"
+          : (t2.w ? t2.w + "kg<em>"
+                    + (t2.first ? "to start" : t2.reps ? "x " + t2.reps : "add a rep") + "</em>"
                   : "<span class='new'>new</span>")) + "</span></button>";
     h += "<button class='swap' data-swap='" + key + ":" + i + "'"
       + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
@@ -212,7 +213,15 @@ function lastLift(name){
    hold the weight until every set reaches the top of the range, then add. */
 function nextTarget(ex, name){
   var last = lastLift(name || ex[0]), sets = stage()[3];
-  if (!last) return { first: true, say: "Pick something you could do two or three more than " + ex[2] + " with." };
+  if (!last){
+    /* A blank is the worst thing to hand someone standing at a machine, so
+       every loaded movement opens on a number. It is a starting point, not a
+       prescription - the rule underneath it is the one in the next sentence. */
+    var open = START[name || ex[0]];
+    return { first: true, w: open || null,
+             say: (open ? "Start around " + open + "kg. " : "")
+                + "You should finish the first set feeling you had two or three more in you." };
+  }
   var allTop = last.r.length >= sets && last.r.every(function(n){ return n >= ex[3]; });
   if (allTop){
     /* A jump has to match the kit. Two kilos is a sensible step on a dumbbell

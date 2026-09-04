@@ -736,3 +736,81 @@ var WORKDATES = [
   ["clocks",  "Malta clocks go back","2026-10-25", "Your finish moves to midnight. This is the exhibit."],
   ["talk",    "The conversation",   "2026-10-27", "The week after, while your contribution is measurable."]
 ];
+
+/* =========================================================== opening weights
+   Where to start each movement, so the first time he touches one the app says
+   a number instead of "new". Anchored on the one real datum he has given me:
+   22.5kg on a chest press machine for three or four sets of ten.
+
+   Everything else is scaled off that and off 71.5kg of bodyweight, and they
+   are STARTING points rather than prescriptions - machines differ enormously
+   in leverage, so a stack number on one is not a stack number on another. The
+   rule that actually governs it is the one in the modal: finish the first set
+   feeling you had two or three more in you.
+
+   Bodyweight movements are absent on purpose: they open at bodyweight. */
+var START = {
+  /* the known one, and its neighbours */
+  "Chest press machine": 22.5,
+  "Incline chest press machine": 20,
+  "Dumbbell bench press": 12,
+  "Incline dumbbell press": 10,
+  "Smith bench press": 20,
+  "Smith incline press": 17.5,
+  "Low-to-high cable fly": 7.5,
+
+  /* pulling */
+  "One-arm dumbbell row": 14,
+  "Chest-supported row machine": 25,
+  "Seated cable row": 30,
+  "Wide-grip cable row": 30,
+  "T-bar row": 20,
+  "Lat pulldown": 30,
+  "Neutral-grip pulldown": 30,
+  "Assisted pull-up machine": 30,
+  "Straight-arm pulldown": 15,
+  "Cable pullover": 15,
+
+  /* legs */
+  "Goblet squat": 14,
+  "Leg press": 60,
+  "Hack squat": 20,
+  "Smith machine squat": 20,
+  "Belt squat": 30,
+  "Romanian deadlift": 12,
+  "Dumbbell deadlift": 16,
+  "Trap bar deadlift": 40,
+  "Rack pull": 40,
+  "Seated leg curl": 25,
+  "Lying leg curl": 20,
+  "Cable pull-through": 20,
+  "Reverse lunge": 8,
+  "Single-leg press": 30,
+  "Step-up": 8,
+  "Smith split squat": 15,
+  "Walking lunge": 8,
+  "Hip thrust": 40,
+  "Glute drive machine": 40,
+  "Smith hip thrust": 40,
+  "Cable kickback": 10,
+
+  /* shoulders */
+  "Dumbbell shoulder press": 8,
+  "Shoulder press machine": 20,
+  "Smith overhead press": 17.5,
+  "Landmine press": 10,
+
+  /* midsection and carries */
+  "Pallof press": 10,
+  "Cable half-kneeling chop": 10,
+  "Cable woodchop": 10,
+  "Torso rotation machine": 15,
+  "Landmine rotation": 10,
+  "Cable crunch": 20,
+  "Ab crunch machine": 20,
+  "Cable side bend, light": 10,
+  "Farmer's carry": 20,
+  "Trap bar carry": 30,
+  "Suitcase carry": 20,
+  "Suitcase carry, one side": 20
+};
