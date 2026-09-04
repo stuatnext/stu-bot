@@ -103,14 +103,23 @@ function viewFood(){
   var pct = Math.min(100, Math.round(100 * got / target));
   var left = Math.max(0, target - got);
 
-  h += "<div class='panel prot" + (left === 0 ? " done" : "") + "'>"
-    + "<div class='pnum'><b>" + num(got) + "</b><span>of " + num(target) + "g protein today</span></div>"
-    + "<div class='pbar'><i style='width:" + pct + "%'></i></div>";
   var sug = suggestOrder(nowSlot());
-  h += "<p class='fine'>" + (left === 0
-      ? "Done. That is the single biggest lever in the whole plan, closed for today."
-      : num(left) + "g to go" + (sug ? " &mdash; a " + esc(sug[0].toLowerCase()) + " would close it." : "."))
-    + "</p></div>";
+  var slots = ANCHORS.filter(function(a){ return anchorDone(t, a[0]); }).length;
+  h += hero({
+    tone: "green", icon: "plate", kicker: "Protein today",
+    big: num(got), unit: "/ " + num(target) + "g",
+    line: left === 0
+      ? "Done. The single biggest lever in the plan, closed."
+      : num(left) + "g to go" + (sug ? " \u2014 a " + esc(sug[0].toLowerCase()) + " would close it" : ""),
+    pct: pct,
+    foot: slots + " of " + ANCHORS.length + " eating occasions so far today"
+        + (slots < 2 ? " \u2014 one meal cannot carry " + num(target) + "g" : "")
+  });
+  h += facts([
+    [num(got) + "g", "eaten", left === 0 ? "on" : ""],
+    [num(left) + "g", "to go", left > target * .6 ? "warn" : ""],
+    [slots + "/" + ANCHORS.length, "occasions", slots >= 2 ? "on" : ""]
+  ]);
 
   h += "<div class='anch'>";
   ANCHORS.forEach(function(a){

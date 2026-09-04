@@ -85,9 +85,25 @@ function tapOut(){
 function viewBasics(){
   var t = today(), h = "";
 
+  var gl = waterOn(t), met = vitalsMet(t), clear = clearDays();
+  var litres = ((gl * GLASS_ML) / 1000).toFixed(1);
+  var full = ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1);
+
+  /* Water is the tab, so water is the number. The other four basics sit under
+     it as facts rather than competing for the top of the screen. */
+  h += hero({
+    tone: "blue", icon: "drop", kicker: "Water today",
+    big: gl, unit: "/ " + WATER_GLASSES,
+    line: gl >= WATER_GLASSES
+      ? litres + "L. That is the day's water, before the kopi."
+      : litres + "L of " + full + "L \u2014 " + (WATER_GLASSES - gl) + " to go",
+    pct: Math.round(100 * gl / WATER_GLASSES),
+    foot: met + " of " + VITALS.length + " basics closed"
+        + (clear ? " \u00b7 " + num(clear) + " clear " + (clear === 1 ? "day" : "days") + " so far" : "")
+  });
+
   h += questHTML();
 
-  var met = vitalsMet(t), clear = clearDays();
   h += "<div class='rulehead'><h3>Today</h3><span></span><em>five basics</em></div>";
   h += "<div class='cond" + (met === VITALS.length ? " full" : "") + "'>"
     + "<div class='cring'>" + ring(met, VITALS.length, "gold") + "<b>" + met + "</b></div>"
@@ -112,9 +128,8 @@ function viewBasics(){
   });
   h += "</div>";
 
-  h += "<div class='rulehead'><h3>Water</h3><span></span><em>"
-    + ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1) + "L</em></div>";
-  var glasses = waterOn(t);
+  h += "<div class='rulehead'><h3>Water</h3><span></span><em>" + full + "L</em></div>";
+  var glasses = gl;
   h += "<div class='glass'>";
   for (var gi = 1; gi <= WATER_GLASSES; gi++){
     h += "<button class='gl" + (gi <= glasses ? " on" : "") + "' data-water='" + gi + "'"

@@ -29,22 +29,14 @@ function viewYou(){
     + "<div class='dim'>" + num(fullDays()) + (fullDays() === 1 ? " full day" : " full days")
     + " &middot; " + num(heldCount()) + " of " + CARDS.length + " cards</div></div></div>";
 
-  /* the pot */
-  h += "<div class='vault'><div class='amt'>" + money(have) + "</div>"
-    + "<div class='cap'>yours to spend</div>"
-    + "<div class='btns'><button class='btn pri' data-spend='1'>Spent some</button>"
-    + "<button class='btn' data-rate='1'>Change the rate</button></div>"
-    + "<p class='fine'>Every full day pays " + money(rate()) + ". Real money, spent on real things "
-    + "&mdash; the only rule is you log it, so the number stays true.</p></div>";
-  if ((S.spends || []).length){
-    h += "<div class='recs'>";
-    S.spends.slice().reverse().slice(0, 4).forEach(function(s){
-      h += "<div class='rec'><span class='rd'>" + esc(nice(s[0])) + "</span>"
-        + "<span class='rt'>" + esc(s[2] || "Something") + "</span>"
-        + "<b class='rv'>" + money(s[1]) + "</b></div>";
-    });
-    h += "</div>";
-  }
+  /* The pot lives on its own screen now, reached from the gold chip that is
+     always in the HUD. What stays here is the door to it, because You is
+     where you look for anything that is about him rather than about today. */
+  h += "<button class='potdoor' data-tab='vault'>"
+    + "<span class='pd-a'>" + money(have) + "</span>"
+    + "<span class='pd-b'><b>The pot</b><span>" + money(rate()) + " a day &middot; "
+    + money(potTotal()) + " earned so far</span></span>"
+    + "<span class='pd-c'>" + svg("arrow", 18) + "</span></button>";
 
   /* the streaks, and the net under them */
   h += "<div class='panel'><h3>Streaks</h3><div class='str3'>";

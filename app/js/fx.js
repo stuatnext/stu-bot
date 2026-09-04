@@ -42,7 +42,12 @@ var ICONS = {
   pin:   "<path d='M11 19.4s6-5.1 6-9.6a6 6 0 1 0-12 0c0 4.5 6 9.6 6 9.6Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><circle cx='11' cy='9.6' r='2.2' stroke='currentColor' stroke-width='1.7'/>",
   pen:   "<path d='M14.6 3.4 18.6 7.4 8 18H4v-4Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M12.6 5.4 16.6 9.4' stroke='currentColor' stroke-width='1.7'/>",
   save:  "<path d='M11 3.2v9.2M7.2 8.8 11 12.6l3.8-3.8' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/><path d='M3.8 14.6v1.9a2.3 2.3 0 0 0 2.3 2.3h9.8a2.3 2.3 0 0 0 2.3-2.3v-1.9' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
-  load:  "<path d='M11 12.4V3.2M7.2 6.8 11 3l3.8 3.8' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/><path d='M3.8 14.6v1.9a2.3 2.3 0 0 0 2.3 2.3h9.8a2.3 2.3 0 0 0 2.3-2.3v-1.9' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>"
+  load:  "<path d='M11 12.4V3.2M7.2 6.8 11 3l3.8 3.8' stroke='currentColor' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/><path d='M3.8 14.6v1.9a2.3 2.3 0 0 0 2.3 2.3h9.8a2.3 2.3 0 0 0 2.3-2.3v-1.9' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
+  drop:  "<path d='M11 2.6c3.1 3.7 5.5 6.1 5.5 9.2a5.5 5.5 0 0 1-11 0c0-3.1 2.4-5.5 5.5-9.2Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/>",
+  dumb:  "<path d='M6 7.6v6.8M16 7.6v6.8' stroke='currentColor' stroke-width='2.2' stroke-linecap='round'/><path d='M3.2 9.4v3.2M18.8 9.4v3.2' stroke='currentColor' stroke-width='2.2' stroke-linecap='round'/><path d='M6 11h10' stroke='currentColor' stroke-width='2.2'/>",
+  plate: "<path d='M5.5 3v6.6a2.3 2.3 0 0 0 4.6 0V3M7.8 9.6v9.6' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><path d='M15.4 3c-1.3 1.4-1.8 3.2-1.8 5s.7 2.7 1.8 3v8.2' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
+  case:  "<rect x='2.8' y='6.6' width='16.4' height='11.4' rx='2.2' stroke='currentColor' stroke-width='1.9'/><path d='M8.2 6.6V4.9a1.5 1.5 0 0 1 1.5-1.5h2.6a1.5 1.5 0 0 1 1.5 1.5v1.7' stroke='currentColor' stroke-width='1.9'/>",
+  cards: "<rect x='2.9' y='4.6' width='11' height='14.2' rx='1.9' stroke='currentColor' stroke-width='1.9'/><path d='M7.7 3.1h8.4a1.9 1.9 0 0 1 1.9 1.9v10.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>"
 };
 function svg(name, size){
   var s = size || 22;
@@ -256,4 +261,37 @@ function confetti(){
     if (live) requestAnimationFrame(tick); else cv.remove();
   })(t0);
   setTimeout(function(){ if (cv.parentNode) cv.remove(); }, 2600);
+}
+
+/* ==================================================================== hero
+   Every tab that is not Today opens with the same object: a slab in that
+   tab's colour carrying the one number the tab is about, the read on it, and
+   a bar if there is something to fill. Before this, four screens opened with
+   a grey rule and a heading, which is a document, not a place - you could not
+   tell Food from Work at a glance and there was nothing to want. */
+function hero(o){
+  var h = "<div class='hero t-" + (o.tone || "gold") + (o.full ? " full" : "") + "'>";
+  h += "<span class='hero-gl'></span><span class='hero-gl2'></span>";
+  if (o.icon) h += "<span class='hero-ic'>" + svg(o.icon, 22) + "</span>";
+  if (o.kicker) h += "<div class='hero-k'>" + o.kicker + "</div>";
+  h += "<div class='hero-n'><b>" + o.big + "</b>"
+     + (o.unit ? "<i>" + o.unit + "</i>" : "") + "</div>";
+  if (o.line) h += "<div class='hero-l'>" + o.line + "</div>";
+  if (o.pct !== undefined && o.pct !== null){
+    h += "<div class='hero-b'><i style='width:"
+       + Math.max(0, Math.min(100, o.pct)) + "%'></i></div>";
+  }
+  if (o.foot) h += "<div class='hero-f'>" + o.foot + "</div>";
+  return h + "</div>";
+}
+
+/* A row of small facts under a hero: three or four numbers that qualify the
+   big one without competing with it. */
+function facts(rows){
+  var h = "<div class='facts'>";
+  rows.forEach(function(r){
+    h += "<div class='fct" + (r[2] ? " " + r[2] : "") + "'><b>" + r[0] + "</b>"
+       + "<span>" + r[1] + "</span></div>";
+  });
+  return h + "</div>";
 }

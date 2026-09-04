@@ -27,17 +27,38 @@ function daysTo(isoStr){
 function viewWork(){
   var h = "";
 
-  /* The run-up, in order, with the one that has not happened yet at the top. */
+  /* The run-up, in order, with the one that has not happened yet at the top.
+     The countdown is the hero because it is the only thing on this tab with a
+     deadline attached - everything else is a list that waits. */
   var soon = WORKDATES.filter(function(d){ return daysTo(d[2]) >= 0; });
   var next = soon[0];
+  var openN = WORKITEMS.filter(function(i){ return !workDone(i[0]); }).length;
+  var doneN = WORKITEMS.length - openN;
+
   if (next){
     var n = daysTo(next[2]);
-    h += "<div class='panel countdown'>"
-      + "<div class='cd'><b>" + (n === 0 ? "Today" : num(n)) + "</b>"
-      + "<span>" + (n === 0 ? "" : n === 1 ? "day until" : "days until") + "</span></div>"
-      + "<div class='cdb'><h3>" + esc(next[1]) + "</h3>"
-      + "<p>" + esc(next[3]) + "</p></div></div>";
+    h += hero({
+      tone: "violet", icon: "case",
+      kicker: n === 0 ? "Today" : "Next up \u00b7 " + esc(nice(next[2])),
+      big: n === 0 ? "Today" : num(n),
+      unit: n === 0 ? "" : (n === 1 ? "day" : "days"),
+      line: esc(next[1]),
+      foot: esc(next[3])
+    });
+  } else {
+    h += hero({
+      tone: "violet", icon: "case", kicker: "The job",
+      big: doneN, unit: "/ " + WORKITEMS.length,
+      line: openN ? openN + (openN === 1 ? " thing still open" : " things still open")
+                  : "Every one of them done.",
+      pct: Math.round(100 * doneN / WORKITEMS.length)
+    });
   }
+  h += facts([
+    [num(doneN), "done", doneN ? "on" : ""],
+    [num(openN), "open", openN > WORKITEMS.length / 2 ? "warn" : ""],
+    [num(soon.length), "dates ahead", ""]
+  ]);
 
   if (soon.length > 1){
     h += "<div class='recs'>";

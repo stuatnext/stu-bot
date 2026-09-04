@@ -175,3 +175,108 @@ button.vc:active{transform:scale(.96)}
 .ord .on2{font-size:14px; font-weight:700}
 .ord .og{flex:none; font-family:"JetBrains Mono",monospace; font-weight:700; font-size:13px;
   color:var(--ink3)}
+
+/* ==========================================================================
+   The hero.
+
+   Four tabs used to open with a grey hairline rule and a heading, which is
+   how a document opens, not a place. You could not tell Food from Work at a
+   glance and there was nothing on the screen to want. Each tab now owns a
+   colour and opens with the one number it is about, big, on that colour.
+   ========================================================================== */
+.hero{position:relative; overflow:hidden; isolation:isolate;
+  border-radius:24px; padding:17px 18px 19px; margin:14px 0 15px; color:#fff;
+  background:linear-gradient(152deg,var(--h1),var(--h2) 58%,var(--h3));
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 14px 30px -16px var(--hsh), 0 2px 5px -2px rgba(0,0,0,.18),
+             0 1px 0 rgba(255,255,255,.3) inset}
+.hero.full{margin-top:6px; padding:22px 18px 24px}
+.hero-gl,.hero-gl2{position:absolute; border-radius:50%; z-index:-1; pointer-events:none}
+.hero-gl{width:230px; height:230px; right:-72px; top:-104px;
+  background:radial-gradient(circle,rgba(255,255,255,.42),transparent 66%)}
+.hero-gl2{width:280px; height:280px; left:-110px; bottom:-166px;
+  background:radial-gradient(circle,rgba(0,0,0,.24),transparent 64%)}
+.hero::after{content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:linear-gradient(104deg,transparent 34%,rgba(255,255,255,.16) 47%,transparent 58%)}
+.hero-ic{position:absolute; right:15px; top:15px; width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; color:#fff;
+  background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.26)}
+.hero-k{font-size:10.5px; font-weight:800; letter-spacing:.15em; text-transform:uppercase;
+  opacity:.84; margin-bottom:5px}
+.hero-n{display:flex; align-items:baseline; gap:5px; line-height:1;
+  font-family:"Nunito",sans-serif}
+.hero-n b{font-size:44px; font-weight:800; letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums; text-shadow:0 2px 8px rgba(0,0,0,.16)}
+.hero-n b small{font-size:.46em; font-weight:800; opacity:.72; margin-left:1px}
+.hero-n i{font-style:normal; font-size:19px; font-weight:800; opacity:.72}
+.hero-l{margin-top:6px; font-size:14px; font-weight:700; opacity:.93; text-wrap:balance}
+.hero-b{height:9px; border-radius:6px; margin-top:13px; overflow:hidden;
+  background:rgba(0,0,0,.19); box-shadow:0 1px 2px rgba(0,0,0,.14) inset}
+.hero-b i{display:block; height:100%; border-radius:6px; background:#fff;
+  box-shadow:0 0 12px rgba(255,255,255,.55);
+  transition:width .55s var(--tap)}
+.hero-f{margin-top:13px; padding-top:11px; font-size:12.5px; font-weight:700; opacity:.82;
+  border-top:1px solid rgba(255,255,255,.24)}
+
+.t-gold  {--h1:#FFCE2E; --h2:#F0A800; --h3:#D07E06; --hsh:rgba(214,140,0,.75)}
+.t-flame {--h1:#FFA53A; --h2:#F27000; --h3:#D14A12; --hsh:rgba(214,90,10,.7)}
+.t-green {--h1:#78DB2B; --h2:#4FBB03; --h3:#2F8A08; --hsh:rgba(64,150,6,.7)}
+.t-blue  {--h1:#4CC6FF; --h2:#159FE6; --h3:#0B72BD; --hsh:rgba(15,130,200,.7)}
+.t-violet{--h1:#D79AFF; --h2:#A961EE; --h3:#7A38C4; --hsh:rgba(140,70,215,.66)}
+
+/* Small facts under a hero: numbers that qualify the big one without
+   competing with it. */
+.facts{display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:8px; margin:0 0 4px}
+.fct{background:var(--card); border:1.5px solid var(--edge); border-bottom-width:3px;
+  border-radius:14px; padding:10px 8px; text-align:center}
+.fct b{display:block; font-family:"Nunito",sans-serif; font-size:20px; font-weight:800;
+  letter-spacing:-.03em; font-variant-numeric:tabular-nums; line-height:1.1}
+.fct span{display:block; margin-top:3px; font-size:10.5px; font-weight:700; color:var(--ink3);
+  letter-spacing:.04em}
+.fct.on{background:var(--greenSoft); border-color:#BFE79A}
+.fct.on b{color:var(--greenInk)}
+.fct.warn{background:var(--flameSoft); border-color:#F5CE96}
+.fct.warn b{color:#A85F0E}
+
+/* Leaving a screen that is not in the bar. */
+.backrow{display:inline-flex; align-items:center; gap:6px; margin:10px 0 0; padding:7px 13px 7px 9px;
+  background:var(--card); border:1.5px solid var(--edge); border-bottom-width:3px;
+  border-radius:999px; color:var(--ink2); font:inherit; font-size:13px; font-weight:800;
+  cursor:pointer; -webkit-appearance:none}
+.backrow svg{transform:rotate(180deg)}
+.backrow:active{transform:translateY(1px); border-bottom-width:2px}
+
+/* ============================================================== the vault
+   Where the money came from, as bars rather than a list, because the answer
+   he actually wants is "which of these is doing the work". */
+.src{display:grid; gap:8px}
+.sr{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px;
+  background:var(--card); border:1.5px solid var(--edge); border-bottom-width:3px;
+  border-radius:16px; padding:11px 13px; opacity:.55}
+.sr.on{opacity:1}
+.sr .si{display:flex; color:var(--ink3)}
+.sr.on .si{color:var(--goldEdge)}
+.sr .sb{min-width:0}
+.sr .sb b{display:block; font-size:14.5px; font-weight:800; letter-spacing:-.01em}
+.sr .sb > span{display:block; font-size:11.5px; font-weight:600; color:var(--ink3); line-height:1.35}
+.sr .srb{display:block; height:5px; border-radius:4px; margin-top:6px; background:var(--sunk);
+  overflow:hidden}
+.sr .srb i{display:block; height:100%; border-radius:4px;
+  background:linear-gradient(90deg,var(--gold),var(--goldEdge))}
+.sr .sv{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:14px; font-weight:700; color:var(--ink3)}
+.sr.on .sv{color:var(--goldInk)}
+
+/* The door to the vault, on You. */
+.potdoor{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:14px;
+  width:100%; text-align:left; margin:12px 0 4px; padding:15px 16px; cursor:pointer;
+  border-radius:20px; color:#5A3E00; font:inherit;
+  background:linear-gradient(150deg,#FFE9A3,#FFD34D 58%,#F5B915);
+  border:1.5px solid #E9B411; border-bottom-width:4px;
+  box-shadow:0 10px 22px -14px rgba(200,140,0,.9)}
+.potdoor:active{transform:translateY(1px); border-bottom-width:3px}
+.potdoor .pd-a{font-family:"Nunito",sans-serif; font-size:27px; font-weight:800;
+  letter-spacing:-.035em; font-variant-numeric:tabular-nums; color:#4A3200}
+.potdoor .pd-b b{display:block; font-size:14.5px; font-weight:800}
+.potdoor .pd-b span{display:block; font-size:11.5px; font-weight:700; opacity:.72}
+.potdoor .pd-c{display:flex; opacity:.5}

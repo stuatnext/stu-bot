@@ -25,8 +25,11 @@ function viewDeck(){
     h += "<div class='panel whycards'><h3>What cards are</h3>"
       + "<p>Souvenirs of your Singapore year \u2014 real dishes, places, phrases and "
       + "milestones. They do nothing except get collected, which is the point: full days "
-      + "earn packs, duplicates melt into spares, spares make cards you are missing, and "
+      + "earn packs, duplicates melt into spares, spares force a sealed card open, and "
       + "finishing a set pays the pot.</p>"
+      + "<p>A card you have not found is a <strong>sealed back</strong> with its rarity on it. "
+      + "You can see there is a rare missing from a set; you cannot see which one it is until "
+      + "you turn it over. That is the whole game.</p>"
       + "<p>Two exceptions: the <strong>Mandarin</strong> set is real vocabulary \u2014 the "
       + "character, its tone drawn underneath, your own mnemonic on the back. And "
       + "<strong>Trophies</strong> are never in packs: you claim one yourself when the real "
@@ -54,7 +57,21 @@ function viewDeck(){
       + num(setsCompleteEver()) + " sets completed all time</span></div>";
   }
 
-  /* packs first, because that is what he came for */
+  /* Packs first when there are packs, because that is what he came for. The
+     hero only takes the top of the screen on a day with nothing to open. */
+  if (!(w.streak || w.day)){
+    var heldN = heldCount(), sealed = CARDS.length - heldN;
+    h += hero({
+      tone: "gold", icon: "cards", kicker: "Season " + season(),
+      big: num(heldN), unit: "/ " + num(CARDS.length),
+      line: sealed ? num(sealed) + (sealed === 1 ? " card still sealed" : " cards still sealed")
+                   : "Every card in the deck, found.",
+      pct: Math.round(100 * heldN / CARDS.length),
+      foot: fd ? "Close all three pillars today and a pack lands tonight."
+               : "A full day \u2014 all three pillars \u2014 earns the first pack."
+    });
+  }
+
   if (w.streak || w.day){
     h += "<div style='display:flex;gap:11px;justify-content:center;margin:8px 0 4px'>";
     if (w.streak) h += "<button class='pk big' data-pack='streak' style='flex:1 1 0;max-width:150px;margin:0'>"
@@ -125,7 +142,11 @@ function viewDeck(){
     h += "<div class='binder'>";
     show.forEach(function(c){
       var n = (S.cards || {})[c[0]];
-      h += tcard(c, n, { attr: " data-card=\"" + esc(c[0]) + "\"" });
+      /* A sealed slot is addressed by set and rarity, never by name - the name
+         would otherwise sit in the markup of a card he is not meant to know. */
+      h += tcard(c, n, { attr: (!n && c[1] !== 3)
+        ? " data-sealed=\"" + esc(c[2]) + "|" + c[1] + "\""
+        : " data-card=\"" + esc(c[0]) + "\"" });
     });
     h += "</div>";
   } else {
@@ -144,12 +165,13 @@ function viewDeck(){
       + num(sp) + "</div><div class='dim'>from " + num(sparesEarned()) + " earned</div></div></div>";
     h += "<p class='dim' style='margin:10px 0 0'>Every card you pull twice is worth spares: "
       + RARITY[0][4] + " for a common, " + RARITY[1][4] + " uncommon, " + RARITY[2][4] + " rare. "
-      + "They make a card you are missing — " + RARITY[0][5] + ", " + RARITY[1][5] + " or "
-      + RARITY[2][5] + " — and nothing else. They are not money and they do not buy packs.</p>";
+      + "They force a sealed card open — " + RARITY[0][5] + ", " + RARITY[1][5] + " or "
+      + RARITY[2][5] + " — and nothing else. You choose the set and the rarity; the deck "
+      + "chooses the card. They are not money and they do not buy packs.</p>";
     if (missing.length){
       h += "<div class='btns'><button class='btn " + (affordable.length ? "go" : "quiet") + "'"
         + (affordable.length ? "" : " disabled") + " data-craft='" + DECKSET + "'>"
-        + (affordable.length ? "Make one from " + esc(st[1]) : "Not enough for anything in " + esc(st[1]))
+        + (affordable.length ? "Force one open" : "Not enough for anything in " + esc(st[1]))
         + "</button></div>";
     }
     h += "</div>";
@@ -212,31 +234,44 @@ async function askClaimTrophy(name){
   if (ok) claimTrophy(name);
 }
 
-/* The one thing spares buy. He picks the card; nothing is chosen for him. */
+/* The one thing spares buy. He used to pick the card off a list, which meant
+   the list had to name every card he was missing - the spoiler he asked me to
+   take out. Now he picks a rarity out of the set and the deck picks the card,
+   and it arrives face-down on the stage like anything else. Same cost, same
+   odds of getting the one he wanted; what changes is that he finds out by
+   turning it over. */
 async function askCraft(setKey){
-  var sp = spares();
+  var sp = spares(), st = SETS.filter(function(s){ return s[0] === setKey; })[0];
   var missing = setCards(setKey).filter(function(c){
     return !(S.cards || {})[c[0]] && c[1] !== 3;
-  }).sort(function(a, b){ return craftCost(a) - craftCost(b); });
+  });
   if (!missing.length){ toast("Nothing missing in this one."); return; }
+  var byR = {};
+  missing.forEach(function(c){ byR[c[1]] = (byR[c[1]] || 0) + 1; });
   var v = await ask({
-    title: "Make a card",
+    title: "Force one open",
     say: "You have <strong>" + num(sp) + " spares</strong>. They came from cards you pulled twice, and "
-       + "this is the only thing they do.",
-    options: missing.map(function(c){
-      var cost = craftCost(c), can = cost <= sp;
-      return { id: c[0], label: c[0] + "  ·  " + cost, pri: can,
-               note: can ? RARITY[c[1]][0] : RARITY[c[1]][0] + " · " + (cost - sp) + " short" };
+       + "this is the only thing they do. Pick what you want out of <b>" + esc(st ? st[1] : setKey)
+       + "</b> &mdash; which card it turns out to be is not yours to choose.",
+    options: Object.keys(byR).sort().map(function(r){
+      var cost = RARITY[r][5], n = byR[r], can = cost <= sp;
+      return { id: String(r), label: RARITY[r][0] + "  ·  " + cost, pri: can,
+               note: can ? n + " sealed in this set"
+                         : n + " sealed &middot; " + (cost - sp) + " short" };
     }),
     cancel: "Close"
   });
   if (!v) return;
-  var card = cardByName(v);
-  if (!canCraft(card)){ sfx("no"); toast("Not enough spares for that one."); return; }
-  craft(v);
+  doCraftR(setKey, v);
+}
+
+/* Shared by the set screen and by tapping a sealed card on the binder. */
+function doCraftR(setKey, r){
+  if (!canCraftR(setKey, r)){ sfx("no"); toast("Not enough spares for that one."); return; }
+  var got = craftRandom(setKey, r);
+  if (!got){ sfx("no"); toast("Nothing sealed at that rarity."); return; }
   sfx("craft"); buzz([16, 40, 16]);
-  render({ keepScroll: true, animate: true });
-  setTimeout(function(){ openSheet(v); }, 220);
+  revealOne(got);
 }
 
 /* Rolling the deck is irreversible, so it is asked for rather than tapped. */

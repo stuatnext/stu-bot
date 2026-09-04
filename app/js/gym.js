@@ -12,10 +12,29 @@ function viewGym(){
   var doneN = 0;
   list.forEach(function(ex, i){ if (loggedToday(pickFor(key, i))) doneN++; });
 
-  h += "<div class='rulehead'><h3>Session " + key + "</h3><span></span>"
+  /* The tab opens on the one thing it is about: how much of today's session
+     is on the board. Everything under it qualifies that number. */
+  var doneS = sessionsDone();
+  var wNow = (S.waist || []).slice(-1)[0];
+  h += hero({
+    tone: "flame", icon: "dumb", kicker: "Today\u2019s session \u00b7 " + key,
+    big: doneN, unit: "/ " + list.length,
+    line: doneN === list.length ? "Every move logged. That is the session."
+        : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
+        : "moves waiting at 24/7 Tanjong Pagar",
+    pct: Math.round(100 * doneN / Math.max(1, list.length)),
+    foot: doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged all time"
+        : "Turning up is the thing being trained. One move counts."
+  });
+  h += facts([
+    [num(doneS), "sessions", doneS ? "on" : ""],
+    [st[3] + "", "sets a move", ""],
+    [wNow ? wNow[1] + "cm" : "\u2014", "waist", ""]
+  ]);
+
+  h += "<div class='rulehead'><h3>Today's moves</h3><span></span>"
     + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
 
-  var doneS = sessionsDone();
   h += "<div class='stg'>"
     + "<div class='sh'><b>" + esc(st[1]) + "</b>"
     + "<span>" + list.length + (list.length === 1 ? " move" : " moves")

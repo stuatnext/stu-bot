@@ -551,6 +551,26 @@ function craft(name){
   save();
   return true;
 }
+/* Spares no longer buy a card by name, because naming the cards he is missing
+   is the spoiler he asked me to remove. He buys a rarity out of a set and the
+   deck picks; the card is turned over on the stage like any other. The cost is
+   the rarity's cost either way, so nothing about the economy moves. */
+function craftPool(setKey, r){
+  return setCards(setKey).filter(function(c){
+    return c[1] === Number(r) && !(S.cards || {})[c[0]];
+  });
+}
+function canCraftR(setKey, r){
+  return setOpen(setKey) && Number(r) !== 3
+      && craftPool(setKey, r).length > 0 && spares() >= RARITY[Number(r)][5];
+}
+function craftRandom(setKey, r){
+  var pool = craftPool(setKey, r);
+  if (!canCraftR(setKey, r) || !pool.length) return null;
+  var pick = pool[Math.floor(Math.random() * pool.length)];
+  return craft(pick[0]) ? pick[0] : null;
+}
+
 /* ------------------------------------------------------------- collection */
 var BY_NAME = {};
 CARDS.forEach(function(c){ BY_NAME[c[0]] = c; });

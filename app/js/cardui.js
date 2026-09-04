@@ -5,8 +5,8 @@
 
    Opening a pack takes the screen: the sachet tears, the stage lights, and
    every card arrives face-down for the player to turn over - nothing here
-   acts on his behalf. The sheet is the one place "what is this card" gets
-   answered, held or not.
+   acts on his behalf. The sheet answers "what is this card" for a card he
+   holds; for one he does not, the answer is the back, on purpose.
    ======================================================================== */
 
 /* ================================================================= the stage */
@@ -170,10 +170,52 @@ function closeStage(){
   render();
 }
 
+/* One card, turned over on the stage. Crafting used to end in a card sheet,
+   which is a receipt; a card you paid for deserves the same moment as a card
+   you pulled. Trophies come through here too. */
+function revealOne(name){
+  ST = { cards: [name], i: 0, kind: "one",
+         lvlBefore: rank().level, sparesBefore: spares() };
+  var el = stageEl();
+  el.className = "on lit";
+  el.innerHTML = "";
+  document.body.style.overflow = "hidden";
+  showSlot();
+}
+
+/* Tapping a sealed slot. It is a real question - "what is in there" - and it
+   gets a real answer that is not the card: which set, which rarity, how many
+   like it are still sealed, and the one thing spares can do about it. */
+function openSealed(setKey, r){
+  r = Number(r);
+  var st = SETS.filter(function(s){ return s[0] === setKey; })[0];
+  var n = craftPool(setKey, r).length;
+  var cost = RARITY[r][5], can = canCraftR(setKey, r);
+  var el = document.getElementById("sheet");
+  el.innerHTML = "<div class='slot' id='shSlot'>" + sealedCard(r, true) + "</div>"
+    + "<div class='meta'>" + esc(st ? st[1] : setKey) + " &middot; " + RARITY[r][0]
+    + " &middot; not found yet</div>"
+    + "<p class='fine' style='text-align:center;margin:2px 14px 0'>"
+    + num(n) + " " + RARITY[r][0].toLowerCase() + (n === 1 ? "" : "s")
+    + " still sealed in this set. Packs are how they open. Spares can force one, "
+    + "but not this one in particular &mdash; that is the deck's call.</p>"
+    + "<div class='acts'>"
+    + "<button class='" + (can ? "pri" : "") + "' " + (can ? "" : "disabled ")
+    + "data-craftr='" + esc(setKey) + "|" + r + "'>"
+    + (can ? "Force one open &middot; " + cost + " spares"
+           : cost + " spares (" + spares() + ")") + "</button>"
+    + "<button id='shClose'>Close</button></div>";
+  el.className = "on";
+  sfx("tap");
+  document.getElementById("shClose").onclick = closeSheet;
+  el.onclick = function(ev){ if (ev.target === el) closeSheet(); };
+}
+
 /* ------------------------------------------------------------- card detail
-   Tapping a card shows you the card. Including one you do not hold - that is
-   the only place the question "what is this" gets asked, and it used to be
-   answered with a face-down back and the words "not found yet". */
+   Tapping a card asks "what is this". For one he holds, that is the card. For
+   one he does not, the honest answer is a sealed back and its rarity - he
+   asked not to be shown the deck in advance, and a detail sheet that spells
+   out the card is the same spoiler in a bigger font. */
 function openSheet(name){
   var c = cardByName(name);
   if (!c) return;
@@ -190,10 +232,11 @@ function openSheet(name){
   } else if (c[1] === 3){
     meta = esc(st ? st[1] : "") + " &middot; not in packs. This one only happens by happening.";
   } else {
-    meta = esc(st ? st[1] : "") + " &middot; " + RARITY[c[1]][0] + " &middot; not held";
+    meta = esc(st ? st[1] : "") + " &middot; " + RARITY[c[1]][0] + " &middot; not found yet";
   }
 
-  var can = canCraft(c), cost = craftCost(c);
+  var canR = c[1] !== 3 && canCraftR(c[2], c[1]);
+  var costR = c[1] !== 3 ? RARITY[c[1]][5] : 0;
   /* A held card asks something of you - otherwise it is wallpaper. The ask
      lives here on the sheet, and one of them is the day's side quest. */
   var lived = (S.lived || {})[name];
@@ -202,14 +245,21 @@ function openSheet(name){
       + (lived ? "Lived · " + esc(nice(lived)) : "Try") + "</b>"
       + esc(cardDo(c)) + "</div>"
     : "";
+  /* He can still spend spares from here, but on a rarity out of this set
+     rather than on this card - the deck picks, and turning it over is the
+     point. Tapping a sealed slot is a question, not a shopping list. */
   el.innerHTML = "<div class='slot' id='shSlot'></div>"
     + "<div class='meta'>" + meta + "</div>"
     + tryLine
+    + (held || c[1] === 3 ? "" :
+        "<p class='fine' style='text-align:center;margin:2px 14px 0'>Sealed until you find it. "
+        + "Spares can force one open, but not this one in particular.</p>")
     + "<div class='acts'>"
     + (!held && c[1] !== 3 && setOpen(c[2])
-        ? "<button class='" + (can ? "pri" : "") + "' " + (can ? "" : "disabled ")
-          + "data-craftit='" + esc(name) + "'>"
-          + (can ? "Make it &middot; " + cost + " spares" : cost + " spares (" + spares() + ")")
+        ? "<button class='" + (canR ? "pri" : "") + "' " + (canR ? "" : "disabled ")
+          + "data-craftr='" + esc(c[2]) + "|" + c[1] + "'>"
+          + (canR ? "Open " + RARITY[c[1]][0].toLowerCase() + " &middot; " + costR + " spares"
+                  : costR + " spares (" + spares() + ")")
           + "</button>"
         : "")
     + "<button id='shClose'>Close</button></div>";
@@ -229,15 +279,9 @@ function closeSheet(){
 /* Trophies are not pulled, they are earned - but the moment should look the
    same, or claiming one feels like ticking a box. */
 function claimTrophy(name){
-  var before = rank().level;
   S.cards = S.cards || {};
   S.cards[name] = 1;
   S.seen = S.seen || {}; S.seen[name] = 0;
   save();
-  ST = { cards: [name], i: 0, kind: "gold", lvlBefore: before, sparesBefore: spares() };
-  var el = stageEl();
-  el.className = "on lit";
-  el.innerHTML = "";
-  document.body.style.overflow = "hidden";
-  showSlot();
+  revealOne(name);
 }

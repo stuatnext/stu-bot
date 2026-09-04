@@ -138,14 +138,21 @@ function artTint(c){
 }
 
 /* A card. Face up or face down, small in the binder or large on the stage.
-   A card he does not hold in a set he can see is shown as its own face, muted
-   - never as a back. He has to be able to ask what a card is, and the one
-   place that question gets asked is the one place it used to be refused. */
+
+   No spoilers: a card he has not found yet is a back, not a muted face. He
+   asked for that directly - knowing the whole deck in advance is knowing the
+   ending. What the back does carry is the rarity, so a set can read as "there
+   is a rare in here I am missing" without saying which. Trophies are the one
+   exception, because they are goals he claims himself: you cannot claim a
+   thing you are not allowed to see. */
 function tcard(c, count, opts){
   opts = opts || {};
   var r = c[1];
-  var cls = "tc r" + r + (opts.down ? " down" : "") + (count ? "" : " miss")
+  var hid = !count && r !== 3 && !opts.reveal;
+  var cls = "tc r" + r + (opts.down || hid ? " down" : "")
+          + (count || hid ? "" : " miss") + (hid ? " hid" : "")
           + (opts.lg ? " lg" : "") + (opts.extra || "");
+  if (hid) return sealedCard(r, opts.lg, opts.attr);
   var h = "<div class='" + cls + "'" + (opts.attr || "") + ">";
   h += "<div class='tc-i'>";
   h += "<div class='tc-f'><div class='tc-pane'>";
@@ -164,6 +171,19 @@ function tcard(c, count, opts){
   h += "</div></div>";
   return h;
 }
+/* A sealed slot. It never learns which card it is - the name is not in the
+   markup at all, so there is nothing to find by poking at the page either. All
+   it knows is the set it belongs to and the rarity, which is all the screen
+   needs to say and all he asked to be told. */
+function sealedCard(r, lg, attr){
+  return "<div class='tc r" + r + " down hid" + (lg ? " lg" : "") + "'"
+       + (attr || "") + "><div class='tc-i'>"
+       + "<div class='tc-f'></div>"
+       + "<div class='tc-b'>" + BACKMARK
+       + "<span class='tc-pip'>" + esc(RARITY[r][0]) + "</span></div>"
+       + "</div></div>";
+}
+
 /* The back. One mark for the whole deck, so a face-down stack reads as a
    stack: the sun that runs through the app, not a letter. */
 var BACKMARK = "<div class='tc-mark'><svg viewBox='0 0 100 100' fill='none' aria-hidden='true'>"

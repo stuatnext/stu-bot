@@ -18,14 +18,18 @@ function paintHud(animate){
   var pct = r.to ? (r.xp - r.from) / (r.to - r.from) : 1;
   var C = 2 * Math.PI * 19;
 
-  /* Nothing in the HUD until it means something. Two chips reading zero on a
-     first open is the app showing off furniture he has not earned. */
-  var earnedAny = potTotal() > 0, hasSpares = sparesEarned() > 0;
+  /* The pot chip is never hidden. It used to disappear until the pot was
+     non-zero, which meant the one mechanic that pays real money did not exist
+     on a fresh install - he asked where it was, and the honest answer was
+     nowhere. A chip reading $0 is an invitation; an absent chip is a secret.
+     Spares still hide, because a spare with nothing to spend it on is only
+     furniture. */
+  var hasSpares = sparesEarned() > 0;
   var run = dayRun();
   document.getElementById("chipFlame").hidden = fullDays() === 0;
   document.getElementById("chipFlameN").textContent = run;
   document.getElementById("chipFlame").classList.toggle("cold", run === 0);
-  document.getElementById("chipPot").hidden = !earnedAny;
+  document.getElementById("chipPot").classList.toggle("cold", potTotal() === 0);
   document.getElementById("chipShard").hidden = !hasSpares;
   document.getElementById("hud").classList.toggle("bare", r.xp === 0);
 
@@ -60,7 +64,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v24";
+var BUILD = "v25";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -75,7 +79,7 @@ window.addEventListener("appinstalled", function(){
 
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewToday, gym: viewGym, food: viewFood, basics: viewBasics,
-             work: viewWork, cards: viewDeck, you: viewYou };
+             work: viewWork, cards: viewDeck, vault: viewVault, you: viewYou };
 var tab = "today";
 
 function render(opts){
@@ -104,7 +108,7 @@ function go(next){
   if (next === tab) return;
   /* Matches the bar left to right, so a swipe goes the way the eye does. You is
    last because it is reached from the crest rather than the bar. */
-var order = ["today", "gym", "food", "basics", "work", "cards", "you"];
+var order = ["today", "gym", "food", "basics", "work", "cards", "vault", "you"];
   var back = order.indexOf(next) < order.indexOf(tab);
   tab = next;
   sfx("nav"); buzz(8);
@@ -139,7 +143,8 @@ document.addEventListener("click", function(ev){
   if (ds.df !== undefined){ DECKFILTER = Number(ds.df); sfx("tap"); render({ keepScroll: true }); return; }
   if (ds.cardswhy){ S.cardsWhy = 1; save(); sfx("done"); render({ keepScroll: true }); return; }
   if (ds.card){ openSheet(ds.card); return; }
-  if (ds.craftit){ closeSheet(); askCraftOne(ds.craftit); return; }
+  if (ds.sealed){ var sl = ds.sealed.split("|"); openSealed(sl[0], sl[1]); return; }
+  if (ds.craftr){ var cr = ds.craftr.split("|"); closeSheet(); doCraftR(cr[0], cr[1]); return; }
   if (ds.craft){ askCraft(ds.craft); return; }
   if (ds.claim){ askClaimTrophy(ds.claim); return; }
   if (ds.questdone){ questDone(b); return; }
@@ -176,7 +181,7 @@ document.addEventListener("click", function(ev){
   if (ds.reset){ askReset(); return; }
   if (b.id === "crest"){ sfx("tap"); go("you"); return; }   /* the crest is his rank, so it opens You */
   if (b.id === "chipFlame"){ sfx("tap"); go("today"); return; }
-  if (b.id === "chipPot"){ sfx("tap"); go("you"); return; }
+  if (b.id === "chipPot"){ sfx("tap"); go("vault"); return; }
   if (b.id === "chipShard"){ sfx("tap"); go("cards"); return; }
 });
 
@@ -189,15 +194,7 @@ window.addEventListener("keydown", function(ev){
   else if (ST) closeStage();
 });
 
-/* Crafting one named card from its sheet. */
-async function askCraftOne(name){
-  var c = cardByName(name);
-  if (!c || !canCraft(c)){ sfx("no"); toast("Not enough spares for that one."); return; }
-  craft(name);
-  sfx("craft"); buzz([16, 40, 16]);
-  render({ keepScroll: true, animate: true });
-  setTimeout(function(){ openSheet(name); }, 220);
-}
+
 
 /* -------------------------------------------------------------- front door */
 function everLoggedAnything(){
