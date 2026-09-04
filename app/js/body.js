@@ -174,16 +174,62 @@ function lastLift(name){
 }
 /* Double progression, which is the only progression rule he needs this year:
    hold the weight until every set reaches the top of the range, then add. */
-function nextTarget(ex){
-  var last = lastLift(ex[0]), sets = stage()[3];
+function nextTarget(ex, name){
+  var last = lastLift(name || ex[0]), sets = stage()[3];
   if (!last) return { first: true, say: "Pick something you could do two or three more than " + ex[2] + " with." };
   var allTop = last.r.length >= sets && last.r.every(function(n){ return n >= ex[3]; });
   if (allTop){
-    var up = last.w + (last.w < 10 ? 1 : 2);
-    return { w: up, reps: ex[2], say: "Up to " + up + "kg, back to " + ex[2] + ". Or the next dumbbell." };
+    /* A jump has to match the kit. Two kilos is a sensible step on a dumbbell
+       and meaningless on a leg press, and the first version told him to find
+       "the next dumbbell" while he was sitting on a machine. */
+    var w = last.w;
+    var step = w >= 60 ? 10 : w >= 30 ? 5 : w >= 15 ? 2.5 : w >= 8 ? 2 : 1;
+    var up = Math.round((w + step) * 2) / 2;
+    /* Judged on the movement actually being done, not on the slot's default -
+       swapping to the leg press was still telling him to find a dumbbell. */
+    var doing = (name || ex[0]).toLowerCase();
+    var how = (doing.indexOf("dumbbell") >= 0 || doing.indexOf("goblet") >= 0
+               || doing.indexOf("farmer") >= 0 || doing.indexOf("carry") >= 0)
+            ? "Or the next dumbbell up." : "Or the next notch up.";
+    return { w: up, reps: ex[2], say: "Up to " + up + "kg, back to " + ex[2] + ". " + how };
   }
   return { w: last.w, reps: null, say: "Stay at " + last.w + "kg. Add a rep wherever you can." };
 }
+/* Which variant he is using in a slot. Stored per slot, so swapping to the
+   hack squat sticks until he swaps back, and each variant keeps its own
+   history - a leg press and a goblet squat are not the same number, and
+   averaging them would make the progression advice nonsense. */
+function slotId(sKey, i){ return sKey + ":" + i; }
+function pickFor(sKey, i){
+  var ex = sessionFor(sKey)[1][i];
+  var chosen = (S.liftPick || {})[slotId(sKey, i)];
+  if (!chosen) return ex[0];
+  if (chosen === ex[0] || (ex[5] || []).indexOf(chosen) >= 0) return chosen;
+  return ex[0];                       /* a variant I later renamed or removed */
+}
+function swapNames(ex){ return [ex[0]].concat(ex[5] || []); }
+
+function askSwap(sKey, i){
+  var ex = sessionFor(sKey)[1][i], cur = pickFor(sKey, i);
+  ask({
+    title: "Swap the movement",
+    say: "Same job, different kit. Whichever is free is the right one &mdash; a busy rack "
+       + "is not a reason to go home. Each keeps its own weights.",
+    options: swapNames(ex).map(function(n){
+      var last = lastLift(n);
+      return { id: n, label: n + (n === cur ? "  (using)" : ""),
+               note: last ? "last " + last.w + "kg" : (n === ex[0] ? "the default" : "not tried yet") };
+    }),
+    cancel: "Keep " + cur
+  }).then(function(v){
+    if (!v || v === "__no") return;
+    S.liftPick = S.liftPick || {};
+    S.liftPick[slotId(sKey, i)] = v;
+    save(); sfx("tap"); buzz(10);
+    render({ keepScroll: true });
+  });
+}
+
 function loggedToday(name){
   var e = (S.lifts || {})[today()];
   return e && e.ex ? e.ex[name] : null;
@@ -206,10 +252,11 @@ function askLift(sKey, idx){
   var s = sessionFor(sKey); if (!s) return;
   var ex = s[1][idx]; if (!ex) return;
   var sets = stage()[3];
-  var t = nextTarget(ex), had = loggedToday(ex[0]);
+  var name = pickFor(sKey, idx);
+  var t = nextTarget(ex, name), had = loggedToday(name);
   var pre = had ? had.w + "kg x " + had.r.join(",") : (t.w ? t.w + " x " : "");
   ask({
-    title: ex[0],
+    title: name,
     say: esc(ex[4]) + " &middot; " + sets + " sets of " + (ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3])
        + "<br><b>" + esc(t.say) + "</b>",
     field: { label: "Weight and reps", value: pre, placeholder: "14 x 8,8,7", type: "number" },
@@ -222,7 +269,7 @@ function askLift(sKey, idx){
     S.lifts = S.lifts || {};
     S.lifts[k] = S.lifts[k] || { s: sKey, ex: {} };
     S.lifts[k].s = sKey;
-    S.lifts[k].ex[ex[0]] = got;
+    S.lifts[k].ex[name] = got;
     save(); buzz(14); sfx("tick");
     render({ keepScroll: true });
   });
@@ -369,7 +416,7 @@ function viewBody(){
   var open = todaySession(), key = open || nextSessionKey();
   var st = stage(), nx = nextStage(), list = stageLifts(key);
   var doneN = 0;
-  list.forEach(function(ex){ if (loggedToday(ex[0])) doneN++; });
+  list.forEach(function(ex, i){ if (loggedToday(pickFor(key, i))) doneN++; });
 
   h += "<div class='rulehead'><h3>Session " + key + "</h3><span></span>"
     + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
@@ -401,14 +448,19 @@ function viewBody(){
 
   h += "<div class='lifts'>";
   list.forEach(function(ex, i){
-    var had = loggedToday(ex[0]), t2 = nextTarget(ex);
+    var name = pickFor(key, i);
+    var had = loggedToday(name), t2 = nextTarget(ex, name);
+    var swapped = name !== ex[0];
+    h += "<div class='liftrow'>";
     h += "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
-      + "<span class='lb2'><b>" + esc(ex[0]) + "</b>"
-      + "<span>" + esc(ex[4]) + "</span></span>"
+      + "<span class='lb2'><b>" + esc(name) + "</b>"
+      + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4]) + "</span></span>"
       + "<span class='lv'>" + (had
           ? had.w + "kg<em>" + had.r.join(" &middot; ") + "</em>"
           : (t2.w ? t2.w + "kg<em>" + (t2.reps ? "x " + t2.reps : "add a rep") + "</em>"
                   : "<span class='new'>new</span>")) + "</span></button>";
+    h += "<button class='swap' data-swap='" + key + ":" + i + "'"
+      + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
   });
   h += "</div>";
 

@@ -534,30 +534,53 @@ var RANKS = [
    changes, change the other.
 
    Exercise: [ name, sets, repMin, repMax, cue ] */
+/* [ name, sets, repMin, repMax, cue, alternatives ]
+   The alternatives are there because his gym is full of machines and because a
+   busy rack should never be a reason to go home. Anything in a slot's list
+   trains the same pattern; each variant keeps its own weight history, since a
+   leg press and a goblet squat are not the same number. */
 var SESSIONS = [
   ["A", [
-    ["Goblet squat",         3,  8, 10, "One dumbbell at the chest"],
-    ["Dumbbell bench press", 3,  8, 10, "The chest exercise"],
-    ["One-arm dumbbell row", 3, 10, 10, "Each side. Upper back, posture"],
-    ["Romanian deadlift",    3, 10, 10, "Dumbbells, hinge at the hip"],
-    ["Pallof press",         3, 12, 12, "Each side. Resist the twist"],
-    ["Farmer's carry",       3, 40, 40, "Metres. Heavy, do not lean"]
+    ["Goblet squat",         3,  8, 10, "One dumbbell at the chest",
+      ["Leg press", "Hack squat", "Smith machine squat"]],
+    ["Dumbbell bench press", 3,  8, 10, "The chest exercise",
+      ["Chest press machine", "Smith bench press", "Incline chest press machine"]],
+    ["One-arm dumbbell row", 3, 10, 10, "Each side. Upper back, posture",
+      ["Chest-supported row machine", "Seated cable row", "T-bar row"]],
+    ["Romanian deadlift",    3, 10, 10, "Dumbbells, hinge at the hip",
+      ["Seated leg curl", "Lying leg curl", "Cable pull-through", "Back extension"]],
+    ["Pallof press",         3, 12, 12, "Each side. Resist the twist",
+      ["Torso rotation machine", "Cable half-kneeling chop", "Ab wheel"]],
+    ["Farmer's carry",       3, 40, 40, "Metres. Heavy, do not lean",
+      ["Trap bar carry", "Suitcase carry, one side", "Sled push"]]
   ]],
   ["B", [
-    ["Dumbbell deadlift",    3,  6,  8, "Flat back, drive the floor away"],
-    ["Lat pulldown",         3,  8, 10, "Width. Makes the waist look smaller"],
-    ["Incline dumbbell press", 3, 10, 10, "Upper chest, the part that reads flat"],
-    ["Reverse lunge",        3,  8,  8, "Each leg. Step back, not forward"],
-    ["Side plank",           3, 30, 30, "Seconds each side"],
-    ["Dead bug",             3, 10, 10, "Each side. Lower back stays flat"]
+    ["Dumbbell deadlift",    3,  6,  8, "Flat back, drive the floor away",
+      ["Trap bar deadlift", "Rack pull", "Back extension", "45-degree hyperextension"]],
+    ["Lat pulldown",         3,  8, 10, "Width. Makes the waist look smaller",
+      ["Assisted pull-up machine", "Neutral-grip pulldown", "Straight-arm pulldown"]],
+    ["Incline dumbbell press", 3, 10, 10, "Upper chest, the part that reads flat",
+      ["Incline chest press machine", "Smith incline press", "Low-to-high cable fly"]],
+    ["Reverse lunge",        3,  8,  8, "Each leg. Step back, not forward",
+      ["Single-leg press", "Step-up", "Smith split squat", "Walking lunge"]],
+    ["Side plank",           3, 30, 30, "Seconds each side",
+      ["Suitcase carry", "Pallof hold", "Cable side bend, light"]],
+    ["Dead bug",             3, 10, 10, "Each side. Lower back stays flat",
+      ["Cable crunch", "Ab crunch machine", "Reverse crunch"]]
   ]],
   ["C", [
-    ["Leg press",            3, 10, 10, "Or a squat if someone has shown you"],
-    ["Seated cable row",     3, 10, 10, "Squeeze the shoulder blades"],
-    ["Dumbbell shoulder press", 3, 8, 10, "Shoulders. Width again"],
-    ["Hip thrust",           3, 12, 12, "Glutes. The other half of the posture fix"],
-    ["Cable woodchop",       3, 12, 12, "Each side. Controlled, do not swing"],
-    ["Hanging knee raise",   3, 10, 10, "Or a lying reverse crunch"]
+    ["Leg press",            3, 10, 10, "Or a squat if someone has shown you",
+      ["Hack squat", "Smith machine squat", "Goblet squat", "Belt squat"]],
+    ["Seated cable row",     3, 10, 10, "Squeeze the shoulder blades",
+      ["Chest-supported row machine", "T-bar row", "Wide-grip cable row"]],
+    ["Dumbbell shoulder press", 3, 8, 10, "Shoulders. Width again",
+      ["Shoulder press machine", "Smith overhead press", "Landmine press"]],
+    ["Hip thrust",           3, 12, 12, "Glutes. The other half of the posture fix",
+      ["Glute drive machine", "Smith hip thrust", "Cable kickback", "Back extension"]],
+    ["Cable woodchop",       3, 12, 12, "Each side. Controlled, do not swing",
+      ["Torso rotation machine", "Pallof press", "Landmine rotation"]],
+    ["Hanging knee raise",   3, 10, 10, "Or a lying reverse crunch",
+      ["Captain's chair knee raise", "Cable crunch", "Reverse crunch"]]
   ]]
 ];
 

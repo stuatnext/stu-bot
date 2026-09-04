@@ -60,7 +60,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v21";
+var BUILD = "v22";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -120,6 +120,7 @@ document.addEventListener("click", function(ev){
   if (ds.slot){ askAnchor(ds.slot); return; }
   if (ds.undofood){ undoFood(); return; }
   if (ds.lift){ var lp = ds.lift.split(":"); askLift(lp[0], Number(lp[1])); return; }
+  if (ds.swap){ var sp = ds.swap.split(":"); askSwap(sp[0], Number(sp[1])); return; }
   if (ds.finish){ finishSession(); return; }
   if (ds.waist){ askWaist(); return; }
   if (ds.water){ tapWater(Number(ds.water)); return; }
