@@ -1,3 +1,97 @@
+/* ===================================================================== gym
+   Sessions, lifts and the waist. Nothing else - he asked for Body to be about
+   the gym and nothing but, and he was right that a tab holding training, food,
+   water and sleep at once was four subjects wearing one hat. */
+
+function viewGym(){
+  var t = today(), h = "";
+
+  /* --- the session, at whatever stage he has unlocked */
+  var open = todaySession(), key = open || nextSessionKey();
+  var st = stage(), nx = nextStage(), list = stageLifts(key);
+  var doneN = 0;
+  list.forEach(function(ex, i){ if (loggedToday(pickFor(key, i))) doneN++; });
+
+  h += "<div class='rulehead'><h3>Session " + key + "</h3><span></span>"
+    + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
+
+  var doneS = sessionsDone();
+  h += "<div class='stg'>"
+    + "<div class='sh'><b>" + esc(st[1]) + "</b>"
+    + "<span>" + list.length + (list.length === 1 ? " move" : " moves")
+    + " &middot; " + st[3] + " sets</span></div>"
+    + "<p class='fine'>" + esc(st[4]) + "</p>";
+  if (nx){
+    var need = nx[0] - doneS, span = Math.max(1, nx[0] - st[0]);
+    var pctS = Math.min(100, Math.round(100 * (doneS - st[0]) / span));
+    h += "<div class='sbar'><i style='width:" + pctS + "%'></i></div>"
+      + "<p class='fine'>" + need + " more " + (need === 1 ? "session" : "sessions")
+      + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
+  } else {
+    h += "<p class='fine'>" + num(doneS) + " sessions logged.</p>";
+  }
+  h += "</div>";
+
+  if (!doneN && !doneS){
+    h += "<p class='fine' style='margin:0 0 10px'>24/7 Fitness, Tanjong Pagar. Tap an exercise to "
+      + "log it. The arrows swap it for a machine that does the same job.</p>";
+  }
+
+  h += "<div class='lifts'>";
+  list.forEach(function(ex, i){
+    var name = pickFor(key, i);
+    var had = loggedToday(name), t2 = nextTarget(ex, name);
+    var swapped = name !== ex[0];
+    h += "<div class='liftrow'>";
+    h += "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
+      + "<span class='lb2'><b>" + esc(name) + "</b>"
+      + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4]) + "</span></span>"
+      + "<span class='lv'>" + (had
+          ? had.w + "kg<em>" + had.r.join(" &middot; ") + "</em>"
+          : (t2.w ? t2.w + "kg<em>" + (t2.reps ? "x " + t2.reps : "add a rep") + "</em>"
+                  : "<span class='new'>new</span>")) + "</span></button>";
+    h += "<button class='swap' data-swap='" + key + ":" + i + "'"
+      + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
+  });
+  h += "</div>";
+
+  var held = sessionFor(key)[1].slice(list.length);
+  if (held.length){
+    h += "<div class='hold'>" + held.length + " more "
+      + (held.length === 1 ? "move" : "moves") + " in this session, still sealed &mdash; "
+      + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</div>";
+  }
+
+  if (doneN){
+    var already = day(t).p.train;
+    h += "<div class='btns'><button class='btn" + (already ? " quiet" : " pri") + "' data-finish='1'>"
+      + (already ? "Trained is marked" : "Finish &mdash; mark Trained") + "</button></div>";
+    if (!already) h += "<p class='fine'>One exercise counts. Ten minutes counts. Turning up is the "
+      + "thing you are training here.</p>";
+  }
+
+  /* --- waist, which belongs with the gym rather than with the food */
+  var w = (S.waist || []).slice(-1)[0];
+  var prev = (S.waist || []).slice(-2)[0];
+  h += "<div class='rulehead'><h3>Waist</h3><span></span><em>weekly</em></div>";
+  h += "<div class='panel wst'><div class='pnum'><b>"
+    + (w ? w[1] + "<small>cm</small>" : "&mdash;")
+    + "</b><span>" + (w ? "measured " + esc(nice(w[0])) : "not measured yet") + "</span></div>";
+  if (w && prev && prev[1] !== w[1]){
+    var dlt = w[1] - prev[1];
+    h += "<p class='fine " + (dlt < 0 ? "good" : "") + "'>"
+      + (dlt < 0 ? "Down " + Math.abs(dlt).toFixed(1) : "Up " + dlt.toFixed(1))
+      + "cm since " + esc(nice(prev[0])) + ".</p>";
+  }
+  h += "<p class='fine'>Not the scale. On this plan your weight is meant to rise, so the waist is "
+    + "the number that answers what you actually asked.</p>"
+    + "<div class='btns'><button class='btn' data-waist='1'>Measure</button></div></div>";
+
+  h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>"
+    + "The whole plan, on paper</button></div>";
+  return h;
+}
+
 /* ==================================================================== body
    Gym and food, in the one place. The point of this tab is that he should
    never have to remember a number: what he lifted last time decides what to
@@ -9,77 +103,19 @@
 function kg(){ return Number(S.kg) > 0 ? Number(S.kg) : KG_DEFAULT; }
 function proteinTarget(){ return Math.round(1.8 * kg()); }
 
-/* ------------------------------------------------------------- the vitals
-   Five basics, of which two were already being tracked. They compose into one
-   score rather than five checkboxes, and none of them can break anything. */
-function waterOn(k){ return Number((S.water || {})[k] || 0); }
-function sleepOn(k){ return Number((S.sleep || {})[k] || 0); }
-function outOn(k){ return !!(S.out || {})[k]; }
 
-function vitalMet(key, k){
-  if (key === "water")   return waterOn(k) >= WATER_GLASSES;
-  if (key === "sleep")   return sleepOn(k) >= SLEEP_TARGET;
-  if (key === "protein") return proteinOn(k) >= proteinTarget();
-  if (key === "train")   return !!(S.days[k] && S.days[k].p && S.days[k].p.train);
-  if (key === "out")     return outOn(k);
-  return false;
-}
-function vitalsMet(k){
-  return VITALS.filter(function(v){ return vitalMet(v[0], k); }).length;
-}
-/* A day where all five closed. Counted, never required. */
-function clearDays(){
-  var seen = {};
-  Object.keys(S.water || {}).forEach(function(k){ seen[k] = 1; });
-  Object.keys(S.sleep || {}).forEach(function(k){ seen[k] = 1; });
-  Object.keys(S.days  || {}).forEach(function(k){ seen[k] = 1; });
-  return Object.keys(seen).filter(function(k){ return vitalsMet(k) === VITALS.length; }).length;
-}
 
-function tapWater(n){
-  var k = today(), was = waterOn(k);
-  S.water = S.water || {};
-  /* Tapping the glass you are already on empties it, so a mis-tap is one tap
-     to undo rather than a trip through a menu. */
-  S.water[k] = (was === n) ? n - 1 : n;
-  if (S.water[k] <= 0) delete S.water[k];
-  save();
-  var now = waterOn(k);
-  if (now > was){
-    buzz(10);
-    sfx(now >= WATER_GLASSES ? "done" : "tick");
-    if (now === WATER_GLASSES) toast("Eight glasses. That is the day's water.");
-  } else sfx("untick");
-  render({ keepScroll: true });
-}
 
-function askSleep(){
-  var k = today();
-  ask({
-    title: "Last night",
-    say: "Hours actually asleep, roughly. Your shift ends late and this is the number "
-       + "everything else is downstream of &mdash; including the headaches.",
-    field: { label: "Hours", value: sleepOn(k) ? String(sleepOn(k)) : "", placeholder: "7.5", type: "number" },
-    confirm: "Save", cancel: "Cancel"
-  }).then(function(v){
-    if (v === null || v === "__no") return;
-    var n = Number(String(v).replace(/[^0-9.]/g, ""));
-    if (!(n > 0) || n > 24) return;
-    S.sleep = S.sleep || {};
-    S.sleep[k] = n;
-    save(); sfx("tick"); buzz(12);
-    render({ keepScroll: true });
-  });
-}
 
-function tapOut(){
-  var k = today();
-  S.out = S.out || {};
-  if (S.out[k]){ delete S.out[k]; sfx("untick"); }
-  else { S.out[k] = 1; sfx("tick"); buzz(12); }
-  save();
-  render({ keepScroll: true });
-}
+
+
+
+
+
+
+
+
+
 
 /* --------------------------------------------------------------- the food */
 function foodOn(k){ return (S.food || {})[k] || []; }
@@ -329,177 +365,7 @@ function askFoodOther(slot){
 }
 
 /* ------------------------------------------------------------------ view */
-function viewBody(){
-  var t = today(), h = "";
-  var target = proteinTarget(), got = proteinOn(t);
-  var pct = Math.min(100, Math.round(100 * got / target));
-  var left = Math.max(0, target - got);
 
-  /* --- the week first: it is the frame the day sits inside */
-  h += questHTML();
-
-  /* --- the day's condition, as one score rather than five checkboxes */
-  var met = vitalsMet(t), clear = clearDays();
-  h += "<div class='cond" + (met === VITALS.length ? " full" : "") + "'>"
-    + "<div class='cring'>" + ring(met, VITALS.length, "gold") + "<b>" + met + "</b></div>"
-    + "<div class='cbd'><h3>" + (met === VITALS.length ? "A clear day" : "Condition") + "</h3>"
-    + "<span>" + met + " of " + VITALS.length + " basics closed"
-    + (clear ? " &middot; " + num(clear) + " clear " + (clear === 1 ? "day" : "days") + " so far" : "")
-    + "</span></div></div>";
-
-  h += "<div class='vit'>";
-  VITALS.forEach(function(v){
-    var on = vitalMet(v[0], t);
-    var act = v[0] === "water" ? "" : (v[0] === "sleep" ? " data-sleep='1'"
-            : (v[0] === "out" ? " data-out='1'" : ""));
-    var val = v[0] === "water"   ? waterOn(t) + "/" + WATER_GLASSES
-            : v[0] === "sleep"   ? (sleepOn(t) ? sleepOn(t) + "h" : "&mdash;")
-            : v[0] === "protein" ? num(proteinOn(t)) + "g"
-            : v[0] === "train"   ? (on ? "done" : "&mdash;")
-            : (on ? "yes" : "&mdash;");
-    var tag = act ? "button" : "div";
-    h += "<" + tag + " class='vc" + (on ? " on" : "") + "'" + act + ">"
-      + "<span class='vv'>" + val + "</span>"
-      + "<span class='vl'>" + esc(v[1]) + "</span></" + tag + ">";
-  });
-  h += "</div>";
-
-  /* Water is eight taps, which is the whole reason it gets its own row. */
-  var glasses = waterOn(t);
-  h += "<div class='glass'>";
-  for (var gi = 1; gi <= WATER_GLASSES; gi++){
-    h += "<button class='gl" + (gi <= glasses ? " on" : "") + "' data-water='" + gi + "'"
-      + " aria-label='Glass " + gi + "'><i></i></button>";
-  }
-  h += "</div>";
-  var wsay = glasses >= WATER_GLASSES
-      ? "That is roughly " + ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1) + " litres, before the kopi."
-      : num(WATER_GLASSES - glasses) + " to go, about "
-        + (((WATER_GLASSES - glasses) * GLASS_ML) / 1000).toFixed(1) + "L. Singapore is thirty degrees "
-        + "all year and you eat once, so almost none of your water arrives with food. The honest "
-        + "check is the colour, not the count.";
-  h += "<p class='fine'>" + wsay + "</p>";
-
-  /* --- protein */
-  h += "<div class='panel prot" + (left === 0 ? " done" : "") + "'>"
-    + "<div class='pnum'><b>" + num(got) + "</b><span>of " + num(target) + "g protein today</span></div>"
-    + "<div class='pbar'><i style='width:" + pct + "%'></i></div>";
-  var sug = suggestOrder(nowSlot());
-  h += "<p class='fine'>" + (left === 0
-      ? "Done. That is the single biggest lever in the whole plan, closed for today."
-      : num(left) + "g to go" + (sug ? " &mdash; a " + esc(sug[0].toLowerCase()) + " would close it." : "."))
-    + "</p></div>";
-
-  /* --- the three anchors */
-  h += "<div class='anch'>";
-  ANCHORS.forEach(function(a){
-    var on = anchorDone(t, a[0]);
-    h += "<button class='an" + (on ? " on" : "") + "' data-slot='" + a[0] + "'>"
-      + "<span class='ak'>" + esc(a[2]) + "</span>"
-      + "<span class='av'>" + esc(a[1]) + "</span>"
-      + "<span class='ad'>" + (on ? "logged" : "tap to add") + "</span></button>";
-  });
-  h += "</div>";
-
-  if (foodOn(t).length){
-    h += "<div class='recs'>";
-    foodOn(t).slice().reverse().forEach(function(f){
-      h += "<div class='rec'><span class='rd'>" + esc(f[2]) + "</span>"
-        + "<span class='rt'>" + esc(f[0]) + "</span>"
-        + "<b class='rv'>" + num(f[1]) + "g</b></div>";
-    });
-    h += "</div>";
-    h += "<div class='btns tight'><button class='btn quiet' data-undofood='1'>Undo the last one</button></div>";
-  }
-
-  /* --- the session, at whatever stage he has unlocked */
-  var open = todaySession(), key = open || nextSessionKey();
-  var st = stage(), nx = nextStage(), list = stageLifts(key);
-  var doneN = 0;
-  list.forEach(function(ex, i){ if (loggedToday(pickFor(key, i))) doneN++; });
-
-  h += "<div class='rulehead'><h3>Session " + key + "</h3><span></span>"
-    + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
-
-  /* Where the programme itself has got to, and what the next one costs. */
-  var doneS = sessionsDone();
-  h += "<div class='stg'>"
-    + "<div class='sh'><b>" + esc(st[1]) + "</b>"
-    + "<span>" + list.length + (list.length === 1 ? " move" : " moves")
-    + " &middot; " + st[3] + " sets</span></div>"
-    + "<p class='fine'>" + esc(st[4]) + "</p>";
-  if (nx){
-    var need = nx[0] - doneS, span = Math.max(1, nx[0] - st[0]);
-    var pctS = Math.min(100, Math.round(100 * (doneS - st[0]) / span));
-    h += "<div class='sbar'><i style='width:" + pctS + "%'></i></div>"
-      + "<p class='fine'>" + need + " more " + (need === 1 ? "session" : "sessions")
-      + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
-  } else {
-    /* The stage note already says nothing more is added, so this says the one
-       thing it cannot: how many times he has turned up. */
-    h += "<p class='fine'>" + num(doneS) + " sessions logged.</p>";
-  }
-  h += "</div>";
-
-  if (!doneN && !doneS){
-    h += "<p class='fine' style='margin:0 0 10px'>24/7 Fitness, Tanjong Pagar. Tap an exercise to "
-      + "log it &mdash; the weight it suggests comes from what you did last time.</p>";
-  }
-
-  h += "<div class='lifts'>";
-  list.forEach(function(ex, i){
-    var name = pickFor(key, i);
-    var had = loggedToday(name), t2 = nextTarget(ex, name);
-    var swapped = name !== ex[0];
-    h += "<div class='liftrow'>";
-    h += "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
-      + "<span class='lb2'><b>" + esc(name) + "</b>"
-      + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4]) + "</span></span>"
-      + "<span class='lv'>" + (had
-          ? had.w + "kg<em>" + had.r.join(" &middot; ") + "</em>"
-          : (t2.w ? t2.w + "kg<em>" + (t2.reps ? "x " + t2.reps : "add a rep") + "</em>"
-                  : "<span class='new'>new</span>")) + "</span></button>";
-    h += "<button class='swap' data-swap='" + key + ":" + i + "'"
-      + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
-  });
-  h += "</div>";
-
-  var held = sessionFor(key)[1].slice(list.length);
-  if (held.length){
-    h += "<div class='hold'>" + held.length + " more "
-      + (held.length === 1 ? "move" : "moves") + " in this session, still sealed &mdash; "
-      + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</div>";
-  }
-
-  if (doneN){
-    var already = day(t).p.train;
-    h += "<div class='btns'><button class='btn" + (already ? " quiet" : " pri") + "' data-finish='1'>"
-      + (already ? "Trained is marked" : "Finish &mdash; mark Trained") + "</button></div>";
-    if (!already) h += "<p class='fine'>One exercise counts. Ten minutes counts. Turning up is the "
-      + "thing you are training here.</p>";
-  }
-
-  /* --- waist */
-  var w = (S.waist || []).slice(-1)[0];
-  var prev = (S.waist || []).slice(-2)[0];
-  h += "<div class='rulehead'><h3>Waist</h3><span></span><em>weekly</em></div>";
-  h += "<div class='panel wst'><div class='pnum'><b>"
-    + (w ? w[1] + "<small>cm</small>" : "&mdash;")
-    + "</b><span>" + (w ? "measured " + esc(nice(w[0])) : "not measured yet") + "</span></div>";
-  if (w && prev && prev[1] !== w[1]){
-    var dlt = w[1] - prev[1];
-    h += "<p class='fine " + (dlt < 0 ? "good" : "") + "'>"
-      + (dlt < 0 ? "Down " + Math.abs(dlt).toFixed(1) : "Up " + dlt.toFixed(1))
-      + "cm since " + esc(nice(prev[0])) + ".</p>";
-  }
-  h += "<p class='fine'>Not the scale. On this plan your weight is meant to rise &mdash; "
-    + "the waist is the number that answers what you actually asked.</p>"
-    + "<div class='btns'><button class='btn' data-waist='1'>Measure</button></div></div>";
-
-  h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>"
-    + "The whole plan, on paper</button></div>";
-  return h;
-}
 
 /* Which anchor we are plausibly in, so the suggestion fits the hour. */
 function nowSlot(){

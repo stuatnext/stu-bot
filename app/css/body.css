@@ -136,3 +136,42 @@ button.vc:active{transform:scale(.96)}
 .swap{flex:none; width:46px; border-radius:var(--r2); border:2px solid var(--edge);
   background:var(--card2); color:var(--ink3); font-size:20px; line-height:1; cursor:pointer}
 .swap:active{transform:scale(.94)}
+
+/* --------------------------------------------------------------- the job */
+.countdown{display:flex; align-items:center; gap:15px; border-color:#F3D9A0;
+  background:var(--flameSoft)}
+.cd{flex:none; text-align:center; min-width:64px}
+.cd b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:38px;
+  line-height:.95; letter-spacing:-.04em; font-variant-numeric:tabular-nums}
+.cd span{display:block; font-family:"JetBrains Mono",monospace; font-size:9px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink3); margin-top:3px}
+.cdb h3{margin:0; font-size:17px}
+.cdb p{margin:4px 0 0; font-size:13px; color:var(--ink2); line-height:1.4}
+
+.wk{display:grid; gap:8px}
+.wi{display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left; cursor:pointer;
+  padding:12px 14px; border-radius:var(--r2); border:2px solid var(--edge); background:var(--card);
+  color:var(--ink); font:inherit; font-family:"Nunito",sans-serif}
+.wi:active{transform:scale(.985)}
+.wi.on{border-color:#BEE8A0; background:var(--greenSoft)}
+.wbox{flex:none; width:24px; height:24px; border-radius:8px; border:2px solid var(--edge2);
+  display:flex; align-items:center; justify-content:center; font-size:14px; margin-top:1px;
+  background:var(--card)}
+.wi.on .wbox{background:var(--jade); border-color:var(--jade); color:#FFFFFF}
+.wb{flex:1; min-width:0}
+.wb b{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:15px;
+  letter-spacing:-.015em; line-height:1.25}
+.wb span{display:block; font-size:12px; color:var(--ink3); line-height:1.35; margin-top:3px}
+.wi.on .wb b{color:var(--greenInk)}
+.wi.on .wb span{color:var(--greenInk); opacity:.7}
+
+/* the order list on Food */
+.ordl{display:grid; gap:7px; margin:0 0 4px}
+.ord{display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%;
+  text-align:left; cursor:pointer; padding:11px 14px; border-radius:14px;
+  border:2px solid var(--edge); background:var(--card); color:var(--ink);
+  font:inherit; font-family:"Nunito",sans-serif}
+.ord:active{transform:scale(.985)}
+.ord .on2{font-size:14px; font-weight:700}
+.ord .og{flex:none; font-family:"JetBrains Mono",monospace; font-weight:700; font-size:13px;
+  color:var(--ink3)}

@@ -60,7 +60,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v22";
+var BUILD = "v23";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -74,7 +74,8 @@ window.addEventListener("appinstalled", function(){
 });
 
 /* ------------------------------------------------------------------ router */
-var TABS = { today: viewToday, cards: viewDeck, body: viewBody, you: viewYou };
+var TABS = { today: viewToday, gym: viewGym, food: viewFood, basics: viewBasics,
+             work: viewWork, cards: viewDeck, you: viewYou };
 var tab = "today";
 
 function render(opts){
@@ -101,7 +102,9 @@ function render(opts){
 }
 function go(next){
   if (next === tab) return;
-  var order = ["today", "cards", "body", "you"];
+  /* Matches the bar left to right, so a swipe goes the way the eye does. You is
+   last because it is reached from the crest rather than the bar. */
+var order = ["today", "gym", "food", "basics", "work", "cards", "you"];
   var back = order.indexOf(next) < order.indexOf(tab);
   tab = next;
   sfx("nav"); buzz(8);
@@ -127,6 +130,9 @@ document.addEventListener("click", function(ev){
   if (ds.sleep){ askSleep(); return; }
   if (ds.out){ tapOut(); return; }
   if (ds.newseason){ askNewSeason(); return; }
+  if (ds.work){ toggleWork(ds.work); return; }
+  if (ds.order){ var od = ORDERS.filter(function(o){ return o[0] === ds.order; })[0];
+    if (od) logFood(od[0], od[1], nowSlot()); return; }
   if (ds.open){ sfx("tap"); openStage(packsWaiting().streak ? "streak" : "day"); return; }
   if (ds.pack){ sfx("tap"); openStage(ds.pack); return; }
   if (ds.set){ DECKSET = ds.set; DECKFILTER = 0; sfx("tap"); render({ keepScroll: true }); return; }
@@ -168,7 +174,7 @@ document.addEventListener("click", function(ev){
     return;
   }
   if (ds.reset){ askReset(); return; }
-  if (b.id === "crest"){ sfx("tap"); go("cards"); return; }
+  if (b.id === "crest"){ sfx("tap"); go("you"); return; }   /* the crest is his rank, so it opens You */
   if (b.id === "chipFlame"){ sfx("tap"); go("today"); return; }
   if (b.id === "chipPot"){ sfx("tap"); go("you"); return; }
   if (b.id === "chipShard"){ sfx("tap"); go("cards"); return; }

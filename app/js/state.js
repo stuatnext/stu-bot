@@ -19,7 +19,7 @@ function load(){
             days:{}, threads:{}, cards:{}, rewards:{}, claimed:{}, openedDay:0, openedStreak:0,
             theme:null, mute:false, rate:0, spends:[], freezes:{},
             crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0,
-            season:1, vault:{}, setsEver:0, liftPick:{},
+            season:1, vault:{}, setsEver:0, liftPick:{}, work:{},
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
             monthSeen:{}, pushOn:0,
             lifts:{}, food:{}, waist:[], kg:0,

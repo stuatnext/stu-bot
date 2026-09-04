@@ -677,3 +677,62 @@ var CH_PAY = 2;
 var CH_SWEEP = 3;
 
 var KG_DEFAULT = 71.5;
+
+/* ===================================================================== work
+   The job, kept away from the body. Three areas, because they are three
+   different fights: the employer, his own company, and his name.
+
+   His stated goal for 2027, when I made him rank them, was one thing: hours
+   and pay changed. Everything here is either that or downstream of it.
+
+   [ id, area, what to do, why it matters ] */
+var WORKITEMS = [
+  ["fye",     "SUG",  "Find the financial year end",
+    "One email to Ottavia. You cannot plan a single filing without it."],
+  ["acra",    "SUG",  "Annual return to ACRA",
+    "Dated, dull, and expensive to miss. Diarise it the day you know the FYE."],
+  ["tax1",    "SUG",  "First corporate tax filing",
+    "New company, so this one sets the pattern for every year after."],
+  ["cover",   "SUG",  "Insurance that follows you here",
+    "Your UK policy does not and NEXT's does not extend. A gap with your name on it."],
+  ["rate",    "SUG",  "Say the day rate out loud",
+    "To a stranger's face, without softening it. You cannot charge what you cannot say."],
+  ["client2", "SUG",  "Client number two",
+    "The thing that turns a structure into a business, and the EP argument that writes itself."],
+  ["intern",  "SUG",  "An intern from here",
+    "A young Singaporean, taught something real. Capacity, and the best idea in any of this."],
+
+  ["numbers", "NEXT", "Pull what LinkedIn drove for NEXTPredict",
+    "Reach, inbound, named connections, pipeline. The best-evidenced line in the rate conversation."],
+  ["sow",     "NEXT", "Write it as a statement of work",
+    "You are a supplier, not an employee. Scope, coverage hours, response times, rate."],
+  ["defect",  "NEXT", "Lead with the midnight finish",
+    "Malta holds you to 17:00 their time all year, so their clocks going back moved your finish to "
+    + "midnight. Nobody chose that. It is a drafting defect, not a preference."],
+  ["twodays", "NEXT", "Two days on Singapore hours from January",
+    "The ask you already decided on. Put a date on it rather than a direction."],
+
+  ["name",    "NAME", "Commit to a name for it",
+    "When Shift Happens, or something better. Naming it is most of starting it."],
+  ["provoke", "NAME", "Publish the one you are holding back",
+    "The reason to hold it is needing Kalshi and Polymarket on a stage. After 23 October that is spent."],
+  ["byline",  "NAME", "Post under your name, not the company page",
+    "The entire point of building a moat is that it leaves with you."],
+  ["nostal",  "NAME", "One nostalgia piece",
+    "The pillar you keep naming and keep not writing. It is also the one nobody else can copy."]
+];
+
+var WORKAREAS = [
+  ["NEXT", "The employer", "Hours and pay. The one that changes everything else."],
+  ["SUG",  "Straight Up Growth", "The business becoming a business."],
+  ["NAME", "Your name", "The thing that outlives the event."]
+];
+
+/* [ id, what, ISO date, what it means ] */
+var WORKDATES = [
+  ["retreat", "Bulgaria retreat",   "2026-09-09", "Company retreat. Travel version of the programme."],
+  ["nyc",     "NEXTPredict, NYC",   "2026-10-22", "Negotiate nothing before this."],
+  ["free",    "The muzzle comes off","2026-10-24", "After the event you no longer need them on a stage."],
+  ["clocks",  "Malta clocks go back","2026-10-25", "Your finish moves to midnight. This is the exhibit."],
+  ["talk",    "The conversation",   "2026-10-27", "The week after, while your contribution is measurable."]
+];
