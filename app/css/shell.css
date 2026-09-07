@@ -29,6 +29,44 @@
   letter-spacing:.14em; color:var(--ink3)}
 @media (prefers-reduced-motion:reduce){ #boot .mk,#boot .nm,#boot .sub{animation:none} }
 
+/* ------------------------------------------------------------- front door
+   #gate shipped with markup and JS and not one line of CSS, so on a fresh
+   install it rendered as unstyled flow content in the middle of Today: an
+   SVG with no width painted itself 393px wide, and the heading and the tap
+   line landed under the nav bar. It is a door, so it behaves like one -
+   fixed, full bleed, above everything except the boot card. */
+#gate{position:fixed; inset:0; z-index:190; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:2px; padding:32px 26px;
+  padding-bottom:calc(32px + env(safe-area-inset-bottom));
+  text-align:center; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  background:
+    radial-gradient(120% 68% at 50% 24%, #FFF3D2, transparent 62%),
+    radial-gradient(90% 50% at 50% 100%, #FFE6EE, transparent 70%),
+    var(--bg);
+  transition:opacity .5s var(--tap), transform .5s var(--tap)}
+#gate .mk{width:min(38vw,132px); height:min(38vw,132px); flex:none;
+  filter:drop-shadow(0 8px 20px rgba(226,168,20,.35));
+  animation:gatemk .8s var(--pop) both}
+#gate h1{margin:22px 0 0; font-family:"Nunito",sans-serif; font-weight:900;
+  font-size:clamp(38px,12vw,52px); letter-spacing:-.035em; color:var(--ink);
+  animation:gatein .55s var(--pop) both .12s}
+#gate p{margin:8px 0 0; max-width:19ch; font-size:15.5px; font-weight:700;
+  line-height:1.45; color:var(--ink2); text-wrap:balance;
+  animation:gatein .55s var(--pop) both .2s}
+#gate .go{margin-top:30px; padding:13px 26px; border-radius:999px;
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--goldInk);
+  background:var(--goldSoft); border:1.5px solid var(--goldEdge);
+  border-bottom-width:4px;
+  animation:gatein .55s var(--pop) both .3s, gatepulse 2.4s ease-in-out 1.1s infinite}
+#gate.going{opacity:0; transform:scale(1.06)}
+@keyframes gatemk{from{opacity:0; transform:scale(.6) rotate(-24deg)} to{opacity:1; transform:none}}
+@keyframes gatein{from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none}}
+@keyframes gatepulse{0%,100%{transform:none} 50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){
+  #gate .mk,#gate h1,#gate p,#gate .go{animation:none}
+}
+
 /* ------------------------------------------------------ the stat bar (HUD) */
 #hud{position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:8px;
   padding:calc(10px + env(safe-area-inset-top)) 14px 8px;

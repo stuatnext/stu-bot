@@ -1,10 +1,16 @@
 /* ================================================================== basics
-   Water, sleep and getting out of the flat, plus the week's challenges.
+   The Water tab, and the five-basics model that Today summarises.
 
-   He wanted hydration kept apart from the gym, and these belong with it: they
-   are the floor of a day rather than a workout. Five basics compose into one
-   score and none of them can break anything - the three pillars carry the
-   streak, so being tired is never a fifth way to have failed. */
+   The tab used to carry water, sleep, getting out, the condition ring and the
+   week's challenges - which meant a hydration screen was showing him his
+   protein, his gym sessions and how often he had called home. He asked for
+   each tab to mind its own business, so it does: this screen is water and
+   nothing else. The composite score and the challenges moved to Today, whose
+   subject is the whole day rather than any one part of it.
+
+   Five basics compose into one score and none of them can break anything -
+   the three pillars carry the streak, so being tired is never a fifth way to
+   have failed. */
 
 /* ------------------------------------------------------------- the vitals
    Five basics, of which two were already being tracked. They compose into one
@@ -35,6 +41,22 @@ function clearDays(){
   Object.keys(S.sleep || {}).forEach(function(k){ seen[k] = 1; });
   Object.keys(S.days  || {}).forEach(function(k){ seen[k] = 1; });
   return Object.keys(seen).filter(function(k){ return vitalsMet(k) === VITALS.length; }).length;
+}
+
+/* Water's own history, so the tab has something to be about besides today's
+   eight. Counted, never required - like everything else down here. */
+function waterLast(days){
+  var out = [], d = new Date();
+  d.setDate(d.getDate() - (days - 1));
+  for (var i = 0; i < days; i++){
+    var k = iso(d);
+    out.push([k, waterOn(k)]);
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+function waterHit(days){
+  return waterLast(days).filter(function(x){ return x[1] >= WATER_GLASSES; }).length;
 }
 
 function tapWater(n){
@@ -81,30 +103,13 @@ function tapOut(){
   save();
   render({ keepScroll: true });
 }
-/* ------------------------------------------------------------------- view */
-function viewBasics(){
-  var t = today(), h = "";
-
-  var gl = waterOn(t), met = vitalsMet(t), clear = clearDays();
-  var litres = ((gl * GLASS_ML) / 1000).toFixed(1);
-  var full = ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1);
-
-  /* Water is the tab, so water is the number. The other four basics sit under
-     it as facts rather than competing for the top of the screen. */
-  h += hero({
-    tone: "blue", icon: "drop", kicker: "Water today",
-    big: gl, unit: "/ " + WATER_GLASSES,
-    line: gl >= WATER_GLASSES
-      ? litres + "L. That is the day's water, before the kopi."
-      : litres + "L of " + full + "L \u2014 " + (WATER_GLASSES - gl) + " to go",
-    pct: Math.round(100 * gl / WATER_GLASSES),
-    foot: met + " of " + VITALS.length + " basics closed"
-        + (clear ? " \u00b7 " + num(clear) + " clear " + (clear === 1 ? "day" : "days") + " so far" : "")
-  });
-
-  h += questHTML();
-
-  h += "<div class='rulehead'><h3>Today</h3><span></span><em>five basics</em></div>";
+/* ------------------------------------------------- the day, for Today
+   Five basics as one score, with sleep and getting out tappable where they
+   are shown. This is a read on the whole day, so Today is where it belongs -
+   it is the only screen whose subject is the day rather than one part of it. */
+function conditionHTML(){
+  var t = today(), met = vitalsMet(t), clear = clearDays(), h = "";
+  h += "<div class='rulehead'><h3>The basics</h3><span></span><em>five of them</em></div>";
   h += "<div class='cond" + (met === VITALS.length ? " full" : "") + "'>"
     + "<div class='cring'>" + ring(met, VITALS.length, "gold") + "<b>" + met + "</b></div>"
     + "<div class='cbd'><h3>" + (met === VITALS.length ? "A clear day" : "Condition") + "</h3>"
@@ -115,6 +120,9 @@ function viewBasics(){
   h += "<div class='vit'>";
   VITALS.forEach(function(v){
     var on = vitalMet(v[0], t);
+    /* Sleep and getting out are logged here because nowhere else owns them.
+       The other three are mirrors of Gym, Food and Water - tapping them would
+       be a second place to do the same thing, so they only report. */
     var act = v[0] === "sleep" ? " data-sleep='1'" : (v[0] === "out" ? " data-out='1'" : "");
     var val = v[0] === "water"   ? waterOn(t) + "/" + WATER_GLASSES
             : v[0] === "sleep"   ? (sleepOn(t) ? sleepOn(t) + "h" : "&mdash;")
@@ -127,8 +135,30 @@ function viewBasics(){
       + "<span class='vl'>" + esc(v[1]) + "</span></" + tag + ">";
   });
   h += "</div>";
+  return h;
+}
 
-  h += "<div class='rulehead'><h3>Water</h3><span></span><em>" + full + "L</em></div>";
+/* ------------------------------------------------------------------- view
+   Water. Only water. */
+function viewBasics(){
+  var t = today(), h = "";
+
+  var gl = waterOn(t);
+  var litres = ((gl * GLASS_ML) / 1000).toFixed(1);
+  var full = ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1);
+  var hit7 = waterHit(7);
+
+  h += hero({
+    tone: "blue", icon: "drop", kicker: "Water today",
+    big: gl, unit: "/ " + WATER_GLASSES,
+    line: gl >= WATER_GLASSES
+      ? litres + "L. That is the day's water, before the kopi."
+      : litres + "L of " + full + "L \u2014 " + (WATER_GLASSES - gl) + " to go",
+    pct: Math.round(100 * gl / WATER_GLASSES),
+    foot: hit7 + " of the last 7 days reached " + WATER_GLASSES
+  });
+
+  h += "<div class='rulehead'><h3>Today</h3><span></span><em>" + full + "L</em></div>";
   var glasses = gl;
   h += "<div class='glass'>";
   for (var gi = 1; gi <= WATER_GLASSES; gi++){
@@ -142,5 +172,24 @@ function viewBasics(){
         + (((WATER_GLASSES - glasses) * GLASS_ML) / 1000).toFixed(1) + "L. Singapore is thirty degrees "
         + "all year and you eat once, so almost none of your water arrives with food. The honest "
         + "check is the colour, not the count.") + "</p>";
+
+  /* The last seven days, as its own record rather than a line in a composite
+     score. A tab about water should be able to answer "am I actually doing
+     this" without sending him to another screen. */
+  h += "<div class='rulehead'><h3>The last week</h3><span></span><em>"
+    + hit7 + " of 7</em></div>";
+  h += "<div class='wk7'>";
+  waterLast(7).forEach(function(row){
+    var k = row[0], n = row[1], on = n >= WATER_GLASSES;
+    var d = new Date(k + "T00:00:00");
+    h += "<div class='w7" + (on ? " on" : "") + (k === t ? " now" : "") + "'>"
+      + "<span class='w7b'><i style='height:"
+      + Math.max(4, Math.round(100 * Math.min(n, WATER_GLASSES) / WATER_GLASSES)) + "%'></i></span>"
+      + "<b>" + n + "</b>"
+      + "<span class='w7d'>" + "SMTWTFS"[d.getDay()] + "</span></div>";
+  });
+  h += "</div>";
+  h += "<p class='fine'>Eight glasses is the line. Nothing here can break a streak "
+    + "&mdash; the three pillars do that, and thirst is not a moral failing.</p>";
   return h;
 }

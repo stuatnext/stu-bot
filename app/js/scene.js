@@ -7,7 +7,11 @@
    training app - probably a little like Duolingo," keeping the unlockables
    and the pot. So Today is the daily session: the hour on one living sky
    card, the week you are standing in, the three things as big pressable
-   quest rows, and the chest that fills as they land. One viewport.
+   quest rows, and the chest that fills as they land.
+
+   It also carries the two things whose subject is the day rather than any
+   one part of it - the five-basics condition score and the week's challenges
+   - because every other tab now minds strictly its own business.
    ======================================================================== */
 
 /* ------------------------------------------------------------ the sky card
@@ -170,6 +174,13 @@ function viewToday(){
   h += "<" + (packs ? "button" : "div") + " class='gem" + (packs ? " won" : "") + "'"
     + (packs ? " data-open='1'" : "") + ">" + gemHTML(done, packs)
     + "</" + (packs ? "button" : "div") + ">";
+
+  /* The day as a whole, which is this screen's actual subject: the five
+     basics as one score, then the week's challenges. Both used to live on the
+     Water tab, where they were somebody else's business - a hydration screen
+     is not the place to be told about protein, gym sessions and calling home. */
+  h += conditionHTML();
+  h += questHTML();
 
   /* the side quest: one held card asks something of him. This is what makes
      the collection a deck instead of wallpaper - his call, his words. */

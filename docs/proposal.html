@@ -113,7 +113,11 @@ a:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radi
 .doc h3:first-child{margin-top:0;}
 .doc p{font-size:15px; margin:9px 0;}
 .doc ul{font-size:15px;}
-.fill{background:var(--signal-soft); color:var(--signal); padding:1px 6px; border-radius:4px; font-family:"JetBrains Mono",monospace; font-size:12.5px; white-space:nowrap;}
+/* These were nowrap, so the longest placeholder (719px of it) set the width
+   of the whole document: on a phone the page rendered at 786 CSS px and was
+   scaled down to fit, which is why every word on it was tiny. They wrap now,
+   and box-decoration-break keeps the pill looking like a pill across lines. */
+.fill{background:var(--signal-soft); color:var(--signal); padding:1px 6px; border-radius:4px; font-family:"JetBrains Mono",monospace; font-size:12.5px; overflow-wrap:anywhere; -webkit-box-decoration-break:clone; box-decoration-break:clone;}
 .big2{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums; font-weight:700; font-size:40px; letter-spacing:-.03em; line-height:1;}
 </style>
 </head>

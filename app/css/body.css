@@ -280,3 +280,23 @@ button.vc:active{transform:scale(.96)}
 .potdoor .pd-b b{display:block; font-size:14.5px; font-weight:800}
 .potdoor .pd-b span{display:block; font-size:11.5px; font-weight:700; opacity:.72}
 .potdoor .pd-c{display:flex; opacity:.5}
+
+/* ------------------------------------------------------- water, seven days
+   The Water tab's own record. It used to borrow the condition ring for a
+   sense of history, which meant borrowing four things that were not water. */
+.wk7{display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:7px; margin:2px 0 4px;
+  align-items:end}
+.w7{display:flex; flex-direction:column; align-items:center; gap:5px;
+  background:var(--card); border:1.5px solid var(--edge); border-bottom-width:3px;
+  border-radius:13px; padding:9px 4px 8px}
+.w7 .w7b{display:flex; align-items:flex-end; justify-content:center;
+  width:14px; height:44px; border-radius:5px; background:var(--sunk); overflow:hidden}
+.w7 .w7b i{display:block; width:100%; border-radius:5px;
+  background:linear-gradient(180deg,#6ED0FF,var(--blue)); transition:height .45s var(--tap)}
+.w7 b{font-family:"Nunito",sans-serif; font-size:14px; font-weight:800; line-height:1;
+  font-variant-numeric:tabular-nums; color:var(--ink2)}
+.w7 .w7d{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.06em;
+  color:var(--ink3)}
+.w7.on{background:var(--blueSoft); border-color:#A8DFFA}
+.w7.on b{color:#0B72BD}
+.w7.now{box-shadow:0 0 0 2px var(--blue) inset}
