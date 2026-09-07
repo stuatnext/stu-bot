@@ -64,7 +64,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v31";
+var BUILD = "v32";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -129,6 +129,11 @@ document.addEventListener("click", function(ev){
   if (ds.lift){ var lp = ds.lift.split(":"); askLift(lp[0], Number(lp[1])); return; }
   if (ds.swap){ var sp = ds.swap.split(":"); askSwap(sp[0], Number(sp[1])); return; }
   if (ds.finish){ finishSession(); return; }
+  if (ds.startsession){ sfx("tap"); startSession(ds.startsession); return; }
+  if (ds.how){ var hw = ds.how.split(":"); askHow(hw[0], Number(hw[1])); return; }
+  if (typeof SESSION !== "undefined" && SESSION && sessionTap(ds, b)) return;
+  if (ds.fold){ toggleFold(ds.fold); return; }
+  if (ds.pushagain){ if (S.pushBundle) showBundle(S.pushBundle); return; }
   if (ds.restskip){ restStop(); return; }
   if (ds.waist){ askWaist(); return; }
   if (ds.water){ tapWater(Number(ds.water)); return; }
@@ -194,6 +199,7 @@ document.addEventListener("click", function(ev){
 window.addEventListener("keydown", function(ev){
   if (ev.key !== "Escape") return;
   if (MODAL) MODAL.close(null);
+  else if (typeof SESSION !== "undefined" && SESSION) closeSession();
   else if (document.getElementById("sheet").className) closeSheet();
   else if (document.getElementById("chip").className) closeChip();
   else if (ST) closeStage();
@@ -296,7 +302,7 @@ if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
   var RELOADING = false, RELOAD_WANTED = false;
 
   function busyNow(){
-    return !!MODAL || !!ST
+    return !!MODAL || !!ST || (typeof SESSION !== "undefined" && !!SESSION)
       || !!document.getElementById("sheet").className
       || !!document.getElementById("stage").className
       || !!document.getElementById("chip").className;

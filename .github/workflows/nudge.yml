@@ -23,5 +23,6 @@ jobs:
       - run: npm install web-push@3 --no-audit --no-fund
       - run: node scripts/send-push.mjs
         env:
+          PUSH_BUNDLE: ${{ secrets.PUSH_BUNDLE }}
           PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}

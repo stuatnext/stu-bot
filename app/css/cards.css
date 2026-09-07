@@ -503,3 +503,39 @@
 .tc.kd:not(.lg) .tc-verb{font-size:11px; display:-webkit-box; -webkit-line-clamp:3;
   -webkit-box-orient:vertical; overflow:hidden}
 .tc.ki:not(.lg).k-place .tc-mark{display:none}
+
+/* ================================================================= textures
+   A rarity you can feel with your thumb. --px, --py and --ang come from
+   tilt(), so every layer here moves as the card is turned in the hand:
+   common is matte, uncommon carries a specular band, rare refracts, gold is
+   foil with a sparkle where the light is. At rest they sit at centre. */
+.tc-fx{position:absolute; inset:0; z-index:2; pointer-events:none; border-radius:7px}
+.tc.r0 .tc-fx{opacity:.5; mix-blend-mode:multiply;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.035) 0 1px,transparent 1px 3px)}
+.tc.r1 .tc-fx{opacity:.75; mix-blend-mode:screen;
+  background:linear-gradient(calc(62deg + var(--px,.5) * 46deg),
+    transparent calc(var(--px,.5) * 100% - 34%), rgba(255,255,255,.62) calc(var(--px,.5) * 100%),
+    transparent calc(var(--px,.5) * 100% + 34%))}
+.tc.r2 .tc-fx{opacity:.58; mix-blend-mode:color-dodge; filter:saturate(1.35);
+  background:
+    repeating-linear-gradient(calc(112deg + var(--px,.5) * 36deg),
+      rgba(255,255,255,.16) 0 2px, transparent 2px 7px),
+    conic-gradient(from var(--ang,170deg) at calc(var(--px,.5) * 100%) calc(var(--py,.5) * 100%),
+      #ff6ec7,#ffd36e,#6effb3,#6ec7ff,#c86eff,#ff6ec7)}
+.tc.r3 .tc-fx{opacity:.82; mix-blend-mode:overlay;
+  background:
+    radial-gradient(circle at calc(var(--px,.5) * 100%) calc(var(--py,.5) * 100%),
+      rgba(255,255,255,.85), transparent 38%),
+    repeating-radial-gradient(circle at 28% 22%, rgba(255,255,255,.2) 0 1px, transparent 1px 6px),
+    linear-gradient(calc(58deg + var(--px,.5) * 54deg),
+      #B8860B 0%, #FFE38A 24%, #C9A227 50%, #FFF1B8 76%, #B8860B 100%)}
+/* the same layer on a Do or Inspire face is paper: a whisper of grain */
+.tc.kd .tc-fx{opacity:.35; mix-blend-mode:screen;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px)}
+.tc.ki .tc-fx{opacity:.5; mix-blend-mode:multiply;
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.03) 0 1px,transparent 1px 4px)}
+/* lived: the foil edge stays, and the holo is a soft wash rather than a second rainbow */
+.tc.lived .tc-holo{opacity:.3}
+/* the rarity, said on the plate as a texture would be on a real card */
+.tc-gem::after{content:""; position:absolute; inset:0; border-radius:inherit;
+  background:linear-gradient(135deg,rgba(255,255,255,.7),transparent 55%)}

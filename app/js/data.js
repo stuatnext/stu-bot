@@ -519,8 +519,14 @@ var SET_DO = {
   sug:   say2("Do the {n} thing {when}. One email, one document, done.",
               "{n}: book thirty minutes for it {when}, and do not move them."),
   mkt:   say2("Write down {n} in your own words {when}. That is the panel, prepared.",
-              "Post about {n} {when}. One paragraph, your name on it.")
+              "Post about {n} {when}. One paragraph, your name on it."),
+  gold:  say2("Tell someone {n} happened. Out loud, today, to a person who was not there.",
+              "Write three lines about the day {n} happened, before you forget which day it was.")
 };
+/* Any set I add later without an entry above gets this, rather than a
+   crash on the first tap - the rewrite that dropped "gold" was one. */
+var SET_DO_ANY = say2("Do something about {n} {when}. Small counts.",
+                      "Make {n} part of {when}, on purpose.");
 var CARD_DO = {
   "Chilli crab": "Book the chilli crab dinner - it needs two people, so ask.",
   "MRT at 06:00": "Catch one train before 06:30 this week and watch the city wake.",
@@ -548,7 +554,8 @@ var CARD_DO = {
    The public half of the VAPID pair - safe in the open by design. The
    private half lives only in the repo's Actions secrets and signs the one
    evening nudge a day. */
-var VAPID_PUBLIC = "BPzJd3TZ6bSeFIRWBVzeKKkJA6tkUxGFHMDbal6_JXLrjULbQg9REfSSISRnoOWvUghgNaTQfo4xTMdxO_XtvLI";
+/* There is no push key in the repo any more: the phone makes its own pair
+   when the nudge is switched on and hands over one bundle to paste. */
 
 /* Ranks rather than bare numbers - a level should say something about you. */
 var RANKS = [
@@ -955,3 +962,139 @@ var INSPIRE = [
   ["i39","line","A rare card is a rare day","The point of the game is that it notices the ordinary ones too."],
   ["i40","line","Every hawker centre is a reason to leave the flat","And there are over a hundred of them."]
 ];
+
+
+/* ==================================================================== how
+   How to do each movement, for someone standing in front of the machine for
+   the first time. Three or four lines, in the order they happen; the last
+   one is always the thing that goes wrong. An alternative without its own
+   entry inherits the slot's, then the generic one. */
+var HOW = {
+  "Goblet squat": ["Hold one dumbbell against your chest, elbows tucked under it",
+    "Feet shoulder-width, toes turned out a touch",
+    "Sit down between your heels until your elbows touch your knees, chest up",
+    "Wrong: heels lifting. If they do, go lighter or widen your stance"],
+  "Dumbbell bench press": ["Lie back with the dumbbells at your chest, feet flat on the floor",
+    "Press up and slightly in until your arms are straight, not locked",
+    "Lower slowly to just outside your chest, elbows about 45 degrees from your body",
+    "Wrong: elbows flared straight out. That is the shoulder complaining later"],
+  "One-arm dumbbell row": ["One hand and one knee on the bench, back flat like a table",
+    "Pull the dumbbell to your hip, not your armpit, elbow close",
+    "Lower all the way until you feel the stretch in the lat",
+    "Wrong: twisting the torso to lift it. If you have to twist, it is too heavy"],
+  "Romanian deadlift": ["Dumbbells in front of your thighs, knees soft, not bent",
+    "Push your hips back and let the dumbbells slide down your legs, back flat",
+    "Stop when you feel the hamstrings, usually around the knee, then stand up through the hips",
+    "Wrong: rounding the back to go lower. Depth comes from the hips, not the spine"],
+  "Pallof press": ["Cable at chest height, stand side-on, hold the handle at your chest",
+    "Press straight out in front of you and hold two seconds",
+    "The cable will try to twist you. Do not let it",
+    "Wrong: leaning away from the stack. Stand tall and let the core do it"],
+  "Farmer's carry": ["Heaviest dumbbells you can hold with a straight back",
+    "Walk tall, shoulders back, eyes forward, short quick steps",
+    "Forty metres, or twenty there and back. Set them down, do not drop them",
+    "Wrong: leaning to one side or shrugging. If you are, they are too heavy"],
+  "Dumbbell deadlift": ["Dumbbells outside your feet, hips back, chest up, flat back",
+    "Drive the floor away with your legs; the arms just hang on",
+    "Stand fully tall at the top, then lower with the hips going back first",
+    "Wrong: pulling with the back. The legs push, the back stays flat"],
+  "Lat pulldown": ["Grip a bit wider than your shoulders, knees under the pad",
+    "Lean back a touch and pull the bar to your upper chest, elbows down and back",
+    "Let it all the way up until your shoulders rise, then pull again",
+    "Wrong: pulling behind the neck or yanking with the body. Slow, to the chest"],
+  "Incline dumbbell press": ["Bench at about 30 degrees, not 45",
+    "Press up and together, arms straight, not locked",
+    "Lower to the upper chest, elbows about 45 degrees out",
+    "Wrong: the bench too steep. That turns it into a shoulder press"],
+  "Reverse lunge": ["Stand tall, step one foot back and drop the back knee toward the floor",
+    "Front shin roughly vertical, torso upright",
+    "Push through the front heel to stand. All reps one side, then the other",
+    "Wrong: the front knee caving inward. Point it over the middle toes"],
+  "Side plank": ["On your side, elbow under your shoulder, feet stacked",
+    "Lift your hips so you are a straight line from head to feet",
+    "Hold for the seconds, breathing. Then the other side",
+    "Wrong: hips sagging. If they drop, the set is over - rest and go again"],
+  "Dead bug": ["On your back, arms straight up, knees over hips",
+    "Press your lower back into the floor and keep it there the whole time",
+    "Lower the opposite arm and leg slowly, bring them back, switch",
+    "Wrong: the lower back lifting off the floor. Smaller movement, more control"],
+  "Leg press": ["Feet flat on the platform, shoulder-width, in the middle",
+    "Lower until your knees are around 90 degrees, back flat against the pad",
+    "Press through the whole foot; do not lock the knees at the top",
+    "Wrong: going so deep your hips lift off the seat. That is too deep"],
+  "Seated cable row": ["Sit tall, feet on the plate, knees slightly bent",
+    "Pull the handle to your stomach, squeezing the shoulder blades together",
+    "Let it forward until your arms are straight, without rounding",
+    "Wrong: leaning back to move the weight. The torso stays still"],
+  "Dumbbell shoulder press": ["Sit with back support, dumbbells at shoulder height, palms forward",
+    "Press up until your arms are straight, not locked",
+    "Lower to ear height, not lower",
+    "Wrong: arching the back to push. If the back arches, it is too heavy"],
+  "Hip thrust": ["Upper back on a bench, feet flat, knees bent",
+    "Drive the hips up until your body is flat from shoulders to knees",
+    "Squeeze the glutes at the top for a second, lower under control",
+    "Wrong: pushing through the toes or arching the back. Heels, chin tucked"],
+  "Cable woodchop": ["Cable high, stand side-on, both hands on the handle",
+    "Pull it down and across your body to the opposite hip, arms nearly straight",
+    "Turn from the hips and shoulders together, not the arms",
+    "Wrong: swinging it. Slow enough that you could stop at any point"],
+  "Hanging knee raise": ["Hang from the bar with straight arms",
+    "Bring your knees up toward your chest, curling the hips, not just lifting legs",
+    "Lower slowly, no swinging. Stop the swing before the next rep",
+    "Wrong: swinging into it. If you swing, do the lying version instead"],
+  "Chest press machine": ["Set the seat so the handles line up with the middle of your chest",
+    "Push until your arms are straight, not locked",
+    "Come back until your hands are level with your chest, not behind it",
+    "Wrong: the seat too low, so the handles are at your shoulders. Raise it"],
+  "Hack squat": ["Shoulders under the pads, feet shoulder-width and a little forward",
+    "Lower until your thighs are about parallel, knees over toes",
+    "Drive up through the whole foot, do not lock out",
+    "Wrong: feet too low on the platform, which throws the knees forward"],
+  "Smith machine squat": ["Bar across the upper back, feet a little in front of the bar",
+    "Sit down and back until thighs are around parallel",
+    "Stand up through the heels, chest up",
+    "Wrong: the bar too high on the neck. It sits on the muscle, not the bone"],
+  "Chest-supported row machine": ["Chest on the pad, feet planted, grab the handles",
+    "Pull to your sides with the elbows, squeeze the shoulder blades together",
+    "Let the arms straighten fully between reps",
+    "Wrong: lifting the chest off the pad to pull. It stays down"],
+  "Seated leg curl": ["Pad just above the ankles, back against the seat",
+    "Curl your heels under the seat as far as they go",
+    "Return slowly - the way back is half the exercise",
+    "Wrong: the hips lifting to help. Hold the handles and keep them down"],
+  "Lying leg curl": ["Face down, pad just above the ankles, hips pressed into the bench",
+    "Curl your heels to your glutes",
+    "Lower slowly to nearly straight",
+    "Wrong: the hips rising off the bench. Press them down"],
+  "Shoulder press machine": ["Seat set so the handles are at shoulder height",
+    "Press up until the arms are straight, not locked",
+    "Lower until the handles are at ear height",
+    "Wrong: arching to get it up. If you arch, it is too heavy"],
+  "Assisted pull-up machine": ["Kneel on the pad; more weight on the stack means more help",
+    "Pull until your chin is at the bar, elbows down and back",
+    "Lower all the way until your arms are straight",
+    "Wrong: half reps at the bottom. All the way down counts"],
+  "Incline chest press machine": ["Seat so the handles are at the upper chest",
+    "Press up and forward until straight, not locked",
+    "Back until the hands are level with the chest",
+    "Wrong: the seat too low. The handles should not start at the shoulders"],
+  "Single-leg press": ["One foot in the middle of the platform, the other on the floor",
+    "Lower to about 90 degrees, hips staying on the seat",
+    "Push through the whole foot. All reps, then swap",
+    "Wrong: the knee drifting in. Track it over the middle toes"],
+  "Cable crunch": ["Kneel facing the stack, rope held at the sides of your head",
+    "Curl your ribs toward your hips, rounding the upper back",
+    "Come back up slowly to nearly upright",
+    "Wrong: pulling with the arms or bowing from the hips. The elbows stay by the head"],
+  "Ab crunch machine": ["Chest on the pad or hands on the handles, feet under the rollers",
+    "Curl forward, bringing the ribs to the hips",
+    "Return slowly, not all the way to slack",
+    "Wrong: yanking with the arms. The stomach moves it"]
+};
+var HOW_GENERIC = ["Set the seat so the handles line up with the joint that moves",
+  "Two light sets to find the weight, then the working sets",
+  "Slow on the way down, controlled on the way up",
+  "Stop each set with two or three reps still in you"];
+function howFor(name, ex){
+  return HOW[name] || (ex && HOW[ex[0]]) || HOW_GENERIC;
+}

@@ -61,30 +61,35 @@ function viewWork(){
   ]);
 
   if (soon.length > 1){
-    h += "<div class='recs'>";
+    var recs = "<div class='recs'>";
     soon.slice(1).forEach(function(d){
-      h += "<div class='rec'><span class='rd'>" + esc(nice(d[2])) + "</span>"
+      recs += "<div class='rec'><span class='rd'>" + esc(nice(d[2])) + "</span>"
         + "<span class='rt'>" + esc(d[1]) + "</span>"
         + "<b class='rv'>" + num(daysTo(d[2])) + "d</b></div>";
     });
-    h += "</div>";
+    recs += "</div>";
+    h += fold("workdates", "After that", (soon.length - 1) + " more dates", recs, false);
   }
 
+  /* Three areas, fifteen items, all open at once was the whole tab as a wall.
+     Each area is a fold now with its open count on the front; the first one
+     with anything left is open, the rest wait. */
+  var opened = false;
   WORKAREAS.forEach(function(a){
     var items = WORKITEMS.filter(function(i){ return i[1] === a[0]; });
     var left = workLeft(a[0]);
-    h += "<div class='rulehead'><h3>" + esc(a[1]) + "</h3><span></span>"
-      + "<em>" + (left ? left + " open" : "all done") + "</em></div>";
-    h += "<p class='fine' style='margin:0 0 9px'>" + esc(a[2]) + "</p>";
-    h += "<div class='wk'>";
+    var inner = "<p class='fine' style='margin:0 0 9px'>" + esc(a[2]) + "</p><div class='wk'>";
     items.forEach(function(i){
       var on = workDone(i[0]);
-      h += "<button class='wi" + (on ? " on" : "") + "' data-work='" + i[0] + "'>"
+      inner += "<button class='wi" + (on ? " on" : "") + "' data-work='" + i[0] + "'>"
         + "<span class='wbox'>" + (on ? "&#10003;" : "") + "</span>"
         + "<span class='wb'><b>" + esc(i[2]) + "</b>"
         + "<span>" + esc(i[3]) + "</span></span></button>";
     });
-    h += "</div>";
+    inner += "</div>";
+    var def = !opened && left > 0;
+    if (def) opened = true;
+    h += fold("work-" + a[0], esc(a[1]), left ? left + " open" : "all done", inner, def);
   });
 
   h += "<div class='btns'><button class='btn quiet' data-go='../docs/proposal.html'>"

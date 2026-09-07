@@ -301,3 +301,69 @@ button.vc:active{transform:scale(.96)}
 .w7.on b{color:#0B72BD}
 .w7.now{box-shadow:0 0 0 2px var(--blue) inset}
 .hero-f2{margin-top:6px; font-size:12.5px; font-weight:700; opacity:.82}
+
+/* ==================================================================== fold
+   A heading, one line of what is inside, and a chevron. Open or shut, it
+   stays how he left it. */
+.fold{margin:14px 0 0}
+.fold .fh{display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:13px 14px;
+  background:var(--card); border:1.5px solid var(--edge); border-bottom-width:3px; border-radius:16px;
+  font:inherit; color:var(--ink); cursor:pointer}
+.fold .fh b{font-size:15.5px; font-weight:800; letter-spacing:-.01em; flex:1}
+.fold .fh em{font-style:normal; font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--ink3)}
+.fold .fh i{display:flex; color:var(--ink3); transform:rotate(90deg); transition:transform .2s var(--tap)}
+.fold.open .fh{border-radius:16px 16px 0 0; border-bottom-width:1.5px}
+.fold.open .fh i{transform:rotate(-90deg)}
+.fold .fb{border:1.5px solid var(--edge); border-top:0; border-bottom-width:3px; border-radius:0 0 16px 16px;
+  padding:12px 12px 14px; background:var(--card)}
+.fold .fb .rulehead{margin-top:6px}
+.fold .fb .rec,.fold .fb .wi{background:var(--card2)}
+.btn.big{min-height:56px; font-size:16px; width:100%}
+.how{margin:4px 0 8px 18px; padding:0; text-align:left}
+.how li{margin:7px 0; font-size:14px; line-height:1.45}
+.how li:last-child{color:var(--flameEdge); font-weight:700}
+
+/* ================================================================= session
+   The guided one. Full screen, one movement at a time, nothing else on it. */
+#session{position:fixed; inset:0; z-index:130; display:none; background:var(--bg); overflow-y:auto;
+  -webkit-overflow-scrolling:touch; overscroll-behavior:contain}
+#session.on{display:block; animation:fadein .2s ease-out both}
+.ss{max-width:560px; margin:0 auto; padding:max(14px,env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom))}
+.sstop{display:flex; align-items:center; gap:12px; margin-bottom:6px}
+.ssx{width:42px; height:42px; border-radius:50%; font:inherit; font-size:24px; line-height:1; cursor:pointer;
+  background:var(--card); color:var(--ink2); border:1.5px solid var(--edge); border-bottom-width:3px}
+.ssk{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink3); flex:1}
+.ssp{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; color:var(--ink3)}
+.sshero{position:relative; overflow:hidden; border-radius:24px; padding:20px 18px 18px; color:#fff; margin:8px 0 14px;
+  background:linear-gradient(152deg,#FFA53A,#F27000 58%,#D14A12);
+  box-shadow:0 14px 30px -16px rgba(214,90,10,.7), 0 1px 0 rgba(255,255,255,.3) inset}
+.sshero .ssk2{font-size:10.5px; font-weight:800; letter-spacing:.15em; text-transform:uppercase; opacity:.84}
+.sshero h2{font-family:"Nunito",sans-serif; font-size:30px; font-weight:900; letter-spacing:-.03em; line-height:1.05;
+  margin:6px 0 0; text-transform:none; color:#fff}
+.sshero p{margin:10px 0 0; font-size:14.5px; font-weight:700; opacity:.94; line-height:1.45}
+.sshero .sstarget{background:rgba(0,0,0,.18); border-radius:14px; padding:10px 12px}
+.ssacts{display:flex; gap:8px; margin-top:12px}
+.ssacts .btn{flex:1; background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.35);
+  padding:10px 8px; min-height:42px; font-size:13px}
+.sssets{display:flex; gap:7px; margin:4px 0 12px; align-items:center}
+.sspill{min-width:44px; height:44px; padding:0 12px; border-radius:14px; display:flex; align-items:center;
+  justify-content:center; font-family:"Nunito",sans-serif; font-size:17px; font-weight:800;
+  background:var(--card); color:var(--ink3); border:1.5px solid var(--edge); border-bottom-width:3px}
+.sspill.on{background:var(--greenSoft); color:var(--greenInk); border-color:#BFE79A}
+.sspill.now{border-color:var(--flame); color:var(--flameEdge); box-shadow:0 0 0 2px var(--flameSoft)}
+.sspill.add{font:inherit; font-size:22px; cursor:pointer; color:var(--ink2)}
+.sslab{display:block; font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink3); margin:10px 0 4px}
+.ssrest{min-height:0; margin:6px 0 2px; text-align:center; font-weight:800; font-size:14px; color:var(--ink3)}
+.ssrest.going{min-height:54px; display:flex; align-items:center; justify-content:center; border-radius:17px;
+  background:var(--blueSoft); color:#0B72BD; border:2px solid var(--blue); font-size:17px}
+.ssrest.done{color:var(--greenInk); padding:6px 0}
+#session .lf .lfr{grid-template-columns:auto 60px 1fr 60px}
+#session .lfb{width:60px; height:58px}
+#session .lfv{font-size:34px}
+/* the paste, on the nudge sheet */
+#modal .bundle{width:100%; height:110px; resize:none; margin:8px 0 4px; padding:10px 12px; border-radius:12px;
+  font:600 11px/1.4 "JetBrains Mono",monospace; color:var(--ink2); background:var(--sunk);
+  border:1.5px solid var(--edge); word-break:break-all}

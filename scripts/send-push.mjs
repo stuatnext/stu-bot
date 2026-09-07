@@ -15,26 +15,42 @@
 
 import webpush from "web-push";
 
-const VAPID_PUBLIC =
+// One secret, made by the phone: { subscription, vapidPublic, vapidPrivate }.
+// The app generates the key pair itself now, so nothing about push lives in
+// the repo. The old two-secret layout still works, for a phone that set it
+// up before this.
+const LEGACY_PUBLIC =
   "BPzJd3TZ6bSeFIRWBVzeKKkJA6tkUxGFHMDbal6_JXLrjULbQg9REfSSISRnoOWvUghgNaTQfo4xTMdxO_XtvLI";
 
-const sub = process.env.PUSH_SUBSCRIPTION;
-const priv = process.env.VAPID_PRIVATE_KEY;
+export function readConfig(env){
+  const raw = env.PUSH_BUNDLE;
+  if (raw){
+    let b;
+    try { b = JSON.parse(raw); } catch (e){ throw new Error("PUSH_BUNDLE is not JSON: " + e.message); }
+    if (!b.subscription || !b.subscription.endpoint) throw new Error("PUSH_BUNDLE has no subscription endpoint");
+    if (!b.vapidPublic || !b.vapidPrivate) throw new Error("PUSH_BUNDLE is missing a VAPID key");
+    return { subscription: b.subscription, pub: b.vapidPublic, priv: b.vapidPrivate, via: "bundle" };
+  }
+  const sub = env.PUSH_SUBSCRIPTION, priv = env.VAPID_PRIVATE_KEY;
+  if (!sub || !priv) return null;
+  let subscription;
+  try { subscription = JSON.parse(sub); if (!subscription.endpoint) throw new Error("no endpoint"); }
+  catch (e){ throw new Error("PUSH_SUBSCRIPTION does not parse as a push subscription: " + e.message); }
+  return { subscription, pub: LEGACY_PUBLIC, priv, via: "legacy" };
+}
 
-if (!sub || !priv){
-  console.log("PUSH_SUBSCRIPTION and/or VAPID_PRIVATE_KEY not set - nothing to send.");
+const isMain = process.argv[1] && import.meta.url.endsWith(process.argv[1].split("/").pop());
+if (!isMain) {
+  // imported for a check: export only
+} else {
+let cfg;
+try { cfg = readConfig(process.env); }
+catch (e){ console.error(e.message); process.exit(1); }
+if (!cfg){
+  console.log("PUSH_BUNDLE not set (nor the legacy PUSH_SUBSCRIPTION + VAPID_PRIVATE_KEY) - nothing to send.");
   process.exit(0);
 }
-
-let subscription;
-try {
-  subscription = JSON.parse(sub);
-  if (!subscription.endpoint) throw new Error("no endpoint");
-} catch (e){
-  console.error("PUSH_SUBSCRIPTION does not parse as a push subscription:", e.message);
-  process.exit(1);
-}
-
+const { subscription, pub: VAPID_PUBLIC, priv } = cfg;
 webpush.setVapidDetails("https://github.com/stuatnext/stu-bot", VAPID_PUBLIC, priv);
 
 try {
@@ -49,4 +65,5 @@ try {
   }
   console.error("Send failed:", e.statusCode || "", e.body || e.message);
   process.exit(1);
+}
 }

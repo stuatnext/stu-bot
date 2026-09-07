@@ -296,3 +296,29 @@ function facts(rows){
   });
   return h + "</div>";
 }
+
+
+/* ==================================================================== fold
+   The screens had grown into lists of everything. A fold shows a heading
+   and one line of what is inside, and opens on a tap; the choice sticks, so
+   a section he never wants stays shut and one he lives in stays open.
+   "Not overwhelming" is mostly this: one thing at a time, the rest a tap
+   away. */
+function fold(id, title, meta, inner, openDefault){
+  var f = S.folds || {};
+  var open = f[id] === undefined ? !!openDefault : !!f[id];
+  return "<div class='fold" + (open ? " open" : "") + "'>"
+    + "<button class='fh' data-fold='" + esc(id) + "' aria-expanded='" + (open ? "true" : "false") + "'>"
+    + "<b>" + title + "</b>" + (meta ? "<em>" + meta + "</em>" : "")
+    + "<i>" + svg("arrow", 16) + "</i></button>"
+    + (open ? "<div class='fb'>" + inner + "</div>" : "")
+    + "</div>";
+}
+function toggleFold(id){
+  S.folds = S.folds || {};
+  var f = S.folds, cur = document.querySelector("[data-fold='" + id + "']");
+  var wasOpen = cur ? cur.getAttribute("aria-expanded") === "true" : !!f[id];
+  f[id] = !wasOpen;
+  save(); sfx("tap");
+  render({ keepScroll: true });
+}

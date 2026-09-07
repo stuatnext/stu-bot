@@ -225,22 +225,54 @@ async function askInstall(){
    Action - so the last step is one paste into a repo secret. Honest about
    its own architecture: no server, no account, nothing personal leaves
    the phone except the push address itself. */
-function vapidKey(){
-  var s = VAPID_PUBLIC.replace(/-/g, "+").replace(/_/g, "/");
+/* ------------------------------------------------------- the nudge
+   iPhone push, for a web app on the Home Screen. It has never sent, and the
+   reason was structural: the public key was baked into two files and the
+   private half lived nowhere he could find. So the phone makes its own pair
+   now - WebCrypto, P-256, the curve web push wants - subscribes with it, and
+   hands him ONE bundle: subscription, public key, private key. One paste into
+   one repository secret, and the sender reads the lot. Nothing about push is
+   in the repo any more. The bundle is kept on the phone too, so it can be
+   shown again if the paste goes wrong. */
+function b64uToBytes(s){
+  s = s.replace(/-/g, "+").replace(/_/g, "/");
   while (s.length % 4) s += "=";
-  var raw = atob(s), arr = new Uint8Array(raw.length);
-  for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
-  return arr;
+  var bin = atob(s), out = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
 }
+function bytesToB64u(bytes){
+  var bin = "";
+  for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+/* The key pair web push wants: the public half as a 65-byte uncompressed
+   point, the private half as the 32-byte scalar. Both base64url. */
+async function vapidPair(){
+  var k = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+  var pub = await crypto.subtle.exportKey("jwk", k.publicKey);
+  var prv = await crypto.subtle.exportKey("jwk", k.privateKey);
+  var x = b64uToBytes(pub.x), y = b64uToBytes(pub.y);
+  var raw = new Uint8Array(65); raw[0] = 4; raw.set(x, 1); raw.set(y, 33);
+  return { pub: bytesToB64u(raw), priv: prv.d };
+}
+function pushBundle(sub, keys){
+  return JSON.stringify({ v: 1, made: today(), subscription: sub,
+    vapidPublic: keys.pub, vapidPrivate: keys.priv });
+}
+
 async function askPush(){
   if (S.pushOn){
-    var off = await ask({
+    var v = await ask({
       title: "The evening nudge",
-      say: "On. Around 22:15 the game checks in - it names what is still open, or says the "
-         + "day is already in and asks nothing.",
+      say: "On since " + esc(nice(S.pushMade || today())) + ". Around 22:15 the game checks in "
+         + "\u2014 it names what is still open, or says the day is already in and asks nothing."
+         + (S.pushBundle ? "<br><br>If the paste never happened, or GitHub lost it, show it again." : ""),
+      options: S.pushBundle ? [{ id: "again", label: "Show the paste again" }] : [],
       confirm: "Turn it off", cancel: "Keep it"
     });
-    if (!off) return;
+    if (v === "again"){ showBundle(S.pushBundle); return; }
+    if (!v) return;
     try {
       var reg0 = await navigator.serviceWorker.ready;
       var old = await reg0.pushManager.getSubscription();
@@ -251,20 +283,21 @@ async function askPush(){
     render({ keepScroll: true });
     return;
   }
-  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)){
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)
+      || !(window.crypto && crypto.subtle)){
     sfx("no");
     toast(isiOS() ? "iOS only allows this once Daylight is on the Home Screen." : "This browser cannot do push.");
     return;
   }
   if (isiOS() && !isStandalone()){
     sfx("no");
-    toast("Home Screen first - iOS only allows the nudge for installed apps.");
+    toast("Home Screen first \u2014 iOS only allows the nudge for installed apps.");
     return;
   }
   var go = await ask({
     title: "The evening nudge",
     say: "Once a night, around 22:15: the game names what is still open, or tells you the day "
-       + "is already in. Two steps - your phone asks permission now, then one paste into the "
+       + "is already in. Two steps \u2014 your phone asks permission now, then one paste into the "
        + "repo so the scheduler can reach this phone.",
     confirm: "Turn it on", cancel: "Not now"
   });
@@ -275,36 +308,58 @@ async function askPush(){
       sfx("no"); toast("No permission, no nudge. Re-allow it in Settings if you change your mind.");
       return;
     }
+    var keys = await vapidPair();
     var reg = await navigator.serviceWorker.ready;
+    var prev = await reg.pushManager.getSubscription();
+    if (prev) await prev.unsubscribe();
     var sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: vapidKey()
+      applicationServerKey: b64uToBytes(keys.pub)
     });
-    var json = JSON.stringify(sub);
-    var copied = false;
-    try { await navigator.clipboard.writeText(json); copied = true; } catch(e){}
-    if (!copied){
-      try {
-        var a = document.createElement("a");
-        a.href = "data:application/json;charset=utf-8," + encodeURIComponent(json);
-        a.download = "push-subscription.json";
-        document.body.appendChild(a); a.click(); a.remove();
-      } catch(e2){}
-    }
-    S.pushOn = 1; save(); sfx("done"); buzz(14);
-    await ask({
-      title: "One paste left",
-      say: (copied ? "This phone's push address is on your clipboard."
-                   : "This phone's push address downloaded as push-subscription.json.")
-         + " In GitHub: stu-bot → Settings → Secrets and variables → Actions → "
-         + "set PUSH_SUBSCRIPTION to it. From the next 22:15, the nudge is live.",
-      cancel: "Done"
-    });
+    var bundle = pushBundle(sub.toJSON(), keys);
+    S.pushOn = 1; S.pushMade = today(); S.pushBundle = bundle;
+    save(); sfx("done"); buzz(14);
     render({ keepScroll: true });
+    showBundle(bundle);
   } catch(e){
     sfx("no");
     toast("The phone refused the subscription. Nothing changed.");
   }
+}
+
+/* The one paste, with the exact route to where it goes, and two ways to
+   carry it there: the clipboard, or the share sheet to a Mac. */
+function showBundle(bundle){
+  var el = document.getElementById("modal");
+  el.innerHTML = "<div class='mw'><div class='grab'></div>"
+    + "<h3>One paste, then it is live</h3>"
+    + "<p class='say'>In GitHub, on any device: <b>stu-bot &rarr; Settings &rarr; Secrets and variables "
+    + "&rarr; Actions &rarr; New repository secret</b>. Name it <b>PUSH_BUNDLE</b>, paste this in, "
+    + "save. From the next 22:15 the nudge arrives on this phone. Nothing else to set.</p>"
+    + "<textarea class='bundle' readonly spellcheck='false'>" + esc(bundle) + "</textarea>"
+    + "<div class='btns'>"
+    + "<button class='btn pri' data-pushcopy='1'>Copy</button>"
+    + (navigator.share ? "<button class='btn' data-pushshare='1'>Share to a Mac</button>" : "")
+    + "<button class='btn quiet' data-mk='__no'>Done</button></div></div>";
+  el.className = "on";
+  document.body.style.overflow = "hidden";
+  function close(){ if (!MODAL) return; MODAL = null; el.className = ""; el.innerHTML = ""; document.body.style.overflow = ""; }
+  MODAL = { close: close };
+  el.onclick = function(ev){
+    if (ev.target === el){ close(); return; }
+    var b = ev.target.closest ? ev.target.closest("[data-mk],[data-pushcopy],[data-pushshare]") : null;
+    if (!b) return;
+    ev.stopPropagation();
+    if (b.dataset.mk === "__no"){ sfx("tap"); close(); return; }
+    if (b.dataset.pushcopy){
+      navigator.clipboard.writeText(bundle).then(function(){ sfx("done"); toast("Copied. Paste it as PUSH_BUNDLE.", true); },
+        function(){ var t = el.querySelector(".bundle"); if (t){ t.focus(); t.select(); } toast("Select all and copy."); });
+      return;
+    }
+    if (b.dataset.pushshare){
+      navigator.share({ title: "PUSH_BUNDLE", text: bundle }).then(function(){ sfx("done"); }, function(){});
+    }
+  };
 }
 
 /* ------------------------------------------------------ the coach file

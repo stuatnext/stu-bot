@@ -145,15 +145,17 @@ function viewFood(){
       + "anything or giving anything up. You currently have one.</p>";
   }
 
-  /* The whole list, so the answer to "what do I order" is never a decision. */
-  h += "<div class='rulehead'><h3>What to order</h3><span></span><em>protein</em></div>";
-  h += "<div class='ordl'>";
+  /* The whole list, so the answer to "what do I order" is never a decision -
+     behind a fold, because twenty rows of menu is the first thing that made
+     this tab feel like a spreadsheet. */
+  var ordl = "<div class='ordl'>";
   ORDERS.forEach(function(o){
-    h += "<button class='ord' data-order='" + esc(o[0]) + "'>"
+    ordl += "<button class='ord' data-order='" + esc(o[0]) + "'>"
       + "<span class='on2'>" + esc(o[0]) + "</span>"
       + "<span class='og'>" + num(o[1]) + "g</span></button>";
   });
-  h += "</div>";
+  ordl += "</div>";
+  h += fold("orders", "What to order", ORDERS.length + " that close the gap", ordl, false);
 
   h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>"
     + "Why protein and not calories</button></div>";

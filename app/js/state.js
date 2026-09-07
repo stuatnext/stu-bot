@@ -24,7 +24,9 @@ function load(){
             monthSeen:{}, pushOn:0,
             lifts:{}, food:{}, waist:[], kg:0,
             water:{}, sleep:{}, out:{},
-            hand:{ do:[], in:[] }, doneDo:{}, kept:{}, dealtDo:{}, dealtIn:{} };
+            hand:{ do:[], in:[] }, doneDo:{}, kept:{}, dealtDo:{}, dealtIn:{},
+            /* anything not listed here does not survive a reload */
+            sess:null, folds:{}, pushBundle:"", pushMade:"" };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
@@ -145,7 +147,8 @@ function monthOf(k){ return k.slice(0, 7); }
    XP - never money, the pot stays consistency-only - and marks the card
    "lived", which no pack can do. */
 function cardDo(c){
-  return CARD_DO[c[0]] || SET_DO[c[2]](c[0], c);
+  var f = SET_DO[c[2]] || SET_DO_ANY;
+  return CARD_DO[c[0]] || f(c[0], c);
 }
 /* A lived card is the record. Living one used to be possible only on the day
    the hash happened to pick it as the side quest; now any held card can be

@@ -163,7 +163,12 @@ function tcard(c, count, opts){
   h += "<div class='tc-nm'>" + esc(c[0]) + "</div>";
   h += "<div class='tc-art' style='" + artTint(c) + "'>" + cardArt(c);
   if (c[2] === "zh" && c[4]) h += "<div class='tc-han zh'>" + esc(c[4]) + "</div>";
-  if ((r >= 2 && count) || lived) h += "<div class='tc-holo'></div>";
+  /* The texture layer: matte on a common, a specular band on an uncommon,
+     refraction on a rare, foil on gold. It reads --px/--py/--ang from tilt(),
+     so it moves under the thumb. The old holo overlay is kept for lived
+     cards only; on a rare it was a second rainbow on top of the first. */
+  if (count) h += "<div class='tc-fx'></div>";
+  if (lived) h += "<div class='tc-holo'></div>";
   if (count > 1) h += "<span class='tc-cnt'>x" + count + "</span>";
   if (count && (S.seen || {})[c[0]] === 0) h += "<span class='tc-new'></span>";
   if (lived) h += "<span class='tc-stamp'><b>Lived</b><i>" + esc(nice(lived)) + "</i></span>";
@@ -189,7 +194,7 @@ function dcard(a, opts){
     + "<div class='tc-verb'>" + esc(a[1]) + "</div>"
     + "<div class='tc-det'>" + esc(a[2]) + "</div>"
     + "<div class='tc-mk'>" + svg("tick", 22) + "</div>"
-    + "<div class='tc-glare'></div></div></div>"
+    + "<div class='tc-fx'></div><div class='tc-glare'></div></div></div>"
     + "<div class='tc-b'>" + BACKMARK + "<span class='tc-pip'>Do</span></div>"
     + "</div></div>";
 }
@@ -203,7 +208,7 @@ function icard(i, opts){
     + "<div class='tc-mark'>" + mark + "</div>"
     + "<div class='tc-ttl'>" + esc(i[2]) + "</div>"
     + "<div class='tc-body'>" + esc(i[3]) + "</div>"
-    + "<div class='tc-glare'></div></div></div>"
+    + "<div class='tc-fx'></div><div class='tc-glare'></div></div></div>"
     + "<div class='tc-b'>" + BACKMARK + "<span class='tc-pip'>Inspire</span></div>"
     + "</div></div>";
 }
@@ -249,10 +254,13 @@ function tilt(tc){
         + (-y * 17).toFixed(1) + "deg)";
     }
     tc.style.setProperty("--ang", ((x + .5) * 340).toFixed(0) + "deg");
+    tc.style.setProperty("--px", (x + .5).toFixed(3));
+    tc.style.setProperty("--py", (y + .5).toFixed(3));
   }
   function off(){
     var inner = tc.querySelector(".tc-i");
     if (inner && !tc.classList.contains("down")) inner.style.transform = "";
+    tc.style.setProperty("--px", ".5"); tc.style.setProperty("--py", ".5");
   }
   tc.addEventListener("touchmove", function(e){ at(e); }, { passive: true });
   tc.addEventListener("touchend", off);

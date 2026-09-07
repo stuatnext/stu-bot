@@ -180,7 +180,11 @@ function viewToday(){
      Water tab, where they were somebody else's business - a hydration screen
      is not the place to be told about protein, gym sessions and calling home. */
   h += conditionHTML();
-  h += questHTML();
+  /* The week's three challenges, behind a fold that opens by default and
+     stays how he leaves it. */
+  var qk = weekKey(), qs = questsFor(qk);
+  var qdone = qs.filter(function(q){ return questDoneQ(q, qk); }).length;
+  h += fold("week", "This week", qdone + " of " + qs.length, questHTML(), true);
 
   /* the side quest: one held card asks something of him. This is what makes
      the collection a deck instead of wallpaper - his call, his words. */

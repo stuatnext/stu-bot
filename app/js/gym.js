@@ -26,16 +26,24 @@ function viewGym(){
     foot: doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged all time"
         : "Turning up is the thing being trained. One move counts."
   });
-  h += facts([
-    [num(doneS), "sessions", doneS ? "on" : ""],
-    [st[3] + "", "sets a move", ""],
-    [wNow ? wNow[1] + "cm" : "\u2014", "waist", ""]
-  ]);
+  /* The way in. A newbie does not want a list; he wants to be told what to
+     do next, one thing at a time, and to be told when to rest. That is the
+     guided session. The list under it is the overview, and still works. */
+  var resume = S.sess && S.sess.day === t;
+  h += "<div class='btns'><button class='btn pri big' data-startsession='" + key + "'>"
+    + (resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session")
+    + "</button></div>";
+  if (!doneS && !doneN){
+    h += "<p class='fine' style='text-align:center;margin:-4px 0 12px'>It walks you through it: what "
+      + "the machine is, how to set it, what to lift, when to rest. Nothing to work out.</p>";
+  }
+
+  h += gymProgressHTML();
 
   h += "<div class='rulehead'><h3>Today's moves</h3><span></span>"
     + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
 
-  h += "<div class='stg'>"
+  var stgh = "<div class='stg'>"
     + "<div class='sh'><b>" + esc(st[1]) + "</b>"
     + "<span>" + list.length + (list.length === 1 ? " move" : " moves")
     + " &middot; " + st[3] + " sets</span></div>"
@@ -43,13 +51,15 @@ function viewGym(){
   if (nx){
     var need = nx[0] - doneS, span = Math.max(1, nx[0] - st[0]);
     var pctS = Math.min(100, Math.round(100 * (doneS - st[0]) / span));
-    h += "<div class='sbar'><i style='width:" + pctS + "%'></i></div>"
+    stgh += "<div class='sbar'><i style='width:" + pctS + "%'></i></div>"
       + "<p class='fine'>" + need + " more " + (need === 1 ? "session" : "sessions")
       + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
   } else {
-    h += "<p class='fine'>" + num(doneS) + " sessions logged.</p>";
+    stgh += "<p class='fine'>" + num(doneS) + " sessions logged.</p>";
   }
-  h += "</div>";
+  stgh += "</div>";
+  h += fold("stage", esc(st[1]), num(doneS) + (doneS === 1 ? " session" : " sessions")
+    + (nx ? " \u00b7 " + (nx[0] - doneS) + " to " + esc(nx[1]) : ""), stgh, false);
 
   if (!doneN && !doneS){
     h += "<p class='fine' style='margin:0 0 10px'>24/7 Fitness, Tanjong Pagar. Tap an exercise to "
@@ -70,7 +80,8 @@ function viewGym(){
           ? had.w + "kg<em>" + had.r.join(" &middot; ") + "</em>"
           : (t2.w ? t2.w + "kg<em>" + esc(t2.tag || "") + "</em>"
                   : "<span class='new'>new</span>")) + "</span></button>";
-    h += "<button class='swap' data-swap='" + key + ":" + i + "'"
+    h += "<button class='swap' data-how='" + key + ":" + i + "' aria-label='How to do " + esc(name) + "'>?</button>"
+      + "<button class='swap' data-swap='" + key + ":" + i + "'"
       + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
   });
   h += "</div>";
@@ -91,24 +102,24 @@ function viewGym(){
   }
 
   /* --- waist, which belongs with the gym rather than with the food */
+  var wh = "";
   var w = (S.waist || []).slice(-1)[0];
   var prev = (S.waist || []).slice(-2)[0];
-  h += "<div class='rulehead'><h3>Waist</h3><span></span><em>weekly</em></div>";
-  h += "<div class='panel wst'><div class='pnum'><b>"
+  wh += "<div class='panel wst'><div class='pnum'><b>"
     + (w ? w[1] + "<small>cm</small>" : "&mdash;")
     + "</b><span>" + (w ? "measured " + esc(nice(w[0])) : "not measured yet") + "</span></div>";
   if (w && prev && prev[1] !== w[1]){
     var dlt = w[1] - prev[1];
-    h += "<p class='fine " + (dlt < 0 ? "good" : "") + "'>"
+    wh += "<p class='fine " + (dlt < 0 ? "good" : "") + "'>"
       + (dlt < 0 ? "Down " + Math.abs(dlt).toFixed(1) : "Up " + dlt.toFixed(1))
       + "cm since " + esc(nice(prev[0])) + ".</p>";
   }
-  h += "<p class='fine'>Not the scale. On this plan your weight is meant to rise, so the waist is "
+  wh += "<p class='fine'>Not the scale. On this plan your weight is meant to rise, so the waist is "
     + "the number that answers what you actually asked.</p>"
     + "<div class='btns'><button class='btn' data-waist='1'>Measure</button></div></div>";
 
-  h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>"
-    + "The whole plan, on paper</button></div>";
+  h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>The whole plan, on paper</button></div>";
+  h += fold("waist", "Waist", w ? w[1] + "cm \u00b7 " + esc(nice(w[0])) : "not measured yet", wh, false);
   return h;
 }
 
@@ -455,7 +466,7 @@ function restPaint(){
      its own button, and the floating bar sits exactly where that button is -
      two of them in the same place, one on top of the other. The bar is for
      after he closes it, which is when he actually needs it. */
-  if (MODAL || ST){
+  if (MODAL || ST || SESSION){
     el.className = ""; el.innerHTML = "";
     restBtnPaint(left);
     return;
@@ -469,6 +480,11 @@ function restPaint(){
 /* The sheet keeps its own copy of the clock, written directly rather than by
    re-rendering: a full repaint four times a second would fight his thumb. */
 function restBtnPaint(left){
+  var sb = document.getElementById("ssRest");
+  if (sb && SESSION){
+    sb.textContent = left > 0 ? "Resting \u00b7 " + restClock(left) : "Rested. Next set when you are.";
+    sb.className = "ssrest" + (left > 0 ? " going" : " done");
+  }
   var b = document.getElementById("lfRest");
   if (!b || !LIFT) return;
   b.textContent = left > 0
@@ -692,4 +708,253 @@ function askAnchor(slot){
     var o = ORDERS.filter(function(x){ return x[0] === v; })[0];
     if (o) logFood(o[0], o[1], slot);
   });
+}
+
+
+/* ------------------------------------------------------------- progress
+   Is it working. Sessions a week for the last eight weeks, the best lift on
+   the two movements that matter most to what he asked for, and the waist -
+   read as a trend, not a number. */
+function weekKeyOf(k){
+  var d = new Date(k + "T00:00:00"), dow = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - dow);
+  return iso(d);
+}
+function sessionsByWeek(n){
+  var out = [], d = new Date(), dow = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - dow - 7 * (n - 1));
+  var done = liftDays().filter(function(k){ return Object.keys(S.lifts[k].ex || {}).length; });
+  for (var i = 0; i < n; i++){
+    var wk = iso(d);
+    out.push([wk, done.filter(function(k){ return weekKeyOf(k) === wk; }).length]);
+    d.setDate(d.getDate() + 7);
+  }
+  return out;
+}
+/* The best across every variant of a slot, not just the one he is using
+   now - a chest press machine PB is still his chest. */
+function bestOf(names){
+  var best = null;
+  (Array.isArray(names) ? names : [names]).forEach(function(name){
+    liftHistory(name, 60).forEach(function(h){
+      var e = e1rm(h.w, topRep(h));
+      if (!best || e > best.e) best = { e: e, w: h.w, r: topRep(h), k: h.k, name: name };
+    });
+  });
+  return best;
+}
+function gymProgressHTML(){
+  var weeks = sessionsByWeek(8), total = weeks.reduce(function(a, w){ return a + w[1]; }, 0);
+  if (!total) return "";
+  var h = "<div class='rulehead'><h3>Is it working</h3><span></span><em>8 weeks</em></div>";
+  h += "<div class='wk7 gw'>";
+  weeks.forEach(function(w, i){
+    var n = w[1], on = n >= 3;
+    h += "<div class='w7" + (on ? " on" : "") + (i === weeks.length - 1 ? " now" : "") + "'>"
+      + "<span class='w7b'><i style='height:" + Math.max(4, Math.min(100, Math.round(n / 3 * 100))) + "%'></i></span>"
+      + "<b>" + n + "</b><span class='w7d'>" + (i === weeks.length - 1 ? "now" : "w" + (i + 1)) + "</span></div>";
+  });
+  h += "</div>";
+  var press = bestOf(swapNames(sessionFor("A")[1][1])), pull = bestOf(swapNames(sessionFor("B")[1][1]));
+  var pressN = press ? press.name : "", pullN = pull ? pull.name : "";
+  var ws = S.waist || [], w0 = ws[0], w1 = ws[ws.length - 1];
+  h += facts([
+    [press ? press.w + "kg" : "\u2014", press ? "best " + pressN.toLowerCase().split(" ")[0] : "chest", press ? "on" : ""],
+    [pull ? pull.w + "kg" : "\u2014", pull ? "best " + pullN.toLowerCase().split(" ")[0] : "back", pull ? "on" : ""],
+    [w1 ? (w0 && w0 !== w1 ? (w1[1] - w0[1] > 0 ? "+" : "") + (w1[1] - w0[1]).toFixed(1) + "cm" : w1[1] + "cm") : "\u2014",
+     "waist", w1 && w0 && w1[1] < w0[1] ? "on" : ""]
+  ]);
+  h += "<p class='fine'>Three a week is the line. Strength is the estimated best on the chest and "
+    + "back movements; waist is the change since the first measurement.</p>";
+  return h;
+}
+
+/* ------------------------------------------------------------- how-to */
+function askHow(sKey, idx){
+  var ex = sessionFor(sKey)[1][idx], name = pickFor(sKey, idx);
+  var steps = howFor(name, ex);
+  tell(name, "<ol class='how'>" + steps.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>"
+    + "<p class='fine'>" + esc(ex[4]) + " &middot; " + restClock(restOf(ex)) + " between sets.</p>");
+}
+
+/* ============================================================ the session
+   One thing at a time. Warm up, then each movement in turn: what it is, how
+   to do it, what to lift, a dial for the set, and the rest clock started for
+   him the moment he taps Set done. Every set is written to the day's record
+   as it happens, so a dropped phone loses nothing; the session itself is in
+   S.sess so a reload lands him back where he was. */
+var SESSION = null;
+
+function startSession(key){
+  var t = today();
+  if (S.sess && S.sess.day === t && S.sess.key === key){
+    SESSION = S.sess;
+  } else {
+    SESSION = S.sess = { day: t, key: key, i: 0, set: 0, warm: 0, started: Date.now(), extra: {} };
+    save();
+  }
+  var el = document.getElementById("session");
+  el.className = "on";
+  document.body.style.overflow = "hidden";
+  paintSession();
+}
+function closeSession(){
+  var el = document.getElementById("session");
+  if (el){ el.className = ""; el.innerHTML = ""; }
+  document.body.style.overflow = "";
+  SESSION = null;
+  restPaint();
+  render({ keepScroll: true });
+}
+function sessionList(){ return stageLifts(SESSION.key); }
+function sessionSetsFor(name, ex){
+  var extra = (SESSION.extra || {})[name] || 0;
+  return stage()[3] + extra;
+}
+function sessionLogged(name){
+  var e = (S.lifts || {})[SESSION.day];
+  return e && e.ex && e.ex[name] ? e.ex[name] : null;
+}
+
+function paintSession(){
+  var el = document.getElementById("session");
+  if (!el || !SESSION) return;
+  var list = sessionList(), n = list.length;
+  var h = "<div class='ss'>";
+  h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
+    + "<span class='ssk'>Session " + SESSION.key + "</span>"
+    + "<span class='ssp'>" + (SESSION.warm ? Math.min(SESSION.i + 1, n) + " of " + n : "warm-up") + "</span></div>";
+
+  if (!SESSION.warm){
+    h += "<div class='sshero'><div class='ssk2'>Before anything</div><h2>Warm up</h2>"
+      + "<p>Five minutes of easy cardio &mdash; bike, rower, brisk walk on the treadmill. Then two "
+      + "light sets of the first movement to find the weight. Not to failure. Not even close.</p></div>";
+    h += "<div class='ssbig'>" + (restLeft() > 0
+      ? "<div id='ssRest' class='ssrest going'>Warming up \u00b7 " + restClock(restLeft()) + "</div>"
+      : "<button class='btn' data-sswarm='1'>Start a five-minute clock</button>") + "</div>";
+    h += "<div class='btns'><button class='btn pri big' data-swarmdone='1'>Warm. Start the first movement</button></div>";
+    h += "</div>";
+    el.innerHTML = h;
+    return;
+  }
+
+  if (SESSION.i >= n){ paintSummary(el); return; }
+
+  var ex = list[SESSION.i], name = pickFor(SESSION.key, SESSION.i);
+  var t = nextTarget(ex, name), had = sessionLogged(name);
+  var sets = sessionSetsFor(name, ex), setNo = (had ? had.r.length : 0);
+  var doneAll = setNo >= sets;
+  var w = SESSION.w != null && SESSION.wFor === name ? SESSION.w : (had ? had.w : (t.w || 0));
+  var reps = SESSION.r != null && SESSION.rFor === name ? SESSION.r
+           : (had && had.r.length ? had.r[had.r.length - 1] : (t.reps || ex[2]));
+  SESSION.w = w; SESSION.wFor = name; SESSION.r = reps; SESSION.rFor = name;
+
+  h += "<div class='sshero'><div class='ssk2'>Movement " + (SESSION.i + 1) + " of " + n
+    + " &middot; " + esc(ex[4]) + "</div><h2>" + esc(name) + "</h2>"
+    + "<p class='sstarget'>" + esc(t.say) + "</p>"
+    + "<div class='ssacts'><button class='btn quiet' data-how='" + SESSION.key + ":" + SESSION.i + "'>How to do it</button>"
+    + "<button class='btn quiet' data-sswap='" + SESSION.i + "'>Swap the machine</button></div></div>";
+
+  /* the sets so far, as pills */
+  h += "<div class='sssets'>";
+  for (var k = 0; k < sets; k++){
+    var got = had && had.r[k] != null ? had.r[k] : null;
+    h += "<span class='sspill" + (got != null ? " on" : k === setNo ? " now" : "") + "'>"
+      + (got != null ? got : (k + 1)) + "</span>";
+  }
+  h += "<button class='sspill add' data-saddset='1' aria-label='Add a set'>+</button></div>";
+
+  if (!doneAll){
+    h += "<label class='sslab'>Set " + (setNo + 1) + " &middot; " + (t.w ? "" : "pick a weight, ") + "how many did you do</label>";
+    h += "<div class='lf'>"
+      + liftRow("Load", w, "kg", "sw", 0)
+      + liftRow("Reps", reps, "", "sr", 0)
+      + "</div>";
+    h += "<div id='ssRest' class='ssrest" + (restLeft() > 0 ? " going" : "") + "'>"
+      + (restLeft() > 0 ? "Resting \u00b7 " + restClock(restLeft()) : "") + "</div>";
+    h += "<div class='btns'><button class='btn pri big' data-ssetdone='1'>Set " + (setNo + 1) + " done</button></div>";
+  } else {
+    h += "<div id='ssRest' class='ssrest done'>All " + sets + " sets in. " + esc(had.w) + "kg &middot; "
+      + had.r.join(" \u00b7 ") + "</div>";
+    h += "<div class='btns'><button class='btn pri big' data-snext='1'>"
+      + (SESSION.i + 1 < n ? "Next movement" : "Finish the session") + "</button></div>";
+  }
+  h += "<div class='btns tight'><button class='btn quiet' data-sskip='1'>Skip this one</button></div>";
+  h += "</div>";
+  el.innerHTML = h;
+}
+
+function paintSummary(el){
+  var list = sessionList(), h = "<div class='ss'>";
+  h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
+    + "<span class='ssk'>Session " + SESSION.key + "</span><span class='ssp'>done</span></div>";
+  h += "<div class='sshero'><div class='ssk2'>That is the session</div><h2>Turned up. Lifted. Logged.</h2></div>";
+  h += "<div class='recs'>";
+  list.forEach(function(ex, i){
+    var name = pickFor(SESSION.key, i), had = sessionLogged(name);
+    h += "<div class='rec'><span class='rd'>" + (i + 1) + "</span><span class='rt'>" + esc(name) + "</span>"
+      + "<b class='rv'>" + (had ? had.w + "kg \u00b7 " + had.r.join(",") : "skipped") + "</b></div>";
+  });
+  h += "</div>";
+  h += "<div class='btns'><button class='btn pri big' data-sfinish='1'>Finish &mdash; mark Trained</button></div>";
+  h += "<p class='fine' style='text-align:center'>Next time the app already knows what to suggest.</p>";
+  h += "</div>";
+  el.innerHTML = h;
+}
+
+/* the taps */
+function sessionTap(ds, b){
+  if (!SESSION) return false;
+  var list = sessionList(), ex = list[SESSION.i], name = ex ? pickFor(SESSION.key, SESSION.i) : null;
+  if (ds.sclose){ sfx("tap"); closeSession(); return true; }
+  if (ds.sswarm){ restStart(300); paintSession(); return true; }
+  if (ds.swarmdone){ SESSION.warm = 1; restStop(true); save(); sfx("tick"); buzz(10); paintSession(); return true; }
+  if (ds.lf !== undefined){
+    var p = ds.lf.split(":"), kind = p[0], dir = Number(p[1]);
+    if (kind === "sw"){
+      var st = dir > 0 ? stepFor(SESSION.w) : stepFor(Math.max(0, SESSION.w - 0.5));
+      SESSION.w = Math.max(0, Math.round((SESSION.w + dir * st) * 2) / 2);
+    } else if (kind === "sr"){
+      SESSION.r = Math.max(0, Math.min(60, (Number(SESSION.r) || 0) + dir));
+    } else return false;
+    buzz(6); sfx("tap"); save(); paintSession(); return true;
+  }
+  if (ds.saddset){
+    SESSION.extra = SESSION.extra || {}; SESSION.extra[name] = (SESSION.extra[name] || 0) + 1;
+    save(); sfx("tap"); paintSession(); return true;
+  }
+  if (ds.ssetdone){
+    var k = SESSION.day;
+    S.lifts = S.lifts || {};
+    S.lifts[k] = S.lifts[k] || { s: SESSION.key, ex: {} };
+    S.lifts[k].s = SESSION.key;
+    var e = S.lifts[k].ex[name] || { w: SESSION.w, r: [] };
+    e.w = SESSION.w; e.r.push(Number(SESSION.r) || 0);
+    S.lifts[k].ex[name] = e;
+    save(); buzz(14); sfx("tick");
+    if (b) burst(b, "#8FE3B4");
+    var setsNow = sessionSetsFor(name, ex);
+    if (e.r.length < setsNow) restStart(restOf(ex));
+    paintSession(); return true;
+  }
+  if (ds.snext || ds.sskip){
+    restStop(true);
+    SESSION.i++; SESSION.w = null; SESSION.r = null;
+    save(); sfx(ds.snext ? "done" : "untick");
+    paintSession(); return true;
+  }
+  if (ds.sswap){
+    askSwap(SESSION.key, Number(ds.sswap));
+    /* askSwap re-renders the tab under us; repaint the session when it closes */
+    var iv = setInterval(function(){ if (!MODAL){ clearInterval(iv); SESSION.w = null; SESSION.r = null; paintSession(); } }, 200);
+    return true;
+  }
+  if (ds.sfinish){
+    var day0 = day(SESSION.day);
+    S.sess = null; save();
+    closeSession();
+    if (!day0.p.train) finishSession();
+    return true;
+  }
+  return false;
 }
