@@ -856,3 +856,102 @@ var START = {
   "Suitcase carry": 20,
   "Suitcase carry, one side": 20
 };
+
+
+/* ==================================================================== do
+   Action cards. Not collected: dealt into the hand, done, paid, logged. One
+   per pack on top of the collectibles, so the deck does not slow down.
+   [ id, the verb line, one line of why or how, size ]
+   size 1 is today, 2 is this week, 3 is a plan. The record is S.doneDo. */
+var ACTIONS = [
+  ["d01","Walk to the gym instead of the MRT","Half an hour on foot, and you arrive warm.",1],
+  ["d02","Order the kopi in the words on the card","Out loud. No pointing at the menu.",1],
+  ["d03","Text Tim one thing you noticed today","Not a plan, not logistics. A thing you saw.",1],
+  ["d04","Call your mum before the shift","Ten minutes. It is her evening and your morning.",1],
+  ["d05","Thirty grams of protein before noon","Eggs, yoghurt, the kaya toast set with extra eggs. Anything.",1],
+  ["d06","Two litres before three o\u2019clock","Front-load it. The evening will not catch up.",1],
+  ["d07","One coffee somewhere you have never sat","Not the usual. Sit, finish it, leave.",1],
+  ["d08","Three lines about today for the newsletter","Nobody sees them. That is what makes them true.",1],
+  ["d09","Out of the flat by nine","Anywhere. The direction does not matter, the door does.",1],
+  ["d10","Stairs at every MRT station today","Every one. Count them if it helps.",1],
+  ["d11","A hawker centre you have not eaten at","Pick a stall with a queue. Eat what they are eating.",2],
+  ["d12","Phone in another room from nine","Until you sleep. Bring a book instead.",1],
+  ["d13","Close the laptop when the shift closes","Physically. The lid, down, in a drawer.",1],
+  ["d14","Send the photo you almost sent last week","It is still in the camera roll. They still want it.",1],
+  ["d15","Put the week\u2019s gym sessions in the calendar","Tonight. A decided session is twice as likely.",1],
+  ["d16","One Mandarin word from a person, not the app","Ask what something is called. Use it back.",2],
+  ["d17","Say yes to the next invitation","Whatever it is. You can leave early.",2],
+  ["d18","Bed thirty minutes earlier tonight","Set the alarm for it, the way you would for waking.",1],
+  ["d19","Cook one thing","Eggs count. Rice counts. Ordering does not.",1],
+  ["d20","Twenty minutes somewhere green before the heat","Before nine. Trees, not pavement.",1],
+  ["d21","Reply to the message you have been avoiding","Two lines is enough. Send them.",1],
+  ["d22","One set more than the plan on the lift you like","Just the one. Then log it.",1],
+  ["d23","A whole meal without the phone","Face down, or in the bag. Watch the room instead.",1],
+  ["d24","Fruit by the kilo at a wet market","You have to speak. That is the point.",2],
+  ["d25","One paragraph of what the October conversation needs to say","Draft, not final. It needs to exist.",2],
+  ["d26","Say hello to one person at the gym","A name is enough. Next time it is a nod.",2],
+  ["d27","The thing you keep moving to tomorrow","You know which. Do it first.",1],
+  ["d28","Breakfast at a bakery you have not tried","Then walk it off.",2],
+  ["d29","Somewhere by bus instead of Grab","Upstairs, front seat, window.",1],
+  ["d30","Ten minutes of stretching on the floor after the shift","Hips and chest. The desk undone.",1],
+  ["d31","One specific thing you miss, said to someone at home","Not \u201Ceverything\u201D. One thing.",1],
+  ["d32","Sit in the void deck for ten minutes","The block\u2019s living room. Watch who uses it.",1],
+  ["d33","Twenty minutes of a book instead of the feed","Paper if you have it.",1],
+  ["d34","Plan Saturday with Tim, tonight","One thing, one place, one time.",1],
+  ["d35","Order something you cannot pronounce","Point if you must. Eat all of it.",2],
+  ["d36","One kopi without the condensed milk","Kopi-o kosong. Once. See.",1],
+  ["d37","Message the Sheffield group chat","Today. Anything. A photo of the heat.",1],
+  ["d38","Eight glasses by eight o\u2019clock","Then stop counting.",1],
+  ["d39","Sunset from somewhere high","A rooftop, a hill, a car park. Watch the whole thing.",2],
+  ["d40","Write your own one-line definition of a prediction market","For your mum. If she gets it, it is right.",2]
+];
+
+/* =============================================================== inspire
+   Not a task. A door: a place worth knowing, an idea worth carrying, a line
+   about the life he is actually living. One per pack. Kept or let go; kept
+   ones are the record (S.kept) and are worth a little.
+   [ id, kind, title, body ]  kind is place, idea or line.
+   The places are the well-known ones and described loosely on purpose - he
+   should tell me the ones that are actually his and they will replace these. */
+var INSPIRE = [
+  ["i01","place","Chye Seng Huat Hardware","A roaster in an old hardware shop in Jalan Besar. Sit at the bar and watch the pour."],
+  ["i02","place","Common Man Coffee Roasters","Martin Road. Loud, busy, good. Go early or go at three."],
+  ["i03","place","Nylon Coffee Roasters","Everton Park. Tiny and serious, and almost nowhere to sit. That is the point."],
+  ["i04","place","Tiong Bahru Bakery","The kouign-amann. The queue moves faster than it looks."],
+  ["i05","place","Apartment Coffee","Lavender. Quiet enough to read in, which is rare here."],
+  ["i06","place","The Botanic Gardens at half past seven","Before the heat, before the crowd, and free. The version of the city that is easiest to love."],
+  ["i07","place","Punggol Waterway at dusk","Flat, long, and the sky does all the work."],
+  ["i08","place","Boon Tat Street after seven","Beside Lau Pa Sat, when the road closes and the satay comes out."],
+  ["i09","place","The Southern Ridges","Henderson Waves, and a whole afternoon on foot above the trees."],
+  ["i10","place","Chinatown Complex, upstairs","A couple of hundred stalls. The ones with a queue have earned it."],
+  ["i11","place","Haji Lane before it wakes up","Kampong Glam on a weekday morning, shutters half up, nobody selling anything yet."],
+  ["i12","place","The MRT at six in the morning","The city with the sound turned off. Once, on purpose."],
+  ["i13","idea","Decide the night before","A decided thing is twice as likely. The deciding is the work."],
+  ["i14","idea","Consistency is a skill, not a mood","Skills are practised on the days you do not feel like it. That is what practice means."],
+  ["i15","idea","You cannot target belly fat","You can target the number of days you turned up. That is the only lever there is."],
+  ["i16","idea","Rest is part of the set","Two minutes on the bench is where the next set comes from."],
+  ["i17","idea","One meal cannot carry the day","A hundred and thirty grams of protein needs three occasions. Three is not hard. One is impossible."],
+  ["i18","idea","The kopi is not the problem","The breakfast it stands in for is."],
+  ["i19","idea","Stopping on time is a thing you do","Not a thing that happens to you when the emails run out."],
+  ["i20","idea","A call, not a text","The voice is the point. The words were never the point."],
+  ["i21","idea","You do not need a better plan","You need the same plan on a Tuesday."],
+  ["i22","idea","Ten minutes counts","It counts because it keeps the door open, and the door is the whole thing."],
+  ["i23","idea","Home is not a place you left","It is a group chat you keep."],
+  ["i24","idea","The newsletter is not about the event","It is about the fact that you noticed."],
+  ["i25","idea","Order the thing you cannot pronounce","Nobody has ever remembered the person who ordered the safe thing."],
+  ["i26","idea","Being tired is not a fifth way to have failed","Three things make a day. Tired is allowed."],
+  ["i27","idea","Most days are commons","Collect them anyway. A deck of rares is not a year."],
+  ["i28","idea","The gym does not care how you feel","It cares that you came. So should you."],
+  ["i29","idea","Two hours out is a different country","Use the weekends like a passport."],
+  ["i30","line","Malta is asleep when you wake","Seven hours nobody can email you in. Spend them on purpose."],
+  ["i31","line","Sheffield is eight hours behind","Your morning is their night. Call before the shift, not after."],
+  ["i32","line","The heat is not weather here","It is a condition. Water is the treatment."],
+  ["i33","line","The void deck is where the block meets","Weddings, funerals, and old men with a chessboard. Sit in it once."],
+  ["i34","line","An uncle who knows your order","Is a small win nobody hands out. You earn it by going back."],
+  ["i35","line","Chope with a tissue packet","Local rules apply to you now. Do not smile while doing it."],
+  ["i36","line","You will describe this year for the rest of your life","Make the description true."],
+  ["i37","line","The best coffee in the city","Is the one you drank sitting down."],
+  ["i38","line","Nothing here needs to be perfect","It needs to be Tuesday."],
+  ["i39","line","A rare card is a rare day","The point of the game is that it notices the ordinary ones too."],
+  ["i40","line","Every hawker centre is a reason to leave the flat","And there are over a hundred of them."]
+];

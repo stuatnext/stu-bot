@@ -23,7 +23,8 @@ function load(){
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
             monthSeen:{}, pushOn:0,
             lifts:{}, food:{}, waist:[], kg:0,
-            water:{}, sleep:{}, out:{} };
+            water:{}, sleep:{}, out:{},
+            hand:{ do:[], in:[] }, doneDo:{}, kept:{}, dealtDo:{}, dealtIn:{} };
   try {
     var raw = localStorage.getItem(KEY);
     if (raw){ var p = JSON.parse(raw); for (var k in d) if (k in p) d[k] = p[k]; }
@@ -533,10 +534,88 @@ function openPack(kind){
     S.seen = S.seen || {};
     if (S.cards[card[0]] === 1) S.seen[card[0]] = 0;   /* new, not yet looked at */
   }
+  /* Then the two that are not collected: something to do and something to
+     keep. They ride on top of the collectibles rather than replacing one, or
+     the deck would take three times as long to finish. Into the hand, oldest
+     out if it is full - a Do card is a nudge, not a debt. */
+  S.hand = S.hand || { do: [], in: [] };
+  var d = pickDo();
+  if (d){
+    S.hand.do.push(d[0]);
+    while (S.hand.do.length > 3) S.hand.do.shift();
+    S.dealtDo = S.dealtDo || {}; S.dealtDo[d[0]] = (S.dealtDo[d[0]] || 0) + 1;
+    got.push({ k: "do", id: d[0] });
+  }
+  var ins = pickIn();
+  if (ins){
+    S.hand.in.push(ins[0]);
+    while (S.hand.in.length > 3) S.hand.in.shift();
+    S.dealtIn = S.dealtIn || {}; S.dealtIn[ins[0]] = (S.dealtIn[ins[0]] || 0) + 1;
+    got.push({ k: "in", id: ins[0] });
+  }
   if (kind === "streak") S.openedStreak = (S.openedStreak || 0) + 1;
   else S.openedDay = (S.openedDay || 0) + 1;
   save();
   return got;
+}
+
+/* ------------------------------------------------------------- the hand
+   Do and Inspire cards live here until they are done, kept or let go. */
+var BY_DO = {}, BY_IN = {};
+ACTIONS.forEach(function(a){ BY_DO[a[0]] = a; });
+INSPIRE.forEach(function(i){ BY_IN[i[0]] = i; });
+function actionById(id){ return BY_DO[id]; }
+function inspireById(id){ return BY_IN[id]; }
+/* Rows, not ids. The first version used filter(actionById), which keeps the
+   ids and drops nothing - so every consumer read a[1] off a string and the
+   hand rendered as "0 / 1 / undefined", and Did it could find nothing to do. */
+function handDo(){ return ((S.hand || {}).do || []).map(actionById).filter(Boolean); }
+function handIn(){ return ((S.hand || {}).in || []).map(inspireById).filter(Boolean); }
+
+/* Least-dealt first, so the pool is walked before anything repeats. A Do
+   done in the last three weeks is not offered again; an Inspire he kept is
+   never offered again - he has it. */
+function pickFrom(pool, dealt, skip){
+  var c = pool.filter(function(x){ return !skip(x[0]); });
+  if (!c.length) return null;
+  var least = Math.min.apply(null, c.map(function(x){ return dealt[x[0]] || 0; }));
+  var pick = c.filter(function(x){ return (dealt[x[0]] || 0) === least; });
+  return pick[Math.floor(Math.random() * pick.length)];
+}
+function pickDo(){
+  var hand = (S.hand || {}).do || [], done = S.doneDo || {};
+  var cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 21);
+  var recent = iso(cutoff);
+  return pickFrom(ACTIONS, S.dealtDo || {}, function(id){
+    return hand.indexOf(id) >= 0 || (done[id] && done[id] >= recent);
+  });
+}
+function pickIn(){
+  var hand = (S.hand || {}).in || [], kept = S.kept || {};
+  return pickFrom(INSPIRE, S.dealtIn || {}, function(id){
+    return hand.indexOf(id) >= 0 || !!kept[id];
+  });
+}
+function doneDoCount(){ return Object.keys(S.doneDo || {}).length; }
+function keptCount(){ return Object.keys(S.kept || {}).length; }
+function doIt(id){
+  var h = (S.hand || {}).do || [], i = h.indexOf(id);
+  if (i < 0 || !actionById(id)) return false;
+  h.splice(i, 1);
+  S.doneDo = S.doneDo || {}; S.doneDo[id] = today();
+  save(); return true;
+}
+function keepIn(id){
+  var h = (S.hand || {}).in || [], i = h.indexOf(id);
+  if (i < 0 || !inspireById(id)) return false;
+  h.splice(i, 1);
+  S.kept = S.kept || {}; S.kept[id] = today();
+  save(); return true;
+}
+function letGo(id){
+  var h = (S.hand || {}).in || [], i = h.indexOf(id);
+  if (i < 0) return false;
+  h.splice(i, 1); save(); return true;
 }
 
 /* ---------------------------------------------------------------- spares
@@ -556,6 +635,7 @@ function sparesEarned(){
     if (have > 1) n += (have - 1) * RARITY[c[1]][4];
   });
   n += livedCount() * 10;
+  n += doneDoCount() * 10;
   return n;
 }
 function spares(){ return Math.max(0, sparesEarned() - (S.sparesSpent || 0)); }
@@ -691,6 +771,8 @@ function xp(){
   n += Object.keys(S.done || {}).length * 20;
   n += setsCompleteEver() * 100;
   n += livedCount() * 20;
+  n += doneDoCount() * 20;
+  n += keptCount() * 5;
   return n;
 }
 

@@ -46,7 +46,8 @@ function ghostsHTML(n){
 function dotsHTML(){
   var h = "";
   for (var i = 0; i < ST.cards.length; i++){
-    var c0 = cardByName(ST.cards[i]), seen = i < ST.i;
+    var e0 = ST.cards[i], seen = i < ST.i;
+    var c0 = typeof e0 === "string" ? cardByName(e0) : null;
     h += "<i class='" + (seen ? (c0 && c0[1] >= 2 ? "on hi" : "on") : "") + "' data-dot='" + i + "'></i>";
   }
   return h;
@@ -82,24 +83,30 @@ function tearPack(){
 function dealNext(){
   var st = document.getElementById("stStack");
   if (!ST || !st) return;
-  var c = cardByName(ST.cards[ST.i]);
+  var e = ST.cards[ST.i];
   var step = document.getElementById("stStep");
   if (step) step.textContent = "Tap to turn over \u00b7 " + (ST.i + 1) + " of " + ST.cards.length;
   var ghost = st.querySelector(".ghost");
   if (ghost) ghost.remove();
-  st.insertAdjacentHTML("beforeend", tcard(c, S.cards[c[0]], { down: true, lg: true, extra: " deal" }));
+  st.insertAdjacentHTML("beforeend", entryFace(e, { down: true, lg: true, extra: " deal" }));
   var tc = st.querySelector(".tc.deal");
-  tc.addEventListener("click", function(){ turnCard(tc, c); }, { once: true });
+  if (!tc) return;
+  tc.addEventListener("click", function(){ turnCard(tc, e); }, { once: true });
   tilt(tc);
   var u = document.getElementById("stUnder");
   if (u) u.style.visibility = "hidden";
-  if (reduced()) turnCard(tc, c);
+  if (reduced()) turnCard(tc, e);
+}
+/* What kind of thing an entry is, and its rarity if it has one. */
+function entryInfo(e){
+  if (typeof e === "string"){ var c = cardByName(e); return { kind: "card", c: c, r: c ? c[1] : 0 }; }
+  return { kind: e.k, c: null, r: -1 };
 }
 
 /* Lift, tease if it deserves it, turn, land. The rarer the card, the longer
    the moment before you know - that pause is the whole trade. */
-function turnCard(tc, c){
-  var r = c[1], fast = reduced();
+function turnCard(tc, e){
+  var info = entryInfo(e), r = info.r, fast = reduced();
   var tease = fast ? 0 : (r === 3 ? 640 : r === 2 ? 460 : 0);
   var flip = fast ? 0 : (r === 3 ? 1050 : r === 2 ? 860 : 620);
   tc.classList.remove("deal");
@@ -118,12 +125,12 @@ function turnCard(tc, c){
         f.classList.add("go"); if (r === 3) f.classList.add("gold");
       }, Math.round(flip * 0.45));
     }
-    setTimeout(function(){ landCard(tc, c); }, flip);
+    setTimeout(function(){ landCard(tc, e); }, flip);
   }, tease);
 }
 
-function landCard(tc, c){
-  var r = c[1], el = stageEl();
+function landCard(tc, e){
+  var info = entryInfo(e), r = info.r, c = info.c, el = stageEl();
   if (!ST) return;
   tc.classList.remove("lift", "tease2", "tease3");
   tc.classList.add("land");
@@ -134,12 +141,23 @@ function landCard(tc, c){
     sparks(tc, r === 3 ? 26 : 16);
     sfx(r === 3 ? "gold" : "rare");
     buzz([20, 45, 25, 45, 40]);
+  } else if (info.kind === "do"){
+    tc.classList.add("sweep"); sfx("done"); buzz([14, 30, 14]);
+  } else if (info.kind === "in"){
+    sfx("tick"); buzz(10);
   } else {
     sfx("land");
   }
   var step = document.getElementById("stStep");
-  var dup = S.cards[c[0]] > 1;
-  if (step) step.textContent = RARITY[r][0] + (dup ? " \u00b7 spare \u00b7 +" + RARITY[r][4] : " \u00b7 new");
+  if (step){
+    if (c){
+      var dup = S.cards[c[0]] > 1;
+      step.textContent = RARITY[r][0] + (dup ? " \u00b7 spare \u00b7 +" + RARITY[r][4] : " \u00b7 new");
+    } else {
+      step.textContent = info.kind === "do" ? "Something to do \u00b7 into your hand"
+                                             : "Something to keep \u00b7 into your hand";
+    }
+  }
   var dot = document.querySelector("[data-dot='" + ST.i + "']");
   if (dot) dot.className = r >= 2 ? "on hi" : "on";
   var u = document.getElementById("stUnder");
@@ -149,17 +167,17 @@ function landCard(tc, c){
     var last = ST.i >= ST.cards.length - 1;
     b.textContent = last ? "Done" : "Next";
     b.className = last ? "pri" : "";
-    b.onclick = function(){ sfx("tap"); if (last) showScore(); else advance(tc, c); };
+    b.onclick = function(){ sfx("tap"); if (last) showScore(); else advance(tc, e); };
   }
 }
 
 /* The turned card goes to the tray, and the next one comes off the stack. */
-function trayAdd(c){
+function trayAdd(e){
   var tray = document.getElementById("stTray");
   if (tray) tray.insertAdjacentHTML("beforeend",
-    tcard(c, S.cards[c[0]], { extra: " pop", attr: " aria-hidden='true'" }));
+    entryFace(e, { extra: " pop", attr: " aria-hidden='true'" }));
 }
-function advance(tc, c){
+function advance(tc, e){
   if (!ST || ST.busy) return;
   /* Next stays visible for the length of the fly, and a second tap in that
      window used to run this again on a card that had already gone - and skip
@@ -169,7 +187,7 @@ function advance(tc, c){
   if (u) u.style.visibility = "hidden";
   if (b) b.onclick = null;
   tc.classList.add("fly");
-  trayAdd(c);
+  trayAdd(e);
   setTimeout(function(){
     if (tc.parentNode) tc.parentNode.removeChild(tc);
     ST.i++;
@@ -196,20 +214,21 @@ function sparks(host, n){
 
 /* The whole pull stays on the table under the score. */
 function showScore(){
-  var el = stageEl(), fresh = 0, gain = 0;
+  var el = stageEl(), fresh = 0, gain = 0, nCards = 0, nDo = 0, nIn = 0;
   ST.cards.forEach(function(n){
+    if (typeof n !== "string"){ if (n.k === "do") nDo++; else nIn++; return; }
     var c = cardByName(n);
     if (!c) return;
+    nCards++;
     gain += RARITY[c[1]][3];
     if (S.cards[n] === 1) fresh++;
   });
-  var spare = ST.cards.length - fresh;
+  var spare = nCards - fresh;
   var gotSpares = spares() - ST.sparesBefore;
   var r = rank(), levelled = r.level > ST.lvlBefore;
   var w = packsWaiting(), more = w.day + w.streak;
 
-  var lastCard = cardByName(ST.cards[ST.i]);
-  if (lastCard && document.querySelector("#stage .stack .tc")) trayAdd(lastCard);
+  if (document.querySelector("#stage .stack .tc")) trayAdd(ST.cards[ST.i]);
   ["stArena", "stDots", "stStep"].forEach(function(id){
     var x = document.getElementById(id); if (x) x.remove();
   });
@@ -220,6 +239,8 @@ function showScore(){
     + "<div class='big' id='stXP'>+0 XP</div>"
     + "<div class='sm'>" + fresh + " new" + (spare ? " &middot; " + spare + " spare" : "")
     + " &middot; " + heldCount() + " of " + CARDS.length + " held</div>"
+    + (nDo || nIn ? "<div class='sm hand'>" + (nDo ? "something to do" : "")
+        + (nDo && nIn ? " &middot; " : "") + (nIn ? "something to keep" : "") + " &middot; in your hand</div>" : "")
     + (gotSpares > 0 ? "<div class='shard'>+" + gotSpares + " spares</div>" : "");
   el.insertBefore(score, tray);
   el.classList.add("scored");
@@ -257,8 +278,8 @@ function closeStage(){
 
 /* One card, turned over on the stage: a crafted card, or a trophy. Same
    ceremony as a pack, minus the pack. */
-function revealOne(name){
-  ST = { cards: [name], i: 0, kind: "one", lvlBefore: rank().level, sparesBefore: spares() };
+function revealOne(entry){
+  ST = { cards: [entry], i: 0, kind: "one", lvlBefore: rank().level, sparesBefore: spares() };
   var el = stageEl();
   el.innerHTML = stageFrame("one", 1);
   el.className = "on lit";

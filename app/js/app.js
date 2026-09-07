@@ -64,7 +64,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v30";
+var BUILD = "v31";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -145,6 +145,9 @@ document.addEventListener("click", function(ev){
   if (ds.cardswhy){ S.cardsWhy = 1; save(); sfx("done"); render({ keepScroll: true }); return; }
   if (ds.card){ openSheet(ds.card); return; }
   if (ds.liveit){ liveIt(ds.liveit); return; }
+  if (ds.doit){ doItUI(ds.doit, b); return; }
+  if (ds.keepin){ keepUI(ds.keepin, b); return; }
+  if (ds.letgo){ letGoUI(ds.letgo); return; }
   if (ds.sealed){ var sl = ds.sealed.split("|"); openSealed(sl[0], sl[1]); return; }
   if (ds.craftr){ var cr = ds.craftr.split("|"); closeSheet(); doCraftR(cr[0], cr[1]); return; }
   if (ds.craft){ askCraft(ds.craft); return; }

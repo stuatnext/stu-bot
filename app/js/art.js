@@ -175,6 +175,46 @@ function tcard(c, count, opts){
   h += "</div></div>";
   return h;
 }
+/* The two faces that are not collected. Same bones as a collectible - an
+   inner that turns, a face, a back - so the stage does not know the
+   difference. A Do card is a verb in large type; an Inspire card is a line
+   set like a page, with a mark for what kind of door it is. */
+function sizeWord(n){ return n === 1 ? "today" : n === 2 ? "this week" : "a plan"; }
+function dcard(a, opts){
+  opts = opts || {};
+  var cls = "tc kd s" + a[3] + (opts.down ? " down" : "") + (opts.lg ? " lg" : "") + (opts.extra || "");
+  return "<div class='" + cls + "'" + (opts.attr || "") + "><div class='tc-i'>"
+    + "<div class='tc-f'><div class='tc-pane'>"
+    + "<div class='tc-kind'>Do <i>" + esc(sizeWord(a[3])) + "</i></div>"
+    + "<div class='tc-verb'>" + esc(a[1]) + "</div>"
+    + "<div class='tc-det'>" + esc(a[2]) + "</div>"
+    + "<div class='tc-mk'>" + svg("tick", 22) + "</div>"
+    + "<div class='tc-glare'></div></div></div>"
+    + "<div class='tc-b'>" + BACKMARK + "<span class='tc-pip'>Do</span></div>"
+    + "</div></div>";
+}
+function icard(i, opts){
+  opts = opts || {};
+  var cls = "tc ki k-" + i[1] + (opts.down ? " down" : "") + (opts.lg ? " lg" : "") + (opts.extra || "");
+  var mark = i[1] === "place" ? svg("pin", 22) : "\u201C";
+  return "<div class='" + cls + "'" + (opts.attr || "") + "><div class='tc-i'>"
+    + "<div class='tc-f'><div class='tc-pane'>"
+    + "<div class='tc-kind'>" + (i[1] === "place" ? "A place" : i[1] === "idea" ? "An idea" : "A line") + "</div>"
+    + "<div class='tc-mark'>" + mark + "</div>"
+    + "<div class='tc-ttl'>" + esc(i[2]) + "</div>"
+    + "<div class='tc-body'>" + esc(i[3]) + "</div>"
+    + "<div class='tc-glare'></div></div></div>"
+    + "<div class='tc-b'>" + BACKMARK + "<span class='tc-pip'>Inspire</span></div>"
+    + "</div></div>";
+}
+/* One entry of a pack: a collectible by name, or {k:"do"|"in", id}. */
+function entryFace(e, opts){
+  if (typeof e === "string"){ var c = cardByName(e); return c ? tcard(c, (S.cards || {})[e], opts) : ""; }
+  if (e && e.k === "do"){ var a = actionById(e.id); return a ? dcard(a, opts) : ""; }
+  if (e && e.k === "in"){ var i = inspireById(e.id); return i ? icard(i, opts) : ""; }
+  return "";
+}
+
 /* A sealed slot. It never learns which card it is - the name is not in the
    markup at all, so there is nothing to find by poking at the page either. All
    it knows is the set it belongs to and the rarity, which is all the screen

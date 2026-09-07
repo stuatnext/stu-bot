@@ -184,7 +184,18 @@ function viewToday(){
 
   /* the side quest: one held card asks something of him. This is what makes
      the collection a deck instead of wallpaper - his call, his words. */
-  if (S.onboarded){
+  /* The oldest Do card in his hand is the day's quest. Only when the hand is
+     empty does a held collectible stand in, the way it always did. */
+  var hd = S.onboarded ? handDo() : [];
+  if (hd.length){
+    var a = hd[0];
+    h += "<div class='quest'>"
+      + "<span class='qgl'>" + svg("tick", 22) + "</span>"
+      + "<span class='qtx'><b>Do \u00b7 " + esc(sizeWord(a[3])) + "</b>"
+      + "<span>" + esc(a[1]) + ". " + esc(a[2]) + "</span></span>"
+      + "<span class='qact'><button class='qgo' data-doit='" + a[0] + "'>Did it</button></span>"
+      + "</div>";
+  } else if (S.onboarded){
     var q = questFor(t);
     if (q){
       var qa = q.card[2] === "zh" ? (q.card[4] || "\u8bcd")
