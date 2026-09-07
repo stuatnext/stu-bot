@@ -170,3 +170,42 @@
 .lfv{text-align:center; font-family:"Nunito",sans-serif; font-size:30px; font-weight:800;
   letter-spacing:-.03em; font-variant-numeric:tabular-nums; color:var(--ink)}
 .lfv i{font-style:normal; font-size:.5em; font-weight:800; color:var(--ink3); margin-left:3px}
+
+/* ------------------------------------------------------------- the rest bar
+   Above the nav, outliving the sheet that started it. Resting is precisely
+   when the phone goes back in a pocket, so the clock has to be somewhere he
+   can find it without remembering which exercise he tapped. */
+#rest{position:fixed; left:50%; transform:translateX(-50%);
+  bottom:calc(84px + env(safe-area-inset-bottom)); z-index:158;
+  display:none; align-items:center; gap:13px; padding:9px 9px 9px 17px;
+  border-radius:999px; background:var(--card); color:var(--ink);
+  border:2px solid var(--blue); border-bottom-width:4px;
+  box-shadow:0 10px 24px -12px rgba(15,130,200,.85)}
+#rest.on{display:flex; animation:restin .3s var(--pop) both}
+@keyframes restin{from{opacity:0; transform:translateX(-50%) translateY(10px)}}
+#rest .rb-l{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink3)}
+#rest .rb-n{font-size:23px; font-weight:800; letter-spacing:-.02em; color:#0B72BD;
+  font-variant-numeric:tabular-nums; min-width:56px; text-align:center}
+#rest .rb-x{padding:8px 15px; min-height:38px; border-radius:999px; font:inherit;
+  font-size:12.5px; font-weight:800; cursor:pointer; color:var(--ink2);
+  background:var(--card2); border:1.5px solid var(--edge); border-bottom-width:3px}
+#rest .rb-x:active{transform:translateY(1px); border-bottom-width:2px}
+#rest.soon{border-color:var(--flame); box-shadow:0 10px 24px -12px rgba(224,126,0,.9)}
+#rest.soon .rb-n{color:var(--flameEdge); animation:restpulse .9s ease-in-out infinite}
+@keyframes restpulse{0%,100%{opacity:1} 50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){
+  #rest.on{animation:none} #rest.soon .rb-n{animation:none}
+}
+
+/* adding a set, and the rest button inside the lift sheet */
+.lfset{display:flex; gap:9px; margin:10px 0 2px}
+.lfset button{flex:1; min-height:46px; border-radius:15px; font:inherit; font-size:13.5px;
+  font-weight:800; cursor:pointer; color:var(--ink2);
+  background:var(--card2); border:2px solid var(--edge); border-bottom-width:4px}
+.lfset button:active{transform:translateY(2px); border-bottom-width:2px}
+.lfrest{width:100%; min-height:54px; border-radius:17px; font:inherit; font-size:15px;
+  font-weight:800; cursor:pointer; color:#0B72BD;
+  background:var(--blueSoft); border:2px solid var(--blue); border-bottom-width:4px}
+.lfrest:active{transform:translateY(2px); border-bottom-width:2px}
+.lfrest.going{background:var(--flameSoft); border-color:var(--flame); color:#A85F0E}

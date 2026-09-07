@@ -533,54 +533,60 @@ var RANKS = [
    suggest rather than ask him to remember. Mirrors docs/train.html - if one
    changes, change the other.
 
-   Exercise: [ name, sets, repMin, repMax, cue ] */
-/* [ name, sets, repMin, repMax, cue, alternatives ]
+   Exercise: [ name, sets, repMin, repMax, cue, alternatives, rest ] */
+/* [ name, sets, repMin, repMax, cue, alternatives, rest in seconds ]
    The alternatives are there because his gym is full of machines and because a
    busy rack should never be a reason to go home. Anything in a slot's list
    trains the same pattern; each variant keeps its own weight history, since a
-   leg press and a goblet squat are not the same number. */
+   leg press and a goblet squat are not the same number.
+
+   Rest is written down per slot rather than inferred from the name, because it
+   is a programming decision and not a guess: roughly two minutes on the heavy
+   compounds, ninety seconds on the rows and single-leg work, a minute on core.
+   An alternative inherits its slot's rest - swapping a goblet squat for the
+   leg press does not change what the set costs you. */
 var SESSIONS = [
   ["A", [
     ["Goblet squat",         3,  8, 10, "One dumbbell at the chest",
-      ["Leg press", "Hack squat", "Smith machine squat"]],
+      ["Leg press", "Hack squat", "Smith machine squat"], 120],
     ["Dumbbell bench press", 3,  8, 10, "The chest exercise",
-      ["Chest press machine", "Smith bench press", "Incline chest press machine"]],
+      ["Chest press machine", "Smith bench press", "Incline chest press machine"], 120],
     ["One-arm dumbbell row", 3, 10, 10, "Each side. Upper back, posture",
-      ["Chest-supported row machine", "Seated cable row", "T-bar row"]],
+      ["Chest-supported row machine", "Seated cable row", "T-bar row"], 90],
     ["Romanian deadlift",    3, 10, 10, "Dumbbells, hinge at the hip",
-      ["Seated leg curl", "Lying leg curl", "Cable pull-through", "Back extension"]],
+      ["Seated leg curl", "Lying leg curl", "Cable pull-through", "Back extension"], 120],
     ["Pallof press",         3, 12, 12, "Each side. Resist the twist",
-      ["Torso rotation machine", "Cable half-kneeling chop", "Ab wheel"]],
+      ["Torso rotation machine", "Cable half-kneeling chop", "Ab wheel"], 60],
     ["Farmer's carry",       3, 40, 40, "Metres. Heavy, do not lean",
-      ["Trap bar carry", "Suitcase carry, one side", "Sled push"]]
+      ["Trap bar carry", "Suitcase carry, one side", "Sled push"], 90]
   ]],
   ["B", [
     ["Dumbbell deadlift",    3,  6,  8, "Flat back, drive the floor away",
-      ["Trap bar deadlift", "Rack pull", "Back extension", "45-degree hyperextension"]],
+      ["Trap bar deadlift", "Rack pull", "Back extension", "45-degree hyperextension"], 150],
     ["Lat pulldown",         3,  8, 10, "Width. Makes the waist look smaller",
-      ["Assisted pull-up machine", "Neutral-grip pulldown", "Straight-arm pulldown"]],
+      ["Assisted pull-up machine", "Neutral-grip pulldown", "Straight-arm pulldown"], 90],
     ["Incline dumbbell press", 3, 10, 10, "Upper chest, the part that reads flat",
-      ["Incline chest press machine", "Smith incline press", "Low-to-high cable fly"]],
+      ["Incline chest press machine", "Smith incline press", "Low-to-high cable fly"], 120],
     ["Reverse lunge",        3,  8,  8, "Each leg. Step back, not forward",
-      ["Single-leg press", "Step-up", "Smith split squat", "Walking lunge"]],
+      ["Single-leg press", "Step-up", "Smith split squat", "Walking lunge"], 90],
     ["Side plank",           3, 30, 30, "Seconds each side",
-      ["Suitcase carry", "Pallof hold", "Cable side bend, light"]],
+      ["Suitcase carry", "Pallof hold", "Cable side bend, light"], 60],
     ["Dead bug",             3, 10, 10, "Each side. Lower back stays flat",
-      ["Cable crunch", "Ab crunch machine", "Reverse crunch"]]
+      ["Cable crunch", "Ab crunch machine", "Reverse crunch"], 60]
   ]],
   ["C", [
     ["Leg press",            3, 10, 10, "Or a squat if someone has shown you",
-      ["Hack squat", "Smith machine squat", "Goblet squat", "Belt squat"]],
+      ["Hack squat", "Smith machine squat", "Goblet squat", "Belt squat"], 120],
     ["Seated cable row",     3, 10, 10, "Squeeze the shoulder blades",
-      ["Chest-supported row machine", "T-bar row", "Wide-grip cable row"]],
+      ["Chest-supported row machine", "T-bar row", "Wide-grip cable row"], 90],
     ["Dumbbell shoulder press", 3, 8, 10, "Shoulders. Width again",
-      ["Shoulder press machine", "Smith overhead press", "Landmine press"]],
+      ["Shoulder press machine", "Smith overhead press", "Landmine press"], 120],
     ["Hip thrust",           3, 12, 12, "Glutes. The other half of the posture fix",
-      ["Glute drive machine", "Smith hip thrust", "Cable kickback", "Back extension"]],
+      ["Glute drive machine", "Smith hip thrust", "Cable kickback", "Back extension"], 90],
     ["Cable woodchop",       3, 12, 12, "Each side. Controlled, do not swing",
-      ["Torso rotation machine", "Pallof press", "Landmine rotation"]],
+      ["Torso rotation machine", "Pallof press", "Landmine rotation"], 60],
     ["Hanging knee raise",   3, 10, 10, "Or a lying reverse crunch",
-      ["Captain's chair knee raise", "Cable crunch", "Reverse crunch"]]
+      ["Captain's chair knee raise", "Cable crunch", "Reverse crunch"], 60]
   ]]
 ];
 

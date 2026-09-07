@@ -64,7 +64,8 @@ function viewGym(){
     h += "<div class='liftrow'>";
     h += "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
       + "<span class='lb2'><b>" + esc(name) + "</b>"
-      + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4]) + "</span></span>"
+      + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4])
+      + " &middot; " + restClock(restOf(ex)) + " rest</span></span>"
       + "<span class='lv'>" + (had
           ? had.w + "kg<em>" + had.r.join(" &middot; ") + "</em>"
           : (t2.w ? t2.w + "kg<em>"
@@ -298,6 +299,94 @@ function loggedToday(name){
   return e && e.ex ? e.ex[name] : null;
 }
 
+/* ------------------------------------------------------------------ rest
+   Rest between sets is part of the programme, not a detail: two minutes on a
+   heavy compound is what makes the next set heavy too, and thirty seconds is
+   why a session stops working. So it is written down per exercise, shown on
+   the row before he opens anything, and there is a clock.
+
+   The clock outlives the sheet on purpose. He closes it, does the set, and the
+   countdown is still there above the nav - resting is exactly when the phone
+   goes back in a pocket. It survives a reload too (the service worker can
+   restart the app under him), because it is an end time in localStorage rather
+   than a number counting down in memory. */
+var REST_KEY = "daylight.rest";
+var REST_TICK = null, REST_WAS = 0;
+
+function restOf(ex){ return (ex && ex[6]) || 90; }
+
+function restLeft(){
+  var until = 0;
+  try { until = Number(localStorage.getItem(REST_KEY) || 0); } catch(e){}
+  if (!until) return 0;
+  var left = Math.ceil((until - Date.now()) / 1000);
+  if (left <= 0){ try { localStorage.removeItem(REST_KEY); } catch(e){} return 0; }
+  return left;
+}
+function restClock(n){
+  var m = Math.floor(n / 60), r = n % 60;
+  return m + ":" + (r < 10 ? "0" : "") + r;
+}
+function restStart(secs){
+  try { localStorage.setItem(REST_KEY, String(Date.now() + secs * 1000)); } catch(e){}
+  REST_WAS = secs;
+  buzz(10); sfx("tick");
+  restPaint(); restSync();
+}
+function restStop(quiet){
+  try { localStorage.removeItem(REST_KEY); } catch(e){}
+  REST_WAS = 0;
+  if (!quiet) sfx("tap");
+  restPaint(); restSync();
+}
+/* The interval only exists while something is actually counting. */
+function restSync(){
+  var live = restLeft() > 0;
+  if (live && !REST_TICK) REST_TICK = setInterval(restPaint, 250);
+  if (!live && REST_TICK){ clearInterval(REST_TICK); REST_TICK = null; }
+}
+function restPaint(){
+  var el = document.getElementById("rest");
+  if (!el) return;
+  var left = restLeft();
+  if (left <= 0){
+    if (REST_WAS > 0){
+      REST_WAS = 0;
+      buzz([30, 70, 30, 70, 50]); sfx("done");
+      toast("Rest is up. Next set.");
+    }
+    el.className = ""; el.innerHTML = "";
+    restBtnPaint(0);
+    restSync();
+    return;
+  }
+  REST_WAS = left;
+  /* One clock at a time. While the sheet is open it carries the countdown on
+     its own button, and the floating bar sits exactly where that button is -
+     two of them in the same place, one on top of the other. The bar is for
+     after he closes it, which is when he actually needs it. */
+  if (MODAL || ST){
+    el.className = ""; el.innerHTML = "";
+    restBtnPaint(left);
+    return;
+  }
+  el.className = "on" + (left <= 10 ? " soon" : "");
+  el.innerHTML = "<span class='rb-l'>Rest</span>"
+    + "<b class='rb-n mono'>" + restClock(left) + "</b>"
+    + "<button class='rb-x' data-restskip='1'>Skip</button>";
+  restBtnPaint(left);
+}
+/* The sheet keeps its own copy of the clock, written directly rather than by
+   re-rendering: a full repaint four times a second would fight his thumb. */
+function restBtnPaint(left){
+  var b = document.getElementById("lfRest");
+  if (!b || !LIFT) return;
+  b.textContent = left > 0
+    ? "Resting \u00b7 " + restClock(left)
+    : "Start " + restClock(LIFT.rest) + " rest";
+  b.className = "lfrest" + (left > 0 ? " going" : "");
+}
+
 /* A jump has to match the kit: two kilos is a sensible step on a dumbbell and
    meaningless on a leg press. Shared by the suggestion and by the + button, so
    they can never disagree about what one notch is. */
@@ -324,11 +413,21 @@ function paintLift(){
   if (!L || !body) return;
   var h = "<label>Weight</label>";
   h += liftRow("Load", L.w, "kg", "w", 0);
-  h += "<label>Reps &middot; " + L.r.length + (L.r.length === 1 ? " set" : " sets") + "</label>";
+  h += "<label>Reps &middot; " + L.r.length + (L.r.length === 1 ? " set" : " sets")
+     + (L.r.length > L.sets ? " &middot; " + (L.r.length - L.sets) + " extra" : "") + "</label>";
   L.r.forEach(function(n, i){
     h += liftRow("Set " + (i + 1), n, "", "r", i);
   });
+  /* The stage prescribes a number of sets; it has never been a ceiling. If he
+     has another one in him it should cost one tap, not a shrug. */
+  h += "<div class='lfset'>"
+    + "<button data-lf='add:0:0'>+ Add a set</button>"
+    + (L.r.length > 1 ? "<button data-lf='del:0:0'>Remove set " + L.r.length + "</button>" : "")
+    + "</div>";
+  h += "<label>Rest between sets</label>";
+  h += "<button id='lfRest' class='lfrest' data-lf='rest:0:0'></button>";
   body.innerHTML = h;
+  restBtnPaint(restLeft());
 }
 
 function askLift(sKey, idx){
@@ -345,7 +444,7 @@ function askLift(sKey, idx){
   for (var i = 0; i < sets; i++){
     r0.push(had && had.r[i] != null ? had.r[i] : (t.reps || ex[2]));
   }
-  LIFT = { w: w0, r: r0, sKey: sKey, name: name };
+  LIFT = { w: w0, r: r0, sKey: sKey, name: name, sets: sets, rest: restOf(ex) };
 
   var el = document.getElementById("modal");
   el.innerHTML = "<div class='mw'><div class='grab'></div>"
@@ -387,6 +486,18 @@ function askLift(sKey, idx){
       save(); buzz(14); sfx("tick");
       close();
       render({ keepScroll: true });
+      return;
+    }
+    if (kind === "add"){
+      LIFT.r.push(LIFT.r[LIFT.r.length - 1] || ex[2]);
+      buzz(8); sfx("tap"); paintLift(); return;
+    }
+    if (kind === "del"){
+      if (LIFT.r.length > 1) LIFT.r.pop();
+      buzz(8); sfx("untick"); paintLift(); return;
+    }
+    if (kind === "rest"){
+      if (restLeft() > 0) restStop(); else restStart(LIFT.rest);
       return;
     }
     if (kind === "w"){

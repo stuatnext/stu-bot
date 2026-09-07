@@ -64,7 +64,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v27";
+var BUILD = "v28";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -129,6 +129,7 @@ document.addEventListener("click", function(ev){
   if (ds.lift){ var lp = ds.lift.split(":"); askLift(lp[0], Number(lp[1])); return; }
   if (ds.swap){ var sp = ds.swap.split(":"); askSwap(sp[0], Number(sp[1])); return; }
   if (ds.finish){ finishSession(); return; }
+  if (ds.restskip){ restStop(); return; }
   if (ds.waist){ askWaist(); return; }
   if (ds.water){ tapWater(Number(ds.water)); return; }
   if (ds.sleep){ askSleep(); return; }
@@ -225,6 +226,9 @@ paintSky();
 render({ first: true });
 paintHud();
 openGate();
+/* A rest running when the app was closed or reloaded is still running. */
+restPaint();
+restSync();
 
 /* Opening the app answers the badge; keep the mirror warm for tonight. */
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch(e){}
