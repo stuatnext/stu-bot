@@ -14,7 +14,7 @@
    One set at a time behind a rail that stays on screen. The old screen put all
    seventeen sets and 158 cards in a single column - sixteen thousand pixels of
    identical grey backs, which is a filing cabinet with the drawer taken out. */
-var DECKSET = null, DECKFILTER = 0;   /* 0 all, 1 missing, 2 held */
+var DECKSET = null, DECKFILTER = 0;   /* 0 all, 1 sealed, 2 held, 3 to live, 4 lived */
 
 function viewDeck(){
   var fd = fullDays(), w = packsWaiting(), h = "";
@@ -23,10 +23,12 @@ function viewDeck(){
      the screen, once, dismissible - not in a chat thread. */
   if (!S.cardsWhy){
     h += "<div class='panel whycards'><h3>What cards are</h3>"
-      + "<p>Souvenirs of your Singapore year \u2014 real dishes, places, phrases and "
-      + "milestones. They do nothing except get collected, which is the point: full days "
-      + "earn packs, duplicates melt into spares, spares force a sealed card open, and "
-      + "finishing a set pays the pot.</p>"
+      + "<p>Your Singapore year, as a deck \u2014 real dishes, places, phrases and milestones. "
+      + "Full days earn packs, duplicates melt into spares, spares force a sealed card open, "
+      + "and finishing a set pays the pot.</p>"
+      + "<p><strong>Every card you hold is something to go and do.</strong> Tap one and it tells "
+      + "you what. Do it, tap <em>Did it</em>, and the card is lived: foil, dated, and paid. "
+      + "Nothing checks, which is exactly why it counts.</p>"
       + "<p>A card you have not found is a <strong>sealed back</strong> with its rarity on it. "
       + "You can see there is a rare missing from a set; you cannot see which one it is until "
       + "you turn it over. That is the whole game.</p>"
@@ -67,6 +69,8 @@ function viewDeck(){
       line: sealed ? num(sealed) + (sealed === 1 ? " card still sealed" : " cards still sealed")
                    : "Every card in the deck, found.",
       pct: Math.round(100 * heldN / CARDS.length),
+      foot2: heldN ? num(livedCount()) + " lived \u00b7 " + num(heldN - livedCount())
+                     + " held and still to go and do" : null,
       foot: fd ? "Close all three pillars today and a pack lands tonight."
                : "A full day \u2014 all three pillars \u2014 earns the first pack."
     });
@@ -125,17 +129,27 @@ function viewDeck(){
       h += "</div></div>";
     }
   } else {
+    /* The two questions a collector has - what am I missing, what do I hold -
+       and the two a person with a life has: what is there to do, what have I
+       done. The deck is a to-do list for the year, and the filters say so. */
+    var livedN = cs.filter(function(c){ return (S.cards || {})[c[0]] && (S.lived || {})[c[0]]; }).length;
+    var todoN = have - livedN;
+    function fb(i, label){
+      return "<button data-df='" + i + "'" + (DECKFILTER === i ? " aria-pressed='true'" : "") + ">"
+        + label + "</button>";
+    }
     h += "<div class='filters'>"
-      + "<button data-df='0'" + (DECKFILTER === 0 ? " aria-pressed='true'" : "") + ">All " + cs.length + "</button>"
-      + "<button data-df='1'" + (DECKFILTER === 1 ? " aria-pressed='true'" : "") + ">Missing " + (cs.length - have) + "</button>"
-      + "<button data-df='2'" + (DECKFILTER === 2 ? " aria-pressed='true'" : "") + ">Held " + have + "</button>"
+      + fb(0, "All " + cs.length) + fb(1, "Sealed " + (cs.length - have)) + fb(2, "Held " + have)
+      + fb(3, "To do " + todoN) + fb(4, "Lived " + livedN)
       + "</div>";
   }
 
   var show = cs.filter(function(c){
-    var n = (S.cards || {})[c[0]];
+    var n = (S.cards || {})[c[0]], lv = !!(S.lived || {})[c[0]];
     if (DECKFILTER === 1) return !n;
     if (DECKFILTER === 2) return !!n;
+    if (DECKFILTER === 3) return !!n && !lv;
+    if (DECKFILTER === 4) return !!n && lv;
     return true;
   });
   if (show.length){
@@ -150,7 +164,10 @@ function viewDeck(){
     });
     h += "</div>";
   } else {
-    h += "<div class='empty'>" + (DECKFILTER === 1 ? "Nothing missing here." : "Nothing held here yet.") + "</div>";
+    h += "<div class='empty'>" + (DECKFILTER === 1 ? "Nothing sealed here."
+      : DECKFILTER === 3 ? (have ? "Every card you hold here, you have lived." : "Nothing held here yet.")
+      : DECKFILTER === 4 ? "Nothing lived here yet. Tap a held card - it tells you what to do."
+      : "Nothing held here yet.") + "</div>";
   }
 
   /* spares, under the set they would finish */

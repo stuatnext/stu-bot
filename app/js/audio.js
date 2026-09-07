@@ -65,5 +65,9 @@ function sfx(name){
                           hiss(0, .3, .06, 1800, 5200); }
   if (name === "money") { tone(880, 0, .1, "triangle", .1); tone(1174, .07, .18, "triangle", .09); }
   if (name === "no")    { tone(220, 0, .12, "square", .06, 165); }
+  /* the pause before a rare card turns, and the soft weight of a card landing */
+  if (name === "tease") { hiss(0, .5, .05, 600, 5200);
+                          [660, 880].forEach(function(f, i){ tone(f, i * .16, .3, "sine", .06, f * 1.25); }); }
+  if (name === "land")  { tone(196, 0, .09, "sine", .12, 120); hiss(0, .06, .05, 300, 900); }
 }
 function buzz(p){ try { if (navigator.vibrate) navigator.vibrate(p); } catch (e){} }

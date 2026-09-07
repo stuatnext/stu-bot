@@ -465,25 +465,61 @@ var TIPS = {
    His call: a card should ask something of you, or it is wallpaper. Every
    card carries a doable line - the specific ones here, the rest built from
    the set template. Completing one marks the card "lived". */
+/* What a card asks of him, when he does not have a line of his own. One
+   sentence per set was filler - 168 cards reading like a form letter - so each
+   set has two, chosen by the name, and the deadline comes from the rarity: a
+   common is this week, an uncommon the next fortnight, a rare is a plan. The
+   note on the face says what the thing is; this says go. */
+function pick2(n){
+  var h = 0;
+  for (var i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) >>> 0;
+  return h % 2;
+}
+function whenFor(c){
+  var r = c ? c[1] : 0;
+  return r >= 2 ? "this month, properly" : r === 1 ? "in the next fortnight" : "this week";
+}
+function say2(a, b){
+  return function(n, c){
+    var w = whenFor(c), t = (pick2(n) ? b : a);
+    return t.replace(/\{n\}/g, n).replace(/\{when\}/g, w);
+  };
+}
 var SET_DO = {
-  hawk:  function(n){ return "Eat " + n + " this week, at a stall, no phone on the table."; },
-  kopi:  function(n){ return "Order " + n + " out loud, exactly like the card says."; },
-  slang: function(n){ return "Use \u201C" + n + "\u201D in a real sentence today, to a real person."; },
-  every: function(n){ return "Notice " + n + " today and stop for ten seconds. That is the whole task."; },
-  herit: function(n){ return "Go to " + n + " this month. Twenty minutes there counts."; },
-  green: function(n){ return "Walk " + n + " this month - it can be this weekend's Trained."; },
-  isles: function(n){ return "Plan " + n + " for a free Saturday. Put it in the calendar now."; },
-  region:function(n){ return "Price flights to " + n + " tonight. Looking costs nothing."; },
-  road:  function(n){ return "Message someone about " + n + " - a memory or a plan."; },
-  home:  function(n){ return "Tell someone at home you miss " + n + ". They want to hear it."; },
-  zh:    function(n){ return "Say \u201C" + n + "\u201D to someone who will understand it today."; },
-  bean:  function(n){ return "Order " + n + " somewhere new this week."; },
-  deep:  function(n){ return "Make " + n + " happen this month. It is why you live here."; },
-  sheff: function(n){ return "One message to the group chat about " + n + ". Today."; },
-  post:  function(n){ return "Thirty minutes before the shift on \u201C" + n + "\u201D."; },
-  sug:   function(n){ return "Book thirty minutes this week for \u201C" + n + "\u201D."; },
-  mkt:   function(n){ return "Write three sentences on \u201C" + n + "\u201D you could say out loud."; },
-  gold:  function(n){ return "You know what has to happen for this one. Move it one step."; }
+  hawk:  say2("Eat {n} {when}, at a stall, no phone on the table. Order it in the words on the card.",
+              "Find the stall an auntie would send you to for {n}, {when}. The queue is the review."),
+  kopi:  say2("Order {n} out loud, exactly as the card says, {when}. No pointing.",
+              "{n} at a kopitiam you have never sat in, {when}. Sit. Finish it there."),
+  slang: say2("Use \u201C{n}\u201D in a real sentence to a real person {when}. Not ironically.",
+              "Catch someone saying \u201C{n}\u201D {when}, and notice that you understood it."),
+  every: say2("Notice {n} {when} and stop for ten seconds. That is the whole task.",
+              "Photograph {n} {when}. Do not post it. Send it to one person."),
+  herit: say2("Go to {n} {when}. Twenty minutes there counts, and read one plaque.",
+              "{n}, {when}, on foot from the MRT. Arrive slowly."),
+  green: say2("Walk {n} {when}. It can be the weekend\u2019s Trained.",
+              "{n} before nine in the morning {when}, before the heat has an opinion."),
+  isles: say2("Put {n} in the calendar for a free Saturday, tonight. Then go.",
+              "{n} {when}. Take the boat, take the long way, take nobody\u2019s phone."),
+  region:say2("Price flights to {n} tonight. Looking costs nothing; not looking costs the year.",
+              "Pick a weekend for {n} {when}, and tell Tim before you can talk yourself out of it."),
+  road:  say2("Message someone about {n} {when} \u2014 a memory, or a plan.",
+              "Write three lines about {n} for the newsletter {when}. Nobody has to see them."),
+  home:  say2("Tell someone at home you miss {n} {when}. They want to hear it.",
+              "Find the nearest thing to {n} here {when}, and report back to the group chat."),
+  zh:    say2("Say \u201C{n}\u201D to someone who will understand it {when}.",
+              "Use \u201C{n}\u201D in a sentence of your own {when}, then ask if it was right."),
+  bean:  say2("Order {n} somewhere new {when}.",
+              "{n} at a roaster you have not tried {when}. Ask what the beans are. Listen."),
+  deep:  say2("Make {n} happen {when}. It is why you live here.",
+              "{n}, {when}, with someone who has never done it."),
+  sheff: say2("One message to the group chat about {n}. Today.",
+              "Call someone from home about {n} {when}. A call, not a text."),
+  post:  say2("Draft the {n} piece {when}. Three hundred bad words beat none.",
+              "Open the doc for {n} {when} and write the first sentence. Just that."),
+  sug:   say2("Do the {n} thing {when}. One email, one document, done.",
+              "{n}: book thirty minutes for it {when}, and do not move them."),
+  mkt:   say2("Write down {n} in your own words {when}. That is the panel, prepared.",
+              "Post about {n} {when}. One paragraph, your name on it.")
 };
 var CARD_DO = {
   "Chilli crab": "Book the chilli crab dinner - it needs two people, so ask.",

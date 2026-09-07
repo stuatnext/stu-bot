@@ -300,3 +300,4 @@ button.vc:active{transform:scale(.96)}
 .w7.on{background:var(--blueSoft); border-color:#A8DFFA}
 .w7.on b{color:#0B72BD}
 .w7.now{box-shadow:0 0 0 2px var(--blue) inset}
+.hero-f2{margin-top:6px; font-size:12.5px; font-weight:700; opacity:.82}

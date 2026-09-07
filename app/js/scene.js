@@ -261,9 +261,8 @@ function questDone(btn){
   var t = today(), q = questFor(t);
   if (!q || q.done){ sfx("no"); return; }
   S.quests = S.quests || {};
-  S.quests[t] = { done: 1, swaps: q.swaps };
-  S.lived = S.lived || {};
-  if (!S.lived[q.card[0]]) S.lived[q.card[0]] = t;
+  S.quests[t] = { done: 1, swaps: q.swaps, card: q.card[0] };
+  liveCard(q.card[0]);
   save();
   sfx("rare"); buzz([16, 40, 20]);
   if (btn) burst(btn, "#FFC800");
@@ -275,6 +274,9 @@ function questSwap(){
   if (!q || q.done || q.swaps){ sfx("no"); return; }
   S.quests = S.quests || {};
   S.quests[t] = { done: 0, swaps: 1 };
+  /* Pin the swapped-to card, or a pack opened later would swap it again. */
+  var nq = questFor(t);
+  if (nq) S.quests[t].card = nq.card[0];
   save();
   sfx("tap"); buzz(10);
   render({ keepScroll: true, animate: true });

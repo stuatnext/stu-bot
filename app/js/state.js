@@ -144,11 +144,36 @@ function monthOf(k){ return k.slice(0, 7); }
    XP - never money, the pot stays consistency-only - and marks the card
    "lived", which no pack can do. */
 function cardDo(c){
-  return CARD_DO[c[0]] || SET_DO[c[2]](c[0]);
+  return CARD_DO[c[0]] || SET_DO[c[2]](c[0], c);
+}
+/* A lived card is the record. Living one used to be possible only on the day
+   the hash happened to pick it as the side quest; now any held card can be
+   lived from its own sheet, and both routes land here. Paid once per card,
+   from the record, so neither route can pay twice. */
+function livedCount(){ return Object.keys(S.lived || {}).length; }
+function liveCard(name){
+  if (!(S.cards || {})[name]) return false;
+  S.lived = S.lived || {};
+  if (S.lived[name]) return false;
+  S.lived[name] = today();
+  save();
+  return true;
 }
 function questFor(k){
   var q = (S.quests || {})[k];
-  var held = CARDS.filter(function(c){ return (S.cards || {})[c[0]]; });
+  /* Once the day's quest has been acted on it is pinned by name. Before this,
+     the card was re-derived from the held pool on every call, so opening a
+     pack - or living the card - moved the quest to a different card while it
+     was showing as done. */
+  if (q && q.card && cardByName(q.card) && (S.cards || {})[q.card]){
+    var pinned = cardByName(q.card);
+    return { card: pinned, text: cardDo(pinned), done: !!q.done, swaps: q.swaps || 0 };
+  }
+  var all = CARDS.filter(function(c){ return (S.cards || {})[c[0]]; });
+  /* The day's quest should be something he has not done yet. Only once every
+     held card is lived does it start sending him back round. */
+  var fresh = all.filter(function(c){ return !(S.lived || {})[c[0]]; });
+  var held = fresh.length ? fresh : all;
   if (!held.length) return null;
   var skip = q && q.swaps ? q.swaps : 0;
   var h = 0, str = k + "~q" + skip;
@@ -530,7 +555,7 @@ function sparesEarned(){
     var have = held[c[0]] || 0;
     if (have > 1) n += (have - 1) * RARITY[c[1]][4];
   });
-  n += questsDone() * 10;
+  n += livedCount() * 10;
   return n;
 }
 function spares(){ return Math.max(0, sparesEarned() - (S.sparesSpent || 0)); }
@@ -665,7 +690,7 @@ function xp(){
   Object.keys(S.days).forEach(function(k){ if (allThree(k)) n += 15; });
   n += Object.keys(S.done || {}).length * 20;
   n += setsCompleteEver() * 100;
-  n += questsDone() * 20;
+  n += livedCount() * 20;
   return n;
 }
 

@@ -149,8 +149,12 @@ function tcard(c, count, opts){
   opts = opts || {};
   var r = c[1];
   var hid = !count && r !== 3 && !opts.reveal;
+  /* A lived card is one he went and did. It wears the foil whatever its
+     rarity, and a stamp with the date - the card changing is the reward. */
+  var lived = count ? (S.lived || {})[c[0]] : null;
   var cls = "tc r" + r + (opts.down || hid ? " down" : "")
           + (count || hid ? "" : " miss") + (hid ? " hid" : "")
+          + (lived ? " lived" : "")
           + (opts.lg ? " lg" : "") + (opts.extra || "");
   if (hid) return sealedCard(r, opts.lg, opts.attr);
   var h = "<div class='" + cls + "'" + (opts.attr || "") + ">";
@@ -159,10 +163,10 @@ function tcard(c, count, opts){
   h += "<div class='tc-nm'>" + esc(c[0]) + "</div>";
   h += "<div class='tc-art' style='" + artTint(c) + "'>" + cardArt(c);
   if (c[2] === "zh" && c[4]) h += "<div class='tc-han zh'>" + esc(c[4]) + "</div>";
-  if (r >= 2 && count) h += "<div class='tc-holo'></div>";
+  if ((r >= 2 && count) || lived) h += "<div class='tc-holo'></div>";
   if (count > 1) h += "<span class='tc-cnt'>x" + count + "</span>";
   if (count && (S.seen || {})[c[0]] === 0) h += "<span class='tc-new'></span>";
-  if (count && (S.lived || {})[c[0]]) h += "<span class='tc-lived'>" + svg("tick", 10) + "</span>";
+  if (lived) h += "<span class='tc-stamp'><b>Lived</b><i>" + esc(nice(lived)) + "</i></span>";
   h += "<div class='tc-gem'></div></div>";
   h += "<div class='tc-nt'>" + esc(c[3]) + "</div>";
   h += "<div class='tc-glare'></div>";

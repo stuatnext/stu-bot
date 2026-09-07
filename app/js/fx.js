@@ -282,6 +282,7 @@ function hero(o){
        + Math.max(0, Math.min(100, o.pct)) + "%'></i></div>";
   }
   if (o.foot) h += "<div class='hero-f'>" + o.foot + "</div>";
+  if (o.foot2) h += "<div class='hero-f2'>" + o.foot2 + "</div>";
   return h + "</div>";
 }
 

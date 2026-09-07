@@ -9,99 +9,173 @@
    holds; for one he does not, the answer is the back, on purpose.
    ======================================================================== */
 
-/* ================================================================= the stage */
+/* ================================================================= the stage
+   One DOM for the whole ceremony, built once and mutated: the pack tears and
+   drops, the stack rises out of it, each card lifts, teases if it is worth
+   teasing, turns, lands, and flies to a tray at the bottom - so by the last
+   one the whole pull is on the table. The old stage rebuilt innerHTML at
+   every step, which is a slide show with sound effects. */
 var ST = null;
 function stageEl(){ return document.getElementById("stage"); }
+
+function stageFrame(kind, n){
+  var withPack = kind !== "one";
+  var title = kind === "streak" ? "Streak Pack" : "Day Pack";
+  return "<div class='rays'></div><div class='flash'></div>"
+    + "<div class='step' id='stStep'>" + (withPack ? "Tap to open" : "Tap to turn over") + "</div>"
+    + "<div class='arena' id='stArena'>"
+    +   "<div class='stack" + (withPack ? "" : " up") + "' id='stStack'>" + ghostsHTML(n) + "</div>"
+    +   (withPack
+        ? "<button class='pk" + (kind === "streak" ? " big" : "") + "' id='stPack'>"
+          + "<span class='pk-sheen'></span><span class='pk-strip'></span>"
+          + "<span class='pk-body'><span class='pk-ttl'>" + title + "</span>"
+          + "<span class='pk-sub'>" + n + (n === 1 ? " card" : " cards") + "</span></span></button>"
+        : "")
+    + "</div>"
+    + "<div class='dots' id='stDots'></div>"
+    + "<div class='tray' id='stTray'></div>"
+    + "<div class='under' id='stUnder' style='visibility:hidden'><button id='stNext'>Next</button></div>";
+}
+/* The rest of the pack, as a real stack: each card back a little lower, a
+   little turned, a little dimmer than the one on top of it. */
+function ghostsHTML(n){
+  var h = "";
+  for (var k = n - 1; k >= 1; k--) h += "<div class='ghost' style='--k:" + k + "'></div>";
+  return h;
+}
+function dotsHTML(){
+  var h = "";
+  for (var i = 0; i < ST.cards.length; i++){
+    var c0 = cardByName(ST.cards[i]), seen = i < ST.i;
+    h += "<i class='" + (seen ? (c0 && c0[1] >= 2 ? "on hi" : "on") : "") + "' data-dot='" + i + "'></i>";
+  }
+  return h;
+}
 
 function openStage(kind){
   var before = rank().level, sparesBefore = spares();
   var got = openPack(kind);
   ST = { cards: got, i: 0, kind: kind, lvlBefore: before, sparesBefore: sparesBefore };
   var el = stageEl();
-  el.innerHTML =
-      "<div class='rays'></div>"
-    + "<div class='step'>Tap to open</div>"
-    + "<button class='pk" + (kind === "streak" ? " big" : "") + "' id='stPack'>"
-    +   "<span class='pk-sheen'></span><span class='pk-strip'></span>"
-    +   "<span class='pk-body'><span class='pk-ttl'>"
-    +     (kind === "streak" ? "Streak Pack" : "Day Pack") + "</span>"
-    +   "<span class='pk-sub'>" + got.length + " cards</span></span>"
-    + "</button>"
-    + "<div class='under' style='visibility:hidden'></div>";
+  el.innerHTML = stageFrame(kind, got.length);
   el.className = "on";
   document.body.style.overflow = "hidden";
+  document.getElementById("stDots").innerHTML = dotsHTML();
   document.getElementById("stPack").addEventListener("click", tearPack, { once: true });
 }
 
 function tearPack(){
-  var pk = document.getElementById("stPack");
+  var pk = document.getElementById("stPack"), st = document.getElementById("stStack");
   sfx("tear"); buzz([12, 30, 18]);
   pk.classList.add("tear");
   stageEl().classList.add("lit");
-  setTimeout(showSlot, reduced() ? 0 : 560);
+  var fast = reduced();
+  setTimeout(function(){ st.classList.add("up"); }, fast ? 0 : 220);
+  setTimeout(dealNext, fast ? 0 : 640);
+  /* The torn pack fades out but it was still there, invisible, on top of the
+     card, taking the tap that should have turned it. Once it has dropped, it
+     is gone. */
+  setTimeout(function(){ if (pk.parentNode) pk.parentNode.removeChild(pk); }, fast ? 0 : 720);
 }
 
-function showSlot(){
-  var el = stageEl(), left = ST.cards.length - ST.i;
-  var dots = "", i;
-  for (i = 0; i < ST.cards.length; i++){
-    var c0 = cardByName(ST.cards[i]);
-    var seen = i < ST.i;
-    dots += "<i class='" + (seen ? (c0 && c0[1] >= 2 ? "on hi" : "on") : "") + "' data-dot='" + i + "'></i>";
-  }
-  el.innerHTML =
-      "<div class='rays'></div>"
-    + "<div class='step' id='stStep'>Tap to turn over &middot; " + (ST.i + 1)
-    +   " of " + ST.cards.length + "</div>"
-    + "<div class='slot' id='stSlot'>"
-    +   (left > 2 ? "<div class='ghost g2'></div>" : "")
-    +   (left > 1 ? "<div class='ghost g1'></div>" : "")
-    + "</div>"
-    + "<div class='dots'>" + dots + "</div>"
-    + "<div class='under' id='stUnder' style='visibility:hidden'>"
-    +   "<button id='stNext'>Next</button></div>";
-  el.className = "on lit";
-
+/* The next card comes off the top of the stack, face down. */
+function dealNext(){
+  var st = document.getElementById("stStack");
+  if (!ST || !st) return;
   var c = cardByName(ST.cards[ST.i]);
-  var slot = document.getElementById("stSlot");
-  slot.insertAdjacentHTML("beforeend", tcard(c, S.cards[c[0]], { down: true, lg: true }));
-  var tc = slot.querySelector(".tc");
+  var step = document.getElementById("stStep");
+  if (step) step.textContent = "Tap to turn over \u00b7 " + (ST.i + 1) + " of " + ST.cards.length;
+  var ghost = st.querySelector(".ghost");
+  if (ghost) ghost.remove();
+  st.insertAdjacentHTML("beforeend", tcard(c, S.cards[c[0]], { down: true, lg: true, extra: " deal" }));
+  var tc = st.querySelector(".tc.deal");
   tc.addEventListener("click", function(){ turnCard(tc, c); }, { once: true });
   tilt(tc);
+  var u = document.getElementById("stUnder");
+  if (u) u.style.visibility = "hidden";
   if (reduced()) turnCard(tc, c);
 }
 
+/* Lift, tease if it deserves it, turn, land. The rarer the card, the longer
+   the moment before you know - that pause is the whole trade. */
 function turnCard(tc, c){
-  tc.classList.remove("down");
-  sfx("flip"); buzz(14);
-  var delay = reduced() ? 0 : 340;
+  var r = c[1], fast = reduced();
+  var tease = fast ? 0 : (r === 3 ? 640 : r === 2 ? 460 : 0);
+  var flip = fast ? 0 : (r === 3 ? 1050 : r === 2 ? 860 : 620);
+  tc.classList.remove("deal");
+  tc.classList.add("lift");
+  if (tease){ tc.classList.add("tease" + r); sfx("tease"); buzz([8, 60, 8, 60, 12]); }
   setTimeout(function(){
-    if (c[1] >= 2){
-      tc.classList.add("sweep");
-      sparks(tc, c[1] === 3 ? 22 : 14);
-      sfx(c[1] === 3 ? "gold" : "rare");
-      buzz([20, 45, 25, 45, 40]);
+    tc.style.setProperty("--flipd", flip + "ms");
+    tc.classList.remove("down");
+    sfx("flip"); buzz(14);
+    if (r >= 2 && !fast){
+      /* the face ignites as it comes round */
+      setTimeout(function(){
+        var f = document.querySelector("#stage .flash");
+        if (!f) return;
+        f.classList.remove("go", "gold"); void f.offsetWidth;
+        f.classList.add("go"); if (r === 3) f.classList.add("gold");
+      }, Math.round(flip * 0.45));
     }
-    var st = document.getElementById("stStep");
-    var dup = S.cards[c[0]] > 1;
-    if (st) st.textContent = RARITY[c[1]][0] + (dup
-      ? " · spare · +" + RARITY[c[1]][4]
-      : " · new");
-    var dot = document.querySelector("[data-dot='" + ST.i + "']");
-    if (dot) dot.className = c[1] >= 2 ? "on hi" : "on";
-    var u = document.getElementById("stUnder");
-    if (u){
-      u.style.visibility = "visible";
-      var b = document.getElementById("stNext");
-      var last = ST.i >= ST.cards.length - 1;
-      b.textContent = last ? "Done" : "Next";
-      if (last) b.className = "pri";
-      b.onclick = function(){
-        sfx("tap");
-        if (last) showScore(); else { ST.i++; showSlot(); }
-      };
-    }
-  }, delay);
+    setTimeout(function(){ landCard(tc, c); }, flip);
+  }, tease);
+}
+
+function landCard(tc, c){
+  var r = c[1], el = stageEl();
+  if (!ST) return;
+  tc.classList.remove("lift", "tease2", "tease3");
+  tc.classList.add("land");
+  el.classList.remove("burst2", "burst3"); void el.offsetWidth;
+  if (r >= 2){
+    el.classList.add("burst" + r);
+    tc.classList.add("sweep");
+    sparks(tc, r === 3 ? 26 : 16);
+    sfx(r === 3 ? "gold" : "rare");
+    buzz([20, 45, 25, 45, 40]);
+  } else {
+    sfx("land");
+  }
+  var step = document.getElementById("stStep");
+  var dup = S.cards[c[0]] > 1;
+  if (step) step.textContent = RARITY[r][0] + (dup ? " \u00b7 spare \u00b7 +" + RARITY[r][4] : " \u00b7 new");
+  var dot = document.querySelector("[data-dot='" + ST.i + "']");
+  if (dot) dot.className = r >= 2 ? "on hi" : "on";
+  var u = document.getElementById("stUnder");
+  if (u){
+    u.style.visibility = "visible";
+    var b = document.getElementById("stNext");
+    var last = ST.i >= ST.cards.length - 1;
+    b.textContent = last ? "Done" : "Next";
+    b.className = last ? "pri" : "";
+    b.onclick = function(){ sfx("tap"); if (last) showScore(); else advance(tc, c); };
+  }
+}
+
+/* The turned card goes to the tray, and the next one comes off the stack. */
+function trayAdd(c){
+  var tray = document.getElementById("stTray");
+  if (tray) tray.insertAdjacentHTML("beforeend",
+    tcard(c, S.cards[c[0]], { extra: " pop", attr: " aria-hidden='true'" }));
+}
+function advance(tc, c){
+  if (!ST || ST.busy) return;
+  /* Next stays visible for the length of the fly, and a second tap in that
+     window used to run this again on a card that had already gone - and skip
+     the next one. The button goes first. */
+  ST.busy = true;
+  var u = document.getElementById("stUnder"), b = document.getElementById("stNext");
+  if (u) u.style.visibility = "hidden";
+  if (b) b.onclick = null;
+  tc.classList.add("fly");
+  trayAdd(c);
+  setTimeout(function(){
+    if (tc.parentNode) tc.parentNode.removeChild(tc);
+    ST.i++;
+    ST.busy = false;
+    dealNext();
+  }, reduced() ? 0 : 380);
 }
 
 function sparks(host, n){
@@ -120,6 +194,7 @@ function sparks(host, n){
   setTimeout(function(){ if (b.parentNode) b.parentNode.removeChild(b); }, 1300);
 }
 
+/* The whole pull stays on the table under the score. */
 function showScore(){
   var el = stageEl(), fresh = 0, gain = 0;
   ST.cards.forEach(function(n){
@@ -133,26 +208,36 @@ function showScore(){
   var r = rank(), levelled = r.level > ST.lvlBefore;
   var w = packsWaiting(), more = w.day + w.streak;
 
-  el.innerHTML =
-      "<div class='rays'></div>"
-    + (levelled ? "<div class='lvlup'>" + esc(r.name) + "</div>" : "")
-    + "<div class='score'><div class='big'>+" + gain + " XP</div>"
-    +   "<div class='sm'>" + fresh + " new" + (spare ? " &middot; " + spare + " spare" : "")
-    +   " &middot; " + heldCount() + " of " + CARDS.length + " held</div>"
-    +   (gotSpares > 0 ? "<div class='shard'>+" + gotSpares + " spares</div>" : "")
-    + "</div>"
-    + "<div class='under'>"
-    +   (more ? "<button id='stMore'>Open another</button>" : "")
-    +   "<button class='pri' id='stDone'>Done</button></div>";
-  el.className = "on lit";
+  var lastCard = cardByName(ST.cards[ST.i]);
+  if (lastCard && document.querySelector("#stage .stack .tc")) trayAdd(lastCard);
+  ["stArena", "stDots", "stStep"].forEach(function(id){
+    var x = document.getElementById(id); if (x) x.remove();
+  });
+  var tray = document.getElementById("stTray");
+  var score = document.createElement("div");
+  score.className = "score";
+  score.innerHTML = (levelled ? "<div class='lvlup'>" + esc(r.name) + "</div>" : "")
+    + "<div class='big' id='stXP'>+0 XP</div>"
+    + "<div class='sm'>" + fresh + " new" + (spare ? " &middot; " + spare + " spare" : "")
+    + " &middot; " + heldCount() + " of " + CARDS.length + " held</div>"
+    + (gotSpares > 0 ? "<div class='shard'>+" + gotSpares + " spares</div>" : "");
+  el.insertBefore(score, tray);
+  el.classList.add("scored");
+
+  var u = document.getElementById("stUnder");
+  if (u){
+    u.style.visibility = "visible";
+    u.innerHTML = (more ? "<button id='stMore'>Open another</button>" : "")
+      + "<button class='pri' id='stDone'>Done</button>";
+    document.getElementById("stDone").onclick = closeStage;
+    var m = document.getElementById("stMore");
+    if (m) m.onclick = function(){ sfx("tap"); openStage(packsWaiting().streak ? "streak" : "day"); };
+  }
+  var xpEl = document.getElementById("stXP");
+  if (reduced()) xpEl.textContent = "+" + gain + " XP";
+  else countTo(xpEl, 0, gain, function(v){ return "+" + Math.round(v) + " XP"; }, 700);
   sfx(levelled ? "level" : "done");
   buzz(levelled ? [30, 60, 30, 60, 60] : 20);
-  document.getElementById("stDone").onclick = closeStage;
-  var m = document.getElementById("stMore");
-  if (m) m.onclick = function(){
-    sfx("tap");
-    openStage(packsWaiting().streak ? "streak" : "day");
-  };
 }
 
 function closeStage(){
@@ -170,17 +255,16 @@ function closeStage(){
   render();
 }
 
-/* One card, turned over on the stage. Crafting used to end in a card sheet,
-   which is a receipt; a card you paid for deserves the same moment as a card
-   you pulled. Trophies come through here too. */
+/* One card, turned over on the stage: a crafted card, or a trophy. Same
+   ceremony as a pack, minus the pack. */
 function revealOne(name){
-  ST = { cards: [name], i: 0, kind: "one",
-         lvlBefore: rank().level, sparesBefore: spares() };
+  ST = { cards: [name], i: 0, kind: "one", lvlBefore: rank().level, sparesBefore: spares() };
   var el = stageEl();
+  el.innerHTML = stageFrame("one", 1);
   el.className = "on lit";
-  el.innerHTML = "";
   document.body.style.overflow = "hidden";
-  showSlot();
+  document.getElementById("stDots").innerHTML = dotsHTML();
+  dealNext();
 }
 
 /* Tapping a sealed slot. It is a real question - "what is in there" - and it
@@ -240,10 +324,16 @@ function openSheet(name){
   /* A held card asks something of you - otherwise it is wallpaper. The ask
      lives here on the sheet, and one of them is the day's side quest. */
   var lived = (S.lived || {})[name];
+  /* The ask, and the button that answers it. Living a card used to be
+     possible only on the day the hash picked it as the side quest; a card you
+     can only act on when told to is not actionable, it is homework. */
   var tryLine = held
     ? "<div class='try" + (lived ? " done" : "") + "'><b>"
-      + (lived ? "Lived · " + esc(nice(lived)) : "Try") + "</b>"
-      + esc(cardDo(c)) + "</div>"
+      + (lived ? "Lived \u00b7 " + esc(nice(lived)) : "Go and do it") + "</b>"
+      + esc(cardDo(c))
+      + (lived ? "" : "<button class='doit' data-liveit='" + esc(name)
+          + "'>Did it &middot; +10 spares, +20 XP</button>")
+      + "</div>"
     : "";
   /* He can still spend spares from here, but on a rarity out of this set
      rather than on this card - the deck picks, and turning it over is the
@@ -274,6 +364,25 @@ function openSheet(name){
 function closeSheet(){
   var el = document.getElementById("sheet");
   el.className = ""; el.innerHTML = "";
+}
+
+/* Living a card from its own sheet. The card changes in front of him - foil,
+   stamp, date - which is the reward, so the sheet stays open to show it. If
+   it happened to be today's side quest as well, that is done too; the record
+   is the lived card, and it pays once whichever way it was reached. */
+function liveIt(name){
+  if (!liveCard(name)){ sfx("no"); return; }
+  var t = today(), q = questFor(t);
+  if (q && q.card[0] === name && !q.done){
+    S.quests = S.quests || {};
+    S.quests[t] = { done: 1, swaps: q.swaps, card: name };
+    save();
+  }
+  sfx("rare"); buzz([16, 40, 20]);
+  openSheet(name);
+  var tc = document.querySelector("#sheet .tc");
+  if (tc){ tc.classList.add("sweep"); sparks(tc, 16); }
+  render({ keepScroll: true, animate: true });
 }
 
 /* Trophies are not pulled, they are earned - but the moment should look the
