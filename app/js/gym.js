@@ -68,8 +68,7 @@ function viewGym(){
       + " &middot; " + restClock(restOf(ex)) + " rest</span></span>"
       + "<span class='lv'>" + (had
           ? had.w + "kg<em>" + had.r.join(" &middot; ") + "</em>"
-          : (t2.w ? t2.w + "kg<em>"
-                    + (t2.first ? "to start" : t2.reps ? "x " + t2.reps : "add a rep") + "</em>"
+          : (t2.w ? t2.w + "kg<em>" + esc(t2.tag || "") + "</em>"
                   : "<span class='new'>new</span>")) + "</span></button>";
     h += "<button class='swap' data-swap='" + key + ":" + i + "'"
       + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
@@ -229,35 +228,126 @@ function lastLift(name){
   }
   return null;
 }
-/* Double progression, which is the only progression rule he needs this year:
-   hold the weight until every set reaches the top of the range, then add. */
+/* ------------------------------------------------- reading what he actually did
+   The old rule knew one move: if every set hit the top of the range, add one
+   notch off a load-scaled table. That has no answer for the three things that
+   actually happen. Twenty reps when the range tops out at ten - the weight is
+   light, and one notch will still leave it light. Four reps when the range
+   starts at eight - he is buried, and "add a rep wherever you can" is the
+   worst thing to tell him. And three sessions at the same weight and the same
+   reps, which is a stall, and stalls are where people quit.
+
+   So it reads the history instead of the last line of it. */
+function liftHistory(name, n){
+  var ks = liftDays(), out = [];
+  for (var i = ks.length - 1; i >= 0 && out.length < n; i--){
+    var e = (S.lifts[ks[i]].ex || {})[name];
+    if (e && e.r && e.r.length){
+      out.push({ k: ks[i], w: Number(e.w) || 0, r: e.r.map(Number) });
+    }
+  }
+  return out;                                  /* newest first */
+}
+function lowRep(h){ return Math.min.apply(null, h.r); }
+function topRep(h){ return Math.max.apply(null, h.r); }
+function sumReps(h){ return h.r.reduce(function(a, b){ return a + b; }, 0); }
+
+/* Epley, capped at fifteen reps because above that it stops describing
+   anything real. Capping biases every estimate low, which is the right
+   direction to be wrong in when the answer is a weight he is going to put
+   over his chest. */
+function e1rm(w, reps){ return w * (1 + Math.min(reps, 15) / 30); }
+function loadFor(max, reps){ return max / (1 + reps / 30); }
+
+/* Gym kit comes in 2.5kg plates and 2kg dumbbells, not in decimals. */
+function roundLoad(w){
+  if (w >= 20) return Math.round(w / 2.5) * 2.5;
+  if (w >= 10) return Math.round(w);
+  return Math.round(w * 2) / 2;
+}
+/* The smallest change worth making at a given load. */
+function minInc(w){ return w >= 20 ? 2.5 : w >= 10 ? 1 : 0.5; }
+function deloadFrom(w){
+  var d = roundLoad(w * 0.9);
+  if (d >= w) d = roundLoad(w - stepFor(w));
+  return Math.max(stepFor(w), d);
+}
+
 function nextTarget(ex, name){
-  var last = lastLift(name || ex[0]), sets = stage()[3];
-  if (!last){
+  name = name || ex[0];
+  var setsWant = stage()[3], lo = ex[2], hi = ex[3];
+  var H = liftHistory(name, 3);
+
+  if (!H.length){
     /* A blank is the worst thing to hand someone standing at a machine, so
        every loaded movement opens on a number. It is a starting point, not a
        prescription - the rule underneath it is the one in the next sentence. */
-    var open = START[name || ex[0]];
-    return { first: true, w: open || null,
+    var open = START[name];
+    return { first: true, w: open || null, tag: "to start",
              say: (open ? "Start around " + open + "kg. " : "")
                 + "You should finish the first set feeling you had two or three more in you." };
   }
-  var allTop = last.r.length >= sets && last.r.every(function(n){ return n >= ex[3]; });
-  if (allTop){
-    /* A jump has to match the kit. Two kilos is a sensible step on a dumbbell
-       and meaningless on a leg press, and the first version told him to find
-       "the next dumbbell" while he was sitting on a machine. */
-    var w = last.w;
-    var up = Math.round((w + stepFor(w)) * 2) / 2;
-    /* Judged on the movement actually being done, not on the slot's default -
-       swapping to the leg press was still telling him to find a dumbbell. */
-    var doing = (name || ex[0]).toLowerCase();
-    var how = (doing.indexOf("dumbbell") >= 0 || doing.indexOf("goblet") >= 0
-               || doing.indexOf("farmer") >= 0 || doing.indexOf("carry") >= 0)
-            ? "Or the next dumbbell up." : "Or the next notch up.";
-    return { w: up, reps: ex[2], say: "Up to " + up + "kg, back to " + ex[2] + ". " + how };
+
+  var last = H[0], worst = lowRep(last), best = topRep(last);
+  /* Judged on the movement actually being done, not on the slot's default -
+     swapping to the leg press was still telling him to find a dumbbell. */
+  var doing = name.toLowerCase();
+  var how = (doing.indexOf("dumbbell") >= 0 || doing.indexOf("goblet") >= 0
+             || doing.indexOf("farmer") >= 0 || doing.indexOf("carry") >= 0)
+          ? "Or the next dumbbell up." : "Or the next notch up.";
+
+  /* CLEARED IT. The jump is sized from what he actually lifted rather than off
+     a fixed table: the weight that should put the worst of those sets back at
+     the bottom of the range. It comes out gentler than a flat step on a heavy
+     machine and larger on a light one, which is the point. Never more than a
+     fifth up in one session, whatever the arithmetic says. */
+  if (last.r.length >= setsWant && worst >= hi){
+    var want = loadFor(e1rm(last.w, worst), lo);
+    var up = roundLoad(Math.min(want, last.w * 1.2));
+    /* Slots with a fixed rep count (3 x 10, no window) have nothing to convert,
+       so the estimate lands back on the same weight. They get the smallest
+       honest bump instead of a step off the dial table - one notch of that
+       table is ten kilos at the top, which is a sixth of the load. */
+    if (up <= last.w){
+      up = roundLoad(Math.max(last.w * 1.05, last.w + minInc(last.w)));
+    }
+    return { w: up, reps: lo, tag: "x " + lo,
+      say: worst >= hi + 3
+        ? worst + " reps on every set when the range stops at " + hi + " means the weight is "
+          + "light, not that you are ready for one more notch. " + up + "kg, back to " + lo + "."
+        : "Every set at " + hi + ". Up to " + up + "kg"
+          + (lo < hi ? ", back to " + lo : "") + ". " + how };
   }
-  return { w: last.w, reps: null, say: "Stay at " + last.w + "kg. Add a rep wherever you can." };
+
+  /* BURIED. Short of the bottom of the range. Once is a bad day; twice at the
+     same weight is the weight, and backing off is the programme working. */
+  if (best < lo){
+    if (H[1] && H[1].w === last.w && topRep(H[1]) < lo){
+      var down = deloadFrom(last.w);
+      return { w: down, reps: lo, tag: "ease off",
+        say: "Two sessions short of " + lo + " at " + last.w + "kg. Down to " + down
+           + "kg and build it back - that is the plan working, not you failing." };
+    }
+    return { w: last.w, reps: lo, tag: "x " + lo,
+      say: "Short of " + lo + " last time. Same " + last.w + "kg, and " + lo
+         + " on the first set is the whole job." };
+  }
+
+  /* STALLED. Three sessions at one weight with no more total reps than the
+     first of them. Backing off ten per cent and running it up again beats
+     grinding, and swapping the movement is a real answer too. */
+  if (H.length >= 3 && H[1].w === last.w && H[2].w === last.w
+      && sumReps(last) <= sumReps(H[2])){
+    var back = deloadFrom(last.w);
+    return { w: back, reps: lo, tag: "ease off",
+      say: "Three sessions at " + last.w + "kg without adding a rep. Down to " + back
+         + "kg and run it back up, or swap the movement with the arrows." };
+  }
+
+  /* IN THE RANGE. Hold and chase reps, and name the set that is holding it. */
+  return { w: last.w, reps: null, tag: "add a rep",
+    say: "Stay at " + last.w + "kg. Add a rep wherever you can \u2014 "
+       + worst + " is the set to beat." };
 }
 /* Which variant he is using in a slot. Stored per slot, so swapping to the
    hack squat sticks until he swaps back, and each variant keeps its own
@@ -437,12 +527,20 @@ function askLift(sKey, idx){
   var name = pickFor(sKey, idx);
   var t = nextTarget(ex, name), had = loggedToday(name);
 
-  /* Where the dials start: what he did today if he is correcting it, else the
-     target, else the bottom of the rep range. */
+  /* Where the dials start. The stage prescribes a number of sets, but if he
+     chose to do more last time then that is the shape of this exercise for him
+     now, so it opens on that. And when the weight is holding, the job is to
+     beat last session's reps - so the rep dials open on last session's reps,
+     set by set, rather than on the bottom of the range. */
+  var prev = liftHistory(name, 1)[0];
   var w0 = had ? had.w : (t.w || 0);
+  var want = had ? had.r.length : Math.max(sets, prev ? prev.r.length : 0);
+  var holding = !t.reps && prev && prev.w === w0;
   var r0 = [];
-  for (var i = 0; i < sets; i++){
-    r0.push(had && had.r[i] != null ? had.r[i] : (t.reps || ex[2]));
+  for (var i = 0; i < want; i++){
+    if (had && had.r[i] != null){ r0.push(had.r[i]); continue; }
+    if (holding && prev.r[i] != null){ r0.push(prev.r[i]); continue; }
+    r0.push(t.reps || ex[2]);
   }
   LIFT = { w: w0, r: r0, sKey: sKey, name: name, sets: sets, rest: restOf(ex) };
 
