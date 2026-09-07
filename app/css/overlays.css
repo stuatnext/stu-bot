@@ -150,3 +150,23 @@
   #chip.on{animation:none}
   .chipw .medal.big{animation:none}
 }
+
+/* ------------------------------------------------------- logging a lift
+   This was one text input asking for "14 x 8,8,7" while presenting a decimal
+   keypad, which has no x, no comma and no space on it - the app asked for a
+   format its own keyboard could not produce. It is dials now: nothing to type
+   while standing at a machine, and the target is already dialled in, so the
+   usual case is one tap on Log it. */
+#modal .lf{margin:2px 0 4px}
+#modal .lf label{margin-top:14px}
+.lfr{display:grid; grid-template-columns:auto 54px 1fr 54px; align-items:center;
+  gap:10px; margin:8px 0}
+.lfl{font-size:14px; font-weight:800; color:var(--ink2); min-width:44px}
+.lfb{width:54px; height:52px; border-radius:16px; font:inherit; font-size:26px;
+  font-weight:800; line-height:1; cursor:pointer; color:var(--ink);
+  background:var(--card2); border:2px solid var(--edge); border-bottom-width:4px;
+  display:flex; align-items:center; justify-content:center}
+.lfb:active{transform:translateY(2px); border-bottom-width:2px; background:var(--sunk)}
+.lfv{text-align:center; font-family:"Nunito",sans-serif; font-size:30px; font-weight:800;
+  letter-spacing:-.03em; font-variant-numeric:tabular-nums; color:var(--ink)}
+.lfv i{font-style:normal; font-size:.5em; font-weight:800; color:var(--ink3); margin-left:3px}

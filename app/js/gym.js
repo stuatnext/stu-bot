@@ -247,8 +247,7 @@ function nextTarget(ex, name){
        and meaningless on a leg press, and the first version told him to find
        "the next dumbbell" while he was sitting on a machine. */
     var w = last.w;
-    var step = w >= 60 ? 10 : w >= 30 ? 5 : w >= 15 ? 2.5 : w >= 8 ? 2 : 1;
-    var up = Math.round((w + step) * 2) / 2;
+    var up = Math.round((w + stepFor(w)) * 2) / 2;
     /* Judged on the movement actually being done, not on the slot's default -
        swapping to the leg press was still telling him to find a dumbbell. */
     var doing = (name || ex[0]).toLowerCase();
@@ -299,17 +298,37 @@ function loggedToday(name){
   return e && e.ex ? e.ex[name] : null;
 }
 
-/* One field, forgiving. "14 x 8,8,7" and "14 8 8 7" both work, and a single
-   rep number is applied to every set - because typing three identical numbers
-   at the end of a set is exactly the friction that stops people logging. */
-function parseLift(text, sets){
-  var nums = String(text || "").match(/\d+(\.\d+)?/g);
-  if (!nums || !nums.length) return null;
-  var w = Number(nums[0]);
-  var reps = nums.slice(1).map(Number).filter(function(n){ return n > 0; });
-  if (!reps.length) return null;
-  while (reps.length < sets) reps.push(reps[reps.length - 1]);
-  return { w: w, r: reps.slice(0, sets) };
+/* A jump has to match the kit: two kilos is a sensible step on a dumbbell and
+   meaningless on a leg press. Shared by the suggestion and by the + button, so
+   they can never disagree about what one notch is. */
+function stepFor(w){
+  return w >= 60 ? 10 : w >= 30 ? 5 : w >= 15 ? 2.5 : w >= 8 ? 2 : 1;
+}
+
+/* The free-text parser went with the field it served. Nothing types a lift
+   any more, so there is no string to be forgiving about. */
+
+var LIFT = null;
+
+function liftRow(label, value, unit, kind, i){
+  return "<div class='lfr'>"
+    + "<span class='lfl'>" + esc(label) + "</span>"
+    + "<button class='lfb' data-lf='" + kind + ":-1:" + i + "' aria-label='Less'>&minus;</button>"
+    + "<span class='lfv'>" + value + (unit ? "<i>" + unit + "</i>" : "") + "</span>"
+    + "<button class='lfb' data-lf='" + kind + ":1:" + i + "' aria-label='More'>+</button>"
+    + "</div>";
+}
+
+function paintLift(){
+  var L = LIFT, body = document.getElementById("lfBody");
+  if (!L || !body) return;
+  var h = "<label>Weight</label>";
+  h += liftRow("Load", L.w, "kg", "w", 0);
+  h += "<label>Reps &middot; " + L.r.length + (L.r.length === 1 ? " set" : " sets") + "</label>";
+  L.r.forEach(function(n, i){
+    h += liftRow("Set " + (i + 1), n, "", "r", i);
+  });
+  body.innerHTML = h;
 }
 
 function askLift(sKey, idx){
@@ -318,25 +337,69 @@ function askLift(sKey, idx){
   var sets = stage()[3];
   var name = pickFor(sKey, idx);
   var t = nextTarget(ex, name), had = loggedToday(name);
-  var pre = had ? had.w + "kg x " + had.r.join(",") : (t.w ? t.w + " x " : "");
-  ask({
-    title: name,
-    say: esc(ex[4]) + " &middot; " + sets + " sets of " + (ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3])
-       + "<br><b>" + esc(t.say) + "</b>",
-    field: { label: "Weight and reps", value: pre, placeholder: "14 x 8,8,7", type: "number" },
-    confirm: "Log it", cancel: "Not this one"
-  }).then(function(v){
-    if (v === null || v === "__no") return;
-    var got = parseLift(v, sets);
-    if (!got){ toast("Give me a weight and at least one rep count."); return; }
-    var k = today();
-    S.lifts = S.lifts || {};
-    S.lifts[k] = S.lifts[k] || { s: sKey, ex: {} };
-    S.lifts[k].s = sKey;
-    S.lifts[k].ex[name] = got;
-    save(); buzz(14); sfx("tick");
-    render({ keepScroll: true });
-  });
+
+  /* Where the dials start: what he did today if he is correcting it, else the
+     target, else the bottom of the rep range. */
+  var w0 = had ? had.w : (t.w || 0);
+  var r0 = [];
+  for (var i = 0; i < sets; i++){
+    r0.push(had && had.r[i] != null ? had.r[i] : (t.reps || ex[2]));
+  }
+  LIFT = { w: w0, r: r0, sKey: sKey, name: name };
+
+  var el = document.getElementById("modal");
+  el.innerHTML = "<div class='mw'><div class='grab'></div>"
+    + "<h3>" + esc(name) + "</h3>"
+    + "<p class='say'>" + esc(ex[4]) + " &middot; " + sets + " sets of "
+    + (ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3])
+    + "<br><b>" + esc(t.say) + "</b></p>"
+    + "<div id='lfBody' class='lf'></div>"
+    + "<div class='btns'><button class='btn pri' data-lf='ok:0:0'>Log it</button>"
+    + "<button class='btn quiet' data-lf='no:0:0'>Not this one</button></div></div>";
+  el.className = "on";
+  document.body.style.overflow = "hidden";
+  paintLift();
+  sfx("tap");
+
+  function close(){
+    if (!MODAL) return;
+    MODAL = null; LIFT = null;
+    el.className = ""; el.innerHTML = "";
+    document.body.style.overflow = "";
+  }
+  MODAL = { close: close };
+
+  el.onclick = function(ev){
+    if (ev.target === el){ close(); return; }
+    var b = ev.target.closest ? ev.target.closest("[data-lf]") : null;
+    if (!b) return;
+    ev.stopPropagation();
+    var p = b.dataset.lf.split(":"), kind = p[0], dir = Number(p[1]), at = Number(p[2]);
+    if (kind === "no"){ sfx("tap"); close(); return; }
+    if (kind === "ok"){
+      var reps = LIFT.r.filter(function(n){ return n > 0; });
+      if (!reps.length){ sfx("no"); toast("At least one set with reps in it."); return; }
+      var k = today();
+      S.lifts = S.lifts || {};
+      S.lifts[k] = S.lifts[k] || { s: sKey, ex: {} };
+      S.lifts[k].s = sKey;
+      S.lifts[k].ex[LIFT.name] = { w: LIFT.w, r: reps };
+      save(); buzz(14); sfx("tick");
+      close();
+      render({ keepScroll: true });
+      return;
+    }
+    if (kind === "w"){
+      /* One notch is whatever a notch is at this load, and stepping down uses
+         the step for the weight below so 30 -> 27.5 rather than 30 -> 25. */
+      var st = dir > 0 ? stepFor(LIFT.w) : stepFor(Math.max(0, LIFT.w - 0.5));
+      LIFT.w = Math.max(0, Math.round((LIFT.w + dir * st) * 2) / 2);
+    } else if (kind === "r"){
+      LIFT.r[at] = Math.max(0, Math.min(60, (Number(LIFT.r[at]) || 0) + dir));
+    }
+    buzz(6); sfx("tap");
+    paintLift();
+  };
 }
 
 /* Ending the session is what marks Trained, and one exercise is enough to

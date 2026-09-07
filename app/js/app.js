@@ -64,7 +64,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v26";
+var BUILD = "v27";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -269,10 +269,53 @@ setTimeout(function(){
   if (b) b.classList.add("gone");
 }, 2600);
 
-/* Offline, and installable. Service workers only exist over https, so this
-   is a no-op from file:// and never blocks the app. */
+/* Offline, installable - and, from v27, actually updatable.
+
+   The bug this fixes: an app on the Home Screen that is resumed from the app
+   switcher never navigates again. The service worker was already network-first,
+   so it would have served fresh files happily - but nothing ever asked it for
+   any, because the page had been sitting in memory since whenever it was last
+   cold-started. He was looking at a build two releases old and there was no
+   way for him or me to tell from inside the app.
+
+   So: ask for an update whenever the app comes back to the foreground, and
+   when a new worker takes over, reload once. Never on the first-ever install
+   (there was no old build to replace), and never over the top of something he
+   is in the middle of - a reload while a modal is open would eat what he was
+   typing, so it waits for the next time he comes back. */
 if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
+  var HAD_SW = !!navigator.serviceWorker.controller;
+  var RELOADING = false, RELOAD_WANTED = false;
+
+  function busyNow(){
+    return !!MODAL || !!ST
+      || !!document.getElementById("sheet").className
+      || !!document.getElementById("stage").className
+      || !!document.getElementById("chip").className;
+  }
+  function takeUpdate(){
+    if (RELOADING) return;
+    if (busyNow()){ RELOAD_WANTED = true; return; }
+    RELOADING = true;
+    location.reload();
+  }
+
   window.addEventListener("load", function(){
-    navigator.serviceWorker.register("sw.js").catch(function(){});
+    navigator.serviceWorker.register("sw.js").then(function(reg){
+      navigator.serviceWorker.addEventListener("controllerchange", function(){
+        /* First install on a page that had no worker: nothing to replace. */
+        if (!HAD_SW) return;
+        takeUpdate();
+      });
+      function check(){
+        if (RELOAD_WANTED){ takeUpdate(); return; }
+        try { reg.update(); } catch(e){}
+      }
+      document.addEventListener("visibilitychange", function(){
+        if (!document.hidden) check();
+      });
+      window.addEventListener("focus", check);
+      setInterval(check, 30 * 60 * 1000);
+    }).catch(function(){});
   });
 }
