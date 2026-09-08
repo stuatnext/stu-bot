@@ -64,7 +64,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v34";
+var BUILD = "v35";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;

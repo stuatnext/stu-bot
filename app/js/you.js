@@ -97,7 +97,7 @@ function viewYou(){
           "Full screen, its own icon — and it unlocks the nudge"))
     + mrow("push", "1", "clock", "The evening nudge",
         S.pushOn ? "On — a 22:15 check-in" : "A 22:15 check-in when the day is still open")
-    + mrow("replay", "1", "pack", "How this works", "The three-tap tour, again")
+    + mrow("replay", "1", "ask", "How this works", "The three-tap tour, again")
     + mrow("sound", "1", "spare", "Sound", S.mute ? "Off" : "On")
     + mrow("camp", "1", "pin", "Where you are", S.camp)
     + "</div>";

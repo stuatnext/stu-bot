@@ -336,14 +336,20 @@ button.vc:active{transform:scale(.96)}
 .ssk{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
   color:var(--ink3); flex:1}
 .ssp{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em; color:var(--ink3)}
+/* the same iron the Gym tab is made of: the session is that tab, full screen */
 .sshero{position:relative; overflow:hidden; border-radius:24px; padding:20px 18px 18px; color:#fff; margin:8px 0 14px;
-  background:linear-gradient(152deg,#FFA53A,#F27000 58%,#D14A12);
-  box-shadow:0 14px 30px -16px rgba(214,90,10,.7), 0 1px 0 rgba(255,255,255,.3) inset}
-.sshero .ssk2{font-size:10.5px; font-weight:800; letter-spacing:.15em; text-transform:uppercase; opacity:.84}
+  background:linear-gradient(152deg,#2B3442,#161C27 58%,#0B0F17);
+  box-shadow:0 14px 30px -16px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.16) inset}
+.sshero::after{content:""; position:absolute; width:230px; height:230px; right:-70px; top:-100px;
+  border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle,rgba(255,140,40,.5),transparent 62%)}
+.sshero > *{position:relative; z-index:1}
+.sshero .ssk2{font-family:"JetBrains Mono",monospace; font-size:10.5px; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:#FFB35C}
 .sshero h2{font-family:"Nunito",sans-serif; font-size:30px; font-weight:900; letter-spacing:-.03em; line-height:1.05;
   margin:6px 0 0; text-transform:none; color:#fff}
 .sshero p{margin:10px 0 0; font-size:14.5px; font-weight:700; opacity:.94; line-height:1.45}
-.sshero .sstarget{background:rgba(0,0,0,.18); border-radius:14px; padding:10px 12px}
+.sshero .sstarget{background:rgba(255,255,255,.08); border-radius:14px; padding:10px 12px}
 .ssacts{display:flex; gap:8px; margin-top:12px}
 .ssacts .btn{flex:1; background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.35);
   padding:10px 8px; min-height:42px; font-size:13px}
@@ -356,9 +362,17 @@ button.vc:active{transform:scale(.96)}
 .sspill.add{font:inherit; font-size:22px; cursor:pointer; color:var(--ink2)}
 .sslab{display:block; font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.12em;
   text-transform:uppercase; color:var(--ink3); margin:10px 0 4px}
-.ssrest{min-height:0; margin:6px 0 2px; text-align:center; font-weight:800; font-size:14px; color:var(--ink3)}
+/* The rest clock is the one live thing on the screen, so it looks alive: the
+   fill drains left to right as the seconds go. */
+.ssrest{position:relative; min-height:0; margin:6px 0 2px; text-align:center; font-weight:800;
+  font-size:14px; color:var(--ink3); overflow:hidden}
+.ssrest > i{display:none}
+.ssrest > span{position:relative; z-index:1}
 .ssrest.going{min-height:54px; display:flex; align-items:center; justify-content:center; border-radius:17px;
   background:var(--blueSoft); color:#0B72BD; border:2px solid var(--blue); font-size:17px}
+.ssrest.going > i{display:block; position:absolute; left:0; top:0; bottom:0;
+  width:calc(var(--rest, 1) * 100%); background:rgba(28,176,246,.28);
+  transition:width 1s linear}
 .ssrest.done{color:var(--greenInk); padding:6px 0}
 #session .lf .lfr{grid-template-columns:auto 60px 1fr 60px}
 #session .lfb{width:60px; height:58px}
@@ -524,3 +538,7 @@ button.vc:active{transform:scale(.96)}
 .ordl{gap:0}
 .ord{border:0; background:none; padding:11px 4px; border-radius:12px}
 .ord + .ord{border-top:1.5px solid var(--edge)}
+
+/* a basic waiting to be logged wears its plus in the gold that means "your move" */
+button.vc:not(.on) .vv{color:var(--goldEdge, #C98A08); font-family:"Nunito",sans-serif;
+  font-size:19px; font-weight:900; line-height:.9}

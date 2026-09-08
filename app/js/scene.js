@@ -80,6 +80,16 @@ function dayName(k){
    Seven dots ending on today: a full day burns green, a frozen one is ice,
    a miss is hollow, today is ringed. Consistency you can see at a glance. */
 function weekHTML(){
+  /* On day one the seven marks are seven blanks, which is a row of nothing
+     across the top of the app. It appears once there is a day behind him. */
+  var any = false, p0 = new Date();
+  p0.setDate(p0.getDate() - 6);
+  for (var j = 0; j < 7; j++){
+    var kj = iso(p0);
+    if (kj !== today() && (allThree(kj) || frozen(kj))) any = true;
+    p0.setDate(p0.getDate() + 1);
+  }
+  if (!any) return "";
   var h = "<div class='week'>", d = new Date();
   d.setDate(d.getDate() - 6);
   for (var i = 0; i < 7; i++){

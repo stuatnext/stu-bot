@@ -120,11 +120,13 @@ function conditionHTML(){
        The other three are mirrors of Gym, Food and Water - tapping them would
        be a second place to do the same thing, so they only report. */
     var act = v[0] === "sleep" ? " data-sleep='1'" : (v[0] === "out" ? " data-out='1'" : "");
+    /* The two he can log here say "+" until they are logged; the three that
+       only report say nothing rather than inviting a tap that does nothing. */
     var val = v[0] === "water"   ? waterOn(t) + "/" + WATER_GLASSES
-            : v[0] === "sleep"   ? (sleepOn(t) ? sleepOn(t) + "h" : "&mdash;")
+            : v[0] === "sleep"   ? (sleepOn(t) ? sleepOn(t) + "h" : "+")
             : v[0] === "protein" ? num(proteinOn(t)) + "g"
             : v[0] === "train"   ? (on ? "done" : "&mdash;")
-            : (on ? "yes" : "&mdash;");
+            : (on ? "yes" : "+");
     var tag = act ? "button" : "div";
     h += "<" + tag + " class='vc" + (on ? " on" : "") + "'" + act + ">"
       + "<span class='vv'>" + val + "</span>"

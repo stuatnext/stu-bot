@@ -9,7 +9,9 @@
    occasions instead of one. */
 
 /* --------------------------------------------------------------- the food */
-function foodOn(k){ return (S.food || {})[k] || []; }
+/* Always a list. A day written by an older build - or a hand-edited record -
+   must not be able to take the screen down. */
+function foodOn(k){ var v = (S.food || {})[k]; return Array.isArray(v) ? v : []; }
 
 function proteinOn(k){
   return foodOn(k).reduce(function(a, f){ return a + Number(f[1] || 0); }, 0);

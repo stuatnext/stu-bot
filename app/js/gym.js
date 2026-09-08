@@ -66,7 +66,7 @@ function viewGym(){
           ? had.w + "kg<em>" + had.r.join(" &middot; ") + "</em>"
           : (t2.w ? t2.w + "kg<em>" + esc(t2.tag || "") + "</em>"
                   : "<span class='new'>new</span>")) + "</span></button>";
-    h += "<button class='swap' data-how='" + key + ":" + i + "' aria-label='How to do " + esc(name) + "'>?</button>"
+    h += "<button class='swap' data-how='" + key + ":" + i + "' aria-label='How to do " + esc(name) + "'>" + svg("ask", 18) + "</button>"
       + "<button class='swap' data-swap='" + key + ":" + i + "'"
       + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
   });
@@ -401,9 +401,19 @@ var REST_TICK = null, REST_WAS = 0;
 
 function restOf(ex){ return (ex && ex[6]) || 90; }
 
+/* The clock is stored as "endsAt:total" so a reload knows not just how long is
+   left but how long it was, which is what the draining bar is drawn from. */
+function restRaw(){
+  var v = "";
+  try { v = localStorage.getItem(REST_KEY) || ""; } catch(e){}
+  return String(v).split(":");
+}
+function restTotal(){
+  var n = Number(restRaw()[1]);
+  return n > 0 ? n : (REST_WAS || 90);
+}
 function restLeft(){
-  var until = 0;
-  try { until = Number(localStorage.getItem(REST_KEY) || 0); } catch(e){}
+  var until = Number(restRaw()[0] || 0);
   if (!until) return 0;
   var left = Math.ceil((until - Date.now()) / 1000);
   if (left <= 0){ try { localStorage.removeItem(REST_KEY); } catch(e){} return 0; }
@@ -414,7 +424,7 @@ function restClock(n){
   return m + ":" + (r < 10 ? "0" : "") + r;
 }
 function restStart(secs){
-  try { localStorage.setItem(REST_KEY, String(Date.now() + secs * 1000)); } catch(e){}
+  try { localStorage.setItem(REST_KEY, (Date.now() + secs * 1000) + ":" + secs); } catch(e){}
   REST_WAS = secs;
   buzz(10); sfx("tick");
   restPaint(); restSync();
@@ -467,8 +477,12 @@ function restPaint(){
 function restBtnPaint(left){
   var sb = document.getElementById("ssRest");
   if (sb && SESSION){
-    sb.textContent = left > 0 ? "Resting \u00b7 " + restClock(left) : "Rested. Next set when you are.";
+    var tot = restTotal();
     sb.className = "ssrest" + (left > 0 ? " going" : " done");
+    sb.style.setProperty("--rest", left > 0 ? (left / Math.max(1, tot)).toFixed(3) : "0");
+    var lab = sb.querySelector("span");
+    if (!lab){ sb.innerHTML = "<i></i><span></span>"; lab = sb.querySelector("span"); }
+    lab.textContent = left > 0 ? "Resting \u00b7 " + restClock(left) : "Rested. Next set when you are.";
   }
   var b = document.getElementById("lfRest");
   if (!b || !LIFT) return;
@@ -819,7 +833,9 @@ function paintSession(){
       + "<p>Five minutes of easy cardio &mdash; bike, rower, brisk walk on the treadmill. Then two "
       + "light sets of the first movement to find the weight. Not to failure. Not even close.</p></div>";
     h += "<div class='ssbig'>" + (restLeft() > 0
-      ? "<div id='ssRest' class='ssrest going'>Warming up \u00b7 " + restClock(restLeft()) + "</div>"
+      ? "<div id='ssRest' class='ssrest going' style='--rest:"
+        + (restLeft() / Math.max(1, restTotal())).toFixed(3) + "'><i></i><span>Warming up \u00b7 "
+        + restClock(restLeft()) + "</span></div>"
       : "<button class='btn' data-sswarm='1'>Start a five-minute clock</button>") + "</div>";
     h += "<div class='btns'><button class='btn pri big' data-swarmdone='1'>Warm. Start the first movement</button></div>";
     h += "</div>";
@@ -838,8 +854,7 @@ function paintSession(){
            : (had && had.r.length ? had.r[had.r.length - 1] : (t.reps || ex[2]));
   SESSION.w = w; SESSION.wFor = name; SESSION.r = reps; SESSION.rFor = name;
 
-  h += "<div class='sshero'><div class='ssk2'>Movement " + (SESSION.i + 1) + " of " + n
-    + " &middot; " + esc(ex[4]) + "</div><h2>" + esc(name) + "</h2>"
+  h += "<div class='sshero'><div class='ssk2'>" + esc(ex[4]) + "</div><h2>" + esc(name) + "</h2>"
     + "<p class='sstarget'>" + esc(t.say) + "</p>"
     + "<div class='ssacts'><button class='btn quiet' data-how='" + SESSION.key + ":" + SESSION.i + "'>How to do it</button>"
     + "<button class='btn quiet' data-sswap='" + SESSION.i + "'>Swap the machine</button></div></div>";
@@ -859,12 +874,14 @@ function paintSession(){
       + liftRow("Load", w, "kg", "sw", 0)
       + liftRow("Reps", reps, "", "sr", 0)
       + "</div>";
-    h += "<div id='ssRest' class='ssrest" + (restLeft() > 0 ? " going" : "") + "'>"
-      + (restLeft() > 0 ? "Resting \u00b7 " + restClock(restLeft()) : "") + "</div>";
+    var rl = restLeft();
+    h += "<div id='ssRest' class='ssrest" + (rl > 0 ? " going" : "") + "'"
+      + " style='--rest:" + (rl > 0 ? (rl / Math.max(1, restTotal())).toFixed(3) : 0) + "'>"
+      + "<i></i><span>" + (rl > 0 ? "Resting \u00b7 " + restClock(rl) : "") + "</span></div>";
     h += "<div class='btns'><button class='btn pri big' data-ssetdone='1'>Set " + (setNo + 1) + " done</button></div>";
   } else {
-    h += "<div id='ssRest' class='ssrest done'>All " + sets + " sets in. " + esc(had.w) + "kg &middot; "
-      + had.r.join(" \u00b7 ") + "</div>";
+    h += "<div id='ssRest' class='ssrest done'><i></i><span>All " + sets + " sets in. "
+      + esc(had.w) + "kg &middot; " + had.r.join(" \u00b7 ") + "</span></div>";
     h += "<div class='btns'><button class='btn pri big' data-snext='1'>"
       + (SESSION.i + 1 < n ? "Next movement" : "Finish the session") + "</button></div>";
   }
