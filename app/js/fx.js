@@ -277,12 +277,16 @@ function hero(o){
   h += "<div class='hero-n'><b>" + o.big + "</b>"
      + (o.unit ? "<i>" + o.unit + "</i>" : "") + "</div>";
   if (o.line) h += "<div class='hero-l'>" + o.line + "</div>";
-  if (o.pct !== undefined && o.pct !== null){
+  /* an empty bar is a grey line that says nothing; it appears once there is
+     something in it */
+  if (o.pct !== undefined && o.pct !== null && o.pct > 0){
     h += "<div class='hero-b'><i style='width:"
        + Math.max(0, Math.min(100, o.pct)) + "%'></i></div>";
   }
   if (o.foot) h += "<div class='hero-f'>" + o.foot + "</div>";
   if (o.foot2) h += "<div class='hero-f2'>" + o.foot2 + "</div>";
+  /* the one thing to do from here, inside the hero rather than under it */
+  if (o.cta) h += "<button class='hero-cta' " + o.cta.attr + ">" + o.cta.label + "</button>";
   return h + "</div>";
 }
 

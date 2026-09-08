@@ -186,12 +186,9 @@ function questHTML(bare){
 
   h += "<p class='fine'>"
     + (done === qs.length
-        ? "All three. That is " + money(rate() * (CH_PAY * qs.length + CH_SWEEP)) + " in the pot."
-        : "Each one pays " + money(rate() * CH_PAY) + ", all three pays "
-          + money(rate() * CH_SWEEP) + " more. "
-          + (endsIn === 1 ? "Last day." : endsIn + " days left."))
-    + (tier ? " Targets have climbed " + tier + " " + (tier === 1 ? "week" : "weeks")
-            + " &mdash; they will keep climbing." : "")
+        ? "All three \u2014 " + money(rate() * (CH_PAY * qs.length + CH_SWEEP)) + " in the pot."
+        : money(rate() * CH_PAY) + " each, " + money(rate() * CH_SWEEP) + " for all three \u00b7 "
+          + (endsIn === 1 ? "last day" : endsIn + " days left"))
     + "</p>";
   return h;
 }

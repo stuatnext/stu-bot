@@ -109,14 +109,10 @@ function tapOut(){
    it is the only screen whose subject is the day rather than one part of it. */
 function conditionHTML(){
   var t = today(), met = vitalsMet(t), clear = clearDays(), h = "";
-  h += "<div class='rulehead'><h3>Today\u2019s basics</h3><span></span><em>" + met + " of " + VITALS.length + " done</em></div>";
-  h += "<div class='cond" + (met === VITALS.length ? " full" : "") + "'>"
-    + "<div class='cring'>" + ring(met, VITALS.length, "gold") + "<b>" + met + "</b></div>"
-    + "<div class='cbd'><h3>" + (met === VITALS.length ? "All five done" : (VITALS.length - met) + " still to do") + "</h3>"
-    + "<span>" + met + " of " + VITALS.length + " done"
-    + (clear ? " &middot; " + num(clear) + (clear === 1 ? " day" : " days") + " with all five" : "")
-    + "</span></div></div>";
-
+  h += "<div class='rulehead'><h3>Today\u2019s basics</h3><span></span><em>" + met + " of " + VITALS.length
+    + (clear ? " \u00b7 " + clear + " clear" : "") + "</em></div>";
+  /* The five chips are the whole report. A summary card above them said the
+     same number twice, in a bigger box; it is gone. */
   h += "<div class='vit'>";
   VITALS.forEach(function(v){
     var on = vitalMet(v[0], t);
@@ -148,30 +144,45 @@ function viewBasics(){
   var full = ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1);
   var hit7 = waterHit(7);
 
-  h += hero({
-    tone: "blue", icon: "drop", kicker: "Water today",
-    big: gl, unit: "/ " + WATER_GLASSES,
-    line: gl >= WATER_GLASSES
-      ? litres + "L. That is the day's water, before the kopi."
-      : litres + "L of " + full + "L \u2014 " + (WATER_GLASSES - gl) + " to go",
-    pct: Math.round(100 * gl / WATER_GLASSES),
-    foot: hit7 + " of the last 7 days reached " + WATER_GLASSES
-  });
+  /* The bottle. It fills as he drinks and it is the tap target: one tap, one
+     glass. The row of glasses under it is there for putting one back. */
+  var level = Math.min(1, gl / WATER_GLASSES), top = 172 - level * 140;
+  h += "<div class='bottle'>"
+    + "<button class='bt' data-water='" + Math.min(WATER_GLASSES, gl + 1) + "' aria-label='Add a glass'"
+    + (gl >= WATER_GLASSES ? " disabled" : "") + ">"
+    + "<svg viewBox='0 0 100 200' aria-hidden='true'>"
+    + "<defs><linearGradient id='waterGrad' x1='0' y1='0' x2='0' y2='1'>"
+    + "<stop offset='0' stop-color='#7ED4FF'/><stop offset='1' stop-color='#1CB0F6'/></linearGradient>"
+    + "<clipPath id='bodyClip'><path d='M32 34h36v10c8 6 14 16 14 28v98a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12V72c0-12 6-22 14-28z'/></clipPath></defs>"
+    + "<rect class='cap' x='34' y='14' width='32' height='22' rx='5'/>"
+    + "<path class='glass-body' d='M32 34h36v10c8 6 14 16 14 28v98a12 12 0 0 1-12 12H30a12 12 0 0 1-12-12V72c0-12 6-22 14-28z'/>"
+    + "<g clip-path='url(#bodyClip)'>"
+    + "<rect class='liquid' x='0' y='" + top.toFixed(1) + "' width='100' height='200'/>"
+    + (gl > 0 && gl < WATER_GLASSES
+        ? "<path class='wave' d='M0 " + (top + 2).toFixed(1) + " q12 -6 25 0 t25 0 t25 0 t25 0 v8 H0z'/>" : "")
+    + "</g>"
+    + "<g class='ticks'>" + [1,2,3,4,5,6,7].map(function(i){ var y = 172 - i * 140 / 8;
+        return "<line x1='20' y1='" + y + "' x2='28' y2='" + y + "'/>"; }).join("") + "</g>"
+    + "</svg></button>"
+    + "<div class='bside'><div class='bn'>" + gl + "<small>/ " + WATER_GLASSES + "</small></div>"
+    + "<div class='bl'>" + (gl >= WATER_GLASSES
+        ? litres + "L. That is the day\u2019s water, before the kopi."
+        : litres + "L of " + full + "L. " + (WATER_GLASSES - gl) + " to go.") + "</div>"
+    + "<div class='bh2'>Tap the bottle for a glass</div>"
+    + "<div class='bacts'>" + (gl > 0 ? "<button class='btn quiet' data-water='" + gl + "'>Put one back</button>" : "")
+    + "</div></div></div>";
 
-  h += "<div class='rulehead'><h3>Today</h3><span></span><em>" + full + "L</em></div>";
+
   var glasses = gl;
-  h += "<div class='glass'>";
+  h += "<div class='glass' aria-label='Glasses'>";
   for (var gi = 1; gi <= WATER_GLASSES; gi++){
     h += "<button class='gl" + (gi <= glasses ? " on" : "") + "' data-water='" + gi + "'"
       + " aria-label='Glass " + gi + "'><i></i></button>";
   }
   h += "</div>";
   h += "<p class='fine'>" + (glasses >= WATER_GLASSES
-      ? "That is roughly " + ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1) + " litres, before the kopi."
-      : num(WATER_GLASSES - glasses) + " to go, about "
-        + (((WATER_GLASSES - glasses) * GLASS_ML) / 1000).toFixed(1) + "L. Singapore is thirty degrees "
-        + "all year and you eat once, so almost none of your water arrives with food. The honest "
-        + "check is the colour, not the count.") + "</p>";
+      ? "That is " + ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1) + "L, before the kopi."
+      : "The honest check is the colour, not the count.") + "</p>";
 
   /* The last seven days, as its own record rather than a line in a composite
      score. A tab about water should be able to answer "am I actually doing
@@ -189,7 +200,6 @@ function viewBasics(){
       + "<span class='w7d'>" + "SMTWTFS"[d.getDay()] + "</span></div>";
   });
   h += "</div>";
-  h += "<p class='fine'>Eight glasses is the line. Nothing here can break a streak "
-    + "&mdash; the three pillars do that, and thirst is not a moral failing.</p>";
+  h += "<p class='fine'>Eight is the line. Missing it breaks nothing.</p>";
   return h;
 }

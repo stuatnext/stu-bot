@@ -105,21 +105,20 @@ function viewFood(){
 
   var sug = suggestOrder(nowSlot());
   var slots = ANCHORS.filter(function(a){ return anchorDone(t, a[0]); }).length;
-  h += hero({
-    tone: "green", icon: "plate", kicker: "Protein today",
-    big: num(got), unit: "/ " + num(target) + "g",
-    line: left === 0
-      ? "Done. The single biggest lever in the plan, closed."
-      : num(left) + "g to go" + (sug ? " \u2014 a " + esc(sug[0].toLowerCase()) + " would close it" : ""),
-    pct: pct,
-    foot: slots + " of " + ANCHORS.length + " eating occasions so far today"
-        + (slots < 2 ? " \u2014 one meal cannot carry " + num(target) + "g" : "")
-  });
-  h += facts([
-    [num(got) + "g", "eaten", left === 0 ? "on" : ""],
-    [num(left) + "g", "to go", left > target * .6 ? "warn" : ""],
-    [slots + "/" + ANCHORS.length, "occasions", slots >= 2 ? "on" : ""]
-  ]);
+  /* The plate: one ring, one hue, the number in the middle. A single series
+     needs no legend and the value wears ink, not green. */
+  var R = 82, C = 2 * Math.PI * R, dash = (C * Math.min(1, got / target)).toFixed(1);
+  h += "<div class='plate" + (left === 0 ? " done" : "") + "'>"
+    + "<svg viewBox='0 0 200 200' aria-label='Protein today'>"
+    + "<circle class='rim' cx='100' cy='100' r='" + R + "'/>"
+    + "<circle class='rimx' cx='100' cy='100' r='" + (R - 12) + "'/>"
+    + "<circle class='fill' cx='100' cy='100' r='" + R + "' transform='rotate(-90 100 100)'"
+    + " stroke-dasharray='" + dash + " " + C.toFixed(1) + "'/></svg>"
+    + "<div class='pc'><b>" + num(got) + "<small>/ " + num(target) + "g</small></b>"
+    + "<span>protein today</span></div></div>";
+  h += "<p class='pnote'>" + (left === 0 ? "Done for today."
+      : num(left) + "g to go" + (sug ? " \u2014 a " + esc(sug[0].toLowerCase()) + " does it" : ""))
+    + "</p>";
 
   h += "<div class='anch'>";
   ANCHORS.forEach(function(a){
@@ -127,7 +126,7 @@ function viewFood(){
     h += "<button class='an" + (on ? " on" : "") + "' data-slot='" + a[0] + "'>"
       + "<span class='ak'>" + esc(a[2]) + "</span>"
       + "<span class='av'>" + esc(a[1]) + "</span>"
-      + "<span class='ad'>" + (on ? "logged" : "tap to add") + "</span></button>";
+      + "<span class='ad'>" + (on ? "logged" : "+") + "</span></button>";
   });
   h += "</div>";
 
@@ -141,8 +140,7 @@ function viewFood(){
     h += "</div>";
     h += "<div class='btns tight'><button class='btn quiet' data-undofood='1'>Undo the last one</button></div>";
   } else {
-    h += "<p class='fine'>Three occasions at 25 to 40g each gets you there without weighing "
-      + "anything or giving anything up. You currently have one.</p>";
+    h += "<p class='fine'>Three of them at 25 to 40g each gets you there.</p>";
   }
 
   /* The whole list, so the answer to "what do I order" is never a decision -

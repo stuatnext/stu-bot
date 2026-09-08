@@ -16,54 +16,40 @@ function viewGym(){
      is on the board. Everything under it qualifies that number. */
   var doneS = sessionsDone();
   var wNow = (S.waist || []).slice(-1)[0];
+  var resume = S.sess && S.sess.day === t;
   h += hero({
-    tone: "flame", icon: "dumb", kicker: "Today\u2019s session \u00b7 " + key,
+    tone: "iron", icon: "dumb", kicker: "Session " + key + " \u00b7 " + esc(st[1]),
     big: doneN, unit: "/ " + list.length,
     line: doneN === list.length ? "Every move logged. That is the session."
         : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
         : "moves waiting at 24/7 Tanjong Pagar",
     pct: Math.round(100 * doneN / Math.max(1, list.length)),
     foot: doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged all time"
-        : "Turning up is the thing being trained. One move counts."
+        : "Turning up is the thing being trained. One move counts.",
+    cta: { attr: "data-startsession='" + key + "'",
+           label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session" }
   });
   /* The way in. A newbie does not want a list; he wants to be told what to
      do next, one thing at a time, and to be told when to rest. That is the
-     guided session. The list under it is the overview, and still works. */
-  var resume = S.sess && S.sess.day === t;
-  h += "<div class='btns'><button class='btn pri big' data-startsession='" + key + "'>"
-    + (resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session")
-    + "</button></div>";
+     guided session, and it lives on the hero. The list under it is the overview. */
   if (!doneS && !doneN){
-    h += "<p class='fine' style='text-align:center;margin:-4px 0 12px'>It walks you through it: what "
-      + "the machine is, how to set it, what to lift, when to rest. Nothing to work out.</p>";
+    h += "<p class='fine' style='text-align:center;margin:-4px 0 12px'>It tells you what to do, "
+      + "set by set, and times the rests.</p>";
   }
-
-  h += gymProgressHTML();
 
   h += "<div class='rulehead'><h3>Today's moves</h3><span></span>"
     + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
 
-  var stgh = "<div class='stg'>"
-    + "<div class='sh'><b>" + esc(st[1]) + "</b>"
-    + "<span>" + list.length + (list.length === 1 ? " move" : " moves")
-    + " &middot; " + st[3] + " sets</span></div>"
-    + "<p class='fine'>" + esc(st[4]) + "</p>";
+  /* The programme's own level used to sit here in a fold, repeating what the
+     hero already says. What it alone knew - the next unlock - is one line. */
   if (nx){
-    var need = nx[0] - doneS, span = Math.max(1, nx[0] - st[0]);
-    var pctS = Math.min(100, Math.round(100 * (doneS - st[0]) / span));
-    stgh += "<div class='sbar'><i style='width:" + pctS + "%'></i></div>"
-      + "<p class='fine'>" + need + " more " + (need === 1 ? "session" : "sessions")
-      + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
-  } else {
-    stgh += "<p class='fine'>" + num(doneS) + " sessions logged.</p>";
+    h += "<p class='fine' style='margin:-2px 0 8px'>" + (nx[0] - doneS) + " more "
+      + (nx[0] - doneS === 1 ? "session" : "sessions") + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
   }
-  stgh += "</div>";
-  h += fold("stage", esc(st[1]), num(doneS) + (doneS === 1 ? " session" : " sessions")
-    + (nx ? " \u00b7 " + (nx[0] - doneS) + " to " + esc(nx[1]) : ""), stgh, false);
 
   if (!doneN && !doneS){
-    h += "<p class='fine' style='margin:0 0 10px'>24/7 Fitness, Tanjong Pagar. Tap an exercise to "
-      + "log it. The arrows swap it for a machine that does the same job.</p>";
+    h += "<p class='fine' style='margin:0 0 10px'>Tap a move to log it. ? is how to do it, "
+      + "&#8646; swaps the machine.</p>";
   }
 
   h += "<div class='lifts'>";
@@ -97,8 +83,7 @@ function viewGym(){
     var already = day(t).p.train;
     h += "<div class='btns'><button class='btn" + (already ? " quiet" : " pri") + "' data-finish='1'>"
       + (already ? "Trained is marked" : "Finish &mdash; mark Trained") + "</button></div>";
-    if (!already) h += "<p class='fine'>One exercise counts. Ten minutes counts. Turning up is the "
-      + "thing you are training here.</p>";
+
   }
 
   /* --- waist, which belongs with the gym rather than with the food */
@@ -114,12 +99,12 @@ function viewGym(){
       + (dlt < 0 ? "Down " + Math.abs(dlt).toFixed(1) : "Up " + dlt.toFixed(1))
       + "cm since " + esc(nice(prev[0])) + ".</p>";
   }
-  wh += "<p class='fine'>Not the scale. On this plan your weight is meant to rise, so the waist is "
-    + "the number that answers what you actually asked.</p>"
+  wh += "<p class='fine'>Not the scale \u2014 your weight is meant to rise.</p>"
     + "<div class='btns'><button class='btn' data-waist='1'>Measure</button></div></div>";
 
-  h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>The whole plan, on paper</button></div>";
+  h += gymProgressHTML();
   h += fold("waist", "Waist", w ? w[1] + "cm \u00b7 " + esc(nice(w[0])) : "not measured yet", wh, false);
+  h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>The whole plan, on paper</button></div>";
   return h;
 }
 
@@ -746,27 +731,31 @@ function bestOf(names){
 function gymProgressHTML(){
   var weeks = sessionsByWeek(8), total = weeks.reduce(function(a, w){ return a + w[1]; }, 0);
   if (!total) return "";
-  var h = "<div class='rulehead'><h3>Is it working</h3><span></span><em>8 weeks</em></div>";
-  h += "<div class='wk7 gw'>";
+  /* Eight weeks of turning up, as eight bars. It used to be eight tall blue
+     capsules, which read as bottles of water on a gym screen; it is now one
+     low iron chart, and it is folded away because it is history, not today. */
+  var top = Math.max(3, weeks.reduce(function(m, w){ return Math.max(m, w[1]); }, 0));
+  var inner = "<div class='gwk'>";
   weeks.forEach(function(w, i){
-    var n = w[1], on = n >= 3;
-    h += "<div class='w7" + (on ? " on" : "") + (i === weeks.length - 1 ? " now" : "") + "'>"
-      + "<span class='w7b'><i style='height:" + Math.max(4, Math.min(100, Math.round(n / 3 * 100))) + "%'></i></span>"
-      + "<b>" + n + "</b><span class='w7d'>" + (i === weeks.length - 1 ? "now" : "w" + (i + 1)) + "</span></div>";
+    var n = w[1], now = i === weeks.length - 1;
+    inner += "<div class='gwb" + (n >= 3 ? " on" : "") + (now ? " now" : "") + "'>"
+      + "<i style='height:" + Math.max(3, Math.round(n / top * 100)) + "%'></i>"
+      + "<b>" + (now ? "now" : n) + "</b></div>";
   });
-  h += "</div>";
+  inner += "</div>";
+
   var press = bestOf(swapNames(sessionFor("A")[1][1])), pull = bestOf(swapNames(sessionFor("B")[1][1]));
-  var pressN = press ? press.name : "", pullN = pull ? pull.name : "";
   var ws = S.waist || [], w0 = ws[0], w1 = ws[ws.length - 1];
-  h += facts([
-    [press ? press.w + "kg" : "\u2014", press ? "best " + pressN.toLowerCase().split(" ")[0] : "chest", press ? "on" : ""],
-    [pull ? pull.w + "kg" : "\u2014", pull ? "best " + pullN.toLowerCase().split(" ")[0] : "back", pull ? "on" : ""],
-    [w1 ? (w0 && w0 !== w1 ? (w1[1] - w0[1] > 0 ? "+" : "") + (w1[1] - w0[1]).toFixed(1) + "cm" : w1[1] + "cm") : "\u2014",
-     "waist", w1 && w0 && w1[1] < w0[1] ? "on" : ""]
-  ]);
-  h += "<p class='fine'>Three a week is the line. Strength is the estimated best on the chest and "
-    + "back movements; waist is the change since the first measurement.</p>";
-  return h;
+  var bits = [];
+  if (press) bits.push("chest " + press.w + "kg");
+  if (pull) bits.push("back " + pull.w + "kg");
+  if (w1) bits.push("waist " + (w0 && w0 !== w1
+    ? (w1[1] - w0[1] > 0 ? "+" : "") + (w1[1] - w0[1]).toFixed(1) + "cm" : w1[1] + "cm"));
+  inner += "<p class='fine'>Three a week is the line."
+    + (bits.length ? " Best so far: " + bits.join(" · ") + "." : "") + "</p>";
+
+  var wk = weeks[weeks.length - 1][1];
+  return fold("gymprog", "Is it working", wk + " this week", inner, false);
 }
 
 /* ------------------------------------------------------------- how-to */

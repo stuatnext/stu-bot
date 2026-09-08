@@ -59,12 +59,9 @@ function viewDeck(){
       + num(setsCompleteEver()) + " sets completed all time</span></div>";
   }
 
-  /* What is in his hand comes first: it is the part of the deck that is
-     about today rather than about the collection. */
-  h += handHTML();
-
   /* Packs first when there are packs, because that is what he came for. The
      hero only takes the top of the screen on a day with nothing to open. */
+
   if (!(w.streak || w.day)){
     var heldN = heldCount(), sealed = CARDS.length - heldN;
     h += hero({
@@ -95,6 +92,9 @@ function viewDeck(){
     h += "</div>";
   }
 
+
+  /* Then what is in his hand: the part of the deck that is about today. */
+  h += handHTML();
   /* pick the set to show: last chosen, else the one nearest finishing */
   var open = SETS.filter(function(s){ return setOpen(s[0]); });
   if (!DECKSET || !open.filter(function(s){ return s[0] === DECKSET; }).length){
@@ -223,17 +223,18 @@ function handHTML(){
   var hd = handDo(), hi = handIn(), h = "";
   if (hd.length || hi.length){
     h += "<div class='rulehead'><h3>To do</h3><span></span><em>"
-      + (hd.length + hi.length) + "</em></div><div class='hand'>";
+      + (hd.length + hi.length) + "</em></div>";
+    h += "<div class='hand'>";
     hd.forEach(function(a){
-      h += "<div class='hc hd'>" + dcard(a, {})
+      h += "<div class='hc hd' id='hand-" + esc(a[0]) + "'>" + dcard(a, {})
         + "<div class='hcb'><b>" + esc(a[1]) + "</b><span>" + esc(a[2]) + "</span>"
         + "<div class='hca'><button class='btn pri' data-doit='" + a[0]
-        + "'>Did it &middot; +10 spares, +20 XP</button></div></div></div>";
+        + "'>Did it</button></div></div></div>";
     });
     hi.forEach(function(i){
-      h += "<div class='hc hi'>" + icard(i, {})
+      h += "<div class='hc hi' id='hand-" + esc(i[0]) + "'>" + icard(i, {})
         + "<div class='hcb'><b>" + esc(i[2]) + "</b><span>" + esc(i[3]) + "</span>"
-        + "<div class='hca'><button class='btn' data-keepin='" + i[0] + "'>Save it &middot; +5 XP</button>"
+        + "<div class='hca'><button class='btn' data-keepin='" + i[0] + "'>Save it</button>"
         + "<button class='btn quiet' data-letgo='" + i[0] + "'>Let it go</button></div></div></div>";
     });
     h += "</div>";
@@ -372,3 +373,4 @@ function askNewSeason(){
     }
   });
 }
+

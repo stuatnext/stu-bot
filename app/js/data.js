@@ -881,15 +881,15 @@ var VITALS = [
 var CHALLENGES = [
   ["full",   "%n full days",              "full",    3, 0.5, 6],
   ["train",  "%n gym sessions",           "sess",    2, 0.4, 5],
-  ["prot",   "Protein closed on %n days", "prot",    3, 0.5, 6],
-  ["water",  "Eight glasses on %n days",  "water",   3, 0.6, 7],
-  ["sleep",  "Seven hours on %n nights",  "sleep",   3, 0.5, 6],
+  ["prot",   "Hit protein on %n days",    "prot",    3, 0.5, 6],
+  ["water",  "8 glasses on %n days",      "water",   3, 0.6, 7],
+  ["sleep",  "Sleep 7 hours, %n nights",  "sleep",   3, 0.5, 6],
   ["clear",  "%n clear days",             "clear",   1, 0.4, 5],
-  ["out",    "Outside on %n days",        "out",     5, 0.3, 7],
+  ["out",    "Get outside %n days",       "out",     5, 0.3, 7],
   ["bed",    "Bed on time %n nights",     "bed",     3, 0.5, 6],
-  ["fam",    "Talk to home %n times",     "fam",     2, 0.2, 4],
+  ["fam",    "Call home %n times",        "fam",     2, 0.2, 4],
   ["stop",   "Finish on time %n days",    "stop",    3, 0.4, 5],
-  ["place",  "Somewhere new, %n of them", "place",   1, 0.2, 3],
+  ["place",  "%n new places",             "place",   1, 0.2, 3],
   ["lift",   "Beat %n of your own lifts", "beatlift",1, 0.4, 5]
 ];
 

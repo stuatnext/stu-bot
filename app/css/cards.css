@@ -561,3 +561,8 @@
 #stage .tray .tc.kd .tc-pane,#stage .tray .tc.ki .tc-pane{justify-content:center; align-items:center}
 #stage .tray .tc.kd .tc-mk{position:static; width:22px; height:22px; border-radius:7px}
 #stage .tray .tc .tc-kind{margin:0; font-size:7px}
+
+/* A row that has just been asked for, briefly ringed. */
+.hc.pulse{animation:hcpulse .9s var(--pop)}
+@keyframes hcpulse{0%,100%{box-shadow:none}30%{box-shadow:0 0 0 4px var(--goldSoft), 0 0 0 6px var(--gold)}}
+

@@ -106,12 +106,12 @@ button.vc:active{transform:scale(.96)}
 .vc.on .vl{color:var(--greenInk); opacity:.8}
 
 /* eight glasses, because eight taps is the entire interface */
-.glass{display:grid; grid-template-columns:repeat(8,1fr); gap:6px; margin:0 0 8px}
-.gl{padding:0; border:none; background:none; cursor:pointer; min-height:44px;
+.glass{display:grid; grid-template-columns:repeat(8,1fr); gap:8px; margin:2px 0 10px}
+.gl{padding:0; border:none; background:none; cursor:pointer; min-height:34px;
   display:flex; align-items:center; justify-content:center}
-.gl i{display:block; width:100%; max-width:30px; aspect-ratio:.68; border-radius:3px 3px 8px 8px;
-  border:2px solid var(--edge2); background:var(--card); transition:background .18s, border-color .18s}
-.gl.on i{border-color:#7FC7EE; background:linear-gradient(180deg,#BFE4F7,#7FC7EE)}
+.gl i{display:block; width:100%; height:8px; border-radius:5px;
+  background:var(--edge2); transition:background .18s}
+.gl.on i{background:linear-gradient(90deg,#7ED4FF,#1CB0F6)}
 .gl:active i{transform:scale(.9)}
 
 /* the week's three, which regenerate on a Monday and never run out */
@@ -318,7 +318,7 @@ button.vc:active{transform:scale(.96)}
 .fold .fb{border:1.5px solid var(--edge); border-top:0; border-bottom-width:3px; border-radius:0 0 16px 16px;
   padding:12px 12px 14px; background:var(--card)}
 .fold .fb .rulehead{margin-top:6px}
-.fold .fb .rec,.fold .fb .wi{background:var(--card2)}
+.fold .fb .rec{background:var(--card2)}
 .btn.big{min-height:56px; font-size:16px; width:100%}
 .how{margin:4px 0 8px 18px; padding:0; text-align:left}
 .how li{margin:7px 0; font-size:14px; line-height:1.45}
@@ -367,3 +367,160 @@ button.vc:active{transform:scale(.96)}
 #modal .bundle{width:100%; height:110px; resize:none; margin:8px 0 4px; padding:10px 12px; border-radius:12px;
   font:600 11px/1.4 "JetBrains Mono",monospace; color:var(--ink2); background:var(--sunk);
   border:1.5px solid var(--edge); word-break:break-all}
+
+/* ==========================================================================
+   v34 - each tab gets one object that belongs to its subject, and the rest
+   of the screen gets quieter. Iron for the gym, a plate for food, a bottle
+   for water, a calendar leaf for work.
+   ========================================================================== */
+.hero-cta{display:block; width:100%; margin-top:16px; min-height:54px; border-radius:16px;
+  font:inherit; font-size:15.5px; font-weight:900; letter-spacing:.01em; cursor:pointer;
+  color:#1B1200; background:linear-gradient(180deg,#FFE38A,#F2B735 60%,#D89412);
+  border:0; border-bottom:4px solid #A87A0E; box-shadow:0 10px 24px -12px rgba(0,0,0,.6)}
+.hero-cta:active{transform:translateY(2px); border-bottom-width:2px}
+
+/* ------------------------------------------------------------------- iron */
+.t-iron{--h1:#2B3442; --h2:#161C27; --h3:#0B0F17; --hsh:rgba(0,0,0,.7)}
+.t-iron .hero-gl{background:radial-gradient(circle,rgba(255,140,40,.55),transparent 62%); right:-60px; top:-90px}
+.t-iron .hero-gl2{background:radial-gradient(circle,rgba(255,110,30,.28),transparent 60%)}
+.t-iron .hero-n b{color:#FFB35C; text-shadow:0 0 22px rgba(255,150,60,.55)}
+.t-iron .hero-b{background:rgba(255,255,255,.1)}
+.t-iron .hero-b i{background:linear-gradient(90deg,#FF9A3C,#FFD35C); box-shadow:0 0 14px rgba(255,170,60,.7)}
+.t-iron .hero-ic{background:rgba(255,160,60,.16); border-color:rgba(255,180,80,.4); color:#FFB35C}
+/* the programme as numbered plates */
+.lifts{counter-reset:move}
+.liftrow{counter-increment:move; display:grid; grid-template-columns:1fr auto auto; gap:0; margin:9px 0;
+  align-items:stretch; background:var(--card); border:1.5px solid var(--edge); border-bottom-width:3px;
+  border-radius:20px; overflow:hidden}
+.lift{display:flex; align-items:center; gap:13px; padding:11px 18px 11px 12px; min-height:78px; width:100%;
+  text-align:left; font:inherit; color:var(--ink); cursor:pointer; border:0; border-radius:0;
+  background:none}
+.liftrow:has(.lift.on){border-color:#BEE8A0; background:var(--greenSoft)}
+.lift::before{content:counter(move); flex:none; width:26px; height:26px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center; font:900 12px/1 "JetBrains Mono",monospace;
+  color:var(--ink3); background:var(--sunk)}
+.lift.on::before{background:var(--green); color:#fff}
+.lift .lb2{flex:1; min-width:0}
+.lift .lb2 b{display:block; font-size:15.5px; font-weight:800; letter-spacing:-.01em}
+.lift .lb2 span{display:block; font-size:11.5px; color:var(--ink3); margin-top:2px; line-height:1.3}
+.lift .lv{flex:none; width:60px; height:60px; border-radius:50%; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; line-height:1; text-align:center;
+  font-family:"Nunito",sans-serif; font-size:14.5px; font-weight:900; color:#F8FAFC;
+  background:radial-gradient(circle at 50% 40%,#3B4657,#161C27 70%);
+  box-shadow:0 0 0 3px #0B0F17, 0 0 0 4.5px #4B5563, 0 4px 10px rgba(0,0,0,.35)}
+.lift .lv em{font-style:normal; font-family:"JetBrains Mono",monospace; font-size:7.5px; letter-spacing:.06em;
+  text-transform:uppercase; color:rgba(255,255,255,.55); margin-top:3px; max-width:52px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.lift.on .lv{background:radial-gradient(circle at 50% 40%,#5CC26B,#2E7D3C 70%); box-shadow:0 0 0 3px #1F4D28, 0 0 0 4.5px #7ED88B}
+.lift .lv .new{font-size:11px; color:#FFB35C}
+.swap{width:38px; min-height:78px; border:0; border-left:1.5px solid var(--edge); border-radius:0;
+  font:inherit; font-size:16px; cursor:pointer; color:var(--ink3); background:none}
+.swap:active{background:var(--sunk)}
+
+/* ------------------------------------------------------------------ plate */
+.plate{position:relative; display:grid; grid-template-columns:1fr; justify-items:center; margin:12px 0 6px}
+.plate svg{width:184px; height:184px; display:block}
+.plate .rim{fill:none; stroke:var(--sunk); stroke-width:13}
+.plate .rimx{fill:none; stroke:transparent}
+.plate .fill{fill:none; stroke:var(--green); stroke-width:13; stroke-linecap:round;
+  transition:stroke-dasharray .7s var(--tap)}
+.plate.done .fill{stroke:var(--green)}
+.plate .pc{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  pointer-events:none}
+.plate .pc b{font-family:"Nunito",sans-serif; font-size:40px; font-weight:900; letter-spacing:-.04em; line-height:1;
+  color:var(--ink); font-variant-numeric:tabular-nums}
+.plate .pc b small{font-size:.42em; color:var(--ink3); margin-left:2px; font-weight:800}
+.plate .pc span{font-size:12.5px; font-weight:800; color:var(--ink2); margin-top:4px}
+.pnote{margin:2px 0 12px; text-align:center; font-size:13.5px; font-weight:800; color:var(--greenInk)}
+.anch{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:8px 0 4px}
+.an{aspect-ratio:1; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; padding:8px 6px; max-width:118px; margin:0 auto; width:100%; font:inherit; color:var(--ink); cursor:pointer; text-align:center;
+  background:var(--card); border:2px solid var(--edge); box-shadow:0 3px 0 var(--edge), 0 0 0 6px var(--card2) inset}
+.an .ak{font-family:"JetBrains Mono",monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3)}
+.an .av{font-size:12.5px; font-weight:800; line-height:1.15; letter-spacing:-.01em}
+.an .ad{font-size:15px; font-weight:900; color:var(--ink3); line-height:1}
+.an.on .ad{font-size:9.5px; text-transform:uppercase; letter-spacing:.08em}
+.an.on{background:var(--greenSoft); border-color:#BFE79A; color:var(--greenInk);
+  box-shadow:0 3px 0 #BFE79A, 0 0 0 6px #EEF9E2 inset}
+.an.on .ad{color:var(--greenInk)}
+
+/* ----------------------------------------------------------------- bottle */
+.bottle{display:grid; grid-template-columns:132px 1fr; gap:16px; align-items:center; margin:8px 0 6px}
+.bottle button.bt{background:none; border:0; padding:0; cursor:pointer; display:block; -webkit-tap-highlight-color:transparent}
+.bottle svg{width:132px; height:236px; display:block; filter:drop-shadow(0 10px 18px rgba(15,130,200,.22))}
+.bottle .glass-body{fill:#F3F9FD; stroke:#BFDDF0; stroke-width:3}
+.bottle .cap{fill:#1899D6}
+.bottle .liquid{fill:url(#waterGrad); transition:transform .5s var(--tap)}
+.bottle .wave{fill:#7ED4FF; opacity:.9}
+.bottle .ticks line{stroke:#CFE6F4; stroke-width:1.5}
+.bottle .bn{font-family:"Nunito",sans-serif; font-size:52px; font-weight:900; letter-spacing:-.04em; line-height:1;
+  color:var(--ink); font-variant-numeric:tabular-nums}
+.bottle .bn small{font-size:.4em; color:var(--ink3); margin-left:2px}
+.bottle .bl{font-size:14px; font-weight:800; color:var(--ink2); margin-top:6px; line-height:1.35}
+.bottle .bh{font-size:12px; font-weight:700; color:#0B72BD; margin-top:10px}
+.bottle .bacts{display:flex; gap:8px; margin-top:12px}
+.bottle .bacts .btn{padding:9px 13px; min-height:40px; font-size:12.5px; flex:none}
+.glass{display:flex; gap:7px; margin:12px 0 6px}
+.gl{flex:1; height:34px; border:0; background:none; padding:0; cursor:pointer;
+  display:flex; align-items:center; position:relative; overflow:visible}
+.gl i{display:block; width:100%; height:8px; border-radius:5px; background:var(--edge2);
+  transition:background .18s}
+.gl.on i{background:linear-gradient(90deg,#7ED4FF,#1CB0F6)}
+.gl:active i{transform:scaleY(1.5)}
+
+/* ------------------------------------------------------------------ leaf */
+.leafrow{display:grid; grid-template-columns:118px 1fr; gap:14px; align-items:stretch; margin:10px 0 8px}
+.leaf{border-radius:18px; overflow:hidden; background:var(--card); border:1.5px solid var(--edge);
+  border-bottom-width:3px; text-align:center; display:flex; flex-direction:column}
+.leaf .lm{background:linear-gradient(180deg,#CE82FF,#A855E8); color:#fff; font-family:"JetBrains Mono",monospace;
+  font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; padding:8px 0 7px}
+.leaf .ld{font-family:"Nunito",sans-serif; font-size:56px; font-weight:900; letter-spacing:-.05em; line-height:1;
+  padding:12px 0 4px; color:var(--ink)}
+.leaf .lw{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); padding-bottom:12px}
+.until{display:flex; flex-direction:column; justify-content:center; padding:12px 14px; border-radius:18px;
+  color:#fff; background:linear-gradient(152deg,#D79AFF,#A961EE 58%,#7A38C4);
+  box-shadow:0 14px 30px -16px rgba(140,70,215,.66)}
+.until b{font-family:"Nunito",sans-serif; font-size:40px; font-weight:900; letter-spacing:-.04em; line-height:1}
+.until b i{font-style:normal; font-size:.42em; opacity:.8; margin-left:4px; font-weight:800}
+.until .ut{font-size:15px; font-weight:800; margin-top:6px; line-height:1.2}
+.until .un{font-size:12px; font-weight:700; opacity:.85; margin-top:4px; line-height:1.35}
+.tl{position:relative; margin:6px 0 4px 10px; padding-left:22px}
+.tl::before{content:""; position:absolute; left:6px; top:8px; bottom:8px; width:2px; background:var(--edge2); border-radius:2px}
+.tli{position:relative; padding:7px 0}
+.tli::before{content:""; position:absolute; left:-21px; top:13px; width:12px; height:12px; border-radius:50%;
+  background:var(--card); border:2.5px solid var(--violetEdge)}
+.tli b{display:block; font-size:14.5px; font-weight:800}
+.tli span{display:block; font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink3); margin-top:2px}
+
+/* --- v34: eight weeks of sessions, as iron. Never blue: this is not water. */
+.gwk{display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:6px; align-items:end;
+  height:76px; margin:4px 0 10px; padding:0 2px}
+.gwb{display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  gap:5px; height:100%}
+.gwb i{display:block; width:100%; max-width:26px; border-radius:6px 6px 3px 3px;
+  background:var(--line); min-height:3px}
+.gwb.on i{background:linear-gradient(180deg,#FFA13C,#F2701E)}
+.gwb b{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.04em;
+  color:var(--ink3); line-height:1}
+.gwb.now b{color:#D8600E}
+.gwb.now i{box-shadow:0 0 0 2px rgba(242,112,30,.35)}
+
+/* the bottle's own hint, where the eye already is */
+.bottle .bh2{font-size:11.5px; font-weight:700; color:var(--ink3); margin:6px 0 2px}
+
+/* the week's three, flat: the fold is already the box */
+.qq{border:0; background:none; padding:6px 2px 8px}
+.qq + .qq{border-top:1.5px solid var(--edge)}
+.qq.on{background:none}
+
+/* v34b: a task inside a fold is a line, not a card inside a card */
+.wk{gap:0}
+.wi{border:0; background:none; border-radius:12px; padding:11px 4px}
+.wi + .wi{border-top:1.5px solid var(--edge)}
+.wi.on{background:none}
+.wi.on .wbox{background:var(--jade); border-color:var(--jade)}
+/* the same, for the food list */
+.ordl{gap:0}
+.ord{border:0; background:none; padding:11px 4px; border-radius:12px}
+.ord + .ord{border-top:1.5px solid var(--edge)}

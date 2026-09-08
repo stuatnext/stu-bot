@@ -64,7 +64,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v33";
+var BUILD = "v34";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -266,7 +266,11 @@ setInterval(function(){
   paintSky();
   if (tab !== "today" || ST || MODAL) return;
   var sk = document.querySelector("#screen .skycard");
-  if (sk) sk.outerHTML = skyCardHTML();
+  if (sk){
+    /* keep the day's line - only the sun has moved */
+    var bd = sk.querySelector(".skybd"), a = bd && bd.querySelector("b"), u = bd && bd.querySelector("span");
+    sk.outerHTML = skyCardHTML(a ? a.textContent : "", u ? u.textContent : "");
+  }
 }, 60000);
 
 /* Hold the title card for a beat, then hand over. */

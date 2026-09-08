@@ -29,7 +29,7 @@ function arcSeg(a, b){
   }
   return pts.join(" ");
 }
-function skyCardHTML(){
+function skyCardHTML(ask, sub){
   var s = shape(), ph = skyPhase();
   var night = ph === "night" || ph === "deepnight" || ph === "dusk";
   var h = "<div class='skycard'>";
@@ -55,8 +55,9 @@ function skyCardHTML(){
       + (now[1] - 2.4).toFixed(1) + "' r='5.2'/>";
   }
   h += "</svg>";
-  h += "<div class='skybd'><b>" + esc(niceToday()) + "</b>"
-    + "<span>" + esc(dialLabel(s)) + "</span></div></div>";
+  h += "<div class='skybd'><i>" + esc(niceToday()) + " \u00b7 " + esc(dialLabel(s)) + "</i>"
+    + "<b>" + esc(ask || "") + "</b>"
+    + (sub ? "<span>" + esc(sub) + "</span>" : "") + "</div></div>";
   return h;
 }
 function dialLabel(s){
@@ -130,9 +131,7 @@ function viewToday(){
     ask = owed === 1 ? "One more." : owed + " to go.";
     sub = "All of them earns the pack.";
   }
-  h += "<div class='hello'><p class='ask'>" + esc(ask) + "</p>"
-    + "<p class='asksub'>" + esc(sub) + "</p></div>";
-
+  h += skyCardHTML(ask, sub);
   /* A month just closed: hold it up once before it is filed. Never deleted,
      never reset - the pattern in a bad month is the lesson (his call). */
   var rec = S.onboarded ? monthRecapDue() : null;
@@ -147,7 +146,6 @@ function viewToday(){
       + "</div>";
   }
 
-  h += skyCardHTML();
   h += weekHTML();
 
   /* the session: three big pressable rows. The hour points at one of them -
@@ -169,6 +167,10 @@ function viewToday(){
       + "</button>";
   });
   h += "</div>";
+  /* the tiles have no room for the tip; the one the hour points at speaks here */
+  if (up && !pDone(t, up) && required(up, t)){
+    h += "<p class='uptip'>" + esc(tipFor(up)) + "</p>";
+  }
 
   /* the chest */
   h += "<" + (packs ? "button" : "div") + " class='gem" + (packs ? " won" : "") + "'"
