@@ -539,3 +539,25 @@
 /* the rarity, said on the plate as a texture would be on a real card */
 .tc-gem::after{content:""; position:absolute; inset:0; border-radius:inherit;
   background:linear-gradient(135deg,rgba(255,255,255,.7),transparent 55%)}
+
+/* ==================================================== the face stays hidden
+   On iOS, layers with a blend mode inside a 3D flip escape backface culling:
+   the rare texture, the art, the new dot and the gem all showed through the
+   back of a face-down card. So while a card is down, everything on the face
+   is invisible outright - and on the turn it stays invisible until the
+   half-way point, which is exactly when the face comes round. */
+.tc-pane{isolation:isolate}
+.tc .tc-f > *{transition:visibility 0s linear calc(var(--flipd,.62s) * .5)}
+.tc.down .tc-f > *{visibility:hidden; transition-delay:0s}
+.tc.down .tc-fx,.tc.down .tc-holo,.tc.down .tc-glare{display:none}
+
+/* Thumbnails - in the tray and beside a hand row - are pictures, not
+   labels. "Labra tunn" and "Chan Jewe" were not helping anyone. */
+#stage .tray .tc .tc-nm,#stage .tray .tc .tc-nt,#stage .tray .tc .tc-cnt,
+.hc .tc .tc-nm,.hc .tc .tc-nt,
+#stage .tray .tc.kd .tc-verb,#stage .tray .tc.kd .tc-det,
+#stage .tray .tc.ki .tc-ttl,#stage .tray .tc.ki .tc-body,#stage .tray .tc.ki .tc-mark{display:none}
+#stage .tray .tc .tc-art{border-top:0}
+#stage .tray .tc.kd .tc-pane,#stage .tray .tc.ki .tc-pane{justify-content:center; align-items:center}
+#stage .tray .tc.kd .tc-mk{position:static; width:22px; height:22px; border-radius:7px}
+#stage .tray .tc .tc-kind{margin:0; font-size:7px}

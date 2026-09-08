@@ -165,12 +165,13 @@ function questEarned(){
 }
 
 /* ------------------------------------------------------------------- view */
-function questHTML(){
+function questHTML(bare){
   var k = weekKey(), qs = questsFor(k), tier = tierAt(k);
   var done = qs.filter(function(q){ return questDoneQ(q, k); }).length;
   var endsIn = 7 - weekDays(k).length + 1;
-  var h = "<div class='rulehead'><h3>This week</h3><span></span><em>"
-    + (done === qs.length ? "swept" : done + " of " + qs.length) + "</em></div>";
+  /* bare: inside a fold that already carries the heading */
+  var h = bare ? "" : "<div class='rulehead'><h3>This week</h3><span></span><em>"
+    + (done === qs.length ? "all three" : done + " of " + qs.length) + "</em></div>";
 
   h += "<div class='qwk'>";
   qs.forEach(function(q){

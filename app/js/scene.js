@@ -184,7 +184,7 @@ function viewToday(){
      stays how he leaves it. */
   var qk = weekKey(), qs = questsFor(qk);
   var qdone = qs.filter(function(q){ return questDoneQ(q, qk); }).length;
-  h += fold("week", "This week", qdone + " of " + qs.length, questHTML(), true);
+  h += fold("week", "This week", qdone + " of " + qs.length, questHTML(true), true);
 
   /* the side quest: one held card asks something of him. This is what makes
      the collection a deck instead of wallpaper - his call, his words. */
@@ -195,7 +195,7 @@ function viewToday(){
     var a = hd[0];
     h += "<div class='quest'>"
       + "<span class='qgl'>" + svg("tick", 22) + "</span>"
-      + "<span class='qtx'><b>Do \u00b7 " + esc(sizeWord(a[3])) + "</b>"
+      + "<span class='qtx'><b>To do \u00b7 " + esc(sizeWord(a[3])) + "</b>"
       + "<span>" + esc(a[1]) + ". " + esc(a[2]) + "</span></span>"
       + "<span class='qact'><button class='qgo' data-doit='" + a[0] + "'>Did it</button></span>"
       + "</div>";
@@ -206,9 +206,9 @@ function viewToday(){
         : (CARD_ART[q.card[0]] || SET_ART[q.card[2]] || "\u2b50");
       h += "<div class='quest" + (q.done ? " qdone" : "") + "'>"
         + "<span class='qgl" + (q.card[2] === "zh" ? " zh" : "") + "'>" + esc(qa) + "</span>"
-        + "<span class='qtx'><b>" + (q.done ? "Side quest \u00b7 lived" : "Side quest \u00b7 " + esc(q.card[0])) + "</b>"
+        + "<span class='qtx'><b>" + (q.done ? "Done \u00b7 " + esc(q.card[0]) : "Today\u2019s card \u00b7 " + esc(q.card[0])) + "</b>"
         + "<span>" + esc(q.done
-            ? "+10 spares, +20 XP \u00b7 " + q.card[0] + " is a lived card now."
+            ? "+10 spares, +20 XP. That card is done."
             : q.text) + "</span></span>"
         + (q.done
             ? "<span class='qwin'>" + svg("tick", 18) + "</span>"

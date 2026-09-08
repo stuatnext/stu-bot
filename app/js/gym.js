@@ -89,7 +89,7 @@ function viewGym(){
   var held = sessionFor(key)[1].slice(list.length);
   if (held.length){
     h += "<div class='hold'>" + held.length + " more "
-      + (held.length === 1 ? "move" : "moves") + " in this session, still sealed &mdash; "
+      + (held.length === 1 ? "move" : "moves") + " in this session, locked for now &mdash; "
       + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</div>";
   }
 

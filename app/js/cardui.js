@@ -154,8 +154,7 @@ function landCard(tc, e){
       var dup = S.cards[c[0]] > 1;
       step.textContent = RARITY[r][0] + (dup ? " \u00b7 spare \u00b7 +" + RARITY[r][4] : " \u00b7 new");
     } else {
-      step.textContent = info.kind === "do" ? "Something to do \u00b7 into your hand"
-                                             : "Something to keep \u00b7 into your hand";
+      step.textContent = info.kind === "do" ? "A thing to do" : "A thought to keep";
     }
   }
   var dot = document.querySelector("[data-dot='" + ST.i + "']");
@@ -302,12 +301,12 @@ function openSealed(setKey, r){
     + " &middot; not found yet</div>"
     + "<p class='fine' style='text-align:center;margin:2px 14px 0'>"
     + num(n) + " " + RARITY[r][0].toLowerCase() + (n === 1 ? "" : "s")
-    + " still sealed in this set. Packs are how they open. Spares can force one, "
-    + "but not this one in particular &mdash; that is the deck's call.</p>"
+    + " still to find in this set. Packs find them. You can trade spares for one, "
+    + "but the deck picks which.</p>"
     + "<div class='acts'>"
     + "<button class='" + (can ? "pri" : "") + "' " + (can ? "" : "disabled ")
     + "data-craftr='" + esc(setKey) + "|" + r + "'>"
-    + (can ? "Force one open &middot; " + cost + " spares"
+    + (can ? "Trade " + cost + " spares for one"
            : cost + " spares (" + spares() + ")") + "</button>"
     + "<button id='shClose'>Close</button></div>";
   el.className = "on";
@@ -350,7 +349,7 @@ function openSheet(name){
      can only act on when told to is not actionable, it is homework. */
   var tryLine = held
     ? "<div class='try" + (lived ? " done" : "") + "'><b>"
-      + (lived ? "Lived \u00b7 " + esc(nice(lived)) : "Go and do it") + "</b>"
+      + (lived ? "Done \u00b7 " + esc(nice(lived)) : "To do") + "</b>"
       + esc(cardDo(c))
       + (lived ? "" : "<button class='doit' data-liveit='" + esc(name)
           + "'>Did it &middot; +10 spares, +20 XP</button>")
@@ -363,13 +362,13 @@ function openSheet(name){
     + "<div class='meta'>" + meta + "</div>"
     + tryLine
     + (held || c[1] === 3 ? "" :
-        "<p class='fine' style='text-align:center;margin:2px 14px 0'>Sealed until you find it. "
-        + "Spares can force one open, but not this one in particular.</p>")
+        "<p class='fine' style='text-align:center;margin:2px 14px 0'>Not found yet. "
+        + "You can trade spares for one, but the deck picks which.</p>")
     + "<div class='acts'>"
     + (!held && c[1] !== 3 && setOpen(c[2])
         ? "<button class='" + (canR ? "pri" : "") + "' " + (canR ? "" : "disabled ")
           + "data-craftr='" + esc(c[2]) + "|" + c[1] + "'>"
-          + (canR ? "Open " + RARITY[c[1]][0].toLowerCase() + " &middot; " + costR + " spares"
+          + (canR ? "Trade " + costR + " spares for a " + RARITY[c[1]][0].toLowerCase()
                   : costR + " spares (" + spares() + ")")
           + "</button>"
         : "")

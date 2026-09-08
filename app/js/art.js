@@ -171,7 +171,7 @@ function tcard(c, count, opts){
   if (lived) h += "<div class='tc-holo'></div>";
   if (count > 1) h += "<span class='tc-cnt'>x" + count + "</span>";
   if (count && (S.seen || {})[c[0]] === 0) h += "<span class='tc-new'></span>";
-  if (lived) h += "<span class='tc-stamp'><b>Lived</b><i>" + esc(nice(lived)) + "</i></span>";
+  if (lived) h += "<span class='tc-stamp'><b>Done</b><i>" + esc(nice(lived)) + "</i></span>";
   h += "<div class='tc-gem'></div></div>";
   h += "<div class='tc-nt'>" + esc(c[3]) + "</div>";
   h += "<div class='tc-glare'></div>";

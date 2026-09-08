@@ -109,12 +109,12 @@ function tapOut(){
    it is the only screen whose subject is the day rather than one part of it. */
 function conditionHTML(){
   var t = today(), met = vitalsMet(t), clear = clearDays(), h = "";
-  h += "<div class='rulehead'><h3>The basics</h3><span></span><em>five of them</em></div>";
+  h += "<div class='rulehead'><h3>Today\u2019s basics</h3><span></span><em>" + met + " of " + VITALS.length + " done</em></div>";
   h += "<div class='cond" + (met === VITALS.length ? " full" : "") + "'>"
     + "<div class='cring'>" + ring(met, VITALS.length, "gold") + "<b>" + met + "</b></div>"
-    + "<div class='cbd'><h3>" + (met === VITALS.length ? "A clear day" : "Condition") + "</h3>"
-    + "<span>" + met + " of " + VITALS.length + " closed"
-    + (clear ? " &middot; " + num(clear) + " clear " + (clear === 1 ? "day" : "days") + " so far" : "")
+    + "<div class='cbd'><h3>" + (met === VITALS.length ? "All five done" : (VITALS.length - met) + " still to do") + "</h3>"
+    + "<span>" + met + " of " + VITALS.length + " done"
+    + (clear ? " &middot; " + num(clear) + (clear === 1 ? " day" : " days") + " with all five" : "")
     + "</span></div></div>";
 
   h += "<div class='vit'>";

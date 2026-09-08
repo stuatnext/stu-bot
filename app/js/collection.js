@@ -24,12 +24,12 @@ function viewDeck(){
   if (!S.cardsWhy){
     h += "<div class='panel whycards'><h3>What cards are</h3>"
       + "<p>Your Singapore year, as a deck \u2014 real dishes, places, phrases and milestones. "
-      + "Full days earn packs, duplicates melt into spares, spares force a sealed card open, "
+      + "Full days earn packs, duplicates turn into spares, spares can be traded for a card, "
       + "and finishing a set pays the pot.</p>"
       + "<p><strong>Every card you hold is something to go and do.</strong> Tap one and it tells "
       + "you what. Do it, tap <em>Did it</em>, and the card is lived: foil, dated, and paid. "
       + "Nothing checks, which is exactly why it counts.</p>"
-      + "<p>A card you have not found is a <strong>sealed back</strong> with its rarity on it. "
+      + "<p>A card you have not found yet shows its <strong>back</strong>, with the rarity on it. "
       + "You can see there is a rare missing from a set; you cannot see which one it is until "
       + "you turn it over. That is the whole game.</p>"
       + "<p>Two exceptions: the <strong>Mandarin</strong> set is real vocabulary \u2014 the "
@@ -70,7 +70,7 @@ function viewDeck(){
     h += hero({
       tone: "gold", icon: "cards", kicker: "Season " + season(),
       big: num(heldN), unit: "/ " + num(CARDS.length),
-      line: sealed ? num(sealed) + (sealed === 1 ? " card still sealed" : " cards still sealed")
+      line: sealed ? num(sealed) + (sealed === 1 ? " card still to find" : " cards still to find")
                    : "Every card in the deck, found.",
       pct: Math.round(100 * heldN / CARDS.length),
       foot2: heldN ? num(livedCount()) + " lived \u00b7 " + num(heldN - livedCount())
@@ -143,8 +143,8 @@ function viewDeck(){
         + label + "</button>";
     }
     h += "<div class='filters'>"
-      + fb(0, "All " + cs.length) + fb(1, "Sealed " + (cs.length - have)) + fb(2, "Held " + have)
-      + fb(3, "To do " + todoN) + fb(4, "Lived " + livedN)
+      + fb(0, "All " + cs.length) + fb(1, "To find " + (cs.length - have)) + fb(2, "Found " + have)
+      + fb(3, "To do " + todoN) + fb(4, "Done " + livedN)
       + "</div>";
   }
 
@@ -168,10 +168,10 @@ function viewDeck(){
     });
     h += "</div>";
   } else {
-    h += "<div class='empty'>" + (DECKFILTER === 1 ? "Nothing sealed here."
-      : DECKFILTER === 3 ? (have ? "Every card you hold here, you have lived." : "Nothing held here yet.")
-      : DECKFILTER === 4 ? "Nothing lived here yet. Tap a held card - it tells you what to do."
-      : "Nothing held here yet.") + "</div>";
+    h += "<div class='empty'>" + (DECKFILTER === 1 ? "You have found all of these."
+      : DECKFILTER === 3 ? (have ? "You have done every card you hold here." : "Nothing found here yet.")
+      : DECKFILTER === 4 ? "Nothing done here yet. Tap a card you have - it tells you what to do."
+      : "Nothing found here yet.") + "</div>";
   }
 
   /* spares, under the set they would finish */
@@ -186,13 +186,13 @@ function viewDeck(){
       + num(sp) + "</div><div class='dim'>from " + num(sparesEarned()) + " earned</div></div></div>";
     h += "<p class='dim' style='margin:10px 0 0'>Every card you pull twice is worth spares: "
       + RARITY[0][4] + " for a common, " + RARITY[1][4] + " uncommon, " + RARITY[2][4] + " rare. "
-      + "They force a sealed card open — " + RARITY[0][5] + ", " + RARITY[1][5] + " or "
+      + "Trade them for a card you have not found — " + RARITY[0][5] + ", " + RARITY[1][5] + " or "
       + RARITY[2][5] + " — and nothing else. You choose the set and the rarity; the deck "
       + "chooses the card. They are not money and they do not buy packs.</p>";
     if (missing.length){
       h += "<div class='btns'><button class='btn " + (affordable.length ? "go" : "quiet") + "'"
         + (affordable.length ? "" : " disabled") + " data-craft='" + DECKSET + "'>"
-        + (affordable.length ? "Force one open" : "Not enough for anything in " + esc(st[1]))
+        + (affordable.length ? "Trade spares for a card" : "Not enough for anything in " + esc(st[1]))
         + "</button></div>";
     }
     h += "</div>";
@@ -204,7 +204,7 @@ function viewDeck(){
     var dleft = door[3] - fd;
     h += "<div class='door'><span class='lk'>" + svg("lock", 18) + "</span>"
       + "<span class='bd'><b>" + esc(door[1]) + "</b><span>" + setCards(door[0]).length
-      + " cards, sealed. They cannot turn up in a pack before then.</span></span>"
+      + " cards, locked until then.</span></span>"
       + "<span class='at'>" + dleft + " full<br>" + (dleft === 1 ? "day" : "days") + "</span></div>";
   }
   /* the ladder lived on Today; progression belongs with the collection */
@@ -222,7 +222,7 @@ function viewDeck(){
 function handHTML(){
   var hd = handDo(), hi = handIn(), h = "";
   if (hd.length || hi.length){
-    h += "<div class='rulehead'><h3>In hand</h3><span></span><em>"
+    h += "<div class='rulehead'><h3>To do</h3><span></span><em>"
       + (hd.length + hi.length) + "</em></div><div class='hand'>";
     hd.forEach(function(a){
       h += "<div class='hc hd'>" + dcard(a, {})
@@ -233,14 +233,14 @@ function handHTML(){
     hi.forEach(function(i){
       h += "<div class='hc hi'>" + icard(i, {})
         + "<div class='hcb'><b>" + esc(i[2]) + "</b><span>" + esc(i[3]) + "</span>"
-        + "<div class='hca'><button class='btn' data-keepin='" + i[0] + "'>Keep &middot; +5 XP</button>"
+        + "<div class='hca'><button class='btn' data-keepin='" + i[0] + "'>Save it &middot; +5 XP</button>"
         + "<button class='btn quiet' data-letgo='" + i[0] + "'>Let it go</button></div></div></div>";
     });
     h += "</div>";
   }
   var kept = Object.keys(S.kept || {}).sort(function(a, b){ return S.kept[a] < S.kept[b] ? 1 : -1; });
   if (kept.length){
-    h += "<div class='rulehead'><h3>Kept</h3><span></span><em>" + num(kept.length) + "</em></div>";
+    h += "<div class='rulehead'><h3>Saved</h3><span></span><em>" + num(kept.length) + "</em></div>";
     h += "<div class='kept'>";
     kept.slice(0, 6).forEach(function(id){
       var i = inspireById(id); if (!i) return;
@@ -324,15 +324,15 @@ async function askCraft(setKey){
   var byR = {};
   missing.forEach(function(c){ byR[c[1]] = (byR[c[1]] || 0) + 1; });
   var v = await ask({
-    title: "Force one open",
+    title: "Trade spares for a card",
     say: "You have <strong>" + num(sp) + " spares</strong>. They came from cards you pulled twice, and "
        + "this is the only thing they do. Pick what you want out of <b>" + esc(st ? st[1] : setKey)
        + "</b> &mdash; which card it turns out to be is not yours to choose.",
     options: Object.keys(byR).sort().map(function(r){
       var cost = RARITY[r][5], n = byR[r], can = cost <= sp;
       return { id: String(r), label: RARITY[r][0] + "  ·  " + cost, pri: can,
-               note: can ? n + " sealed in this set"
-                         : n + " sealed &middot; " + (cost - sp) + " short" };
+               note: can ? n + " still to find in this set"
+                         : n + " to find &middot; " + (cost - sp) + " short" };
     }),
     cancel: "Close"
   });
@@ -344,7 +344,7 @@ async function askCraft(setKey){
 function doCraftR(setKey, r){
   if (!canCraftR(setKey, r)){ sfx("no"); toast("Not enough spares for that one."); return; }
   var got = craftRandom(setKey, r);
-  if (!got){ sfx("no"); toast("Nothing sealed at that rarity."); return; }
+  if (!got){ sfx("no"); toast("Nothing left to find at that rarity."); return; }
   sfx("craft"); buzz([16, 40, 16]);
   revealOne(got);
 }
