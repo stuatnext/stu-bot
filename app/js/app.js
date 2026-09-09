@@ -29,6 +29,9 @@ function paintHud(animate){
   document.getElementById("chipFlame").hidden = fullDays() === 0;
   document.getElementById("chipFlameN").textContent = run;
   document.getElementById("chipFlame").classList.toggle("cold", run === 0);
+  /* at record pace the flame wears gold - racing his own best self */
+  var rc = recordChase();
+  document.getElementById("chipFlame").classList.toggle("record", !!(rc && rc.at && allThree(today())));
   document.getElementById("chipPot").classList.toggle("cold", potTotal() === 0);
   document.getElementById("chipShard").hidden = !hasSpares;
   document.getElementById("hud").classList.toggle("bare", r.xp === 0);
@@ -64,7 +67,23 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v36";
+var BUILD = "v37";
+
+/* The icon carries the day's debt while the app is closed: open pillars as
+   the badge number, cleared the moment the day is in. Set on the way out,
+   cleared on the way in - a signal about the day, not about the app. */
+function badgeOut(){
+  try {
+    if (!navigator.setAppBadge) return;
+    var t = today(), n = 0;
+    if (S.onboarded && S.badge){
+      n = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
+    }
+    if (n) navigator.setAppBadge(n); else navigator.clearAppBadge();
+  } catch(e){}
+}
+document.addEventListener("visibilitychange", function(){ if (document.hidden) badgeOut(); });
+window.addEventListener("pagehide", badgeOut);
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -169,6 +188,17 @@ document.addEventListener("click", function(ev){
   }
   if (ds.install){ askInstall(); return; }
   if (ds.push){ askPush(); return; }
+  if (ds.look){
+    S.look = S.look === "sky" ? "light" : S.look === "light" ? "dark" : "sky";
+    save(); sfx("tap"); paintSky();
+    render({ keepScroll: true }); return;
+  }
+  if (ds.badge){
+    S.badge = S.badge ? 0 : 1;
+    save(); sfx("tap");
+    if (!S.badge){ try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch(e){} }
+    render({ keepScroll: true }); return;
+  }
   if (ds.coachx){ doCoachExport(); return; }
   if (ds.chipdone){ closeChip(); return; }
   if (ds.chipreward){ askChipReward(Number(ds.chipreward)); return; }

@@ -19,7 +19,8 @@ var POT_PARTS = [
   ["streaks",    "Streak packs",     "flame", "One for every seventh day in a row"],
   ["sets",       "Sets completed",   "pack",  "Every set finished, all time"],
   ["trophies",   "Trophies claimed", "spare", "The ones that only happen by happening"],
-  ["challenges", "Challenges",       "run",   "The week's four, cleared"]
+  ["challenges", "Challenges",       "run",   "The week's four, cleared"],
+  ["comebacks",  "Comebacks",        "load",  "The first full day after a lapse pays double"]
 ];
 
 function viewVault(){

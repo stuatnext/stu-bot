@@ -95,8 +95,14 @@ function viewYou(){
     + (isStandalone() ? "" :
         mrow("install", "1", "phone", "Put it on your Home Screen",
           "Full screen, its own icon — and it unlocks the nudge"))
-    + mrow("push", "1", "clock", "The evening nudge",
-        S.pushOn ? "On — a 22:15 check-in" : "A 22:15 check-in when the day is still open")
+    + mrow("push", "1", "clock", "The nudges",
+        S.pushOn ? "On — 08:00 the day’s shape, 22:15 what is still open"
+                 : "08:00 the day’s shape, 22:15 what is still open")
+    + mrow("look", "1", "moon", "Night look",
+        S.look === "dark" ? "Always dark" : S.look === "light" ? "Always light"
+                          : "With the sky — dark from dusk to dawn")
+    + mrow("badge", "1", "tick", "Icon badge",
+        S.badge ? "Open pillars counted on the app icon" : "Off")
     + mrow("replay", "1", "ask", "How this works", "The three-tap tour, again")
     + mrow("sound", "1", "spare", "Sound", S.mute ? "Off" : "On")
     + mrow("camp", "1", "pin", "Where you are", S.camp)
@@ -264,9 +270,10 @@ function pushBundle(sub, keys){
 async function askPush(){
   if (S.pushOn){
     var v = await ask({
-      title: "The evening nudge",
-      say: "On since " + esc(nice(S.pushMade || today())) + ". Around 22:15 the game checks in "
-         + "\u2014 it names what is still open, or says the day is already in and asks nothing."
+      title: "The nudges",
+      say: "On since " + esc(nice(S.pushMade || today())) + ". At 08:00 the game says what the "
+         + "day looks like \u2014 which pillar first, tonight\u2019s session, today\u2019s card. Around "
+         + "22:15 it names what is still open, or says the day is already in and asks nothing."
          + (S.pushBundle ? "<br><br>If the paste never happened, or GitHub lost it, show it again." : ""),
       options: S.pushBundle ? [{ id: "again", label: "Show the paste again" }] : [],
       confirm: "Turn it off", cancel: "Keep it"
@@ -295,10 +302,11 @@ async function askPush(){
     return;
   }
   var go = await ask({
-    title: "The evening nudge",
-    say: "Once a night, around 22:15: the game names what is still open, or tells you the day "
-       + "is already in. Two steps \u2014 your phone asks permission now, then one paste into the "
-       + "repo so the scheduler can reach this phone.",
+    title: "The nudges",
+    say: "Twice a day. 08:00: what the day looks like \u2014 which pillar first, tonight\u2019s "
+       + "session, today\u2019s card. 22:15: what is still open, or that the day is already in. "
+       + "Two steps \u2014 your phone asks permission now, then one paste into the repo so the "
+       + "scheduler can reach this phone.",
     confirm: "Turn it on", cancel: "Not now"
   });
   if (!go) return;

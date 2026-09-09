@@ -1,13 +1,20 @@
-# The evening nudge: one push a day at ~22:15 Singapore (14:15 UTC - Singapore
-# has no DST, so the offset never moves). The payload is dumb; app/sw.js on
-# the phone reads the mirrored day-state and writes the actual words.
-# No-ops cleanly until the two secrets exist (see scripts/send-push.mjs).
+# The nudges: two pushes a day, Singapore time (UTC+8, no DST, so the
+# offsets never move). 08:00 is the morning brief - the day's shape; 22:15 is
+# the evening check-in - what is still open. Each payload is one word;
+# app/sw.js on the phone reads the mirrored day-state and writes the words.
+# No-ops cleanly until the PUSH_BUNDLE secret exists (see scripts/send-push.mjs).
 name: evening-nudge
 
 on:
   schedule:
-    - cron: "15 14 * * *"
-  workflow_dispatch: {}
+    - cron: "7 0 * * *"     # 08:07 Singapore - the morning brief (off the :00 slot GitHub delays most)
+    - cron: "15 14 * * *"   # 22:15 Singapore - the evening check-in
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: "morning or evening"
+        required: false
+        default: "evening"
 
 permissions: {}
 
@@ -19,10 +26,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm install web-push@3 --no-audit --no-fund
       - run: node scripts/send-push.mjs
         env:
+          KIND: ${{ github.event_name == 'workflow_dispatch' && inputs.kind || (github.event.schedule == '7 0 * * *' && 'morning' || 'evening') }}
           PUSH_BUNDLE: ${{ secrets.PUSH_BUNDLE }}
           PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}

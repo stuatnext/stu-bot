@@ -128,18 +128,30 @@ function viewToday(){
 
   /* one line, his */
   var owed = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
+  /* Two things outrank the plain count: the first day back after a lapse
+     (the return is the win, and it pays double) and a record within reach -
+     racing his own best self is the purest single-player stake there is. */
+  var rc = recordChase();
+  var back = S.onboarded && !allThree(t) && isComebackDay(t);
+  var chase = rc ? (rc.at
+    ? "Tonight beats your record of " + rc.best + "."
+    : rc.away + (rc.away === 1 ? " day" : " days") + " from your record of " + rc.best + ".") : null;
   var ask, sub;
   if (packs){
     ask = packs === 1 ? "That is a pack." : packs + " packs waiting.";
     sub = "Earned, not given. Open it below.";
   } else if (allThree(t)){
-    ask = "Today is in."; sub = "The streak holds. Back tomorrow.";
+    ask = "Today is in.";
+    sub = rc && rc.at ? "Record pace — " + rc.run + " days. Back tomorrow." : "The streak holds. Back tomorrow.";
+  } else if (back){
+    ask = "Back.";
+    sub = "That was the hard part. Today pays double.";
   } else if (!done){
-    if (owed === 3){ ask = "Three things make a day."; sub = "Tick what you have done."; }
-    else { ask = "Two things make a " + dayName(t) + "."; sub = "No shift to stop today."; }
+    if (owed === 3){ ask = "Three things make a day."; sub = chase || "Tick what you have done."; }
+    else { ask = "Two things make a " + dayName(t) + "."; sub = chase || "No shift to stop today."; }
   } else {
     ask = owed === 1 ? "One more." : owed + " to go.";
-    sub = "All of them earns the pack.";
+    sub = chase || "All of them earns the pack.";
   }
   h += skyCardHTML(ask, sub);
   /* A month just closed: hold it up once before it is filed. Never deleted,
@@ -180,6 +192,12 @@ function viewToday(){
   /* the tiles have no room for the tip; the one the hour points at speaks here */
   if (up && !pDone(t, up) && required(up, t)){
     h += "<p class='uptip'>" + esc(tipFor(up)) + "</p>";
+  } else if (allThree(t) && S.onboarded){
+    /* the day is in: point at tomorrow, so there is something to look
+       forward to instead of a dead end - the same brief the 08:00 push reads */
+    var tb = briefFor(shift(1));
+    h += "<p class='uptip'><b>Tomorrow · " + esc(tb.head) + ".</b> " + esc(tb.first)
+      + (tb.gym ? " " + esc(tb.gym) + "." : "") + "</p>";
   }
 
   /* the chest */

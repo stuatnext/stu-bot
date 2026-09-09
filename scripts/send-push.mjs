@@ -1,7 +1,8 @@
-// The evening nudge's sender half. Runs in GitHub Actions on a cron (see
-// .github/workflows/nudge.yml); the receiving half is app/sw.js, which reads
-// the day's mirrored state on the device and writes the actual words - this
-// script sends one dumb, unpersonalised ping and knows nothing about the day.
+// The nudges' sender half. Runs in GitHub Actions on two crons (see
+// .github/workflows/nudge.yml): KIND=morning at 08:00 Singapore, KIND=evening
+// at 22:15. The receiving half is app/sw.js, which reads the day's mirrored
+// state on the device and writes the actual words - this script sends one
+// dumb, unpersonalised ping carrying only which of the two it is.
 //
 // Secrets (repo -> Settings -> Secrets and variables -> Actions):
 //   PUSH_SUBSCRIPTION  - the JSON the app copies to the clipboard when the
@@ -54,8 +55,9 @@ const { subscription, pub: VAPID_PUBLIC, priv } = cfg;
 webpush.setVapidDetails("https://github.com/stuatnext/stu-bot", VAPID_PUBLIC, priv);
 
 try {
-  await webpush.sendNotification(subscription, JSON.stringify({ t: "evening" }), { TTL: 3600 });
-  console.log("Nudge sent.");
+  const kind = process.env.KIND === "morning" ? "morning" : "evening";
+  await webpush.sendNotification(subscription, JSON.stringify({ t: kind }), { TTL: 3600 });
+  console.log("Nudge sent (" + kind + ").");
 } catch (e){
   // 404/410 mean the phone unsubscribed or the subscription expired: the
   // secret needs re-pasting from the app. Anything else is a real failure.
