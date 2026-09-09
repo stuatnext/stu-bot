@@ -24,14 +24,19 @@
 .tc-pane{position:absolute; inset:5px; border-radius:7px; overflow:hidden; background:var(--pane);
   display:flex; flex-direction:column; box-shadow:0 0 0 1px rgba(0,0,0,.18) inset}
 .tc-glyph{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-size:34cqw; line-height:1; padding-bottom:4%;
-  text-shadow:0 2px 0 rgba(0,0,0,.06)}
+  font-size:30cqw; line-height:1; padding-bottom:4%;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.6)) drop-shadow(0 2px 3px rgba(0,0,0,.16))}
 .tc.lg .tc-glyph{font-size:36cqw}
 .tc-art{position:relative; flex:1 1 auto; min-height:0; overflow:hidden; color:var(--cink);
   background:radial-gradient(120% 90% at 50% 20%,var(--artA),var(--artB));
   border-top:1px solid rgba(0,0,0,.2); border-bottom:1px solid rgba(0,0,0,.2);
   box-shadow:0 0 14px rgba(0,0,0,.1) inset}
 .tc-art svg{position:absolute; inset:0; width:100%; height:100%; display:block}
+/* the engraved ground: struck in the card's own ink, well under the subject */
+.tc-back{stroke:currentColor; stroke-width:2.2; fill:none; opacity:.17;
+  stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke}
+.tc.lg .tc-back{stroke-width:1.6}
+.tc.r2 .tc-back,.tc.r3 .tc-back{opacity:.22}
 /* The Mandarin set puts the character itself in the window, at size. It is the
    most beautiful thing in the deck and it is also the actual lesson. */
 .tc-han{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
@@ -45,7 +50,7 @@
 .tc-nt{flex:none; padding:6px 8px 7px; font-size:10px; line-height:1.32; color:var(--plateInk2);
   background:linear-gradient(180deg,var(--plateB),var(--plateA)); display:none}
 .tc.lg .tc-nm{font-size:17px; padding:9px 12px; min-height:0}
-.tc.lg .tc-art{flex:0 0 62%}
+.tc.lg .tc-art{flex:0 0 70%}
 .tc.lg .tc-nt{display:flex; align-items:flex-start; flex:1 1 auto; font-size:12.5px; padding:10px 12px 12px}
 .tc-gem{position:absolute; right:5px; bottom:5px; width:13px; height:13px; z-index:4;
   border-radius:3px; transform:rotate(45deg); border:1px solid rgba(0,0,0,.32);
@@ -129,7 +134,9 @@
    what am I missing, and what is nearly done. */
 /* Sticky and transparent meant the page scrolled visibly through the gaps
    between the pills, which reads as a rendering fault rather than a rail. */
-.rail{position:sticky; top:calc(var(--hud) + env(safe-area-inset-top)); z-index:20; margin:0 -14px;
+/* sticks to the top of the scroller, which is now the screen itself rather
+   than the window - the HUD sits outside it and no longer has to be cleared */
+.rail{position:sticky; top:0; z-index:20; margin:0 -14px;
   padding:9px 14px 10px;
   display:flex; gap:7px; overflow-x:auto; scrollbar-width:none;
   -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity;

@@ -102,23 +102,113 @@ function toneArt(pinyin, hanzi){
   return o + "</g>";
 }
 
-/* Each set has its own emblem, varied per card by its name, so no two faces
-   are identical and every card still reads as belonging somewhere.
-   Memoised: this used to regenerate 5,144 SVG nodes on every single render. */
+/* ------------------------------------------------------------- the backdrop
+   Emoji were the right call for the subject of a card - drawn by
+   professionals, read at a glance, no bytes shipped - but an emoji floating
+   on a gradient is not a card, it is a sticker. So each set gets an engraved
+   motif behind the subject, the way a banknote or a trading card carries a
+   ground: struck in the card's own ink at low opacity, turned and shifted by
+   a hash of the card's name so no two in a set sit the same way.
+
+   Each returns paths in a 100x100 box. Nothing here is random - the same card
+   draws the same ground for ever. */
+var BACK = {
+  /* steam off a bowl */
+  hawk: function(){ return "<path d='M30 62c0-9 9-9 9-18s-8-9-8-17'/>"
+    + "<path d='M50 66c0-10 10-10 10-20s-9-10-9-19'/>"
+    + "<path d='M70 62c0-9 9-9 9-18s-8-9-8-17'/>"
+    + "<path d='M22 68h56a28 26 0 0 1-56 0Z'/><path d='M16 68h68'/>"; },
+  /* a cup from above */
+  kopi: function(){ return "<circle cx='50' cy='50' r='34'/><circle cx='50' cy='50' r='25'/>"
+    + "<circle cx='50' cy='50' r='15'/><path d='M84 44c9 0 12 5 12 10s-4 10-12 10'/>"; },
+  /* what a word looks like when it is said */
+  slang: function(){ return "<path d='M22 30h56a8 8 0 0 1 8 8v24a8 8 0 0 1-8 8H44L28 82V70h-6a8 8 0 0 1-8-8V38a8 8 0 0 1 8-8Z'/>"
+    + "<path d='M32 46h22M32 56h34'/>"; },
+  /* the island, as blocks */
+  every: function(){ return "<path d='M8 84V56h14v28M26 84V40h16v44M46 84V62h12v22M62 84V34h18v50M84 84V52h10v32'/>"
+    + "<path d='M4 84h94'/>"; },
+  /* five-foot way: arched shophouse windows */
+  herit: function(){ return "<path d='M16 78V44a10 10 0 0 1 20 0v34ZM40 78V38a10 10 0 0 1 20 0v40ZM64 78V44a10 10 0 0 1 20 0v34Z'/>"
+    + "<path d='M10 78h80M26 44v34M50 38v40M74 44v34'/>"; },
+  /* a frond */
+  green: function(){
+    var o = "<path d='M52 94C52 62 48 34 36 8'/>";
+    for (var i = 0; i < 6; i++){
+      var y = 78 - i * 12, x = 50 - i * 2.6, len = 26 - i * 2;
+      o += "<path d='M" + x + " " + y + "q" + len + " -3 " + (len + 4) + " -17'/>"
+         + "<path d='M" + x + " " + y + "q-" + len + " -5 -" + (len + 2) + " -18'/>";
+    }
+    return o; },
+  /* water */
+  isles: function(){ return "<path d='M4 40q12-8 24 0t24 0 24 0 24 0'/>"
+    + "<path d='M4 56q12-8 24 0t24 0 24 0 24 0'/><path d='M4 72q12-8 24 0t24 0 24 0 24 0'/>"; },
+  /* a flight path */
+  region: function(){ return "<path d='M10 78q40-62 82-42' stroke-dasharray='5 7'/>"
+    + "<path d='M78 28l14 8-14 9Z'/><circle cx='12' cy='76' r='4'/>"; },
+  /* the road out, with two stops on it */
+  road: function(){ return "<path d='M18 90c0-24 22-20 22-40S16 34 22 16'/>"
+    + "<path d='M60 90c14-18 4-30 14-42s18-10 20-24' stroke-dasharray='4 8'/>"
+    + "<circle cx='40' cy='50' r='5'/><circle cx='74' cy='48' r='5'/>"; },
+  /* a roof over a roof */
+  home: function(){ return "<path d='M14 56 50 26l36 30'/><path d='M22 74 50 50l28 24'/>"
+    + "<path d='M50 90V50'/>"; },
+  /* the practice grid a character is learned in */
+  zh: function(){ return "<rect x='16' y='12' width='68' height='68' rx='2'/>"
+    + "<g stroke-dasharray='4 5'><path d='M50 12v68M16 46h68M16 12l68 68M84 12l-68 68'/></g>"; },
+  /* beans */
+  bean: function(){ return "<g><ellipse cx='34' cy='38' rx='14' ry='10' transform='rotate(-20 34 38)'/>"
+    + "<path d='M22 42q12 6 24-8' transform='rotate(-20 34 38)'/></g>"
+    + "<g><ellipse cx='64' cy='64' rx='14' ry='10' transform='rotate(15 64 64)'/>"
+    + "<path d='M52 68q12 6 24-8' transform='rotate(15 64 64)'/></g>"; },
+  /* looking closer */
+  deep: function(){ return "<circle cx='44' cy='44' r='26'/><circle cx='44' cy='44' r='17'/>"
+    + "<path d='M63 63 88 88'/>"; },
+  /* the hills he came from */
+  sheff: function(){ return "<path d='M2 74q22-26 40-6t26-18 30 4'/><path d='M2 88q26-22 44-4t22-16 30 6'/>"
+    + "<path d='M2 60q18-20 34-4'/>"; },
+  /* columns of print */
+  post: function(){ return "<path d='M14 16h72v68H14z'/><path d='M20 28h60M20 34h60'/>"
+    + "<path d='M50 42v38'/>"
+    + "<g opacity='.55'><path d='M20 50h24M20 58h24M20 66h24M56 50h24M56 58h24M56 66h24'/></g>"; },
+  /* the ask, going up a step at a time */
+  sug: function(){ return "<path d='M10 84h20V64h20V44h20V24h20'/><path d='M10 90h80'/>"; },
+  /* the market */
+  mkt: function(){ return "<path d='M14 86V60M32 86V44M50 86V52M68 86V28M86 86V38'/>"
+    + "<path d='M8 86h84'/><path d='M14 56 32 40l18 8 18-24 18 10' stroke-dasharray='4 5'/>"; },
+  /* a sunburst, for the ones he claims himself */
+  gold: function(){ var o = "<circle cx='50' cy='50' r='17'/>";
+    for (var i = 0; i < 12; i++){ var a = i * Math.PI / 6;
+      o += "<path d='M" + (50 + Math.cos(a) * 25).toFixed(1) + " " + (50 + Math.sin(a) * 25).toFixed(1)
+         + "L" + (50 + Math.cos(a) * 42).toFixed(1) + " " + (50 + Math.sin(a) * 42).toFixed(1) + "'/>"; }
+    return o; }
+};
+function backdrop(setKey, seed){
+  var f = BACK[setKey];
+  if (!f) return "";
+  /* the same card is always turned and shifted the same way */
+  var ang = (seed % 11) - 5, dx = ((seed >>> 4) % 9) - 4, dy = ((seed >>> 8) % 9) - 4;
+  var sc = 0.94 + ((seed >>> 12) % 13) / 100;
+  return "<g class='tc-back' transform='translate(" + dx + " " + dy + ") rotate(" + ang
+    + " 50 50) translate(" + (50 - 50 * sc).toFixed(2) + " " + (50 - 50 * sc).toFixed(2)
+    + ") scale(" + sc.toFixed(2) + ")'>" + f() + "</g>";
+}
+
+/* Memoised: this used to regenerate 5,144 SVG nodes on every single render. */
 var ART_CACHE = {};
-/* The face. "Plus they're ugly" ended the generated-squiggle era: every card
-   now wears one big glyph from the platform's own emoji set - drawn by
-   professionals, familiar at a glance, zero bytes shipped - over the tint
-   hashed from its name. Mandarin keeps the character as the face, with its
-   tone drawn underneath, because there the face is also the lesson. */
+/* The face: the set's engraved ground, and on it the subject. Mandarin keeps
+   the character as the subject, with its tone drawn underneath, because there
+   the face is also the lesson. */
 function cardArt(c){
   if (ART_CACHE[c[0]]) return ART_CACHE[c[0]];
+  var seed = hashOf(c[0] + "~b");
+  var inner = backdrop(c[2], seed);
   var o;
   if (c[2] === "zh"){
-    o = toneArt(c[0], c[4]);
+    o = "<svg viewBox='0 0 100 100' fill='none' aria-hidden='true'>" + inner
+      + toneArt(c[0], c[4]) + "</svg>";
   } else {
-    var g = CARD_ART[c[0]] || SET_ART[c[2]] || "\u2B50";
-    o = "<span class='tc-glyph'>" + g + "</span>";
+    o = "<svg viewBox='0 0 100 100' fill='none' aria-hidden='true'>" + inner + "</svg>"
+      + "<span class='tc-glyph'>" + (CARD_ART[c[0]] || SET_ART[c[2]] || "⭐") + "</span>";
   }
   return (ART_CACHE[c[0]] = o);
 }
@@ -127,10 +217,22 @@ function cardArt(c){
    eleven hawker cards were eleven grey bowls with slightly different
    backdrops, which is not a collection - it is a spreadsheet with rounded
    corners. Hue comes off the card's own name, so it never moves. */
+/* A hue per set, chosen rather than hashed: eleven hawker cards in eleven
+   unrelated colours is a rainbow, and a binder page should read as one family.
+   Each is picked for its subject - chilli for the stalls, kopi brown for the
+   kopitiam, park green for the parks, ink for the characters, temple red for
+   the heritage - and no two sit within twelve degrees of each other. */
+var SET_HUE = {
+  hawk: 8, home: 22, kopi: 34, bean: 46, gold: 58, sug: 104, green: 130,
+  mkt: 152, isles: 176, every: 198, zh: 216, post: 228, road: 244,
+  region: 264, sheff: 282, deep: 300, slang: 322, herit: 346
+};
 function artTint(c){
-  var h = hashOf(c[0] + "~t"), hue = h % 360;
-  /* skip the muddy band where everything turns into the same olive */
-  if (hue > 62 && hue < 96) hue += 40;
+  var h = hashOf(c[0] + "~t");
+  var base = SET_HUE[c[2]];
+  if (base === undefined) base = hashOf(c[2] + "~set") % 360;
+  /* the card moves a few degrees inside its set, never out of it */
+  var hue = (base + (h % 15) - 7 + 360) % 360;
   var sat = 26 + (h >>> 9) % 22;
   return "--artA:hsl(" + hue + "," + sat + "%,93%);"
        + "--artB:hsl(" + ((hue + 18) % 360) + "," + (sat + 10) + "%,79%);"

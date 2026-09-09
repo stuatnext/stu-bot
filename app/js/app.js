@@ -64,7 +64,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v35";
+var BUILD = "v36";
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
 var INSTALL_PROMPT = null;
@@ -85,7 +85,8 @@ var tab = "today";
 function render(opts){
   opts = opts || {};
   var el = document.getElementById("screen");
-  var keep = opts.keepScroll ? window.scrollY : null;
+  var scr = document.getElementById("screen");
+  var keep = opts.keepScroll ? scr.scrollTop : null;
   /* Today is a scene: one viewport, no scrolling, staged entrance. The other
      two are lists and scroll like lists. */
   document.body.classList.toggle("scene", tab === "today");
@@ -102,7 +103,7 @@ function render(opts){
   }
   paintHud(!!opts.animate);
   coachSync();
-  if (keep === null) window.scrollTo(0, 0); else window.scrollTo(0, keep);
+  scr.scrollTop = keep === null ? 0 : keep;
 }
 function go(next){
   if (next === tab) return;

@@ -68,13 +68,17 @@ body{
   overscroll-behavior-y:none;
 }
 #hud,#screen,#nav{position:relative; z-index:1}
-#nav{position:fixed}
 
-/* Today fits one viewport; the other tabs scroll like lists */
-body.scene{height:100dvh; overflow:hidden; display:flex; flex-direction:column}
-body.scene #screen{flex:1; min-height:0; display:flex; flex-direction:column;
-  overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain;
-  padding:0 14px calc(84px + env(safe-area-inset-bottom)); width:100%}
+/* ONE SHELL, EVERY TAB. The bar used to be fixed to the viewport while Today
+   alone ran as a 100dvh column - so the bar answered to iOS's collapsing
+   toolbar on five tabs and to the layout box on the sixth, and moved as he
+   crossed between them. Now the whole app is that column on every tab: the
+   HUD on top, one scroller in the middle, the bar at the bottom. Nothing is
+   fixed, so nothing can drift. */
+body{height:100dvh; overflow:hidden; display:flex; flex-direction:column}
+#screen{flex:1; min-height:0; overflow-y:auto; overflow-x:hidden;
+  overscroll-behavior:contain; width:100%}
+body.scene #screen{display:flex; flex-direction:column}
 
 .mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums}
 .disp{font-family:"Nunito",sans-serif; font-weight:800}
