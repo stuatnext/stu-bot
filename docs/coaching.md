@@ -21,8 +21,13 @@ because the record shows *what* broke and only he knows *why*.
    - Side quests: `questsDone / questDaysOffered` — below ~40%, the asks are
      mis-pitched (too big, or landing on the wrong days).
    - Chips: are rewards named (`chipRewards`)? An unnamed chip pulls nothing.
-   - The nudge: if evenings still leak (Stopped missing on weekdays), the
-     22:15 cron in `.github/workflows/nudge.yml` may need to move earlier.
+   - The nudges: if evenings still leak (Stopped missing on weekdays), the
+     22:15 cron in `.github/workflows/nudge.yml` may need to move earlier;
+     if mornings start late, the 08:07 brief may need to say less or move.
+   - Comebacks (`derived.comebacks`): how often he lapsed three-plus days
+     and came back. High and rising means the return is working and the
+     week is not — look at which weekday the lapses start on.
+   - `look`, `badge`, `pushOn` record which stickiness levers he has on.
 3. **Propose the smallest change that attacks the biggest pattern.** Tune
    copy, timing, quest difficulty, tip pools (`TIPS` in `app/js/data.js`),
    challenge lines (`SET_DO` / `CARD_DO`). Do not redesign screens or add

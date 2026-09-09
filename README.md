@@ -341,6 +341,47 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v37: it knows what time it is
+
+Nine days after the push went live on his phone, the brief was open: do
+more with the notifications, more on design and usability, more on the
+stickiness. One theme answers all three — the app knows the hour.
+
+**Two nudges, not one.** `nudge.yml` runs two crons and passes which one it
+is: 08:07 Singapore is the **morning brief**, 22:15 the **evening check**.
+The payload is still one word. The device writes the words from a richer
+mirror the app leaves on every save — open pillars, the run and the record,
+the next chip, the week so far, and a *brief for today and tomorrow*
+(`briefFor` in `state.js`) — so the morning push can describe a day the
+app has not been opened on yet: "Wednesday · Mum's day — Train before Malta
+wakes at 16:00. Session B, 3 moves. Order the kopi in the words on the
+card." The evening push escalates when the app has not been opened at all
+("Not opened today. Yesterday's run of 8 is on the line."), names the chip
+within a week, calls a record when tonight would set one, and on Sundays
+gives the week's score. `composeNudge` in `sw.js` is pure and tested off
+the phone. The **app-icon badge** carries the open-pillar count while the
+app is closed (set on the way out, cleared on the way in; a switch in You).
+
+**The night look.** From dusk to dawn the whole app follows the sky, not
+just the header: dark ground, dark paper, light ink — because the 22:15
+push opens this app in bed, and a white screen there is a small
+punishment. One token block in `tokens.css` under `:root[data-night]`;
+the iron gym hero, the sealed card backs and the card faces are objects
+and keep their own light. Pinnable light or dark in You. The active tab
+also lost its 2.4:1 brand-blue label for one that reads at 10.5px.
+
+**Racing yourself.** With a record of seven or more and the run within a
+week of it, Today says so ("2 days from your record of 10"; "Tonight beats
+your record"), and at record pace the flame in the HUD wears gold. When
+the day is in, the line under the tiles now points at **tomorrow** — which
+pillar first, which session — instead of "back tomorrow".
+
+**The comeback.** Real games never punish the return; the return is the
+win. A full day that follows three or more straight misses is a comeback:
+it pays double into the pot (a new row on the pot screen, derived from the
+record like everything else), counts double for XP, and Today greets it
+with "Back. That was the hard part." Frozen days are not misses.
+
 #### v15: it reaches out, and it remembers
 
 Three asks: a real game lives on the home screen and interrupts you; a bad

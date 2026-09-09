@@ -182,7 +182,7 @@ function viewDeck(){
     h += "<h2>Spares</h2><div class='panel'>";
     h += "<div style='display:flex;align-items:center;gap:13px'>"
       + "<span style='color:var(--jade);flex:none'>" + svg("spare", 30) + "</span>"
-      + "<div style='flex:1'><div class='mono' style='font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--jade)'>"
+      + "<div style='flex:1'><div class='mono' style='font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--greenInk)'>"
       + num(sp) + "</div><div class='dim'>from " + num(sparesEarned()) + " earned</div></div></div>";
     h += "<p class='dim' style='margin:10px 0 0'>Every card you pull twice is worth spares: "
       + RARITY[0][4] + " for a common, " + RARITY[1][4] + " uncommon, " + RARITY[2][4] + " rare. "

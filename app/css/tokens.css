@@ -26,6 +26,7 @@
   --flame:#FF9600; --flameEdge:#E07E00; --flameSoft:#FFE9CC;
   --violet:#CE82FF; --violetEdge:#A855E8; --violetSoft:#F3E5FF; --violetInk:#8549BA;
   --crit:#FF4B4B; --critSoft:#FFDFDF;
+  --navOn:#0E6C9E;
 
   /* compatibility aliases for the screens that still speak the old names */
   --panel:var(--card); --panel2:var(--card2);
@@ -91,3 +92,47 @@ h3{font-size:16.5px; font-weight:800}
 p{margin:9px 0}
 a{color:var(--blue)}
 .dim{color:var(--ink2); font-size:13px}
+
+/* ==========================================================================
+   v37 - the night look. From dusk to dawn (or pinned, in You) the ground
+   goes dark, because the 22:15 nudge opens this app in bed. The iron gym
+   hero, the sealed card backs and the card faces are objects and keep their
+   own light; everything that is ground, paper or ink follows the sky.
+   Specificity does the work: :root[data-night] .x outranks any .x in the
+   later sheets, so the hardcoded light edges below are overridden here
+   rather than hunted through six files.
+   ========================================================================== */
+:root[data-night]{
+  --bg:#14151A;
+  --card:#1E2028; --card2:#232630; --sunk:#2A2D38;
+  --edge:#30343F; --edge2:#3E4352;
+  --ink:#ECEAE2; --ink2:#B9B6AA; --ink3:#8E8C81;
+
+  --greenSoft:#1B3312; --greenInk:#9BE85A;
+  --blueSoft:#10293A;
+  --roseSoft:#3A1622;
+  --goldSoft:#3A2E0C; --goldInk:#FFD35C;
+  --flameSoft:#3A250C;
+  --violetSoft:#2A1B3D; --violetInk:#D7A6FF;
+  --critSoft:#3D1818;
+  --navOn:#4CC6FF;
+}
+:root[data-night] html, :root[data-night] body{background:var(--bg)}
+/* the light-only edges the components hardcode */
+:root[data-night] .pil.on, :root[data-night] .wd.on, :root[data-night] .vc.on,
+:root[data-night] .qq.on, :root[data-night] .panel.jade, :root[data-night] .lift.on,
+:root[data-night] .an.on, :root[data-night] .prot.done{border-color:#2F6B1A}
+:root[data-night] .gem.won, :root[data-night] .quest.qdone, :root[data-night] .warnbar,
+:root[data-night] .cond.full{border-color:#7A5B00}
+:root[data-night] .pil.up, :root[data-night] .wd.ice i{border-color:#1F5F86}
+:root[data-night] #nav button[aria-current="true"]::before{border-color:#1F5F86}
+:root[data-night] .panel.ember{border-color:#6B4A12}
+:root[data-night] .panel.violet{border-color:#4C2E6E}
+:root[data-night] .panel.crit{border-color:#6E2A2A}
+/* dark inks that were tuned for pale tints */
+:root[data-night] .qst, :root[data-night] .tag.ember{color:#FFB35C}
+:root[data-night] .tag.crit{color:#FF8A80}
+:root[data-night] .skycard{border-bottom-color:rgba(255,255,255,.08);
+  box-shadow:0 18px 30px -22px rgba(0,0,0,.9)}
+:root[data-night] #boot{background:var(--bg)}
+:root[data-night] .chip.record{background:var(--goldSoft); border-color:#7A5B00}

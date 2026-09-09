@@ -21,7 +21,7 @@ function load(){
             crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0,
             season:1, vault:{}, setsEver:0, liftPick:{}, work:{},
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
-            monthSeen:{}, pushOn:0,
+            monthSeen:{}, pushOn:0, look:"sky", badge:1,
             lifts:{}, food:{}, waist:[], kg:0,
             water:{}, sleep:{}, out:{},
             hand:{ do:[], in:[] }, doneDo:{}, kept:{}, dealtDo:{}, dealtIn:{},
@@ -42,18 +42,25 @@ function save(){
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
   mirrorState();
 }
-/* A copy of today's shape where the service worker can reach it (it cannot
-   read localStorage), so the evening push can say what is actually open
-   instead of guessing. Fire-and-forget; the app never waits on it. */
+/* A copy of the day's shape where the service worker can reach it (it cannot
+   read localStorage), so a push can say what is actually true instead of
+   guessing. Written on every save, read when a ping lands. Since v37 it
+   also carries tomorrow's brief, so the 08:00 push can describe a day the
+   app has not been opened on yet. Fire-and-forget; the app never waits. */
 function mirrorState(){
   try {
     if (typeof caches === "undefined") return;
-    var t = today();
+    var t = today(), tm = shift(1);
     var open = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); })
                       .map(function(g){ return g[1]; });
+    var briefs = {};
+    briefs[t] = briefFor(t);
+    briefs[tm] = briefFor(tm);
+    var body = { day: t, open: open, run: dayRun(), best: bestRunEver(),
+                 chip: chipNext(), week: weekScore(), briefs: briefs,
+                 badgeOn: S.badge ? 1 : 0 };
     caches.open("daylight-state").then(function(c){
-      return c.put("state", new Response(
-        JSON.stringify({ day: t, open: open, run: dayRun() }),
+      return c.put("state", new Response(JSON.stringify(body),
         { headers: { "Content-Type": "application/json" } }));
     }).catch(function(){});
   } catch(e){}
@@ -245,12 +252,120 @@ function nextUp(){
   if (open.indexOf("train") >= 0 && (sh.weekend || sh.now < sh.start)) return "train";
   return open[0];
 }
-function tipFor(key){
+function tipFor(key, day){
   var pool = TIPS[key] || [];
   if (!pool.length) return "";
-  var k = today() + key, h = 0;
+  var k = (day || today()) + key, h = 0;
   for (var j = 0; j < k.length; j++) h = (h * 33 + k.charCodeAt(j)) >>> 0;
   return pool[h % pool.length];
+}
+
+/* ------------------------------------------------------------ the brief
+   A day, described before it happens: which pillar comes first and when,
+   which gym session it is, and the card that is asking. Written for two
+   readers - the sky card the moment today is in (tomorrow, as the thing to
+   look forward to) and the 08:00 push, which reads it off the mirror. */
+var DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function briefFor(k){
+  var d = new Date(k + "T00:00:00"), dow = d.getDay(), t = today();
+  var wkend = dow === 0 || dow === 6;
+  var w = workUTC(d), start = hhmm(w[0] + offset());
+  var head = DAY_NAMES[dow]
+    + (dow === 3 ? " · Mum’s day" : wkend ? " · no shift" : "");
+  var first = wkend
+    ? "Two things make a " + DAY_NAMES[dow] + ". Train early, call home."
+    : "Train before Malta wakes at " + start + ".";
+  /* the gym only knows sessions once gym.js is loaded; the brief degrades */
+  var gym = null;
+  if (typeof stageLifts === "function" && typeof nextSessionKey === "function"){
+    var key;
+    if (k === t) key = todaySession() || nextSessionKey();
+    else {
+      var lt = (S.lifts || {})[t];
+      if (lt && lt.s && Object.keys(lt.ex || {}).length){
+        var at = SESSIONS.map(function(x){ return x[0]; }).indexOf(lt.s);
+        key = SESSIONS[(at + 1) % SESSIONS.length][0];
+      } else key = nextSessionKey();
+    }
+    var n = stageLifts(key).length;
+    gym = "Session " + key + ", " + n + (n === 1 ? " move" : " moves");
+  }
+  var card = null;
+  var hd = typeof handDo === "function" ? handDo() : [];
+  if (hd.length) card = hd[0][1];
+  else {
+    var q = questFor(k);
+    if (q) card = q.card[0] + " — " + q.text;
+  }
+  return { day: k, dow: dow, name: DAY_NAMES[dow], head: head, first: first,
+           gym: gym, card: card };
+}
+
+/* ---------------------------------------------------------- the record chase
+   Racing his own best self. Only speaks once the record is worth chasing
+   (a week) and the run is within a week of it. */
+function recordChase(){
+  var run = dayRun(), best = bestRunEver();
+  if (best < 7) return null;
+  if (run >= best) return { at: true, run: run, best: best, away: 0 };
+  var away = best - run;
+  if (away > 7) return null;
+  return { at: false, run: run, best: best, away: away };
+}
+/* the first chip not yet minted, and how far the current run is from it */
+function chipNext(){
+  var run = dayRun();
+  for (var i = 0; i < CHIPS.length; i++){
+    if (!(S.chips || {})[CHIPS[i][0]]){
+      return { t: CHIPS[i][0], name: CHIPS[i][1], away: Math.max(0, CHIPS[i][0] - run) };
+    }
+  }
+  return null;
+}
+/* Monday to today: full days so far this week, and how many days that is */
+function weekScore(){
+  if (typeof weekKey !== "function") return null;
+  var days = weekDays(weekKey()), full = 0;
+  days.forEach(function(k){ if (allThree(k)) full++; });
+  return { full: full, of: days.length };
+}
+
+/* ------------------------------------------------------------ the comeback
+   Real games never punish the return; the return is the win. A full day that
+   follows three or more straight misses is a comeback, and it pays double.
+   Derived from the record like everything else, so it can never be claimed
+   twice and needs no button. Frozen days are not misses. */
+function recordStart(){
+  var first = null;
+  PILLARS.forEach(function(g){
+    var f = firstDay(g[0]);
+    if (f && (!first || f < first)) first = f;
+  });
+  return first;
+}
+function gapBefore(k, first){
+  var d = new Date(k + "T00:00:00"), n = 0;
+  for (var i = 0; i < 60; i++){
+    d.setDate(d.getDate() - 1);
+    var j = iso(d);
+    if (!first || j < first) break;
+    if (allThree(j) || frozen(j)) break;
+    n++;
+  }
+  return n;
+}
+function isComebackDay(k){
+  k = k || today();
+  var first = recordStart();
+  if (!first || k <= first) return false;
+  return gapBefore(k, first) >= 3;
+}
+function comebackDays(){
+  var first = recordStart();
+  if (!first) return 0;
+  return Object.keys(S.days).filter(allThree).filter(function(k){
+    return k > first && gapBefore(k, first) >= 3;
+  }).length;
 }
 
 /* ------------------------------------------------------------- the months
@@ -371,7 +486,11 @@ function coachExport(){
     heldCards: heldCount(),
     totalCards: CARDS.length,
     spends: S.spends || [],
-    rate: rate()
+    rate: rate(),
+    comebacks: comebackDays(),
+    look: S.look || "sky",
+    badge: S.badge ? 1 : 0,
+    pushOn: S.pushOn ? 1 : 0
   };
   return "# Daylight coach file\n\n"
     + "Exported " + today() + " from build " + (typeof BUILD !== "undefined" ? BUILD : "?") + ".\n\n"
@@ -776,6 +895,7 @@ function xp(){
   n += livedCount() * 20;
   n += doneDoCount() * 20;
   n += keptCount() * 5;
+  n += comebackDays() * 15;          /* the first day back counts twice */
   return n;
 }
 
@@ -863,7 +983,8 @@ function potEarned(){
     streaks:   pc.streak * r * 2,
     sets:      setsCompleteEver() * r * 3,
     trophies:  goldHeld() * r * 5,
-    challenges: typeof questEarned === "function" ? questEarned() : 0
+    challenges: typeof questEarned === "function" ? questEarned() : 0,
+    comebacks: comebackDays() * r
   };
 }
 function potSpent(){

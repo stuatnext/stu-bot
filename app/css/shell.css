@@ -104,7 +104,9 @@
   font-weight:800; letter-spacing:.03em; position:relative; border-radius:14px}
 #nav button svg{width:24px; height:24px; display:block; position:relative; z-index:1}
 #nav button span.lb{position:relative; z-index:1}
-#nav button[aria-current="true"]{color:var(--blue)}
+/* the active tab in a blue that reads at 10.5px: the brand blue is 2.4:1 on
+   white, this is 5.7:1; at night the token flips to the bright one */
+#nav button[aria-current="true"]{color:var(--navOn)}
 #nav button[aria-current="true"]::before{content:""; position:absolute; inset:2px 6px;
   border-radius:14px; background:var(--blueSoft); border:2px solid #B8E5FB;
   animation:navin .22s var(--pop) both}
@@ -169,3 +171,7 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 /* a flame with no live run sits grey until the next full day relights it */
 .chip.cold b{color:var(--ink3)}
 .chip.cold svg{opacity:.4; filter:grayscale(1)}
+
+/* at record pace the flame wears gold - he is racing his own best self */
+.chip.record{background:var(--goldSoft); border-color:#EDD27E}
+.chip.record b{color:var(--goldInk)}
