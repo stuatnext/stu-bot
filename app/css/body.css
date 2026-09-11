@@ -542,3 +542,14 @@ button.vc:active{transform:scale(.96)}
 /* a basic waiting to be logged wears its plus in the gold that means "your move" */
 button.vc:not(.on) .vv{color:var(--goldEdge, #C98A08); font-family:"Nunito",sans-serif;
   font-size:19px; font-weight:900; line-height:.9}
+
+
+/* ------------------------------------------------------------ the finisher
+   A row after the lifts that is not a move: no number, a dashed edge, and it
+   never counts towards the session or Trained. */
+.liftrow.finrow{counter-increment:none; border-style:dashed}
+.liftrow.finrow:has(.lift.on){border-style:solid}
+.lift.fin::before{content:"+"; font-size:17px; font-weight:800}
+.bellywhy{margin:8px 0 2px}
+/* specific enough to beat .btns.tight button.btn, so the tap target is 44px */
+.btns.tight.bellywhy button.btn{width:100%; text-transform:none; font-weight:800; font-size:13.5px; min-height:44px}

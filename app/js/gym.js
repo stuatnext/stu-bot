@@ -26,6 +26,7 @@ function viewGym(){
     pct: Math.round(100 * doneN / Math.max(1, list.length)),
     foot: doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged all time"
         : "Turning up is the thing being trained. One move counts.",
+    foot2: waistFoot(),
     cta: { attr: "data-startsession='" + key + "'",
            label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session" }
   });
@@ -79,31 +80,47 @@ function viewGym(){
       + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</div>";
   }
 
-  if (doneN){
+  /* the finisher: easy minutes after the lifts, from the third visit. A row
+     that is not a move - no number, never counted, the first thing to skip */
+  var fm = finMinutes(), ft = finToday();
+  if (fm > 0){
+    var onName = ft ? finLabel(ft.on) : finLabel(lastFinOn() || "Bike");
+    h += "<div class='liftrow finrow'>"
+      + "<button class='lift fin" + (ft ? " on" : "") + "' data-fin='1'>"
+      + "<span class='lb2'><b>Finisher</b><span>" + esc(onName)
+      + " &middot; " + (ft ? ft.min : fm) + " min &middot; talking pace</span></span>"
+      + "<span class='lv'>" + (ft ? "in<em>" + ft.min + " min</em>" : fm + "<em>min</em>") + "</span></button>"
+      + "<button class='swap' data-finwhy='1' aria-label='Why the finisher'>" + svg("ask", 18) + "</button></div>";
+  }
+  /* the question he actually asked, one tap away where he looks for the ab work */
+  h += "<div class='btns tight bellywhy'><button class='btn quiet' data-finwhy='1'>"
+    + "Why no crunches &mdash; and where the belly comes in</button></div>";
+
+  if (doneN || ft){
     var already = day(t).p.train;
     h += "<div class='btns'><button class='btn" + (already ? " quiet" : " pri") + "' data-finish='1'>"
       + (already ? "Trained is marked" : "Finish &mdash; mark Trained") + "</button></div>";
-
   }
 
-  /* --- waist, which belongs with the gym rather than with the food */
-  var wh = "";
-  var w = (S.waist || []).slice(-1)[0];
-  var prev = (S.waist || []).slice(-2)[0];
-  wh += "<div class='panel wst'><div class='pnum'><b>"
+  /* --- the waist: the number that answers his actual question, read slowly.
+     On a Sunday with no reading yet it stands open under the lifts; every
+     other day it is a closed fold, and the hero carries the one-line read. */
+  var ws = waistSorted(), w = ws[ws.length - 1], tr = waistTrend(), due = waistDue();
+  var wh = "<div class='panel wst'><div class='pnum'><b>"
     + (w ? w[1] + "<small>cm</small>" : "&mdash;")
     + "</b><span>" + (w ? "measured " + esc(nice(w[0])) : "not measured yet") + "</span></div>";
-  if (w && prev && prev[1] !== w[1]){
-    var dlt = w[1] - prev[1];
-    wh += "<p class='fine " + (dlt < 0 ? "good" : "") + "'>"
-      + (dlt < 0 ? "Down " + Math.abs(dlt).toFixed(1) : "Up " + dlt.toFixed(1))
-      + "cm since " + esc(nice(prev[0])) + ".</p>";
-  }
-  wh += "<p class='fine'>Not the scale \u2014 your weight is meant to rise.</p>"
+  wh += "<p class='fine" + (tr && tr.dir === "down" ? " good" : "") + "'>" + esc(waistLine(tr, ws)) + "</p>";
+  wh += "<p class='fine'>Not the scale \u2014 your weight is allowed to rise. Expect nothing here for "
+    + "eight weeks; a centimetre every two months after that is winning.</p>"
     + "<div class='btns'><button class='btn' data-waist='1'>Measure</button></div></div>";
 
   h += gymProgressHTML();
-  h += fold("waist", "Waist", w ? w[1] + "cm \u00b7 " + esc(nice(w[0])) : "not measured yet", wh, false);
+  if (due){
+    h += "<div class='rulehead'><h3>Tape day</h3><span></span><em>Sunday</em></div>"
+      + "<p class='fine' style='margin:-2px 0 8px'>Navel, before you eat, same tape as last week.</p>" + wh;
+  } else {
+    h += fold("waist", "Waist", waistMeta(ws, tr), wh, false);
+  }
   h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>The whole plan, on paper</button></div>";
   return h;
 }
@@ -202,10 +219,66 @@ function stageLifts(sKey){
 function sessionFor(key){
   return SESSIONS.filter(function(s){ return s[0] === key; })[0];
 }
+
+/* ------------------------------------------------------------ the finisher
+   Easy minutes after the lifts, from the stage table's sixth column. It lives
+   on the day's record as a sibling of ex, so nothing that counts lifts - the
+   stage, the rotation, the PB search, the week's challenges - ever sees it.
+   Never a move, never needed for Trained, the first thing to skip. */
+function finMinutes(){ return stage()[5] || 0; }
+function finToday(){ var e = (S.lifts || {})[today()]; return e && e.fin ? e.fin : null; }
+function lastFinOn(){
+  var ks = liftDays();
+  for (var i = ks.length - 1; i >= 0; i--){
+    var f = S.lifts[ks[i]].fin;
+    if (f && f.on && f.on !== "any") return f.on;
+  }
+  return null;
+}
+function finLabel(id){
+  var f = FINISHERS.filter(function(x){ return x[0] === id; })[0];
+  return f ? f[1] : "Five minutes";
+}
+function logFinisher(min, on, key, dayKey){
+  var k = dayKey || today();
+  S.lifts = S.lifts || {};
+  S.lifts[k] = S.lifts[k] || { s: key || todaySession() || nextSessionKey(), ex: {} };
+  S.lifts[k].fin = { min: min, on: on };
+  save(); buzz(14); sfx("tick");
+}
+/* One modal is the whole entry surface, from the row on the tab: which
+   machine, or the five-minute floor. The overlay's Done logs without asking. */
+function askFinisher(){
+  var min = finMinutes(); if (!min) return;
+  var had = finToday(), last = lastFinOn(), pick = had ? had.on : (last || "Bike");
+  ask({
+    title: "Finisher",
+    say: min + " easy minutes after the lifts. Talking pace \u2014 a sentence, not a song. "
+       + "It never gets harder; the lifts do.",
+    options: FINISHERS.map(function(f){
+      return { id: f[0], label: f[1], note: f[2], pri: pick === f[0] };
+    }).concat([{ id: "any", label: "Five minutes, then left", note: "still counts" }]),
+    cancel: had ? "Keep it" : "Not today"
+  }).then(function(v){
+    if (!v || v === "__no") return;
+    logFinisher(v === "any" ? 5 : min, v);
+    toast(v === "any" ? "Five minutes. That counts." : finLabel(v) + " \u00b7 " + min + " min. In.");
+    render({ keepScroll: true });
+  });
+}
+/* The question he actually asked, answered where he goes looking for the ab
+   work. Six lines, from data.js, never auto-opened. */
+function tellBelly(){
+  tell("Where the belly comes in",
+    "<ol class='how'>" + BELLY.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>");
+}
 /* A to B to C and round again, from whatever was logged last. */
 function nextSessionKey(){
   var ks = liftDays();
   for (var i = ks.length - 1; i >= 0; i--){
+    /* a finisher-only or walk-only day is a visit, not a session: it must not
+       advance the rotation */
+    if (!Object.keys(S.lifts[ks[i]].ex || {}).length) continue;
     var s = S.lifts[ks[i]].s;
     var at = SESSIONS.map(function(x){ return x[0]; }).indexOf(s);
     if (at >= 0) return SESSIONS[(at + 1) % SESSIONS.length][0];
@@ -397,7 +470,7 @@ function loggedToday(name){
    restart the app under him), because it is an end time in localStorage rather
    than a number counting down in memory. */
 var REST_KEY = "daylight.rest";
-var REST_TICK = null, REST_WAS = 0;
+var REST_TICK = null, REST_WAS = 0, REST_LAB = "";
 
 function restOf(ex){ return (ex && ex[6]) || 90; }
 
@@ -423,15 +496,16 @@ function restClock(n){
   var m = Math.floor(n / 60), r = n % 60;
   return m + ":" + (r < 10 ? "0" : "") + r;
 }
-function restStart(secs){
-  try { localStorage.setItem(REST_KEY, (Date.now() + secs * 1000) + ":" + secs); } catch(e){}
+function restStart(secs, label){
+  REST_LAB = label || "";
+  try { localStorage.setItem(REST_KEY, (Date.now() + secs * 1000) + ":" + secs + ":" + REST_LAB); } catch(e){}
   REST_WAS = secs;
   buzz(10); sfx("tick");
   restPaint(); restSync();
 }
 function restStop(quiet){
   try { localStorage.removeItem(REST_KEY); } catch(e){}
-  REST_WAS = 0;
+  REST_WAS = 0; REST_LAB = "";
   if (!quiet) sfx("tap");
   restPaint(); restSync();
 }
@@ -444,15 +518,19 @@ function restSync(){
 function restPaint(){
   var el = document.getElementById("rest");
   if (!el) return;
+  /* the label is read before restLeft() can clear the key at zero, so the end
+     toast and the bar still know what just finished - and so does a reload */
+  REST_LAB = restRaw()[2] || REST_LAB;
   var left = restLeft();
   if (left <= 0){
     if (REST_WAS > 0){
       REST_WAS = 0;
       buzz([30, 70, 30, 70, 50]); sfx("done");
-      toast("Rest is up. Next set.");
+      toast(REST_LAB ? REST_LAB + " done." : "Rest is up. Next set.");
     }
     el.className = ""; el.innerHTML = "";
     restBtnPaint(0);
+    REST_LAB = "";
     restSync();
     return;
   }
@@ -467,7 +545,7 @@ function restPaint(){
     return;
   }
   el.className = "on" + (left <= 10 ? " soon" : "");
-  el.innerHTML = "<span class='rb-l'>Rest</span>"
+  el.innerHTML = "<span class='rb-l'>" + esc(REST_LAB || "Rest") + "</span>"
     + "<b class='rb-n mono'>" + restClock(left) + "</b>"
     + "<button class='rb-x' data-restskip='1'>Skip</button>";
   restBtnPaint(left);
@@ -482,7 +560,8 @@ function restBtnPaint(left){
     sb.style.setProperty("--rest", left > 0 ? (left / Math.max(1, tot)).toFixed(3) : "0");
     var lab = sb.querySelector("span");
     if (!lab){ sb.innerHTML = "<i></i><span></span>"; lab = sb.querySelector("span"); }
-    lab.textContent = left > 0 ? "Resting \u00b7 " + restClock(left) : "Rested. Next set when you are.";
+    lab.textContent = left > 0 ? (REST_LAB || "Resting") + " \u00b7 " + restClock(left)
+      : (REST_LAB ? REST_LAB + " done." : "Rested. Next set when you are.");
   }
   var b = document.getElementById("lfRest");
   if (!b || !LIFT) return;
@@ -645,6 +724,61 @@ function finishSession(){
   }, reduced() ? 0 : 1500);
 }
 
+/* ------------------------------------------------------------- the waist
+   The number that answers his actual question, read slowly on purpose. A
+   self-measured waist carries about a centimetre of noise, so the trend
+   compares the mean of the two latest Sundays with the mean of the two
+   nearest eight weeks earlier, and calls anything under a centimetre steady.
+   A weekly delta would be the tape talking, not him. */
+function waistSorted(){
+  return (S.waist || []).slice().sort(function(a, b){ return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0; });
+}
+function waistDue(){
+  if (new Date().getDay() !== 0) return false;
+  var wk = weekKeyOf(today());
+  return !(S.waist || []).some(function(r){ return weekKeyOf(r[0]) === wk; });
+}
+function waistTrend(){
+  var ws = waistSorted();
+  if (ws.length < 4) return null;
+  var latest = ws[ws.length - 1], d0 = new Date(latest[0] + "T00:00:00");
+  /* readings from the eighth Sunday back and earlier: with weekly tapes the
+     two pair-centres then sit eight weeks apart, which is what the copy says */
+  var older = ws.filter(function(r){ return (d0 - new Date(r[0] + "T00:00:00")) / 86400000 >= 53; });
+  if (older.length < 2) return null;
+  var mean = function(a){ return (a[0][1] + a[1][1]) / 2; };
+  var delta = mean(ws.slice(-2)) - mean(older.slice(-2));
+  return { delta: delta, dir: delta <= -1 ? "down" : delta >= 1 ? "up" : "steady" };
+}
+function waistLine(tr, ws){
+  if (!ws.length) return "Sunday morning, before you eat. One reading a week; the trend reads after ten.";
+  if (ws.length < 4) return ws.length + " of 4 Sundays. The trend reads after ten.";
+  if (!tr) return "Early days \u2014 the belly goes last. The trend reads after ten Sundays.";
+  var x = Math.abs(tr.delta).toFixed(1);
+  if (tr.dir === "down") return "Down " + x + "cm over eight weeks. That is it working.";
+  if (tr.dir === "up") return "Up " + x + "cm over eight weeks. Weight up is the plan; waist up is not. "
+    + "Keep the protein at three meals and give it two more Sundays before reading anything into it.";
+  return "Steady over eight weeks. Under a centimetre is the tape, not you.";
+}
+function waistFoot(){
+  var ws = waistSorted();
+  if (!ws.length) return "The belly is measured on Sundays, not judged in the mirror.";
+  var last = ws[ws.length - 1], tr = waistTrend(), tail;
+  if (ws.length < 4) tail = ws.length + " of 4 Sundays";
+  else if (!tr) tail = "early days, the belly goes last";
+  else if (tr.dir === "steady") tail = "steady over eight weeks";
+  else tail = tr.dir + " " + Math.abs(tr.delta).toFixed(1) + " over eight weeks"
+    + (tr.dir === "up" ? " \u2014 weight up is the plan, the tape needs time" : "");
+  return "Waist " + last[1] + "cm \u00b7 " + tail;
+}
+function waistMeta(ws, tr){
+  if (!ws.length) return "not measured yet";
+  var last = ws[ws.length - 1];
+  if (tr) return last[1] + "cm \u00b7 " + (tr.dir === "steady" ? "steady"
+    : (tr.delta > 0 ? "+" : "\u2212") + Math.abs(tr.delta).toFixed(1)) + " / 8 wks";
+  return last[1] + "cm \u00b7 " + nice(last[0]);
+}
+
 function askWaist(){
   var last = (S.waist || []).slice(-1)[0];
   ask({
@@ -759,14 +893,24 @@ function gymProgressHTML(){
   inner += "</div>";
 
   var press = bestOf(swapNames(sessionFor("A")[1][1])), pull = bestOf(swapNames(sessionFor("B")[1][1]));
-  var ws = S.waist || [], w0 = ws[0], w1 = ws[ws.length - 1];
+  var ws = waistSorted(), w0 = ws[0], w1 = ws[ws.length - 1];
   var bits = [];
   if (press) bits.push("chest " + press.w + "kg");
   if (pull) bits.push("back " + pull.w + "kg");
-  if (w1) bits.push("waist " + (w0 && w0 !== w1
-    ? (w1[1] - w0[1] > 0 ? "+" : "") + (w1[1] - w0[1]).toFixed(1) + "cm" : w1[1] + "cm"));
+  /* the long view of the waist, in the same voice as the fold: under a
+     centimetre is the tape, not him */
+  if (w1){
+    var wd = w0 && w0 !== w1 ? w1[1] - w0[1] : 0;
+    bits.push("waist " + (Math.abs(wd) >= 1 ? (wd > 0 ? "+" : "\u2212") + Math.abs(wd).toFixed(1) + "cm"
+      : (w0 && w0 !== w1 ? "steady" : w1[1] + "cm")));
+  }
   inner += "<p class='fine'>Three a week is the line."
     + (bits.length ? " Best so far: " + bits.join(" · ") + "." : "") + "</p>";
+  if (finMinutes() > 0){
+    var sess = liftDays().filter(function(k){ return Object.keys(S.lifts[k].ex || {}).length; }).slice(-9);
+    var withFin = sess.filter(function(k){ return !!S.lifts[k].fin; }).length;
+    if (withFin) inner += "<p class='fine'>Finisher on " + withFin + " of the last " + sess.length + ".</p>";
+  }
 
   var wk = weeks[weeks.length - 1][1];
   return fold("gymprog", "Is it working", wk + " this week", inner, false);
@@ -830,11 +974,12 @@ function paintSession(){
 
   if (!SESSION.warm){
     h += "<div class='sshero'><div class='ssk2'>Before anything</div><h2>Warm up</h2>"
-      + "<p>Five minutes of easy cardio &mdash; bike, rower, brisk walk on the treadmill. Then two "
-      + "light sets of the first movement to find the weight. Not to failure. Not even close.</p></div>";
+      + "<p>Walked here? You are already warm &mdash; go straight to the two light sets. Otherwise five "
+      + "minutes easy on a bike or rower, then two light sets of the first movement to find the weight. "
+      + "Not to failure. Not even close.</p></div>";
     h += "<div class='ssbig'>" + (restLeft() > 0
       ? "<div id='ssRest' class='ssrest going' style='--rest:"
-        + (restLeft() / Math.max(1, restTotal())).toFixed(3) + "'><i></i><span>Warming up \u00b7 "
+        + (restLeft() / Math.max(1, restTotal())).toFixed(3) + "'><i></i><span>Warm-up \u00b7 "
         + restClock(restLeft()) + "</span></div>"
       : "<button class='btn' data-sswarm='1'>Start a five-minute clock</button>") + "</div>";
     h += "<div class='btns'><button class='btn pri big' data-swarmdone='1'>Warm. Start the first movement</button></div>";
@@ -843,7 +988,11 @@ function paintSession(){
     return;
   }
 
-  if (SESSION.i >= n){ paintSummary(el); return; }
+  if (SESSION.i >= n){
+    var finDone = (S.lifts || {})[SESSION.day] && S.lifts[SESSION.day].fin;
+    if (finMinutes() > 0 && !SESSION.fin && !finDone){ paintFinisher(el); return; }
+    paintSummary(el); return;
+  }
 
   var ex = list[SESSION.i], name = pickFor(SESSION.key, SESSION.i);
   var t = nextTarget(ex, name), had = sessionLogged(name);
@@ -890,6 +1039,32 @@ function paintSession(){
   el.innerHTML = h;
 }
 
+/* The finisher step: after the last movement, before the summary, built from
+   the warm-up step's parts. Done logs the machine he used last time (or the
+   bike) in one tap - the row on the tab is where he changes it. Skipping
+   costs nothing and the copy says so. */
+function paintFinisher(el){
+  var min = finMinutes(), on = lastFinOn() || "Bike";
+  var h = "<div class='ss'>";
+  h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
+    + "<span class='ssk'>Session " + SESSION.key + "</span><span class='ssp'>last thing</span></div>";
+  h += "<div class='sshero'><div class='ssk2'>Easy minutes</div><h2>Finisher</h2>"
+    + "<p>" + min + " easy minutes on the bike, incline treadmill or rower. Talking pace \u2014 a "
+    + "sentence, not a song. Phone out, podcast on. It never gets harder: the lifts get heavier, this "
+    + "stays easy. Short on time? This is the thing to skip, never the first movement.</p></div>";
+  var rl = restLeft();
+  h += "<div class='ssbig'>" + (rl > 0
+    ? "<div id='ssRest' class='ssrest going' style='--rest:" + (rl / Math.max(1, restTotal())).toFixed(3)
+      + "'><i></i><span>Finisher \u00b7 " + restClock(rl) + "</span></div>"
+    : "<button class='btn' data-sfinclock='1'>Start " + (min === 8 ? "an eight" : "a ten")
+      + "-minute clock</button>") + "</div>";
+  h += "<div class='btns'><button class='btn pri big' data-sfindone='1'>Done \u2014 "
+    + esc(finLabel(on).toLowerCase()) + ", " + min + " min</button></div>";
+  h += "<div class='btns tight'><button class='btn quiet' data-sfinskip='1'>Skip today</button></div>";
+  h += "</div>";
+  el.innerHTML = h;
+}
+
 function paintSummary(el){
   var list = sessionList(), h = "<div class='ss'>";
   h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
@@ -901,6 +1076,11 @@ function paintSummary(el){
     h += "<div class='rec'><span class='rd'>" + (i + 1) + "</span><span class='rt'>" + esc(name) + "</span>"
       + "<b class='rv'>" + (had ? had.w + "kg \u00b7 " + had.r.join(",") : "skipped") + "</b></div>";
   });
+  if (finMinutes() > 0){
+    var fe = (S.lifts || {})[SESSION.day], fin = fe && fe.fin ? fe.fin : null;
+    h += "<div class='rec'><span class='rd'>+</span><span class='rt'>Finisher</span>"
+      + "<b class='rv'>" + (fin ? esc(finLabel(fin.on)) + " \u00b7 " + fin.min + " min" : "skipped") + "</b></div>";
+  }
   h += "</div>";
   h += "<div class='btns'><button class='btn pri big' data-sfinish='1'>Finish &mdash; mark Trained</button></div>";
   h += "<p class='fine' style='text-align:center'>Next time the app already knows what to suggest.</p>";
@@ -913,7 +1093,7 @@ function sessionTap(ds, b){
   if (!SESSION) return false;
   var list = sessionList(), ex = list[SESSION.i], name = ex ? pickFor(SESSION.key, SESSION.i) : null;
   if (ds.sclose){ sfx("tap"); closeSession(); return true; }
-  if (ds.sswarm){ restStart(300); paintSession(); return true; }
+  if (ds.sswarm){ restStart(300, "Warm-up"); paintSession(); return true; }
   if (ds.swarmdone){ SESSION.warm = 1; restStop(true); save(); sfx("tick"); buzz(10); paintSession(); return true; }
   if (ds.lf !== undefined){
     var p = ds.lf.split(":"), kind = p[0], dir = Number(p[1]);
@@ -941,6 +1121,19 @@ function sessionTap(ds, b){
     if (b) burst(b, "#8FE3B4");
     var setsNow = sessionSetsFor(name, ex);
     if (e.r.length < setsNow) restStart(restOf(ex));
+    paintSession(); return true;
+  }
+  if (ds.sfinclock){ restStart(finMinutes() * 60, "Finisher"); paintSession(); return true; }
+  if (ds.sfindone){
+    var onv = lastFinOn() || "Bike", mins = finMinutes();
+    logFinisher(mins, onv, SESSION.key, SESSION.day);
+    SESSION.fin = "done"; restStop(true); save();
+    toast(finLabel(onv) + " \u00b7 " + mins + " min. Tap the row on the tab to change it.");
+    paintSession(); return true;
+  }
+  if (ds.sfinskip){
+    SESSION.fin = "skip"; restStop(true); save(); sfx("untick");
+    toast("Skipped. The lifts were the session.");
     paintSession(); return true;
   }
   if (ds.snext || ds.sskip){
