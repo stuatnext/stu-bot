@@ -341,6 +341,50 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v38: the belly, answered where he asked
+
+He sent a photo of his middle and asked how to deal with the belly fat and
+which exercises to put in the Gym tab. The plan on paper already had the
+honest answer — you cannot spot-reduce; add muscle, protein three times a
+day, tape not scale, the belly goes last — so the wrong move was crunches.
+The design was put through a panel (three proposers with different lenses,
+a judge, three adversarial refuters) before a line was written; the
+refuters passed it with fixes that are all in.
+
+**The finisher.** `STAGES` gains a sixth column and a stage of its own:
+at two sessions logged, "The bike" — eight easy minutes on a bike, incline
+treadmill or rower after the lifts, ten from Five moves, capped at ten
+forever. Talking pace is the only intensity ("a sentence, not a song"); no
+heart-rate zones, no dial. It is logged as `S.lifts[day].fin`, a sibling of
+the exercises, so nothing that counts lifts ever sees it — and a
+finisher-only visit can no longer advance the A/B/C rotation
+(`nextSessionKey` skips days with no exercises). In the guided session it
+is one step between the last movement and the summary, with a clock that
+says "Finisher" rather than "Resting"; on the tab it is a dashed row with
+no number that opens one four-option modal. Never counted as a move, never
+required for Trained, the first thing to skip — and the skip says so
+without judgement.
+
+**The waist on the face of the tab.** The gym hero's second foot line now
+carries the waist read; the fold stays closed at the bottom six days a week
+and stands open under the lifts on a Sunday with no reading. The weekly
+delta is gone: the trend compares the mean of the two latest Sundays with
+the mean of the two nearest eight weeks earlier and calls anything under a
+centimetre steady — a tape carries about that much noise. It has an "up"
+branch with non-dieting words, because weight is allowed to rise on this
+plan and waist is not. The 08:07 Sunday brief says "tape at the navel
+first, before you eat".
+
+**The explainer.** Six lines, one tap from where he goes looking for the ab
+work ("Why no crunches — and where the belly comes in"), and from the
+finisher row's `?`. Never auto-opens.
+
+**No crunches, anywhere.** The two swap lists that offered cable crunches
+and the ab machine now offer rep-counted core work (bird dog, lying leg
+raise, banded dead bug) with their own how-to steps; the orphan opening
+weights went with them. The walk to the gym became the warm-up in the
+copy, not a counter. `docs/train.html` mirrors all of it.
+
 #### v37: it knows what time it is
 
 Nine days after the push went live on his phone, the brief was open: do

@@ -788,7 +788,7 @@ var SESSIONS = [
     ["Side plank",           3, 30, 30, "Seconds each side",
       ["Suitcase carry", "Pallof hold", "Cable side bend, light"], 60],
     ["Dead bug",             3, 10, 10, "Each side. Lower back stays flat",
-      ["Cable crunch", "Ab crunch machine", "Reverse crunch"], 60]
+      ["Bird dog", "Lying leg raise", "Dead bug with band"], 60]
   ]],
   ["C", [
     ["Leg press",            3, 10, 10, "Or a squat if someone has shown you",
@@ -801,8 +801,8 @@ var SESSIONS = [
       ["Glute drive machine", "Smith hip thrust", "Cable kickback", "Back extension"], 90],
     ["Cable woodchop",       3, 12, 12, "Each side. Controlled, do not swing",
       ["Torso rotation machine", "Pallof press", "Landmine rotation"], 60],
-    ["Hanging knee raise",   3, 10, 10, "Or a lying reverse crunch",
-      ["Captain's chair knee raise", "Cable crunch", "Reverse crunch"], 60]
+    ["Hanging knee raise",   3, 10, 10, "Or lying leg raises",
+      ["Captain's chair knee raise", "Lying leg raise", "Bird dog"], 60]
   ]]
 ];
 
@@ -833,13 +833,41 @@ var ANCHORS = [
    comes back. Gated on sessions logged rather than weeks, so a bad fortnight
    costs nothing and only turning up moves it.
 
-   [ sessions needed, name, exercises shown, sets each, what this stage is for ] */
+   The sixth column is the finisher: easy minutes on a bike after the lifts,
+   unlocked as a stage of its own at two sessions so nothing ever adds two
+   things on one visit, and capped at ten forever - it never gets harder, the
+   lifts get heavier. Never counted as a move, never required for Trained.
+
+   [ sessions needed, name, exercises shown, sets each, what this stage is for, finisher minutes ] */
 var STAGES = [
-  [0,  "Session zero",     3, 2, "Find the room. Two easy sets of three things, then leave."],
-  [1,  "Three moves",      3, 3, "Legs, a push and a pull. The whole body in twenty-five minutes."],
-  [3,  "Four moves",       4, 3, "A hinge goes in. This is where the posture work starts."],
-  [6,  "Five moves",       5, 3, "The waist work joins it - bracing, not crunches."],
-  [11, "The full session", 6, 3, "All six. From here nothing is added; the weight goes up instead."]
+  [0,  "Session zero",     3, 2, "Find the room. Two easy sets of three things, then leave.", 0],
+  [1,  "Three moves",      3, 3, "Legs, a push and a pull. The whole body in twenty-five minutes.", 0],
+  [2,  "The bike",         3, 3, "Eight easy minutes after the lifts. Talking pace. With the walk in, this is the belly work.", 8],
+  [3,  "Four moves",       4, 3, "A hinge goes in. This is where the posture work starts.", 8],
+  [6,  "Five moves",       5, 3, "The waist work joins it - bracing, not crunches.", 10],
+  [11, "The full session", 6, 3, "All six. From here nothing is added; the weight goes up instead.", 10]
+];
+
+/* ------------------------------------------------------------ the finisher
+   Easy minutes after the lifts, gated by STAGES, capped at ten. One ask()
+   modal is the whole surface: which machine, or the five-minute floor. The
+   talk test is the intensity - a sentence, not a song - and no number he can
+   fail is ever shown. [ id, label, note ] */
+var FINISHERS = [
+  ["Bike",      "Bike",               "or the cross-trainer, same job"],
+  ["Treadmill", "Treadmill, incline", "raise it until a sentence still comes out; hands off the rails"],
+  ["Rower",     "Rower",              "once someone has shown you the stroke - legs, then back, then arms"]
+];
+
+/* What he asked, answered in six lines he can read on his phone: how to deal
+   with the belly, and why there are no crunches in this programme. */
+var BELLY = [
+  "You cannot burn fat off one spot. Crunches train the muscle underneath and leave the layer on top where it is.",
+  "You are not overweight. You are under-muscled, and the middle reads soft because there is nothing behind it.",
+  "A wider back and shoulders make the same waist look smaller. That is the lifts, and it is the fastest visible change.",
+  "Protein three times a day builds it. Not eating less - your weight is allowed to rise.",
+  "Walk here, and do the easy minutes on the bike after the lifts. That is the belly work. Talking pace, no sprints.",
+  "The belly is the last place fat leaves a man. Tape it on Sundays, read it over eight weeks, and expect nothing for the first eight."
 ];
 
 /* Hydration, in a country that is 30 degrees and humid all year, for someone
@@ -1028,8 +1056,6 @@ var START = {
   "Cable woodchop": 10,
   "Torso rotation machine": 15,
   "Landmine rotation": 10,
-  "Cable crunch": 20,
-  "Ab crunch machine": 20,
   "Cable side bend, light": 10,
   "Farmer's carry": 20,
   "Trap bar carry": 30,
@@ -1255,14 +1281,22 @@ var HOW = {
     "Lower to about 90 degrees, hips staying on the seat",
     "Push through the whole foot. All reps, then swap",
     "Wrong: the knee drifting in. Track it over the middle toes"],
-  "Cable crunch": ["Kneel facing the stack, rope held at the sides of your head",
-    "Curl your ribs toward your hips, rounding the upper back",
-    "Come back up slowly to nearly upright",
-    "Wrong: pulling with the arms or bowing from the hips. The elbows stay by the head"],
-  "Ab crunch machine": ["Chest on the pad or hands on the handles, feet under the rollers",
-    "Curl forward, bringing the ribs to the hips",
-    "Return slowly, not all the way to slack",
-    "Wrong: yanking with the arms. The stomach moves it"]
+  "Bird dog": ["On hands and knees, hands under shoulders, knees under hips",
+    "Reach one arm forward and the opposite leg back until both are level with your back",
+    "Hold a breath, come back, swap sides - that is one rep each side",
+    "Wrong: the lower back arching or the hips tipping. Smaller reach, flatter back"],
+  "Lying leg raise": ["On your back, hands under the hips, lower back pressed to the floor",
+    "Legs straight or slightly bent, lift them to vertical without swinging",
+    "Lower slowly until the heels are just off the floor, back still flat",
+    "Wrong: the lower back lifting off the floor. Bend the knees more"],
+  "Dead bug with band": ["A light band anchored behind your head, held in both hands over the chest",
+    "Lie on your back, knees over hips, lower back pressed flat",
+    "Straighten one leg out slowly against the pull of the band, then swap",
+    "Wrong: the back arching. A lighter band, or a shorter reach with the leg"],
+  "Captain's chair knee raise": ["Forearms on the pads, back against the rest, grip the handles",
+    "Lift the knees towards the chest without swinging, and a touch higher at the top",
+    "Lower slowly. Ten controlled ones beat twenty swung ones",
+    "Wrong: shoulders creeping up to the ears. Push down into the pads"]
 };
 var HOW_GENERIC = ["Set the seat so the handles line up with the joint that moves",
   "Two light sets to find the weight, then the working sets",

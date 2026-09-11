@@ -272,7 +272,9 @@ function briefFor(k){
   var w = workUTC(d), start = hhmm(w[0] + offset());
   var head = DAY_NAMES[dow]
     + (dow === 3 ? " · Mum’s day" : wkend ? " · no shift" : "");
-  var first = wkend
+  var first = dow === 0
+    ? "Two things make a Sunday. Train early, call home. Tape at the navel first, before you eat."
+    : wkend
     ? "Two things make a " + DAY_NAMES[dow] + ". Train early, call home."
     : "Train before Malta wakes at " + start + ".";
   /* the gym only knows sessions once gym.js is loaded; the brief degrades */
