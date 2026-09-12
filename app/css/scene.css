@@ -245,3 +245,8 @@ button.gem:active{transform:translateY(3px); border-bottom-width:2px}
 @media (max-width:360px){ .skycard .skybd .skygo{font-size:12px; padding:8px 12px} }
 /* a day in the air: not a miss, and it carries the run like a freeze */
 .wd.jet i{background:var(--violetSoft); border-color:#D9B8F5; color:var(--violetInk)}
+
+/* the city on the sky line, which is also how you correct it */
+.skycard .skybd i .skyloc{font:inherit; color:inherit; background:none; padding:0 1px;
+  border:0; border-bottom:1.5px dotted currentColor; cursor:pointer; letter-spacing:inherit}
+.skycard .skybd i .skyloc:active{opacity:.6}

@@ -56,8 +56,11 @@ function skyCardHTML(ask, sub, cta){
   }
   h += "</svg>";
   var sit = situation();
+  /* The city on the header is the thing that is wrong when it is wrong, so it
+     is also the button that fixes it: tap the word, get the ground and the
+     list. Nothing to find in a fold. */
   h += "<div class='skybd'><i>" + esc(niceToday())
-    + (sit.home ? "" : " \u00b7 " + esc(sit.city))
+    + (sit.home ? "" : " \u00b7 <button class='skyloc' data-notthere='1'>" + esc(sit.city) + "</button>")
     + " \u00b7 " + esc(dialLabel(s)) + "</i>"
     + "<b>" + esc(ask || "") + "</b>"
     + (sub ? "<span>" + esc(sub) + "</span>" : "")

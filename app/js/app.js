@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v43";
+var BUILD = "v44";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -89,6 +89,9 @@ document.addEventListener("visibilitychange", function(){
   var before = today() + "|" + JSON.stringify(whereOn(today()));
   noteWhere();
   if (before !== today() + "|" + JSON.stringify(whereOn(today()))) render({ keepScroll: true });
+  /* and if location is already allowed, let the ground correct the clock
+     without being asked to */
+  autoLocate();
 });
 window.addEventListener("pagehide", badgeOut);
 
@@ -358,6 +361,7 @@ window.addEventListener("load", function(){
     S.booted = (S.booted || 0) + 1;
     save();
   }, reduced() ? 60 : 850);
+  autoLocate();
 });
 setTimeout(function(){
   var b = document.getElementById("boot");

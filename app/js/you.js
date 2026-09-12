@@ -592,6 +592,41 @@ async function askWhere(){
    ever carries a coordinate. */
 function pinMe(){ locate(false); }
 
+/* Has he already said yes? If so the app can read the fix without a prompt,
+   which is the whole difference between a feature he has to remember to use
+   and one that simply works. Permissions.query is not on every browser, so a
+   missing answer means "ask him", never "assume yes". */
+async function geoGranted(){
+  try {
+    if (!navigator.permissions || !navigator.permissions.query) return false;
+    var st = await navigator.permissions.query({ name: "geolocation" });
+    return st && st.state === "granted";
+  } catch(e){ return false; }
+}
+/* Quietly, on opening the app: if the ground is available for free, take it.
+   Never prompts - a prompt on every open is exactly what made this a button
+   in the first place - and never argues with a place he set himself. */
+var GEO_LAST = 0;
+async function autoLocate(){
+  if (S.autoZone === 0) return;
+  var rec = whereOn(today());
+  if (rec && rec.m) return;                       /* his own word stands */
+  if (Date.now() - GEO_LAST < 5 * 60 * 1000) return;
+  if (!(await geoGranted())) return;
+  GEO_LAST = Date.now();
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var la = Math.round(pos.coords.latitude * 100) / 100;
+    var lo = Math.round(pos.coords.longitude * 100) / 100;
+    pinSave(la, lo);
+    var hit = setWhereFromFix(la, lo);
+    if (hit && hit.near && hit.changed){
+      toast(hit.was ? hit.was + " → " + hit.city + "." : hit.city + ".");
+      render({ keepScroll: true });
+    }
+  }, function(){}, { enableHighAccuracy: false, timeout: 8000, maximumAge: 900000 });
+}
+
+
 /* One location read, on a tap, never at launch: an iPhone re-asks a
    home-screen app every time it is opened, so this is a button. Two decimals
    is about a kilometre - enough to centre a map search and to tell one city
@@ -625,6 +660,25 @@ function locate(setPlace){
       ? "Location is off for this app. Settings → Daylight → Location."
       : "No location given. The clock still knows the city.");
   }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
+}
+
+/* A toast is no use for something he has to go and change in Settings. */
+async function geoFailed(err){
+  var denied = err && err.code === 1;
+  var v = await ask({
+    title: denied ? "Location is switched off" : "The phone would not say",
+    say: denied
+      ? "For an app on the Home Screen it is its own setting: Settings \u2192 Daylight "
+        + "\u2192 Location \u2192 While Using. Until then, name the place yourself \u2014 "
+        + "that works just as well and outranks everything."
+      : "No fix came back \u2014 indoors, or the phone was slow. Try again, or name the "
+        + "place yourself.",
+    options: [{ id: "__hand", label: "Name it myself", pri: true },
+              { id: "__retry", label: "Try again" }],
+    cancel: "Leave it"
+  });
+  if (v === "__hand"){ askWhere(); return; }
+  if (v === "__retry"){ locate(true); }
 }
 
 async function askReset(){
