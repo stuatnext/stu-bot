@@ -114,9 +114,7 @@ function viewYou(){
         S.badge ? "Open pillars counted on the app icon" : "Off")
     + mrow("replay", "1", "ask", "How this works", "The three-tap tour, again")
     + mrow("sound", "1", "spare", "Sound", S.mute ? "Off" : "On")
-    + mrow("camp", "1", "pin", "Where you are",
-        S.autoZone !== 0 ? situation().city + " \u2014 from the phone\u2019s clock"
-                         : S.camp + " \u2014 set by hand")
+    + mrow("camp", "1", "pin", "Where you are", whereSource())
     + "</div>";
 
   /* the record itself */
@@ -525,6 +523,16 @@ async function askRate(){
 
 /* Since v39 the phone's clock answers this by itself. The list stays for the
    one case it cannot cover: a phone deliberately left on Singapore time. */
+/* Which of the three answered: his own word, the ground, or the clock. */
+function whereSource(){
+  var rec = whereOn(today()) || {};
+  var city = situation().city;
+  if (rec.m) return city + " \u2014 set by you";
+  if (rec.g) return city + " \u2014 from your location";
+  if (S.autoZone === 0) return S.camp + " \u2014 set by hand";
+  return city + " \u2014 from the phone\u2019s clock";
+}
+
 async function askCamp(){
   var sit = situation(), sh = shape(), auto = S.autoZone !== 0;
   var v = await ask({
@@ -534,8 +542,9 @@ async function askCamp(){
     options: [
       { id: "__auto", label: "Follow the phone\u2019s clock",
         note: sit.city + " now \u00b7 Malta lands " + sh.startT + "\u2013" + sh.endT, pri: auto },
-      { id: "__pin", label: "Pin my spot",
-        note: "For the nearby searches only. Stays on this phone, forgotten tomorrow." }
+      { id: "__gps", label: "Use my location",
+        note: "Asks the phone once. Names the city and centres the searches; the "
+            + "coordinate stays on this phone and is forgotten tomorrow." }
     ].concat(CAMPS.map(function(c){
       return { id: c[0], label: c[0], note: "set by hand", pri: !auto && c[0] === S.camp };
     })),
@@ -543,7 +552,7 @@ async function askCamp(){
   });
   if (!v || v === "__no") return;
   if (v === "__auto"){ S.autoZone = 1; save(); sfx("done"); render({ keepScroll: true }); return; }
-  if (v === "__pin"){ pinMe(); return; }
+  if (v === "__gps"){ locate(true); return; }
   S.autoZone = 0; S.camp = v; save(); sfx("done"); render({ keepScroll: true });
 }
 /* "I am not there." The clock said one thing and he says another; his answer
@@ -581,18 +590,40 @@ async function askWhere(){
    is about a kilometre - enough to centre a map search, not enough to name a
    street - and it is kept outside the save, so no backup and no coach file
    ever carries a coordinate. */
-function pinMe(){
+function pinMe(){ locate(false); }
+
+/* One location read, on a tap, never at launch: an iPhone re-asks a
+   home-screen app every time it is opened, so this is a button. Two decimals
+   is about a kilometre - enough to centre a map search and to tell one city
+   from another, not enough to name a street - and it is kept outside the
+   save, so no backup and no coach file ever carries a coordinate.
+
+   The fix answers two questions at once: where to search from, and what
+   city he is standing in. The second is the one the clock keeps getting
+   wrong, and the ground cannot be wrong about it. */
+function locate(setPlace){
   if (!navigator.geolocation){ toast("This browser will not say where it is."); return; }
-  toast("Asking the phone\u2026");
+  toast("Asking the phone…");
   navigator.geolocation.getCurrentPosition(function(pos){
     var la = Math.round(pos.coords.latitude * 100) / 100;
     var lo = Math.round(pos.coords.longitude * 100) / 100;
     var p = pinSave(la, lo);
+    var hit = setPlace ? setWhereFromFix(la, lo) : placeFromFix(la, lo);
     sfx("done"); buzz(12);
-    toast(p.l ? "Near " + p.l + "." : "Pinned. Maps will search from here.");
+    if (setPlace && hit && hit.near){
+      toast(hit.changed ? (hit.was ? hit.was + " → " + hit.city + ". Fixed." : hit.city + ".")
+                        : hit.city + ". That was right already.");
+    } else if (setPlace){
+      toast(hit ? "Nothing I know within " + hit.km + "km. Pick it by hand."
+                : "No location given.");
+    } else {
+      toast(p.l ? "Near " + p.l + "." : "Pinned. Maps will search from here.");
+    }
     render({ keepScroll: true });
-  }, function(){
-    toast("No location given. The clock still knows the city.");
+  }, function(err){
+    toast(err && err.code === 1
+      ? "Location is off for this app. Settings → Daylight → Location."
+      : "No location given. The clock still knows the city.");
   }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
 }
 

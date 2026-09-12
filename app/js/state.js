@@ -150,7 +150,7 @@ function noteWhere(){
        from until midnight. The phone's clock is the ground truth: if it has
        moved since the stamp, and he has not set the place himself, the day
        moves with it. */
-    if (z && !rec.m && rec.z !== z){
+    if (z && !rec.m && !rec.g && rec.z !== z){
       rec.c = zoneCity(z); rec.z = z; rec.k = guessKind(z, k);
       delete rec.f;
       var yz = whereOn(shift(-1));
@@ -174,6 +174,31 @@ function noteWhere(){
 function zoneFor(city){
   for (var z in ZONES) if (ZONES[z][0] === city) return z;
   return "";
+}
+/* The nearest place we know to a fix, and how far off it is. */
+function placeFromFix(la, lo){
+  var best = null, bestKm = Infinity;
+  PLACES.forEach(function(pl){
+    var km = kmBetween([la, lo], [pl[1], pl[2]]);
+    if (km < bestKm){ bestKm = km; best = pl; }
+  });
+  if (!best) return null;
+  return { city: best[0], kind: best[3], km: Math.round(bestKm), near: bestKm <= PLACE_KM };
+}
+/* What the ground says, which beats the clock. A fix speaks for now and only
+   now, so it writes today and leaves the days behind it alone - he may well
+   have been in Germany yesterday. Marked so the clock cannot undo it. */
+function setWhereFromFix(la, lo){
+  var hit = placeFromFix(la, lo);
+  if (!hit || !hit.near) return hit;
+  var k = today();
+  S.where = S.where || {};
+  var was = (whereOn(k) || {}).c;
+  S.where[k] = { c: hit.city, z: zoneFor(hit.city), k: hit.kind, g: 1 };
+  save();
+  hit.was = was;
+  hit.changed = was !== hit.city;
+  return hit;
 }
 /* His own answer, which beats the clock. Applied backwards over the stay the
    way a work/holiday correction is, so one tap fixes the whole trip, and

@@ -395,6 +395,7 @@ function whereFoldHTML(sit){
     /* The clock can be wrong - a phone left on the old zone, a layover, a
        flight home the app has not caught up with. This is the way to say so
        without turning the clock off altogether. */
+    + "<button class='btn quiet' data-locate='1'>Use my location</button>"
     + "<button class='btn quiet' data-notthere='1'>Not in " + esc(sit.city) + "</button>"
     + "</div>";
   return fold("where:" + sit.city.toLowerCase().replace(/[^a-z]+/g, ""),

@@ -100,6 +100,64 @@ var ZONES = {
    London work trip in the one zone they share. */
 var HOMES = { Singapore: [1.35, 103.82], Sheffield: [53.38, -1.47] };
 
+/* ------------------------------------------------------------ the ground
+   Where the places he goes actually are, so a GPS fix can be turned into a
+   city on the phone itself. A clock can be wrong - left on the old zone, or
+   simply not updated yet - and coordinates cannot. This table is the reason
+   no coordinate ever has to leave the device to be understood: it is matched
+   here, offline, and thrown away.
+
+   [ name, lat, lng, what a day there usually is ] */
+var PLACES = [
+  ["Singapore",  1.35, 103.82, "home"],
+  ["Sheffield", 53.38,  -1.47, "family"],
+  ["Malta",     35.90,  14.50, "hq"],
+  ["London",    51.51,  -0.13, "work"],
+  ["Germany",   52.52,  13.40, "work"],
+  ["Germany",   48.14,  11.58, "work"],
+  ["Germany",   50.11,   8.68, "work"],
+  ["Germany",   53.55,   9.99, "work"],
+  ["Sofia",     42.70,  23.32, "work"],
+  ["Lisbon",    38.72,  -9.14, "work"],
+  ["Spain",     40.42,  -3.70, "work"],
+  ["Spain",     41.39,   2.17, "work"],
+  ["Amsterdam", 52.37,   4.90, "work"],
+  ["Prague",    50.08,  14.44, "work"],
+  ["Bucharest", 44.43,  26.10, "work"],
+  ["Stockholm", 59.33,  18.07, "work"],
+  ["Copenhagen",55.68,  12.57, "work"],
+  ["Dublin",    53.35,  -6.26, "work"],
+  ["Vienna",    48.21,  16.37, "work"],
+  ["Warsaw",    52.23,  21.01, "work"],
+  ["Zurich",    47.38,   8.54, "work"],
+  ["Brussels",  50.85,   4.35, "work"],
+  ["Athens",    37.98,  23.73, "work"],
+  ["Istanbul",  41.01,  28.98, "work"],
+  ["Cyprus",    35.17,  33.36, "work"],
+  ["Riga",      56.95,  24.11, "work"],
+  ["Vilnius",   54.69,  25.28, "work"],
+  ["Tallinn",   59.44,  24.75, "work"],
+  ["Budapest",  47.50,  19.04, "work"],
+  ["Oslo",      59.91,  10.75, "work"],
+  ["Helsinki",  60.17,  24.94, "work"],
+  ["Kyiv",      50.45,  30.52, "work"],
+  ["Paris",     48.86,   2.35, "work"],
+  ["Bangkok",   13.75, 100.50, "holiday"],
+  ["Jakarta",   -6.21, 106.85, "work"],
+  ["Hanoi",     21.03, 105.85, "holiday"],
+  ["Bali",      -8.65, 115.22, "holiday"],
+  ["Hong Kong", 22.32, 114.17, "work"],
+  ["Tokyo",     35.68, 139.69, "holiday"],
+  ["Sydney",   -33.87, 151.21, "work"],
+  ["Colombo",    6.93,  79.86, "holiday"],
+  ["Delhi",     28.61,  77.21, "work"],
+  ["Dubai",     25.20,  55.27, "work"],
+  ["New York",  40.71, -74.01, "work"]
+];
+/* Close enough to be that city; past this a fix is somewhere the table does
+   not know, and saying nothing beats naming the wrong country. */
+var PLACE_KM = 320;
+
 /* key, label, resting icon, what it means in full, the colour it wears, and
    the gloss that sits on the button itself. He looked at "Trained" and asked
    what it constitutes - a label without its definition is a quiz, and a game
