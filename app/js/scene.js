@@ -171,23 +171,25 @@ function viewToday(){
      that row wears the arrow and speaks the actual plan, so "what now?" never
      needs asking twice. */
   var up = nextUp(), sit = situation();
-  h += "<div class='quests'>";
+  /* The three things, as a checklist in large type rather than three tiles.
+     A tile is a box competing with its neighbours; a line of type with a
+     circle at the end of it is a thing to tick, which is what these are. */
+  h += "<ol class='index big'>";
   PILLARS.forEach(function(g){
     var on = pDone(t, g[0]), st = streak(g[0]), carry = !on && !required(g[0], t);
     var isUp = g[0] === up && !on && !carry;
-    h += "<button class='pil q" + g[0] + (on ? " on" : "") + (carry ? " carried" : "")
-      + (isUp ? " up" : "")
-      + "' data-p='" + g[0] + "' style='--pil:" + g[4] + "' aria-pressed='" + (on ? "true" : "false") + "'>"
-      + "<span class='qic'>" + svg(g[2], 24) + "</span>"
-      + "<span class='qbd'><b>" + esc(g[1])
-      + (isUp ? "<i class='now'>Now</i>" : "") + "</b><span>"
-      + esc(carry ? (sit.kind === "holiday" ? "On holiday \u2014 carried" : "No shift today \u2014 carried")
-            : isUp ? planLine(g[0]) : g[5]) + "</span></span>"
-      + (st > 0 && !carry ? "<span class='qst'>" + svg("flame" in ICONS ? "flame" : "tick", 12) + st + "</span>" : "")
-      + "<span class='qchk'>" + (on ? svg("tick", 20) : "") + "</span>"
-      + "</button>";
+    h += "<li class='ixr" + (on ? " on" : "") + (carry ? " carried" : "") + (isUp ? " up" : "") + "'>"
+      + "<button class='ixb' data-p='" + g[0] + "' style='--pil:" + g[4] + "'"
+      + " aria-pressed='" + (on ? "true" : "false") + "'>"
+      + "<span class='po-t'>" + esc(g[1]) + "</span>"
+      + "<span class='po-s'>"
+      + esc(carry ? (sit.kind === "holiday" ? "on holiday" : "no shift today")
+            : isUp ? planLine(g[0]) : on ? "done" : g[5]) + "</span>"
+      + (st > 0 && !carry ? "<span class='po-st'>" + st + "</span>" : "")
+      + "<span class='po-c'>" + (on ? svg("tick", 19) : "") + "</span>"
+      + "</button></li>";
   });
-  h += "</div>";
+  h += "</ol>";
 
   h += conditionHTML(true);
 

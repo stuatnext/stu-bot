@@ -1,0 +1,110 @@
+/* ==========================================================================
+   poster.css - the shape of a screen, not its finish.
+
+   Three passes of restyling changed the paint and left the structure: a card
+   at the top, a heading with a rule, a list of bordered rows. That is why it
+   "barely changed". So this changes the structure.
+
+   A tab is a poster: one statement set at the size of the thing it stands
+   for, an index of what is in it set like the contents page of a book, and
+   one action living where the thumb is rather than where the reading stops.
+   No panels. No dividers between everything. Space and type do the work.
+   ========================================================================== */
+
+/* ---------------------------------------------------------- the statement */
+#screen .poster{padding:18px 0 20px; margin:0}
+#screen .poster .po-k{font-family:"JetBrains Mono",monospace; font-size:10.5px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--ink3)}
+#screen .poster .pbig{display:flex; align-items:baseline; gap:10px; margin:14px 0 0}
+#screen .poster .pbig b{font-family:"Nunito",sans-serif; font-size:86px; font-weight:800;
+  letter-spacing:-.06em; line-height:.82; color:var(--ink)}
+#screen .poster .pbig i{font-style:normal; font-family:"Nunito",sans-serif; font-size:24px;
+  font-weight:800; letter-spacing:-.02em; color:var(--ink3)}
+#screen .poster .psub{margin:12px 0 0; font-size:17.5px; font-weight:600; line-height:1.35;
+  color:var(--ink2); letter-spacing:-.01em; text-wrap:balance; max-width:22em}
+#screen .poster .pfoot{margin:9px 0 0; font-size:13px; font-weight:600; color:var(--ink3)}
+
+/* ------------------------------------------------------------- the index
+   Numbered, large, and mostly air. One hairline per row and nothing else -
+   no card, no chevron, no meta. The detail is a tap away and is read inside
+   the session, which is where he is standing when he needs it. */
+#screen .index{list-style:none; margin:2px 0 0; padding:0}
+#screen .index .ixr{display:grid; grid-template-columns:1fr 38px 38px; align-items:center;
+  border-top:1px solid var(--edge)}
+#screen .index .ixr:last-child{border-bottom:1px solid var(--edge)}
+#screen .index .ixb{display:flex; align-items:baseline; gap:16px; width:100%; text-align:left;
+  background:none; border:0; padding:17px 0; cursor:pointer; font:inherit; color:var(--ink)}
+#screen .index .po-n{font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700;
+  letter-spacing:.06em; color:var(--ink3); flex:none; width:22px}
+#screen .index .po-t{flex:1; min-width:0; font-family:"Nunito",sans-serif; font-size:21px;
+  font-weight:700; letter-spacing:-.025em; line-height:1.2; color:var(--ink)}
+#screen .index .po-f{flex:none; font-family:"Nunito",sans-serif; font-size:18px; font-weight:800;
+  letter-spacing:-.025em; color:var(--accInk)}
+#screen .index .po-f small{font-size:.6em; font-weight:700; opacity:.7; margin-left:1px}
+#screen .index .ixr.on .po-t{color:var(--ink3)}
+#screen .index .ixr.on .po-n{color:var(--greenInk)}
+#screen .index .ixb:active{opacity:.55}
+#screen .index .po-g{width:38px; height:52px; border:0; background:none; color:var(--ink3);
+  opacity:.45; cursor:pointer; display:flex; align-items:center; justify-content:center}
+#screen .index .po-g:active{opacity:.9}
+#screen .note{margin:16px 0 0; font-size:13px; font-weight:600; color:var(--ink3)}
+
+/* ------------------------------------------------------------ the action
+   Where the thumb is. It does not scroll away, so the answer to "what do I
+   do" is never further than the bottom of the screen. */
+/* sticky rather than fixed: #screen is the scroller, and a fixed child of a
+   scroller that animates is positioned against the wrong box. */
+#screen .actionbar{position:sticky; bottom:0; z-index:35; margin:22px -18px 0;
+  padding:14px 18px calc(14px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,transparent,var(--bg) 42%); pointer-events:none}
+#screen .actionbar button{pointer-events:auto; width:100%; min-height:56px; border:0;
+  border-radius:16px; background:var(--acc); color:#14140F; cursor:pointer;
+  font-family:"Nunito",sans-serif; font-size:17px; font-weight:800; letter-spacing:-.01em;
+  box-shadow:0 10px 30px -12px color-mix(in srgb, var(--acc) 70%, transparent)}
+#screen .actionbar button:active{transform:scale(.985); opacity:.92}
+/* the page keeps clear of it */
+body[data-tab="gym"] #screen{padding-bottom:0}
+
+/* the away links, set as a quiet footnote rather than a row of buttons */
+#screen .awayline{gap:16px; margin:18px 0 0; order:2}
+#screen .awayline button{font-size:12.5px; font-weight:700; color:var(--ink3);
+  border-bottom:1px solid var(--edge2)}
+
+/* a poster has no need of a heading with a rule through it */
+body[data-tab="gym"] #screen .rulehead{display:none}
+
+/* ------------------------------------------------ the three things, ticked */
+#screen .index.big .ixr{grid-template-columns:1fr}
+#screen .index.big .ixb{display:grid; grid-template-columns:1fr auto auto; align-items:center;
+  gap:12px; padding:15px 0}
+#screen .index.big .po-t{font-size:20px; font-weight:800; letter-spacing:-.03em; color:var(--ink)}
+#screen .index.big .po-s{grid-column:1; grid-row:2; font-size:12.5px; font-weight:600;
+  color:var(--ink3); margin-top:2px; line-height:1.35; overflow:hidden;
+  display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical}
+#screen .index.big .po-st{grid-row:1/3; font-family:"JetBrains Mono",monospace; font-size:12px;
+  font-weight:700; color:var(--ink3)}
+#screen .index.big .po-c{grid-row:1/3; width:26px; height:26px; border-radius:50%;
+  border:1.5px solid var(--edge2); display:flex; align-items:center; justify-content:center;
+  color:transparent}
+#screen .index.big .ixr.on .po-t{color:var(--greenInk)}
+#screen .index.big .ixr.on .po-s{color:var(--greenInk); opacity:.7}
+#screen .index.big .ixr.on .po-c{background:var(--green); border-color:var(--green); color:#fff}
+#screen .index.big .ixr.up .po-t{color:var(--ink)}
+#screen .index.big .ixr.up .po-c{border-color:var(--blue); border-width:2px}
+#screen .index.big .ixr.carried .po-t{color:var(--ink3)}
+#screen .index.big .ixb:active{opacity:.6}
+
+/* the week, as seven marks rather than seven pills */
+#screen .week{gap:7px; margin:16px 0 2px}
+#screen .wd i{height:6px; border-radius:3px; background:var(--sunk); border:0; max-width:none}
+#screen .wd.on i{background:var(--green)}
+#screen .wd.on i svg{display:none}
+#screen .wd.now i{background:var(--gold)}
+#screen .wd b{font-size:9px; margin-top:2px}
+
+/* the move whose turn it is says what it takes; the rest are names */
+#screen .index .ixb{flex-wrap:wrap}
+#screen .index .po-s{flex-basis:100%; margin:4px 0 0 38px; font-size:12.5px; font-weight:600;
+  color:var(--ink3); line-height:1.4}
+#screen .index .ixr.up .po-t{color:var(--ink)}
+#screen .index .ixr.up .po-n{color:var(--accInk)}

@@ -3,10 +3,10 @@
    the gym and nothing but, and he was right that a tab holding training, food,
    water and sleep at once was four subjects wearing one hat. */
 
-var GYM_MORE = "";
+var GYM_MORE = "", GYM_CTA = "";
 function viewGym(){
   var t = today(), h = "";
-  GYM_MORE = "";
+  GYM_MORE = ""; GYM_CTA = "";
   var p = gymPlan(), sit = p.sit, key = p.key;
   var st = stage(), nx = nextStage(), list = stageLifts(key);
   var doneN = 0;
@@ -52,29 +52,23 @@ function viewGym(){
     cta = { attr: "data-startsession='" + key + "'",
             label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session" };
   }
-  h += hero({
-    tone: "iron", icon: "dumb", kicker: kicker,
-    big: big, unit: unit, line: line, pct: pct,
-    foot: (doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged"
+  /* A statement, not a card. The number is the size of the thing it stands
+     for, the label is small above it, and the qualifier is one line under. No
+     panel, no border, no icon in a circle - the page is the object. */
+  h += "<div class='poster'>"
+    + "<div class='po-k'>" + esc(kicker) + "</div>"
+    + "<div class='pbig'><b>" + big + "</b>" + (unit ? "<i>" + esc(unit) + "</i>" : "") + "</div>"
+    + "<div class='psub'>" + esc(line) + "</div>"
+    + "<div class='pfoot'>" + (doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged"
         : "Turning up is the thing being trained.")
-        + (waistFoot() ? "  \u00b7  " + waistFoot() : ""),
-    cta: cta
-  });
-  if (!doneS && !doneN && lifting){
-    h += "<p class='fine' style='text-align:center;margin:-4px 0 12px'>It tells you what to do, "
-      + "set by set, and times the rests.</p>";
-  }
+        + (waistFoot() ? "  \u00b7  " + waistFoot() : "") + "</div>"
+    + "</div>";
+  /* The one action lives where the thumb is, not where the reading stops. */
+  if (cta) GYM_CTA = "<div class='actionbar'><button " + cta.attr + ">"
+    + esc(cta.label) + "</button></div>";
 
   /* Away, the two things he cannot look up in his own history. Kept for the
      drawer list at the foot, so the top of the tab stays the session. */
-  if (!sit.home){
-    h += "<p class='awayline'><button data-near='gym'>Find a gym in " + esc(sit.city) + "</button>"
-      + (p.mode === "travel"
-          ? "<button data-gymhere='1'>There is one here</button>"
-          : (gymHere() ? "<button data-gymhere='0'>Back to the room</button>" : ""))
-      + "</p>";
-  }
-
   if (!lifting){
     /* A rest or walk day shows no list: the answer is not a list. The session
        stays one tap away, because the app suggests and he decides. */
@@ -90,49 +84,42 @@ function viewGym(){
     /* A row is a line of type. The figure on the right exists only when there
        is a number to put there - a bodyweight move has none, and a wide word
        in that column was squeezing every title into three wrapped lines. */
-    var rowFor = function(i, isNext){
+    /* An index. Two columns of type: the number and the move. What it weighs
+       sits at the end of the line only when there is a weight. Everything
+       else about it - the cue, the sets, the rest - is one tap away, and is
+       read inside the session anyway, which is where he actually is. */
+    var upNext = -1;
+    for (var ln = 0; ln < list.length; ln++){ if (!loggedToday(pickFor(key, ln))){ upNext = ln; break; } }
+    var rowFor = function(i){
       var ex = list[i], name = pickFor(key, i);
       var had = loggedToday(name), t2 = nextTarget(ex, name);
-      var swapped = name !== ex[0];
+      var fig = had ? kgOr(had.w) : (t2.w ? t2.w + "<small>kg</small>" : "");
       var reps = ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3];
-      var meta = [
-        swapped ? "for " + ex[0].toLowerCase() : ex[4],
-        stage()[3] + " \u00d7 " + reps,
-        restClock(restOf(ex)) + " rest"
-      ];
-      var fig = had ? "<b>" + kgOr(had.w) + "</b><em>" + had.r.join(" \u00b7 ") + "</em>"
-              : t2.w ? "<b>" + t2.w + "<small>kg</small></b>"
-                     + (t2.tag ? "<em>" + esc(t2.tag) + "</em>" : "")
-              : "";
-      return "<div class='liftrow" + (isNext ? " next" : "") + (fig ? "" : " nofig") + "'>"
-        + "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
-        + "<span class='lb2'><b>" + esc(name) + "</b>"
-        + "<span>" + esc(meta.join(" \u00b7 ")) + "</span></span>"
-        + (fig ? "<span class='lv'>" + fig + "</span>" : "") + "</button>"
-        + "<button class='swap' data-how='" + key + ":" + i + "' aria-label='How to do " + esc(name) + "'>"
-        + svg("ask", 18) + "</button>"
-        + "<button class='swap' data-swap='" + key + ":" + i + "'"
-        + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
+      /* The move he is about to do says what it takes - the sets, and the rest
+         between them, which he asked to be clear. The ones behind it are just
+         their names until their turn comes. */
+      var meta = had ? had.w + "kg \u00b7 " + had.r.join(" \u00b7 ")
+               : (i === upNext ? stage()[3] + " \u00d7 " + reps + " \u00b7 "
+                   + restClock(restOf(ex)) + " rest" : "");
+      return "<li class='ixr" + (had ? " on" : "") + (i === upNext ? " up" : "") + "'>"
+        + "<button class='ixb' data-lift='" + key + ":" + i + "'>"
+        + "<span class='po-n'>" + (i + 1 < 10 ? "0" : "") + (i + 1) + "</span>"
+        + "<span class='po-t'>" + esc(name) + "</span>"
+        + (meta ? "<span class='po-s'>" + esc(meta) + "</span>" : "")
+        + (fig ? "<span class='po-f'>" + fig + "</span>" : "") + "</button>"
+        + "<button class='po-g' data-how='" + key + ":" + i + "' aria-label='How to do "
+        + esc(name) + "'>" + svg("ask", 17) + "</button>"
+        + "<button class='po-g' data-swap='" + key + ":" + i + "'"
+        + " aria-label='Swap " + esc(name) + "'>&#8646;</button></li>";
     };
-    var upNext = -1;
-    for (var li = 0; li < list.length; li++){ if (!loggedToday(pickFor(key, li))){ upNext = li; break; } }
-
-    h += "<div class='rulehead'><h3>" + (p.mode === "travel" ? "In the room" : "Today\u2019s moves")
-      + "</h3><span></span><em>"
-      + (doneN ? doneN + " of " + list.length + " logged" : list.length + " moves") + "</em></div>";
-    if (nx && p.mode !== "travel" && !doneN){
-      h += "<p class='fine' style='margin:-2px 0 8px'>" + (nx[0] - doneS) + " more "
-        + (nx[0] - doneS === 1 ? "session" : "sessions") + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
-    }
-    h += "<div class='lifts'>";
-    for (var lk = 0; lk < list.length; lk++) h += rowFor(lk, lk === upNext);
-    h += "</div>";
+    h += "<ol class='index'>";
+    for (var lk = 0; lk < list.length; lk++) h += rowFor(lk);
+    h += "</ol>";
 
     var held = sessionFor(key)[1].slice(list.length);
     if (held.length){
-      h += "<p class='fine'>" + held.length + " more "
-        + (held.length === 1 ? "move" : "moves") + " unlock later \u2014 "
-        + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</p>";
+      h += "<p class='note'>" + held.length + " more "
+        + (held.length === 1 ? "move" : "moves") + " unlock later</p>";
     }
   }
 
@@ -175,9 +162,18 @@ function viewGym(){
      rest of the reading lives, and the crunches answer is on the finisher's
      own "?" where the question is actually asked. */
   var prog = wh + gymProgressHTML(true);
+  if (!sit.home){
+    h += "<p class='awayline'><button data-near='gym'>Find a gym in " + esc(sit.city) + "</button>"
+      + (p.mode === "travel"
+          ? "<button data-gymhere='1'>There is one here</button>"
+          : (gymHere() ? "<button data-gymhere='0'>Back to the room</button>" : ""))
+      + "</p>";
+  }
+
   h += drawers([
     due ? "" : fold("progress", "How it is going", waistMeta(ws, tr), prog, false)
   ]);
+  h += GYM_CTA;
   return h;
 }
 
