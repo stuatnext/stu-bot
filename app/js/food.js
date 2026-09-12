@@ -43,39 +43,125 @@ function undoFood(){
 function suggestOrder(slot){
   var left = proteinTarget() - proteinOn(today());
   if (left <= 0) return null;
-  var pool = ORDERS.filter(function(o){ return o[2] === "any" || o[2] === slot; });
-  if (!pool.length) pool = ORDERS;
-  var best = pool[0], gap = Math.abs(pool[0][1] - left);
+  /* One meal, not the whole day: aiming at the remaining gap meant that on an
+     empty morning the app proposed the biggest thing on the list and printed
+     "129g to go - a chicken rice does it", which was arithmetic nonsense. */
+  var aim = Math.min(left, MEAL_CAP);
+  var all = ordersNow();
+  var own = all.filter(function(o){ return o[2] === slot; });
+  var pool = own.length >= 2 ? own : all.filter(function(o){ return o[2] === "any" || o[2] === slot; });
+  if (!pool.length) pool = all;
+  var best = pool[0], gap = Math.abs(pool[0][1] - aim);
   pool.forEach(function(o){
-    var g = Math.abs(o[1] - left);
+    var g = Math.abs(o[1] - aim);
     if (g < gap){ gap = g; best = o; }
   });
   return best;
 }
 
-/* Which anchor we are plausibly in, so the suggestion fits the hour. */
+/* ==================================================================== when
+   "When I go to the food app I want to know exactly what to eat and when."
+
+   The three times used to be typed into the table - ~09:00, ~14:00, "Grab" -
+   which was wrong for half the year in Singapore (the shift slides an hour in
+   late October) and wrong every day of a trip. They are computed now, from
+   when he wakes and where Malta's hours land on his clock.
+
+   The third meal is the one this tab exists for: on a Singapore evening the
+   shift runs to 23:00, so dinner goes INSIDE it, at eight, as a break rather
+   than a delivery at half past eleven. */
+var MEAL_GAP = 180, MEAL_CAP = 40;
+function mealPlan(){
+  var sh = shape(), sit = situation();
+  var bed = t2m(S.bed || BED_DEFAULT);
+  var m1 = sh.wake + 45, m2, m3;
+  if (sh.noShift){
+    m2 = Math.max(m1 + MEAL_GAP, 13 * 60);
+    m3 = Math.max(m2 + MEAL_GAP, 19 * 60 + 30);
+  } else {
+    m3 = (sh.end + 30 <= 20 * 60) ? Math.max(sh.end + 30, 18 * 60) : 20 * 60;
+    m2 = (sh.start - 60 >= m1 + MEAL_GAP) ? sh.start - 60
+       : Math.round((m1 + m3) / 2 / 30) * 30;
+    m2 = Math.max(m2, m1 + MEAL_GAP);
+    m3 = Math.max(m3, m2 + MEAL_GAP);
+  }
+  m3 = Math.min(m3, bed - 90);
+  if (m3 < m2 + 120) m3 = m2 + 120;
+  var hotel = !sit.home && (sit.kind === "work" || sit.kind === "hq");
+  var l1 = hotel ? "Hotel breakfast" : "First thing";
+  var l2 = sh.noShift ? "Lunch"
+         : m2 < sh.start ? "Before the shift"
+         : m2 < sh.end ? "Mid-shift" : "Lunch, after the shift";
+  var l3 = sh.noShift ? "Dinner"
+         : m3 < sh.end ? "In the shift \u2014 a break, not a delivery"
+         : m2 < sh.end ? "After the shift" : "Dinner";
+  return [{ slot: "morning", label: l1, at: m1 },
+          { slot: "midday",  label: l2, at: m2 },
+          { slot: "dinner",  label: l3, at: m3 }];
+}
+/* Which anchor we are plausibly in - the midpoint between the meals, not a
+   fixed clock split that knows nothing about the shift. */
 function nowSlot(){
-  var m = new Date().getHours() * 60 + new Date().getMinutes();
-  if (m < 12 * 60) return "morning";
-  if (m < 16 * 60) return "midday";
+  var pl = mealPlan(), now = shape().now;
+  if (now < (pl[0].at + pl[1].at) / 2) return "morning";
+  if (now < (pl[1].at + pl[2].at) / 2) return "midday";
   return "dinner";
+}
+/* The next occasion he has not logged: the one to name. */
+function nextMeal(){
+  var pl = mealPlan(), t = today(), now = shape().now;
+  var open = pl.filter(function(m){ return !anchorDone(t, m.slot); });
+  if (!open.length) return null;
+  var m = open[0];
+  return { meal: m, late: now - m.at > 120,
+           soon: now >= m.at || m.at - now <= 90,
+           after: open[1] || null };
+}
+/* Twelve hawker dishes are no use in a Sheffield kitchen or a hotel with a
+   menu. Three lists, one rule: where he is standing decides. */
+function ordersNow(){
+  var sit = situation();
+  if (sit.kind === "home") return ORDERS;
+  if (sit.kind === "family") return ORDERS_UK;
+  return ORDERS_AWAY;
+}
+function ordersWord(){
+  var sit = situation();
+  return sit.kind === "home" ? "that close the gap"
+       : sit.kind === "family" ? "in the UK" : "anywhere with a menu";
+}
+function mealLine(){
+  var t = today(), left = Math.max(0, proteinTarget() - proteinOn(t));
+  if (!left) return "Done for today.";
+  var n = nextMeal();
+  if (!n) return num(left) + "g short after three. A shake or a yoghurt closes it.";
+  var o = suggestOrder(n.meal.slot);
+  var what = o ? esc(o[0].toLowerCase()) + ", " + o[1] + "g. " : "";
+  if (n.late)
+    return "<b>Now</b> \u2014 you are past the " + hhmm(n.meal.at) + ". " + what
+         + (n.after ? "Then " + hhmm(n.after.at) + " still stands." : num(left) + "g to go.");
+  if (n.soon)
+    return "<b>Now \u00b7 " + esc(n.meal.label) + "</b> \u2014 " + what + num(left) + "g to go.";
+  return "<b>" + hhmm(n.meal.at) + " \u00b7 " + esc(n.meal.label) + "</b> \u2014 " + what + num(left) + "g to go.";
 }
 
 /* Tapping an anchor offers what fits that slot, plus a way out. */
 function askAnchor(slot){
-  var pool = ORDERS.filter(function(o){ return o[2] === "any" || o[2] === slot; });
-  var a = ANCHORS.filter(function(x){ return x[0] === slot; })[0];
+  var all = ordersNow();
+  var pool = all.filter(function(o){ return o[2] === "any" || o[2] === slot; });
+  var m = mealPlan().filter(function(x){ return x.slot === slot; })[0];
+  var sug = suggestOrder(slot);
   ask({
-    title: a ? a[1] : "Add food",
+    title: m ? m.label + " \u00b7 " + hhmm(m.at) : "Add food",
     say: "Tap what you had. The number is protein, roughly.",
     options: pool.map(function(o){
-      return { id: o[0], label: o[0], note: o[1] + "g" };
+      return { id: o[0], label: o[0], note: o[1] + "g", pri: !!(sug && sug[0] === o[0]) };
     }).concat([{ id: "__other", label: "Something else", note: "Type it" }]),
     cancel: "Cancel"
   }).then(function(v){
     if (v === null || v === "__no") return;
     if (v === "__other"){ askFoodOther(slot); return; }
-    var o = ORDERS.filter(function(x){ return x[0] === v; })[0];
+    var o = all.filter(function(x){ return x[0] === v; })[0];
     if (o) logFood(o[0], o[1], slot);
   });
 }
@@ -105,8 +191,7 @@ function viewFood(){
   var pct = Math.min(100, Math.round(100 * got / target));
   var left = Math.max(0, target - got);
 
-  var sug = suggestOrder(nowSlot());
-  var slots = ANCHORS.filter(function(a){ return anchorDone(t, a[0]); }).length;
+  var plan = mealPlan(), sit = situation();
   /* The plate: one ring, one hue, the number in the middle. A single series
      needs no legend and the value wears ink, not green. */
   var R = 82, C = 2 * Math.PI * R, dash = (C * Math.min(1, got / target)).toFixed(1);
@@ -118,19 +203,24 @@ function viewFood(){
     + " stroke-dasharray='" + dash + " " + C.toFixed(1) + "'/></svg>"
     + "<div class='pc'><b>" + num(got) + "<small>/ " + num(target) + "g</small></b>"
     + "<span>protein today</span></div></div>";
-  h += "<p class='pnote'>" + (left === 0 ? "Done for today."
-      : num(left) + "g to go" + (sug ? " \u2014 a " + esc(sug[0].toLowerCase()) + " does it" : ""))
-    + "</p>";
+  h += "<p class='pnote'>" + mealLine() + "</p>";
 
+  var nx = nextMeal();
   h += "<div class='anch'>";
-  ANCHORS.forEach(function(a){
-    var on = anchorDone(t, a[0]);
-    h += "<button class='an" + (on ? " on" : "") + "' data-slot='" + a[0] + "'>"
-      + "<span class='ak'>" + esc(a[2]) + "</span>"
-      + "<span class='av'>" + esc(a[1]) + "</span>"
-      + "<span class='ad'>" + (on ? "logged" : "+") + "</span></button>";
+  plan.forEach(function(a){
+    var on = anchorDone(t, a.slot);
+    var now = !on && nx && nx.meal.slot === a.slot;
+    h += "<button class='an" + (on ? " on" : "") + (now ? " next" : "") + "' data-slot='" + a.slot + "'>"
+      + "<span class='ak'>" + hhmm(a.at) + "</span>"
+      + "<span class='av'>" + esc(a.label) + "</span>"
+      + "<span class='ad'>" + (on ? "logged" : now ? "next" : "+") + "</span></button>";
   });
   h += "</div>";
+
+  if (!sit.home){
+    h += "<div class='btns tight'><button class='btn quiet' data-near='"
+      + (sit.kind === "family" ? "shop" : "eat") + "'>Find protein near you</button></div>";
+  }
 
   if (foodOn(t).length){
     h += "<div class='recs'>";
@@ -149,13 +239,14 @@ function viewFood(){
      behind a fold, because twenty rows of menu is the first thing that made
      this tab feel like a spreadsheet. */
   var ordl = "<div class='ordl'>";
-  ORDERS.forEach(function(o){
+  ordersNow().forEach(function(o){
     ordl += "<button class='ord' data-order='" + esc(o[0]) + "'>"
       + "<span class='on2'>" + esc(o[0]) + "</span>"
       + "<span class='og'>" + num(o[1]) + "g</span></button>";
   });
   ordl += "</div>";
-  h += fold("orders", "What to order", ORDERS.length + " that close the gap", ordl, false);
+  h += fold("orders", "What to order" + (sit.home ? "" : " in " + esc(sit.city)),
+    ordersNow().length + " " + ordersWord(), ordl, false);
 
   h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>"
     + "Why protein and not calories</button></div>";

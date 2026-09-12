@@ -11,7 +11,7 @@
      files: freshness wins.
    - VERSION changes with every release, and the build number is painted on
      the title card and the You screen so what the phone runs is visible. */
-var VERSION = "daylight-v38";
+var VERSION = "daylight-v39";
 /* Written by the app on every save; read here when a push lands, because a
    service worker cannot see localStorage. Never versioned, never deleted. */
 var STATE_CACHE = "daylight-state";
@@ -87,7 +87,7 @@ function chipLine(st){
   return st.chip.away + (st.chip.away === 1 ? " day" : " days") + " to the "
     + String(st.chip.name).toLowerCase() + " chip.";
 }
-function composeNudge(kind, st, nowISO, dow){
+function composeNudge(kind, st, nowISO, dow, hour){
   var fresh = !!(st && st.day === nowISO);
   var stale1 = !!(st && st.day === dayBefore(nowISO));
   var brief = st && st.briefs && st.briefs[nowISO];
@@ -102,11 +102,15 @@ function composeNudge(kind, st, nowISO, dow){
       if (brief.card) parts.push(brief.card);
       out.body = parts.join(" ");
     } else {
-      out.title = DAY_NAMES[dow] + ".";
+      out.title = DAY_NAMES[dow] + (st && st.where ? " \u00b7 " + st.where.c : "") + ".";
       out.body = "Three things make a day. Train before Malta wakes.";
     }
+    /* one extra sentence at most: the chip if one is close, otherwise the level */
     var cl = chipLine(st);
     if (cl) out.body += " " + cl;
+    else if (st && st.level && st.level.away && st.level.away <= 2)
+      out.body += " Level " + (st.level.n + 1) + " in " + st.level.away
+        + (st.level.away === 1 ? " full day." : " full days.");
     /* the morning badge is the day's whole debt; it clears as the pillars land */
     out.badge = badgeOn ? (fresh ? (st.open || []).length : 3) : 0;
     return out;
@@ -117,11 +121,13 @@ function composeNudge(kind, st, nowISO, dow){
     var open = st.open || [];
     if (open.length){
       out.badge = badgeOn ? open.length : 0;
-      out.title = st.run > 0 ? "The run is at stake" : "Day at risk";
+      out.title = (typeof hour === "number" && hour < 19) ? "Afternoon check"
+                : st.run > 0 ? "The run is at stake" : "Day at risk";
       out.body = open.join(" and ") + (open.length === 1 ? " is" : " are") + " still open"
         + (st.run > 0 ? ". " + st.run + " days on the line." : ".");
       if (st.best >= 7 && st.run >= st.best) out.body += " Tonight is a new record.";
       else if (st.best >= 7 && st.best - st.run <= 3) out.body += " " + (st.best - st.run) + " from your record.";
+      else if (st.level && st.level.away === 1) out.body += " Tonight is a level.";
     } else {
       out.title = "Day is in";
       out.body = "All three landed. Nothing needed tonight.";
@@ -156,7 +162,7 @@ self.addEventListener("push", function(e){
       if (r) state = await r.json();
     } catch(err){}
     var now = new Date();
-    var n = composeNudge(kind, state, localISO(now), now.getDay());
+    var n = composeNudge(kind, state, localISO(now), now.getDay(), now.getHours());
     try {
       if (navigator.setAppBadge){
         if (n.badge) await navigator.setAppBadge(n.badge);

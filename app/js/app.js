@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v38";
+var BUILD = "v39";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -82,7 +82,14 @@ function badgeOut(){
     if (n) navigator.setAppBadge(n); else navigator.clearAppBadge();
   } catch(e){}
 }
-document.addEventListener("visibilitychange", function(){ if (document.hidden) badgeOut(); });
+document.addEventListener("visibilitychange", function(){
+  if (document.hidden){ badgeOut(); return; }
+  /* back in the foreground, possibly in another country: record the day's
+     city if this is the first look at it */
+  var before = today() + "|" + JSON.stringify(whereOn(today()));
+  noteWhere();
+  if (before !== today() + "|" + JSON.stringify(whereOn(today()))) render({ keepScroll: true });
+});
 window.addEventListener("pagehide", badgeOut);
 
 /* Chrome/Android hand over an install prompt; hold it for the You row. */
@@ -95,6 +102,27 @@ window.addEventListener("appinstalled", function(){
   INSTALL_PROMPT = null;
   toast("On the Home Screen. Open it from there.", true);
 });
+
+/* Hand a search to the phone's own maps app. Nothing is fetched and nothing
+   about where he is leaves the device: the URL is opened and this app steps
+   back. */
+function openNear(key){
+  var url = nearHref(key);
+  sfx("tap");
+  var w = null;
+  try { w = window.open(url, "_blank", "noopener"); } catch(e){}
+  if (!w) location.href = url;
+}
+/* His correction to the guess, applied backwards over the whole stay. */
+function doFlip(){
+  var to = flipWhere();
+  if (!to) return;
+  sfx("done"); buzz(12);
+  toast(to === "holiday"
+    ? "Holiday. Stopped is carried while you are here."
+    : "Work trip. Malta\u2019s hours still land, on this clock.");
+  render({ keepScroll: true, animate: true });
+}
 
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewToday, gym: viewGym, food: viewFood, basics: viewBasics,
@@ -123,6 +151,7 @@ function render(opts){
   paintHud(!!opts.animate);
   coachSync();
   scr.scrollTop = keep === null ? 0 : keep;
+  levelSync();
 }
 function go(next){
   if (next === tab) return;
@@ -146,6 +175,16 @@ document.addEventListener("click", function(ev){
   if (ds.p){ tapPillar(ds.p, b); return; }
   if (ds.slot){ askAnchor(ds.slot); return; }
   if (ds.fin){ askFinisher(); return; }
+  if (ds.walk){ askWalk(b); return; }
+  if (ds.near){ openNear(ds.near); return; }
+  if (ds.pinme){ pinMe(); return; }
+  if (ds.flip){ doFlip(); return; }
+  if (ds.gymhere !== undefined){
+    S.gymHere = ds.gymhere === "1" ? situation().city : null;
+    save(); sfx("tap");
+    toast(S.gymHere ? "Noted. The full session, here." : "Back to the travel session.");
+    render({ keepScroll: true }); return;
+  }
   if (ds.finwhy){ tellBelly(); return; }
   if (ds.undofood){ undoFood(); return; }
   if (ds.lift){ var lp = ds.lift.split(":"); askLift(lp[0], Number(lp[1])); return; }
@@ -265,6 +304,7 @@ function graduate(){
 
 /* ------------------------------------------------------------------- start */
 backfillChips();
+noteWhere();
 paintSky();
 render({ first: true });
 paintHud();
@@ -300,9 +340,11 @@ setInterval(function(){
   if (tab !== "today" || ST || MODAL) return;
   var sk = document.querySelector("#screen .skycard");
   if (sk){
-    /* keep the day's line - only the sun has moved */
-    var bd = sk.querySelector(".skybd"), a = bd && bd.querySelector("b"), u = bd && bd.querySelector("span");
-    sk.outerHTML = skyCardHTML(a ? a.textContent : "", u ? u.textContent : "");
+    /* the sun has moved, and so may the instruction: priority() is pure over
+       the record and the clock, so re-reading it costs nothing and cannot eat
+       anything typed - there is no input on this card. */
+    var pr = priority();
+    sk.outerHTML = skyCardHTML(pr.ask, pr.sub, pr.cta);
   }
 }, 60000);
 

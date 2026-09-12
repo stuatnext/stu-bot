@@ -232,3 +232,16 @@ button.gem:active{transform:translateY(3px); border-bottom-width:2px}
 .wd.ice i{background:var(--blueSoft); border-color:#A8DFFA; color:var(--blue)}
 .wd.now i{box-shadow:0 0 0 2.5px var(--gold)}
 .wd.now{border:0}
+
+/* ==================================================================== v39
+   The sky card stopped counting and started instructing, so it carries the
+   one action that lives on another tab. A pill, not a slab: the card is a
+   watch face and the button is a hand on it. */
+.skycard .skybd .skygo{display:inline-block; margin:8px 0 0; padding:9px 14px; min-height:38px;
+  border-radius:12px; border:0; cursor:pointer;
+  background:color-mix(in srgb, var(--skyInk) 92%, transparent);
+  color:var(--sky2); font:900 12.5px/1 "Nunito",sans-serif; letter-spacing:.01em}
+.skycard .skybd .skygo:active{transform:translateY(1px)}
+@media (max-width:360px){ .skycard .skybd .skygo{font-size:12px; padding:8px 12px} }
+/* a day in the air: not a miss, and it carries the run like a freeze */
+.wd.jet i{background:var(--violetSoft); border-color:#D9B8F5; color:var(--violetInk)}

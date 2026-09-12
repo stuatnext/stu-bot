@@ -29,7 +29,7 @@ function arcSeg(a, b){
   }
   return pts.join(" ");
 }
-function skyCardHTML(ask, sub){
+function skyCardHTML(ask, sub, cta){
   var s = shape(), ph = skyPhase();
   var night = ph === "night" || ph === "deepnight" || ph === "dusk";
   var h = "<div class='skycard'>";
@@ -55,12 +55,18 @@ function skyCardHTML(ask, sub){
       + (now[1] - 2.4).toFixed(1) + "' r='5.2'/>";
   }
   h += "</svg>";
-  h += "<div class='skybd'><i>" + esc(niceToday()) + " \u00b7 " + esc(dialLabel(s)) + "</i>"
+  var sit = situation();
+  h += "<div class='skybd'><i>" + esc(niceToday())
+    + (sit.home ? "" : " \u00b7 " + esc(sit.city))
+    + " \u00b7 " + esc(dialLabel(s)) + "</i>"
     + "<b>" + esc(ask || "") + "</b>"
-    + (sub ? "<span>" + esc(sub) + "</span>" : "") + "</div></div>";
+    + (sub ? "<span>" + esc(sub) + "</span>" : "")
+    + (cta ? "<button class='skygo' data-tab='" + esc(cta.tab) + "'>" + esc(cta.label) + "</button>" : "")
+    + "</div></div>";
   return h;
 }
 function dialLabel(s){
+  if (s.holiday) return "On holiday \u2014 no shift";
   if (s.weekend) return "No shift today";
   if (s.working) return "Malta until " + s.endT;
   if (s.now < s.start) return "Malta has " + s.startT + " \u2013 " + s.endT;
@@ -86,7 +92,7 @@ function weekHTML(){
   p0.setDate(p0.getDate() - 6);
   for (var j = 0; j < 7; j++){
     var kj = iso(p0);
-    if (kj !== today() && (allThree(kj) || frozen(kj))) any = true;
+    if (kj !== today() && (allThree(kj) || carried(kj))) any = true;
     p0.setDate(p0.getDate() + 1);
   }
   if (!any) return "";
@@ -94,11 +100,11 @@ function weekHTML(){
   d.setDate(d.getDate() - 6);
   for (var i = 0; i < 7; i++){
     var k = iso(d), isToday = k === today();
-    var full = allThree(k), ice = frozen(k);
-    var cls = full ? "on" : ice ? "ice" : "";
+    var full = allThree(k), ice = frozen(k), jet = !full && !ice && flying(k);
+    var cls = full ? "on" : ice ? "ice" : jet ? "jet" : "";
     var started = PILLARS.some(function(g){ var f = firstDay(g[0]); return f && k >= f; });
     h += "<span class='wd " + cls + (isToday ? " now" : "") + (started ? "" : " off") + "'>"
-      + "<i>" + (full ? svg("tick", 13) : ice ? svg("snow", 12) : "") + "</i>"
+      + "<i>" + (full ? svg("tick", 13) : ice ? svg("snow", 12) : jet ? svg("jet", 12) : "") + "</i>"
       + "<b>" + "SMTWTFS"[d.getDay()] + "</b></span>";
     d.setDate(d.getDate() + 1);
   }
@@ -126,34 +132,13 @@ function viewToday(){
   var done = PILLARS.filter(function(g){ return pDone(t, g[0]); }).length;
   var h = "";
 
-  /* one line, his */
-  var owed = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
-  /* Two things outrank the plain count: the first day back after a lapse
-     (the return is the win, and it pays double) and a record within reach -
-     racing his own best self is the purest single-player stake there is. */
-  var rc = recordChase();
-  var back = S.onboarded && !allThree(t) && isComebackDay(t);
-  var chase = rc ? (rc.at
-    ? "Tonight beats your record of " + rc.best + "."
-    : rc.away + (rc.away === 1 ? " day" : " days") + " from your record of " + rc.best + ".") : null;
-  var ask, sub;
-  if (packs){
-    ask = packs === 1 ? "That is a pack." : packs + " packs waiting.";
-    sub = "Earned, not given. Open it below.";
-  } else if (allThree(t)){
-    ask = "Today is in.";
-    sub = rc && rc.at ? "Record pace — " + rc.run + " days. Back tomorrow." : "The streak holds. Back tomorrow.";
-  } else if (back){
-    ask = "Back.";
-    sub = "That was the hard part. Today pays double.";
-  } else if (!done){
-    if (owed === 3){ ask = "Three things make a day."; sub = chase || "Tick what you have done."; }
-    else { ask = "Two things make a " + dayName(t) + "."; sub = chase || "No shift to stop today."; }
-  } else {
-    ask = owed === 1 ? "One more." : owed + " to go.";
-    sub = chase || "All of them earns the pack.";
-  }
-  h += skyCardHTML(ask, sub);
+  /* One line, and it is an instruction now rather than a count. priority()
+     decides it, and the Gym hero, the pillar row, the brief and both pushes
+     read the same function - so the app can never say two things about one
+     day. */
+  var pr = priority();
+  h += skyCardHTML(pr.ask, pr.sub, pr.cta);
+
   /* A month just closed: hold it up once before it is filed. Never deleted,
      never reset - the pattern in a bad month is the lesson (his call). */
   var rec = S.onboarded ? monthRecapDue() : null;
@@ -171,50 +156,44 @@ function viewToday(){
   h += weekHTML();
 
   /* the session: three big pressable rows. The hour points at one of them -
-     that row wears the arrow and speaks, so "what now?" never needs asking. */
-  var up = nextUp();
+     that row wears the arrow and speaks the actual plan, so "what now?" never
+     needs asking twice. */
+  var up = nextUp(), sit = situation();
   h += "<div class='quests'>";
   PILLARS.forEach(function(g){
-    var on = pDone(t, g[0]), st = streak(g[0]), carried = !on && !required(g[0], t);
-    var isUp = g[0] === up && !on && !carried;
-    h += "<button class='pil q" + g[0] + (on ? " on" : "") + (carried ? " carried" : "")
+    var on = pDone(t, g[0]), st = streak(g[0]), carry = !on && !required(g[0], t);
+    var isUp = g[0] === up && !on && !carry;
+    h += "<button class='pil q" + g[0] + (on ? " on" : "") + (carry ? " carried" : "")
       + (isUp ? " up" : "")
       + "' data-p='" + g[0] + "' style='--pil:" + g[4] + "' aria-pressed='" + (on ? "true" : "false") + "'>"
       + "<span class='qic'>" + svg(g[2], 24) + "</span>"
       + "<span class='qbd'><b>" + esc(g[1])
       + (isUp ? "<i class='now'>Now</i>" : "") + "</b><span>"
-      + esc(carried ? "No shift today \u2014 carried" : isUp ? tipFor(g[0]) : g[5]) + "</span></span>"
-      + (st > 0 && !carried ? "<span class='qst'>" + svg("flame" in ICONS ? "flame" : "tick", 12) + st + "</span>" : "")
+      + esc(carry ? (sit.kind === "holiday" ? "On holiday \u2014 carried" : "No shift today \u2014 carried")
+            : isUp ? planLine(g[0]) : g[5]) + "</span></span>"
+      + (st > 0 && !carry ? "<span class='qst'>" + svg("flame" in ICONS ? "flame" : "tick", 12) + st + "</span>" : "")
       + "<span class='qchk'>" + (on ? svg("tick", 20) : "") + "</span>"
       + "</button>";
   });
   h += "</div>";
-  /* the tiles have no room for the tip; the one the hour points at speaks here */
-  if (up && !pDone(t, up) && required(up, t)){
-    h += "<p class='uptip'>" + esc(tipFor(up)) + "</p>";
-  } else if (allThree(t) && S.onboarded){
-    /* the day is in: point at tomorrow, so there is something to look
-       forward to instead of a dead end - the same brief the 08:00 push reads */
-    var tb = briefFor(shift(1));
-    h += "<p class='uptip'><b>Tomorrow · " + esc(tb.head) + ".</b> " + esc(tb.first)
-      + (tb.gym ? " " + esc(tb.gym) + "." : "") + "</p>";
-  }
 
   /* the chest */
   h += "<" + (packs ? "button" : "div") + " class='gem" + (packs ? " won" : "") + "'"
     + (packs ? " data-open='1'" : "") + ">" + gemHTML(done, packs)
     + "</" + (packs ? "button" : "div") + ">";
 
-  /* The day as a whole, which is this screen's actual subject: the five
-     basics as one score, then the week's challenges. Both used to live on the
-     Water tab, where they were somebody else's business - a hydration screen
-     is not the place to be told about protein, gym sessions and calling home. */
-  h += conditionHTML();
-  /* The week's three challenges, behind a fold that opens by default and
-     stays how he leaves it. */
+  /* Away, one fold says what is different about a day here and hands him the
+     three things he cannot look up in his own history. */
+  if (!sit.home && S.onboarded) h += whereFoldHTML(sit);
+
+  /* The day as a whole. Both of these are read rather than pressed on most
+     opens, so they are one line each with their score on the header - his
+     words were "without being overwhelmed by information", and a fold he
+     opens stays open. */
+  h += fold("basics", "Today\u2019s basics", conditionMeta(), conditionHTML(true), false);
   var qk = weekKey(), qs = questsFor(qk);
   var qdone = qs.filter(function(q){ return questDoneQ(q, qk); }).length;
-  h += fold("week", "This week", qdone + " of " + qs.length, questHTML(true), true);
+  h += fold("week", "This week", qdone + " of " + qs.length, questHTML(true), false);
 
   /* the side quest: one held card asks something of him. This is what makes
      the collection a deck instead of wallpaper - his call, his words. */
@@ -283,6 +262,12 @@ function tapPillar(key, btn){
     } else {
       celebrate(w.streak ? "Seven in a row" : "All three",
         w.streak ? "A streak pack. Five cards, better odds." : "That is a pack, and " + money(rate()) + " in the pot.");
+    }
+    /* the day's XP, flying to the crest the way the money flies to the pot */
+    if (btn && !reduced()){
+      setTimeout(function(){
+        fly(btn, "#crest", "+" + (15 + STEADY.day) + " XP", "var(--gold2)");
+      }, 200);
     }
     if (btn){
       btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
@@ -366,6 +351,120 @@ function showChip(chip){
   document.body.style.overflow = "hidden";
   sfx("level"); buzz([30, 60, 30, 60, 90]);
   confetti();
+}
+/* ------------------------------------------------------------- where he is
+   One fold, only when he is not in Singapore: what the day here is, the two
+   clocks that matter, and the three things the app cannot answer from his own
+   record - what is around him, where exactly he is, and whether this is work
+   or a holiday. */
+function gapWord(){
+  var g = offset() - ukOffset();
+  var sign = g >= 0 ? "+" : "\u2212", m = Math.abs(g);
+  return sign + Math.floor(m / 60) + "h" + (m % 60 ? String(m % 60) : "");
+}
+function whatChanges(sit){
+  var sh = shape();
+  if (sit.kind === "holiday")
+    return "Two things make a holiday: move, and call home. There is no Malta shift to finish, "
+         + "so Stopped is carried, the way it is on a Saturday. Nothing you have built can break here.";
+  if (sit.kind === "family")
+    return "Malta runs " + sh.startT + "\u2013" + sh.endT + " on this clock, so the mornings are yours. "
+         + "Being in the room is the call. A walk with someone is Trained.";
+  if (sit.kind === "hq")
+    return "The shift is on your own clock for once: " + sh.startT + "\u2013" + sh.endT + ". "
+         + "Train before it, call home after.";
+  return "Move and call home are the same anywhere. Stopped is still Malta\u2019s close \u2014 "
+       + sh.endT + " on this clock. Any gym counts, and a walk always has.";
+}
+function whereFoldHTML(sit){
+  var sh = shape(), pin = pinToday();
+  var inner = facts([
+    [sh.noShift ? "\u2014" : sh.startT + "\u2013" + sh.endT, "Malta, here"],
+    [gapWord(), "vs Sheffield"],
+    ["day " + sit.day, "of the stay"]
+  ]);
+  inner += "<p class='fine'>" + whatChanges(sit) + "</p>";
+  inner += "<div class='btns tight'>"
+    + "<button class='btn quiet' data-near='eat'>Around you</button>"
+    + (pin ? "<button class='btn quiet' data-pinme='1'>Pinned \u00b7 " + esc(pin.l || "here") + "</button>"
+           : "<button class='btn quiet' data-pinme='1'>Pin me here</button>")
+    + ((sit.kind === "work" || sit.kind === "holiday")
+        ? "<button class='btn quiet' data-flip='1'>Actually a "
+          + (sit.kind === "work" ? "holiday" : "work trip") + "</button>" : "")
+    + "</div>";
+  return fold("where:" + sit.city.toLowerCase().replace(/[^a-z]+/g, ""),
+    esc(sit.city) + " \u00b7 " + sit.word, "day " + sit.day, inner, sit.day === 1);
+}
+
+/* ------------------------------------------------------------- the level
+   Crossing a rank used to be a 0.7-second scale pop on a 44px circle with a
+   bare digit in it. His sentence was "I want to feel like I'm levelling up",
+   so it takes the screen, in the chip's own grammar, and it names the reason:
+   the days, not the cards. */
+function crestSVG(level){
+  return "<svg class='medal big' viewBox='0 0 120 120' aria-hidden='true'>"
+    + "<circle cx='60' cy='60' r='56' fill='#E6A800'/>"
+    + "<circle cx='60' cy='60' r='47' fill='#FFF4CC'/>"
+    + "<circle cx='60' cy='60' r='41.5' fill='none' stroke='#E6A800' stroke-width='1.8' stroke-dasharray='2.2 4.4'/>"
+    + "<text x='60' y='" + (level > 99 ? 68 : 70) + "' text-anchor='middle' fill='#7A5B00'"
+    + " style='font:900 " + (level > 99 ? 34 : 40) + "px Nunito,sans-serif'>" + level + "</text>"
+    + "<text x='60' y='88' text-anchor='middle' fill='#7A5B00' opacity='.72'"
+    + " style='font:800 10.5px Nunito,sans-serif;letter-spacing:.24em'>LEVEL</text></svg>";
+}
+function showLevel(r){
+  var el = document.getElementById("chip");
+  if (!el) return;
+  /* stamped before it is painted, so no close path can replay it */
+  S.levelSeen = r.level; save();
+  var dn = daysToNext(r), gw = goodWeeks();
+  el.innerHTML = "<div class='chipw'>"
+    + "<div class='chipk'>Level up</div>"
+    + crestSVG(r.level)
+    + "<h2>" + esc(r.name) + "</h2>"
+    + "<p>" + num(fullDays()) + (fullDays() === 1 ? " full day" : " full days")
+    + (gw ? " and " + gw + (gw === 1 ? " good week" : " good weeks") : "") + " did that."
+    + (dn ? " Level " + (r.level + 1) + " in " + dn + (dn === 1 ? " full day." : " full days.") : "")
+    + "</p>"
+    + "<button class='btn pri' data-chipdone='1'>Keep going</button></div>";
+  el.className = "on";
+  document.body.style.overflow = "hidden";
+  sfx("level"); buzz([30, 60, 30, 60, 90]);
+  confetti();
+}
+function levelBusy(){
+  return !!MODAL
+    || (typeof ST !== "undefined" && !!ST)
+    || (typeof SESSION !== "undefined" && !!SESSION)
+    || (typeof COACH !== "undefined" && COACH.on)
+    || !!document.getElementById("sheet").className
+    || !!document.getElementById("stage").className
+    || !!document.getElementById("chip").className
+    || !!document.getElementById("fx").className;
+}
+/* Called at the end of every render, so a level earned from a pack, a card or
+   a quest gets its moment once whatever was on top has closed. The first v39
+   load stamps the number silently - a ceremony for work done weeks ago is the
+   app applauding itself, which is the rule backfillChips already follows. */
+function levelSync(){
+  if (!S.onboarded || levelSync._on) return;
+  var r = levelDue();
+  if (!r) return;
+  if (!Number(S.levelSeen)){ S.levelSeen = r.level; save(); return; }
+  /* Wait for whatever is on top - the all-three confetti, a pack stage, a
+     chip - and then take the screen. Ceremonies queue, they do not collide. */
+  levelSync._on = 1;
+  var tries = 0;
+  setTimeout(function wait(){
+    var rr = levelDue();
+    if (!rr){ levelSync._on = 0; return; }
+    if (levelBusy()){
+      if (++tries > 40){ levelSync._on = 0; return; }   /* twenty seconds: leave it to the next render */
+      setTimeout(wait, 500);
+      return;
+    }
+    levelSync._on = 0;
+    showLevel(rr);
+  }, 420);
 }
 function closeChip(){
   var el = document.getElementById("chip");

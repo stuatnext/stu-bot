@@ -25,7 +25,9 @@ function viewYou(){
   h += "<div class='panel yrank'>"
     + "<div class='yr-ring'>" + ring(into, span, "gold") + "<b>" + r.level + "</b></div>"
     + "<div class='yr-bd'><h3>" + esc(r.name) + "</h3>"
-    + "<div class='dim'>" + num(r.xp) + " XP" + (r.to ? " &middot; " + num(r.to - r.xp) + " to " + esc(r.nextName) : "") + "</div>"
+    + "<div class='dim'>" + num(r.xp) + " XP"
+    + (r.to ? " &middot; " + num(r.to - r.xp) + " to " + esc(r.nextName)
+            + " &middot; about " + daysToNext(r) + (daysToNext(r) === 1 ? " full day" : " full days") : "") + "</div>"
     + "<div class='dim'>" + num(fullDays()) + (fullDays() === 1 ? " full day" : " full days")
     + " &middot; " + num(heldCount()) + " of " + CARDS.length + " cards</div></div></div>";
 
@@ -90,6 +92,13 @@ function viewYou(){
       + "from the record &mdash; where it broke and on which day of the week.</p></div>";
   }
 
+  h += fold("levels", "How the level works", "the crest",
+    "<p class='fine'>Every full day is " + (15 + STEADY.day) + " XP. The first day back after a lapse "
+    + "counts twice. Five full days in a week is " + STEADY.goodWeek + " on top, all seven "
+    + STEADY.perfectWeek + " more, and " + SOLID_MONTH + " in a month " + STEADY.month + ". A chip pays "
+    + "between " + STEADY.chips[1] + " and " + STEADY.chips[5] + " the day it is minted. Cards still count "
+    + "for what they always did \u2014 but the crest is moved by turning up.</p>", false);
+
   /* the switches */
   h += "<div class='menu'>"
     + (isStandalone() ? "" :
@@ -105,7 +114,9 @@ function viewYou(){
         S.badge ? "Open pillars counted on the app icon" : "Off")
     + mrow("replay", "1", "ask", "How this works", "The three-tap tour, again")
     + mrow("sound", "1", "spare", "Sound", S.mute ? "Off" : "On")
-    + mrow("camp", "1", "pin", "Where you are", S.camp)
+    + mrow("camp", "1", "pin", "Where you are",
+        S.autoZone !== 0 ? situation().city + " \u2014 from the phone\u2019s clock"
+                         : S.camp + " \u2014 set by hand")
     + "</div>";
 
   /* the record itself */
@@ -512,14 +523,47 @@ async function askRate(){
   else sfx("no");
 }
 
+/* Since v39 the phone's clock answers this by itself. The list stays for the
+   one case it cannot cover: a phone deliberately left on Singapore time. */
 async function askCamp(){
+  var sit = situation(), sh = shape(), auto = S.autoZone !== 0;
   var v = await ask({
-    title: "Where are you standing?",
-    say: "The shift is fixed to Malta. Moving changes what that lands as, not what it is.",
-    options: CAMPS.map(function(c){ return { id: c[0], label: c[0], pri: c[0] === S.camp }; }),
+    title: "Where you are",
+    say: "The shift is fixed to Malta. Where you stand only changes what that lands as \u2014 "
+       + "and the phone\u2019s clock already knows.",
+    options: [
+      { id: "__auto", label: "Follow the phone\u2019s clock",
+        note: sit.city + " now \u00b7 Malta lands " + sh.startT + "\u2013" + sh.endT, pri: auto },
+      { id: "__pin", label: "Pin my spot",
+        note: "For the nearby searches only. Stays on this phone, forgotten tomorrow." }
+    ].concat(CAMPS.map(function(c){
+      return { id: c[0], label: c[0], note: "set by hand", pri: !auto && c[0] === S.camp };
+    })),
     cancel: "Close"
   });
-  if (v){ S.camp = v; save(); sfx("done"); render({ keepScroll: true }); }
+  if (!v || v === "__no") return;
+  if (v === "__auto"){ S.autoZone = 1; save(); sfx("done"); render({ keepScroll: true }); return; }
+  if (v === "__pin"){ pinMe(); return; }
+  S.autoZone = 0; S.camp = v; save(); sfx("done"); render({ keepScroll: true });
+}
+/* One location read, on a tap, never at launch: an iPhone re-asks a
+   home-screen app every time it is opened, so this is a button. Two decimals
+   is about a kilometre - enough to centre a map search, not enough to name a
+   street - and it is kept outside the save, so no backup and no coach file
+   ever carries a coordinate. */
+function pinMe(){
+  if (!navigator.geolocation){ toast("This browser will not say where it is."); return; }
+  toast("Asking the phone\u2026");
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var la = Math.round(pos.coords.latitude * 100) / 100;
+    var lo = Math.round(pos.coords.longitude * 100) / 100;
+    var p = pinSave(la, lo);
+    sfx("done"); buzz(12);
+    toast(p.l ? "Near " + p.l + "." : "Pinned. Maps will search from here.");
+    render({ keepScroll: true });
+  }, function(){
+    toast("No location given. The clock still knows the city.");
+  }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
 }
 
 async function askReset(){

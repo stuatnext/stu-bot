@@ -39,6 +39,7 @@ var ICONS = {
   moon:  "<path d='M17.4 12.6A7 7 0 0 1 9.4 4.6a7.2 7.2 0 1 0 8 8Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/>",
   snow:  "<path d='M11 2.6v16.8M3.7 6.8l14.6 8.4M18.3 6.8 3.7 15.2' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><path d='M8.4 4.6 11 6.7l2.6-2.1M8.4 17.4 11 15.3l2.6 2.1' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' fill='none'/>",
   gap:   "<rect x='3.2' y='4.6' width='15.6' height='13.8' rx='2.4' stroke='currentColor' stroke-width='1.9'/><path d='M3.2 9h15.6M7.3 2.8v3.4M14.7 2.8v3.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><rect x='8.6' y='11.4' width='4.8' height='4' rx='1' fill='currentColor' opacity='.55'/>",
+  jet:   "<path d='M3 11.6 19.2 4.2l-4.4 14.6-3.9-6.2z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M10.9 12.6l8.3-8.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
   pin:   "<path d='M11 19.4s6-5.1 6-9.6a6 6 0 1 0-12 0c0 4.5 6 9.6 6 9.6Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><circle cx='11' cy='9.6' r='2.2' stroke='currentColor' stroke-width='1.7'/>",
   ask:   "<circle cx='11' cy='11' r='8.4' stroke='currentColor' stroke-width='1.9'/><path d='M8.7 8.6a2.4 2.4 0 1 1 3.2 2.3c-.6.3-.9.8-.9 1.5v.5' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><circle cx='11' cy='15.6' r='1.05' fill='currentColor'/>",
   pen:   "<path d='M14.6 3.4 18.6 7.4 8 18H4v-4Z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M12.6 5.4 16.6 9.4' stroke='currentColor' stroke-width='1.7'/>",
@@ -275,7 +276,8 @@ function hero(o){
   h += "<span class='hero-gl'></span><span class='hero-gl2'></span>";
   if (o.icon) h += "<span class='hero-ic'>" + svg(o.icon, 22) + "</span>";
   if (o.kicker) h += "<div class='hero-k'>" + o.kicker + "</div>";
-  h += "<div class='hero-n'><b>" + o.big + "</b>"
+  h += "<div class='hero-n'><b" + (typeof o.big === "string" && !/^[0-9]/.test(o.big) ? " class='word'" : "") + ">"
+     + o.big + "</b>"
      + (o.unit ? "<i>" + o.unit + "</i>" : "") + "</div>";
   if (o.line) h += "<div class='hero-l'>" + o.line + "</div>";
   /* an empty bar is a grey line that says nothing; it appears once there is
