@@ -39,7 +39,7 @@ function viewGym(){
     pct = Math.round(100 * doneN / Math.max(1, list.length));
     line = doneN === list.length ? "Every move logged. That is the session."
          : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
-         : list.length + " moves \u00b7 ~" + mins + " min \u00b7 a room and your own weight";
+         : "~" + mins + " min \u00b7 a room and your own weight";
     cta = { attr: "data-startsession='T'",
             label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the travel session" };
   } else {
@@ -48,16 +48,16 @@ function viewGym(){
     pct = Math.round(100 * doneN / Math.max(1, list.length));
     line = doneN === list.length ? "Every move logged. That is the session."
          : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
-         : list.length + " moves \u00b7 ~" + mins + " min \u00b7 " + trainWhen();
+         : "~" + mins + " min \u00b7 " + trainWhen();
     cta = { attr: "data-startsession='" + key + "'",
             label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session" };
   }
   h += hero({
     tone: "iron", icon: "dumb", kicker: kicker,
     big: big, unit: unit, line: line, pct: pct,
-    foot: doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged all time"
-        : "Turning up is the thing being trained. One move counts.",
-    foot2: waistFoot(),
+    foot: (doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged"
+        : "Turning up is the thing being trained.")
+        + (waistFoot() ? "  \u00b7  " + waistFoot() : ""),
     cta: cta
   });
   if (!doneS && !doneN && lifting){
@@ -87,21 +87,28 @@ function viewGym(){
     /* One move at a time. He asked to be shown one or two things and to open
        the rest himself, and on a gym floor the only move that matters is the
        one he has not done yet - the others are a list to scroll past. */
+    /* A row is a line of type. The figure on the right exists only when there
+       is a number to put there - a bodyweight move has none, and a wide word
+       in that column was squeezing every title into three wrapped lines. */
     var rowFor = function(i, isNext){
       var ex = list[i], name = pickFor(key, i);
       var had = loggedToday(name), t2 = nextTarget(ex, name);
       var swapped = name !== ex[0];
-      return "<div class='liftrow" + (isNext ? " next" : "") + "'>"
+      var reps = ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3];
+      var meta = [
+        swapped ? "for " + ex[0].toLowerCase() : ex[4],
+        stage()[3] + " \u00d7 " + reps,
+        restClock(restOf(ex)) + " rest"
+      ];
+      var fig = had ? "<b>" + kgOr(had.w) + "</b><em>" + had.r.join(" \u00b7 ") + "</em>"
+              : t2.w ? "<b>" + t2.w + "<small>kg</small></b>"
+                     + (t2.tag ? "<em>" + esc(t2.tag) + "</em>" : "")
+              : "";
+      return "<div class='liftrow" + (isNext ? " next" : "") + (fig ? "" : " nofig") + "'>"
         + "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
         + "<span class='lb2'><b>" + esc(name) + "</b>"
-        + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4])
-        + " &middot; " + stage()[3] + " x " + (ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3])
-        + " &middot; " + restClock(restOf(ex)) + " rest</span></span>"
-        + "<span class='lv'>" + (had
-            ? kgOr(had.w) + "<em>" + had.r.join(" &middot; ") + "</em>"
-            : (t2.w ? t2.w + "kg<em>" + esc(t2.tag || "") + "</em>"
-                    : BODYWEIGHT[name] ? "body<em>" + esc(t2.tag || "") + "</em>"
-                    : "<span class='new'>new</span>")) + "</span></button>"
+        + "<span>" + esc(meta.join(" \u00b7 ")) + "</span></span>"
+        + (fig ? "<span class='lv'>" + fig + "</span>" : "") + "</button>"
         + "<button class='swap' data-how='" + key + ":" + i + "' aria-label='How to do " + esc(name) + "'>"
         + svg("ask", 18) + "</button>"
         + "<button class='swap' data-swap='" + key + ":" + i + "'"

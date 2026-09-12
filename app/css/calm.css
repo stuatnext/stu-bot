@@ -1,0 +1,272 @@
+/* ==========================================================================
+   calm.css - the register, rewritten.
+
+   What was here was four languages at once: a glassy gradient hero, a flat
+   list, a bevelled candy button, monospace micro-labels and blue underlined
+   links, all boxed. In daylight that read as busy; at night, which is when
+   this app is actually opened, the saturated colours and fake 3D edges read
+   as cheap and the grey cards read as mud.
+
+   One language instead:
+
+     - A box is for an object, not for a paragraph. Sections are separated by
+       space and a hairline; almost nothing else has a border.
+     - Headings are small and quiet, content is large. The old sheet had it
+       the other way round, so every section shouted its own name.
+     - One accent per tab, spent on exactly three things: the big number, the
+       one action, and the "done" state. Everything else is ink.
+     - No bevels, no glows, no inner shadows, no gradients pretending to be
+       glass. Depth comes from space.
+   ========================================================================== */
+
+/* ------------------------------------------------------------ the accents */
+:root{ --acc:var(--blue); --accInk:var(--blue); }
+.t-gold,   body[data-tab="cards"]  { --acc:#DDAE2A; --accInk:var(--goldInk) }
+.t-flame,  body[data-tab="gym"]    { --acc:#E0913C; --accInk:#C25E00 }
+.t-iron                            { --acc:#E0913C; --accInk:#C25E00 }
+.t-green,  body[data-tab="food"]   { --acc:#5FA83A; --accInk:var(--greenInk) }
+.t-blue,   body[data-tab="basics"] { --acc:#3F9DD1; --accInk:#0B72BD }
+.t-violet, body[data-tab="work"]   { --acc:#9A6BD1; --accInk:var(--violetInk) }
+:root[data-night] .t-gold,   :root[data-night] body[data-tab="cards"]  { --accInk:#FFD35C }
+:root[data-night] .t-flame,  :root[data-night] .t-iron,
+:root[data-night] body[data-tab="gym"]    { --accInk:#FFB35C }
+:root[data-night] .t-green,  :root[data-night] body[data-tab="food"]   { --accInk:#9BE85A }
+:root[data-night] .t-blue,   :root[data-night] body[data-tab="basics"] { --accInk:#5CC8FF }
+:root[data-night] .t-violet, :root[data-night] body[data-tab="work"]   { --accInk:#D7A6FF }
+
+/* --------------------------------------------------------------- the page */
+#screen{padding:6px 18px 30px}
+
+/* A section is announced quietly and then got on with. The rule through the
+   heading is gone: a line across the screen is a wall every 200 pixels. */
+#screen .rulehead{display:flex; align-items:baseline; gap:12px; margin:26px 0 4px}
+#screen .rulehead h3{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700;
+  letter-spacing:.17em; text-transform:uppercase; color:var(--ink3)}
+#screen .rulehead span{display:none}
+#screen .rulehead em{margin-left:auto; font-family:"JetBrains Mono",monospace; font-size:11px;
+  letter-spacing:.08em; text-transform:none; color:var(--ink3)}
+
+/* ---------------------------------------------------------------- the hero
+   One tinted panel per tab. The tab's colour is in the tint and in the
+   number; the rest is ink, so the number is the only loud thing. */
+#screen .hero{position:relative; overflow:hidden; border-radius:20px; padding:18px 18px 16px; margin:8px 0 4px; color:var(--ink);
+  background:var(--card); border:1px solid var(--edge);
+  box-shadow:none; isolation:auto}
+/* the tab's colour is a whisper of tint, not a wash and not a stripe */
+#screen .hero{background:color-mix(in srgb, var(--acc) 5%, var(--card))}
+#screen .hero .hero-gl,#screen .hero .hero-gl2{display:none}
+#screen .hero::after{display:none}
+#screen .hero .hero-ic{position:absolute; top:16px; right:16px; width:28px; height:28px;
+  border-radius:11px; background:none; border:0; color:var(--accInk); opacity:.55}
+#screen .hero .hero-k{font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--ink3); margin:0 0 8px}
+#screen .hero .hero-n{align-items:baseline; gap:7px; margin:0}
+#screen .hero .hero-n b{font-family:"Nunito",sans-serif; font-size:40px; font-weight:800;
+  letter-spacing:-.04em; line-height:.95; color:var(--accInk); text-shadow:none}
+#screen .hero .hero-n i{font-style:normal; font-size:14px; font-weight:700; color:var(--ink3)}
+#screen .hero .hero-l{margin:7px 0 0; font-size:14.5px; font-weight:600; line-height:1.4;
+  color:var(--ink2); text-wrap:balance}
+#screen .hero .hero-b{height:4px; margin:16px 0 0; border-radius:2px;
+  background:color-mix(in srgb, var(--ink) 12%, transparent)}
+#screen .hero .hero-b i{background:var(--acc); box-shadow:none}
+#screen .hero .hero-f,#screen .hero .hero-f2{margin:9px 0 0; padding:0; border:0;
+  font-size:12px; font-weight:600; color:var(--ink3); opacity:1}
+#screen .hero .hero-f + .hero-f2{margin-top:3px}
+
+/* one action, flat */
+#screen .hero .hero-cta,#screen .btn.pri,#screen .btn.go{
+  margin-top:14px; width:100%; min-height:46px; padding:12px 18px; border-radius:13px;
+  border:0; box-shadow:none; background:var(--acc); color:#14140F;
+  font-family:"Nunito",sans-serif; font-size:15px; font-weight:800; letter-spacing:0;
+  text-transform:none}
+#screen .btn.pri,#screen .btn.go{margin-top:0}
+#screen .hero .hero-cta:active,#screen .btn.pri:active{transform:scale(.985); opacity:.92}
+#screen .btn{border-radius:13px; border:1px solid var(--edge); background:none; box-shadow:none;
+  min-height:46px; font-size:14.5px; font-weight:700; text-transform:none; letter-spacing:0;
+  color:var(--ink2)}
+#screen .btn.quiet{border-color:transparent; background:var(--card2)}
+#screen .btn:active{transform:scale(.985)}
+
+/* ------------------------------------------------------------- the lists
+   A row is a line of type with a figure at the end of it. No card, no ring,
+   no puck - three pucks in a column looked like knobs on an amplifier. */
+#screen .lifts,#screen .wk,#screen .drawers,#screen .ordl{background:none; border:0;
+  border-radius:0; overflow:visible}
+#screen .liftrow,#screen .wi,#screen .ord{border:0; background:none; border-radius:0; margin:0}
+#screen .liftrow{display:grid; grid-template-columns:1fr 32px 32px; align-items:start}
+#screen .liftrow + .liftrow,#screen .wi + .wi,#screen .ord + .ord{
+  border-top:1px solid var(--edge)}
+#screen .lifts .liftrow:has(.lift.on){background:none}
+#screen .lift{padding:14px 6px 14px 0; min-height:0; gap:12px; background:none; border:0;
+  border-radius:0; align-items:flex-start}
+#screen .lift::before{width:16px; height:auto; background:none; border-radius:0; flex:none;
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700; color:var(--ink3);
+  justify-content:flex-start; margin-top:3px}
+#screen .lift.on::before{background:none; color:var(--accInk)}
+#screen .lift .lb2 b{font-family:"Nunito",sans-serif; font-size:15.5px; font-weight:700;
+  letter-spacing:-.015em; line-height:1.25; color:var(--ink)}
+#screen .lift .lb2 span{margin-top:3px; font-size:12px; line-height:1.45; color:var(--ink3)}
+#screen .lift .lv{width:auto; height:auto; min-width:54px; background:none; box-shadow:none;
+  border-radius:0; display:flex; flex-direction:column; align-items:flex-end; gap:2px;
+  margin-top:1px; flex:none;
+  font-family:"Nunito",sans-serif; font-size:17px; font-weight:800; letter-spacing:-.025em;
+  color:var(--accInk)}
+#screen .lift .lv b{font-weight:800}
+#screen .lift .lv small{font-size:.62em; font-weight:700; margin-left:1px; opacity:.75}
+#screen .lift .lv em{font-family:"JetBrains Mono",monospace; font-size:9.5px; font-weight:500;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--ink3); margin:0; max-width:none;
+  white-space:nowrap}
+#screen .lift .lv .new{font-size:11px; color:var(--ink3)}
+#screen .lift.on .lv{color:var(--greenInk)}
+#screen .swap{width:32px; min-height:0; height:44px; border:0; border-radius:9px;
+  background:none; color:var(--ink3); opacity:.6; margin-top:6px}
+#screen .swap svg{width:16px; height:16px}
+#screen .swap:active{background:var(--card2)}
+
+/* work items, the same line of type */
+#screen .wi{padding:15px 0; gap:13px; align-items:flex-start}
+#screen .wi.on{background:none}
+#screen .wbox{width:21px; height:21px; border-radius:7px; border:1.5px solid var(--edge2);
+  background:none; margin-top:2px; font-size:12px}
+#screen .wi.on .wbox{background:var(--acc); border-color:var(--acc); color:#141414}
+#screen .wb b{font-size:16px; font-weight:700; letter-spacing:-.01em; line-height:1.3}
+#screen .wb span{margin-top:4px; font-size:13px; line-height:1.45; color:var(--ink3)}
+
+/* ------------------------------------------------------------- the doors
+   Kept for the one or two records that are genuinely reference, and made to
+   look like a line of type rather than a component. */
+#screen .drawers{margin:26px 0 0; border-top:1px solid var(--edge)}
+#screen .drawers .fold .fh{padding:17px 0; background:none; border:0}
+#screen .drawers .fold + .fold{border-top:1px solid var(--edge)}
+#screen .drawers .fold .fh b{font-size:16px; font-weight:700; color:var(--ink2)}
+#screen .drawers .fold .fh em{font-family:"JetBrains Mono",monospace; font-size:10.5px;
+  letter-spacing:.08em; color:var(--ink3)}
+#screen .drawers .fold.open .fh{border-bottom:0}
+#screen .drawers .fold .fb{padding:2px 0 18px; background:none; border:0}
+#screen .drawers .drow{padding:17px 0; background:none; font-size:16px; color:var(--ink2)}
+
+/* --------------------------------------------------------------- the links */
+#screen .awayline{gap:18px; margin:14px 0 4px; padding:0}
+#screen .awayline button{color:var(--ink2); border:0; border-bottom:1px solid var(--edge2);
+  font-size:13px; font-weight:700}
+#screen .fine{font-size:13px; line-height:1.5; color:var(--ink3)}
+
+/* -------------------------------------------------------------- the marks */
+#screen .vit.flat{margin:16px 0 18px; gap:6px}
+#screen .vit.flat .vc .vv{font-family:"Nunito",sans-serif; font-size:15px; font-weight:800;
+  letter-spacing:-.02em}
+#screen .vit.flat .vc .vl{font-size:10px; letter-spacing:.02em}
+
+/* "body" is not a number - it is the absence of one, so it reads as a note */
+
+#screen .hero .hero-f2{margin-top:2px}
+
+/* ---------------------------------------------------------- the objects
+   The one thing a tab is about keeps its shape and its colour, but loses the
+   costume: no gradients pretending to be plastic, no coloured glow, no cap.
+   The hue survives in the number, which is what the object is for. */
+#screen .leafrow{grid-template-columns:92px 1fr; gap:14px; margin:10px 0 2px; align-items:stretch}
+#screen .leaf{border-radius:16px; border:1px solid var(--edge); border-bottom-width:1px;
+  background:var(--card); justify-content:center; padding:12px 0}
+#screen .leaf .lm{background:none; color:var(--accInk); font-size:10px; letter-spacing:.16em;
+  padding:0 0 3px}
+#screen .leaf .ld{font-size:34px; font-weight:800; letter-spacing:-.04em; color:var(--ink)}
+#screen .leaf .lw{font-size:9.5px; letter-spacing:.12em; color:var(--ink3); padding:3px 0 0}
+#screen .until{border-radius:16px; padding:16px 16px 15px; color:var(--ink);
+  background:color-mix(in srgb, var(--acc) 8%, var(--card));
+  border:1px solid color-mix(in srgb, var(--acc) 22%, transparent); box-shadow:none}
+#screen .until b{font-family:"Nunito",sans-serif; font-size:36px; font-weight:800;
+  letter-spacing:-.045em; line-height:.95; color:var(--accInk)}
+#screen .until b i{font-style:normal; font-size:14px; font-weight:700; color:var(--ink3);
+  margin-left:5px}
+#screen .until .ut{margin-top:7px; font-size:15.5px; font-weight:700; color:var(--ink)}
+#screen .until .un{margin-top:3px; font-size:12.5px; color:var(--ink3); line-height:1.4}
+
+/* the run-up, as a line of dates rather than a chart */
+#screen .tl{margin:2px 0 4px; padding-left:2px; border-left:1px solid var(--edge)}
+#screen .tli{padding:11px 0 11px 16px; position:relative}
+#screen .tli::before{content:""; position:absolute; left:-4px; top:17px; width:7px; height:7px;
+  border-radius:50%; background:var(--edge2)}
+#screen .tli b{font-size:15px; font-weight:700; color:var(--ink)}
+#screen .tli span{display:block; margin-top:2px; font-family:"JetBrains Mono",monospace;
+  font-size:11px; letter-spacing:.06em; color:var(--ink3); text-transform:none}
+
+/* the plate, the bottle: the colour is in the fill, not in a halo */
+#screen .plate svg{filter:none}
+#screen .plate .pc b{font-size:38px}
+#screen .pnote{margin:2px 0 18px; font-size:13.5px; font-weight:600; line-height:1.5;
+  color:var(--ink2); text-wrap:balance}
+#screen .bottle{grid-template-columns:112px 1fr; gap:18px}
+#screen .bottle svg{width:112px; height:200px; filter:none}
+#screen .bottle .bn{font-size:42px; letter-spacing:-.045em}
+#screen .bottle .bl{font-size:14px; margin-top:5px}
+#screen .bottle .bh2{font-size:12px; margin-top:8px}
+#screen .an{border:1px solid var(--edge); background:var(--card); box-shadow:none}
+#screen .an.on{background:color-mix(in srgb, var(--green) 12%, var(--card));
+  border-color:color-mix(in srgb, var(--green) 34%, transparent); box-shadow:none}
+
+/* the work list, a shade smaller so a long line does not become a paragraph */
+#screen .wb b{font-size:15.5px}
+#screen .wb span{font-size:12.5px}
+
+/* ------------------------------------------------------------ the day
+   The three things are the loudest object on the screen because they are the
+   point of it - but loud should mean legible, not saturated. A filled tile
+   becomes a tinted one; the icon keeps its hue at a lower chroma; the streak
+   stops being a badge and becomes a number. */
+#screen .week{gap:8px; margin:14px 0 16px}
+#screen .wd i{height:22px; max-width:none; border-radius:7px; background:var(--sunk);
+  border:1px solid var(--edge)}
+#screen .wd.on i{background:color-mix(in srgb, var(--green) 62%, var(--card));
+  border-color:transparent; color:#fff}
+#screen .wd.on i svg{width:11px; height:11px}
+#screen .wd b{font-size:9.5px; color:var(--ink3); font-weight:700}
+#screen .wd.on b{color:var(--ink3)}
+#screen .wd.now i{box-shadow:0 0 0 2px color-mix(in srgb, var(--gold) 70%, transparent)}
+
+#screen .quests{gap:10px; margin:0 0 4px}
+#screen .pil{min-height:112px; border-radius:18px; padding:14px 10px 12px;
+  background:var(--card); border:1px solid var(--edge); border-bottom-width:1px;
+  box-shadow:none}
+#screen .pil.on{background:color-mix(in srgb, var(--green) 10%, var(--card));
+  border-color:color-mix(in srgb, var(--green) 30%, transparent)}
+#screen .pil.up{border-color:color-mix(in srgb, var(--blue) 42%, transparent)}
+#screen .pil .qic{width:38px; height:38px; border-radius:12px;
+  background:color-mix(in srgb, var(--pil) 24%, transparent); color:var(--pil); box-shadow:none}
+#screen .pil .qbd b{font-size:13.5px; font-weight:700; color:var(--ink)}
+#screen .pil.on .qbd b{color:var(--greenInk)}
+#screen .pil .qst{top:9px; right:9px; padding:0; background:none; border:0;
+  font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700; color:var(--ink3)}
+#screen .pil .qst svg{display:none}
+#screen .pil .qchk{top:9px; left:9px; width:19px; height:19px; border-radius:6px; border-width:1.5px}
+#screen .pil .now{background:var(--blue); color:#fff; font-size:8.5px; padding:3px 7px}
+#screen .uptip{margin:2px 2px 14px; font-size:13px; font-weight:600; color:var(--ink3)}
+
+/* the chest: a panel, not a warning */
+#screen .gem{border-radius:18px; padding:15px 16px; background:var(--card);
+  border:1px solid var(--edge); box-shadow:none; gap:14px}
+#screen .gem.won{background:color-mix(in srgb, var(--gold) 10%, var(--card));
+  border-color:color-mix(in srgb, var(--gold) 32%, transparent)}
+#screen .gem .gcore{width:44px; height:44px; border-radius:13px; background:var(--sunk);
+  color:var(--ink3); box-shadow:none}
+#screen .gem.won .gcore{background:color-mix(in srgb, var(--gold) 22%, transparent);
+  color:var(--goldInk)}
+#screen .gem .gbd b{font-size:15.5px; font-weight:700; color:var(--ink)}
+#screen .gem .dcount{font-size:12.5px; color:var(--ink3)}
+#screen .gem .gn{background:var(--crit); font-size:10px; min-width:18px; height:18px}
+
+/* the day's ask */
+#screen .quest{border-radius:18px; padding:15px 16px; background:var(--card);
+  border:1px dashed var(--edge2); box-shadow:none}
+#screen .quest .qtx b{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink3); font-weight:700}
+#screen .quest .qtx span{font-size:14px; line-height:1.45; color:var(--ink); margin-top:4px}
+#screen .quest .qgo{border-radius:11px; background:var(--acc); color:#14140F; border:0;
+  box-shadow:none; font-size:13.5px; font-weight:800; padding:10px 15px; text-transform:none;
+  letter-spacing:0}
+#screen .skycard .skybd i{font-size:9px; letter-spacing:.11em}
+#screen .skycard .skybd b{font-size:21px}
+
+/* the sky is the header, so it runs to both edges of a page that now has
+   more air at its sides than it used to */
+#screen .skycard{margin-left:-18px; margin-right:-18px}
