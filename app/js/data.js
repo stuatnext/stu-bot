@@ -41,6 +41,65 @@ var CAMPS = [
   ["Valletta", 120], ["Sofia", 180], ["Paris", 120], ["New York", -240]
 ];
 
+/* ------------------------------------------------------------- where he is
+   Since v39 the phone's own clock says where he is standing: its IANA zone
+   names the city and its offset lands the Malta shift on the local clock,
+   DST included, with no permission asked. CAMPS above stays as the manual
+   pin for a phone deliberately left on Singapore time.
+
+   zone -> [ city as the app says it, what a day there usually is ]
+   home = Singapore; family = the UK (Sheffield, unless a pin says London);
+   hq = the office; work = a conference city; holiday = a beach or a break.
+   The kind is only the first guess - one tap on Today corrects it and the
+   correction sticks. A zone not listed still gets a name from its own
+   string ("Europe/Bucharest" reads as Bucharest) and is taken as work on a
+   weekday, holiday at the weekend. */
+var ZONES = {
+  "Asia/Singapore":       ["Singapore", "home"],
+  "Europe/London":        ["Sheffield", "family"],
+  "Europe/Malta":         ["Malta", "hq"],
+  /* the circuit */
+  "Europe/Sofia":         ["Sofia", "work"], "Europe/Lisbon": ["Lisbon", "work"],
+  "Europe/Madrid":        ["Spain", "work"], "Europe/Amsterdam": ["Amsterdam", "work"],
+  "Europe/Berlin":        ["Germany", "work"], "Europe/Prague": ["Prague", "work"],
+  "Europe/Bucharest":     ["Bucharest", "work"], "Europe/Stockholm": ["Stockholm", "work"],
+  "Europe/Copenhagen":    ["Copenhagen", "work"], "Europe/Dublin": ["Dublin", "work"],
+  "Europe/Vienna":        ["Vienna", "work"], "Europe/Warsaw": ["Warsaw", "work"],
+  "Europe/Zurich":        ["Zurich", "work"], "Europe/Brussels": ["Brussels", "work"],
+  "Europe/Athens":        ["Athens", "work"], "Europe/Istanbul": ["Istanbul", "work"],
+  "Europe/Nicosia":       ["Cyprus", "work"], "Europe/Riga": ["Riga", "work"],
+  "Europe/Vilnius":       ["Vilnius", "work"], "Europe/Tallinn": ["Tallinn", "work"],
+  "Europe/Budapest":      ["Budapest", "work"], "Europe/Oslo": ["Oslo", "work"],
+  "Europe/Helsinki":      ["Helsinki", "work"], "Europe/Kyiv": ["Kyiv", "work"],
+  "Europe/Gibraltar":     ["Gibraltar", "work"], "Asia/Dubai": ["Dubai", "work"],
+  "Asia/Qatar":           ["Doha", "work"], "Asia/Riyadh": ["Riyadh", "work"],
+  "Asia/Jerusalem":       ["Tel Aviv", "work"], "Asia/Manila": ["Manila", "work"],
+  "Asia/Hong_Kong":       ["Hong Kong", "work"], "Asia/Macau": ["Macau", "work"],
+  "Asia/Tokyo":           ["Tokyo", "work"], "Asia/Seoul": ["Seoul", "work"],
+  "Asia/Shanghai":        ["China", "work"], "Asia/Taipei": ["Taipei", "work"],
+  "Asia/Kolkata":         ["India", "work"], "Australia/Sydney": ["Sydney", "work"],
+  "Australia/Melbourne":  ["Melbourne", "work"], "Pacific/Auckland": ["Auckland", "work"],
+  "America/New_York":     ["New York", "work"], "America/Toronto": ["Toronto", "work"],
+  "America/Chicago":      ["Chicago", "work"], "America/Denver": ["Denver", "work"],
+  "America/Los_Angeles":  ["Las Vegas", "work"], "America/Phoenix": ["Phoenix", "work"],
+  "America/Mexico_City":  ["Mexico City", "work"], "America/Sao_Paulo": ["S\u00e3o Paulo", "work"],
+  "America/Bogota":       ["Bogot\u00e1", "work"], "Africa/Johannesburg": ["Johannesburg", "work"],
+  "Africa/Cairo":         ["Cairo", "work"], "Africa/Lagos": ["Lagos", "work"],
+  "Africa/Nairobi":       ["Nairobi", "work"],
+  /* two hours out, and the breaks */
+  "Asia/Kuala_Lumpur":    ["Malaysia", "holiday"], "Asia/Bangkok": ["Thailand", "holiday"],
+  "Asia/Jakarta":         ["Jakarta", "holiday"], "Asia/Makassar": ["Bali", "holiday"],
+  "Asia/Ho_Chi_Minh":     ["Vietnam", "holiday"], "Asia/Phnom_Penh": ["Cambodia", "holiday"],
+  "Asia/Vientiane":       ["Laos", "holiday"], "Asia/Colombo": ["Sri Lanka", "holiday"],
+  "Asia/Kathmandu":       ["Nepal", "holiday"], "Indian/Maldives": ["the Maldives", "holiday"],
+  "Europe/Paris":         ["France", "holiday"], "Europe/Rome": ["Italy", "holiday"],
+  "Atlantic/Canary":      ["the Canaries", "holiday"]
+};
+/* City centres, already named all over this repo. Only ever compared with a
+   point the phone hands over on a tap, and only to tell Sheffield from a
+   London work trip in the one zone they share. */
+var HOMES = { Singapore: [1.35, 103.82], Sheffield: [53.38, -1.47] };
+
 /* key, label, resting icon, what it means in full, the colour it wears, and
    the gloss that sits on the button itself. He looked at "Trained" and asked
    what it constitutes - a label without its definition is a quiz, and a game
@@ -448,7 +507,7 @@ var TIPS = {
     "Twenty minutes is a tick. Perfect is not the standard."
   ],
   family: [
-    "About 07:00 in Sheffield right now - a good window.",
+    "A call, not a text. Ten minutes is a real ten minutes.",
     "A call, not a text. The accent comes back in minutes.",
     "Wednesday is Mum's day. Walk while you talk.",
     "Five minutes counts if it is a real five minutes."
@@ -731,6 +790,26 @@ var CARD_DO = {
    when the nudge is switched on and hands over one bundle to paste. */
 
 /* Ranks rather than bare numbers - a level should say something about you. */
+/* ------------------------------------------------------- levelling by turning up
+   His sentence: "I want to feel like I'm levelling up just by being consistent
+   because being consistent is the most important thing." Until v39 that was
+   false in the code - a full day paid 15 XP and the three cards it dropped paid
+   about 60, so the crest was mostly a card counter.
+
+   These are added on top of everything that already pays, never instead: a full
+   day is 15 + 60, the first day back after a lapse doubles, a week with five
+   full days pays once, all seven pays again, twenty in a month pays, and each
+   chip pays the day it is minted. Every term is a count derived from the record,
+   so XP can only ever be higher than it was on v38 for the same record. */
+var STEADY = {
+  day: 60, comeback: 60, goodWeek: 100, perfectWeek: 50, month: 250,
+  chips: [0, 100, 300, 600, 1000, 1500]      /* by CHIPS index: 1, 7, 30, 90, 180, 365 days */
+};
+var GOOD_WEEK = 5, SOLID_MONTH = 20;
+/* The floor a full day is worth, so "Level 8 in 4 full days" is a promise the
+   app can keep rather than an estimate that slips. */
+var XP_PER_FULL_DAY = 75;
+
 var RANKS = [
   [0,     "Just landed"],
   [150,   "Two months in"],
@@ -807,6 +886,38 @@ var SESSIONS = [
 ];
 
 /* [ what to order, grams of protein, where it fits ] */
+/* ------------------------------------------------------- the travel session
+   docs/train.html has promised this since the beginning: twenty minutes, a
+   hotel room, no equipment, "so the run does not break, and so you come home
+   having not lost the thread". Session T is that list, in the app.
+
+   It sits OUTSIDE the SESSIONS array on purpose: nextSessionKey() rotates
+   A - B - C by looking the last letter up in SESSIONS, so a fortnight of hotel
+   rooms must not scramble the programme. Side plank and Dead bug keep the
+   same names as Session B, so their history is one history. */
+var TRAVEL = ["T", [
+  ["Push-up",                    4,  8, 15, "Stop two short of failure",
+    ["Incline push-up, hands on the desk", "Dumbbell bench press"], 75],
+  ["Split squat",                3, 12, 12, "Each leg. Back knee towards the floor",
+    ["Reverse lunge", "Step-up", "Goblet squat"], 75],
+  ["Single-leg Romanian deadlift", 3, 10, 10, "Each side. Bodyweight is enough",
+    ["Romanian deadlift", "Glute bridge"], 75],
+  ["Backpack row",               3, 12, 12, "A loaded bag, or the edge of a table",
+    ["Table-edge row", "One-arm dumbbell row"], 75],
+  ["Side plank",                 3, 40, 40, "Seconds each side",
+    ["Suitcase carry", "Pallof hold"], 60],
+  ["Dead bug",                   3, 12, 12, "Each side. Lower back stays flat",
+    ["Bird dog", "Lying leg raise"], 60]
+]];
+/* Movements with no weight to pick. The dial says "body" rather than a
+   number, and the progression is reps, not kilos. */
+var BODYWEIGHT = {
+  "Push-up": 1, "Incline push-up, hands on the desk": 1, "Split squat": 1,
+  "Single-leg Romanian deadlift": 1, "Glute bridge": 1, "Table-edge row": 1,
+  "Backpack row": 1, "Side plank": 1, "Dead bug": 1, "Bird dog": 1,
+  "Lying leg raise": 1, "Bodyweight squat": 1, "Plank": 1
+};
+
 var ORDERS = [
   ["Yong tau foo, tofu and fish", 30, "any"],
   ["Chicken rice, extra chicken", 35, "any"],
@@ -822,11 +933,55 @@ var ORDERS = [
   ["Protein shake",               25, "morning"]
 ];
 
-var ANCHORS = [
-  ["morning", "Before you train", "~09:00"],
-  ["midday",  "Before the shift", "~14:00"],
-  ["dinner",  "After the shift",  "Grab"]
+/* Away from Singapore the hawker list is no use. Two more: the one for
+   Sheffield, and the one for a hotel with a menu, anywhere on earth. */
+var ORDERS_UK = [
+  ["Roast dinner, extra meat",        40, "dinner"],
+  ["Chicken tikka, plain rice",       35, "dinner"],
+  ["Steak or chicken off a pub menu", 40, "dinner"],
+  ["Fish and chips, eat the fish",    30, "dinner"],
+  ["Chicken breast meal deal",        35, "any"],
+  ["Jacket potato with tuna",         28, "any"],
+  ["Tuna or chicken sandwich",        25, "any"],
+  ["Cottage cheese pot",              20, "any"],
+  ["Two eggs on toast",               14, "morning"],
+  ["Porridge with milk and a scoop",  25, "morning"],
+  ["Greek yoghurt pot",               18, "morning"],
+  ["Protein shake",                   25, "morning"]
 ];
+var ORDERS_AWAY = [
+  ["Grilled chicken, any cuisine",    35, "any"],
+  ["Steak",                           40, "dinner"],
+  ["Grilled fish",                    30, "dinner"],
+  ["Kebab - the meat, not the chips", 35, "dinner"],
+  ["Sushi, twelve pieces",            25, "dinner"],
+  ["Salad with chicken or tuna",      28, "any"],
+  ["Burger - the patty is the point", 28, "any"],
+  ["Omelette",                        20, "any"],
+  ["Three eggs at the hotel breakfast", 20, "morning"],
+  ["Eggs plus yoghurt at breakfast",  30, "morning"],
+  ["Greek yoghurt",                   18, "morning"],
+  ["Protein shake or bar",            20, "any"]
+];
+
+/* The three eating occasions. The times used to be typed here - "~09:00",
+   "~14:00" - which was a lie for half the year and a bigger one abroad. They
+   are computed from his wake time and the shift now (mealPlan in food.js);
+   these labels are only the fallback names. */
+var ANCHORS = [
+  ["morning", "First thing"],
+  ["midday",  "Before the shift"],
+  ["dinner",  "After the shift"]
+];
+
+/* What the maps button searches for, by what he needs at that hour. */
+var NEAR = {
+  gym:    "gym",
+  eat:    "grilled chicken",
+  hawker: "hawker centre",
+  shop:   "supermarket",
+  walk:   "park"
+};
 
 /* The programme unlocks rather than arriving whole. Six exercises on day one
    is how a beginner bails; two easy sets and a look round the room is how one
@@ -1169,6 +1324,55 @@ var INSPIRE = [
    one is always the thing that goes wrong. An alternative without its own
    entry inherits the slot's, then the generic one. */
 var HOW = {
+  /* the travel session - a hotel room, no kit */
+  "Push-up": [
+    "Hands under the shoulders, feet together, body one straight line",
+    "Lower until the chest is a fist off the floor, elbows about 45 degrees back",
+    "Press up without the hips sagging or piking",
+    "Wrong: the head dropping first. The chest leads, the chin stays tucked"
+  ],
+  "Incline push-up, hands on the desk": [
+    "Hands on a desk, a windowsill or the edge of the bath, body one line",
+    "Lower the chest to the edge, elbows back rather than flared",
+    "Press away. The higher the hands, the easier it is",
+    "Wrong: hips first. If the middle sags, take a higher surface"
+  ],
+  "Split squat": [
+    "One foot forward, one back, about a stride apart, hands on your hips",
+    "Drop the back knee towards the floor. The front shin stays near vertical",
+    "Stand through the front heel. All the reps on one leg, then the other",
+    "Wrong: leaning forward onto the front toe. Chest up, weight in the heel"
+  ],
+  "Single-leg Romanian deadlift": [
+    "Stand on one leg, a soft knee, the other leg ready to swing back",
+    "Hinge at the hip: chest down, back leg up, back flat, until you feel the hamstring",
+    "Stand up by squeezing that glute. Touch a wall for balance if you need to",
+    "Wrong: rounding the back or twisting the hips open. Slow it down instead"
+  ],
+  "Backpack row": [
+    "Load a bag with books, hinge until the back is near flat, arm hanging",
+    "Pull the bag to the ribs, elbow close to the body",
+    "Lower all the way. Each side, or both if you have two bags",
+    "Wrong: standing up to lift it. Stay bent over the whole set"
+  ],
+  "Table-edge row": [
+    "Under a sturdy table, hands on the edge, heels on the floor, body straight",
+    "Pull the chest to the edge, elbows back",
+    "Lower until the arms are straight. Walk the feet in to make it easier",
+    "Wrong: hips sagging. Squeeze the glutes for the whole set"
+  ],
+  "Glute bridge": [
+    "On your back, knees bent, heels close to the backside",
+    "Drive through the heels until the hips are level with the knees",
+    "Squeeze at the top for a second, lower without touching down",
+    "Wrong: arching the lower back at the top. The glutes finish it, not the spine"
+  ],
+  "Step-up": [
+    "A bench or a solid chair at about knee height, one foot planted on it",
+    "Stand up through that heel without pushing off the floor foot",
+    "Lower under control. All the reps on one leg, then the other",
+    "Wrong: bouncing off the back foot. If it is a hop, the step is too high"
+  ],
   "Goblet squat": ["Hold one dumbbell against your chest, elbows tucked under it",
     "Feet shoulder-width, toes turned out a touch",
     "Sit down between your heels until your elbows touch your knees, chest up",

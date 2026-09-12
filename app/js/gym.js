@@ -5,85 +5,133 @@
 
 function viewGym(){
   var t = today(), h = "";
-
-  /* --- the session, at whatever stage he has unlocked */
-  var open = todaySession(), key = open || nextSessionKey();
+  var p = gymPlan(), sit = p.sit, key = p.key;
   var st = stage(), nx = nextStage(), list = stageLifts(key);
   var doneN = 0;
   list.forEach(function(ex, i){ if (loggedToday(pickFor(key, i))) doneN++; });
-
-  /* The tab opens on the one thing it is about: how much of today's session
-     is on the board. Everything under it qualifies that number. */
-  var doneS = sessionsDone();
-  var wNow = (S.waist || []).slice(-1)[0];
+  var doneS = sessionsDone(), mins = sessionMinutes(key);
   var resume = S.sess && S.sess.day === t;
+  var trained = !!day(t).p.train, walked = walkedToday();
+  var lifting = p.mode !== "rest" && p.mode !== "walk";
+
+  /* The tab opens on the answer to "what do I train today", in the hero's
+     own voice: the session and how long it takes, or the honest word for a
+     day the programme does not want a session on. */
+  var kicker, big, unit, line, pct = null, cta = null;
+  if (p.mode === "rest"){
+    kicker = "Today \u00b7 rest";
+    big = "Rest"; unit = "";
+    line = "Session " + (p.last || "A") + " was yesterday, and the day after is when it is built. "
+         + "A walk makes Trained.";
+    cta = trained ? null : { attr: "data-walk='1'", label: walked ? "Walked \u00b7 " + walked + " min" : "Walked \u2014 mark Trained" };
+  } else if (p.mode === "walk"){
+    kicker = "This week \u00b7 lifting done";
+    big = p.week; unit = "/ 3 this week";
+    pct = Math.min(100, Math.round(100 * p.week / 3));
+    line = "Legs, a push and a pull all covered since Monday. A walk makes Trained; "
+         + "a fourth session is allowed, not asked.";
+    cta = trained ? null : { attr: "data-walk='1'", label: walked ? "Walked \u00b7 " + walked + " min" : "Walked \u2014 mark Trained" };
+  } else if (p.mode === "travel"){
+    kicker = "Travel session \u00b7 " + esc(sit.city);
+    big = doneN; unit = "/ " + list.length;
+    pct = Math.round(100 * doneN / Math.max(1, list.length));
+    line = doneN === list.length ? "Every move logged. That is the session."
+         : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
+         : list.length + " moves \u00b7 ~" + mins + " min \u00b7 a room and your own weight";
+    cta = { attr: "data-startsession='T'",
+            label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the travel session" };
+  } else {
+    kicker = "Session " + key + " \u00b7 " + esc(st[1]);
+    big = doneN; unit = "/ " + list.length;
+    pct = Math.round(100 * doneN / Math.max(1, list.length));
+    line = doneN === list.length ? "Every move logged. That is the session."
+         : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
+         : list.length + " moves \u00b7 ~" + mins + " min \u00b7 " + trainWhen();
+    cta = { attr: "data-startsession='" + key + "'",
+            label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session" };
+  }
   h += hero({
-    tone: "iron", icon: "dumb", kicker: "Session " + key + " \u00b7 " + esc(st[1]),
-    big: doneN, unit: "/ " + list.length,
-    line: doneN === list.length ? "Every move logged. That is the session."
-        : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
-        : "moves waiting at 24/7 Tanjong Pagar",
-    pct: Math.round(100 * doneN / Math.max(1, list.length)),
+    tone: "iron", icon: "dumb", kicker: kicker,
+    big: big, unit: unit, line: line, pct: pct,
     foot: doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged all time"
         : "Turning up is the thing being trained. One move counts.",
     foot2: waistFoot(),
-    cta: { attr: "data-startsession='" + key + "'",
-           label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session" }
+    cta: cta
   });
-  /* The way in. A newbie does not want a list; he wants to be told what to
-     do next, one thing at a time, and to be told when to rest. That is the
-     guided session, and it lives on the hero. The list under it is the overview. */
-  if (!doneS && !doneN){
+  if (!doneS && !doneN && lifting){
     h += "<p class='fine' style='text-align:center;margin:-4px 0 12px'>It tells you what to do, "
       + "set by set, and times the rests.</p>";
   }
 
-  h += "<div class='rulehead'><h3>Today's moves</h3><span></span>"
-    + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
-
-  /* The programme's own level used to sit here in a fold, repeating what the
-     hero already says. What it alone knew - the next unlock - is one line. */
-  if (nx){
-    h += "<p class='fine' style='margin:-2px 0 8px'>" + (nx[0] - doneS) + " more "
-      + (nx[0] - doneS === 1 ? "session" : "sessions") + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
+  /* Away, the two things he cannot look up in his own history. */
+  if (!sit.home){
+    h += "<div class='btns tight'>"
+      + "<button class='btn quiet' data-near='gym'>Find a gym in " + esc(sit.city) + "</button>"
+      + (p.mode === "travel"
+          ? "<button class='btn quiet' data-gymhere='1'>There is a gym here</button>"
+          : (gymHere() ? "<button class='btn quiet' data-gymhere='0'>Back to the travel session</button>" : ""))
+      + "</div>";
   }
 
-  if (!doneN && !doneS){
-    h += "<p class='fine' style='margin:0 0 10px'>Tap a move to log it. ? is how to do it, "
-      + "&#8646; swaps the machine.</p>";
-  }
+  if (!lifting){
+    /* A rest or walk day shows no list: the answer is not a list. The session
+       stays one tap away, because the app suggests and he decides. */
+    var names = stageLifts(p.key).map(function(x){ return x[0].toLowerCase(); }).join(", ");
+    h += fold("nextmoves", "When you do lift", "Session " + p.key,
+      "<p class='fine' style='margin:2px 0 10px'>" + esc(names) + ".</p>"
+      + "<div class='btns'><button class='btn quiet' data-startsession='" + p.key + "'>"
+      + "Lift anyway \u2014 Session " + p.key + "</button></div>", false);
+  } else {
+    h += "<div class='rulehead'><h3>" + (p.mode === "travel" ? "In the room" : "Today\u2019s moves")
+      + "</h3><span></span>"
+      + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
 
-  h += "<div class='lifts'>";
-  list.forEach(function(ex, i){
-    var name = pickFor(key, i);
-    var had = loggedToday(name), t2 = nextTarget(ex, name);
-    var swapped = name !== ex[0];
-    h += "<div class='liftrow'>";
-    h += "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
-      + "<span class='lb2'><b>" + esc(name) + "</b>"
-      + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4])
-      + " &middot; " + restClock(restOf(ex)) + " rest</span></span>"
-      + "<span class='lv'>" + (had
-          ? had.w + "kg<em>" + had.r.join(" &middot; ") + "</em>"
-          : (t2.w ? t2.w + "kg<em>" + esc(t2.tag || "") + "</em>"
-                  : "<span class='new'>new</span>")) + "</span></button>";
-    h += "<button class='swap' data-how='" + key + ":" + i + "' aria-label='How to do " + esc(name) + "'>" + svg("ask", 18) + "</button>"
-      + "<button class='swap' data-swap='" + key + ":" + i + "'"
-      + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
-  });
-  h += "</div>";
+    /* The programme's own level used to sit here in a fold, repeating what the
+       hero already says. What it alone knew - the next unlock - is one line. */
+    if (nx && p.mode !== "travel"){
+      h += "<p class='fine' style='margin:-2px 0 8px'>" + (nx[0] - doneS) + " more "
+        + (nx[0] - doneS === 1 ? "session" : "sessions") + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
+    }
 
-  var held = sessionFor(key)[1].slice(list.length);
-  if (held.length){
-    h += "<div class='hold'>" + held.length + " more "
-      + (held.length === 1 ? "move" : "moves") + " in this session, locked for now &mdash; "
-      + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</div>";
+    if (!doneN && !doneS){
+      h += "<p class='fine' style='margin:0 0 10px'>Tap a move to log it. ? is how to do it, "
+        + "&#8646; swaps the machine.</p>";
+    }
+
+    h += "<div class='lifts'>";
+    list.forEach(function(ex, i){
+      var name = pickFor(key, i);
+      var had = loggedToday(name), t2 = nextTarget(ex, name);
+      var swapped = name !== ex[0];
+      h += "<div class='liftrow'>";
+      h += "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
+        + "<span class='lb2'><b>" + esc(name) + "</b>"
+        + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4])
+        + " &middot; " + stage()[3] + " x " + (ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3])
+        + " &middot; " + restClock(restOf(ex)) + " rest</span></span>"
+        + "<span class='lv'>" + (had
+            ? kgOr(had.w) + "<em>" + had.r.join(" &middot; ") + "</em>"
+            : (t2.w ? t2.w + "kg<em>" + esc(t2.tag || "") + "</em>"
+                    : BODYWEIGHT[name] ? "body<em>" + esc(t2.tag || "") + "</em>"
+                    : "<span class='new'>new</span>")) + "</span></button>";
+      h += "<button class='swap' data-how='" + key + ":" + i + "' aria-label='How to do " + esc(name) + "'>" + svg("ask", 18) + "</button>"
+        + "<button class='swap' data-swap='" + key + ":" + i + "'"
+        + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
+    });
+    h += "</div>";
+
+    var held = sessionFor(key)[1].slice(list.length);
+    if (held.length){
+      h += "<div class='hold'>" + held.length + " more "
+        + (held.length === 1 ? "move" : "moves") + " in this session, locked for now &mdash; "
+        + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</div>";
+    }
   }
 
   /* the finisher: easy minutes after the lifts, from the third visit. A row
      that is not a move - no number, never counted, the first thing to skip */
   var fm = finMinutes(), ft = finToday();
-  if (fm > 0){
+  if (fm > 0 && lifting && key !== "T"){
     var onName = ft ? finLabel(ft.on) : finLabel(lastFinOn() || "Bike");
     h += "<div class='liftrow finrow'>"
       + "<button class='lift fin" + (ft ? " on" : "") + "' data-fin='1'>"
@@ -96,7 +144,7 @@ function viewGym(){
   h += "<div class='btns tight bellywhy'><button class='btn quiet' data-finwhy='1'>"
     + "Why no crunches &mdash; and where the belly comes in</button></div>";
 
-  if (doneN || ft){
+  if ((doneN || ft) && lifting){
     var already = day(t).p.train;
     h += "<div class='btns'><button class='btn" + (already ? " quiet" : " pri") + "' data-finish='1'>"
       + (already ? "Trained is marked" : "Finish &mdash; mark Trained") + "</button></div>";
@@ -125,68 +173,13 @@ function viewGym(){
   return h;
 }
 
-/* ==================================================================== body
-   Gym and food, in the one place. The point of this tab is that he should
-   never have to remember a number: what he lifted last time decides what to
-   lift today, and what he has eaten decides what to order next.
+/* ==================================================================== lifts
+   The point of this tab is that he should never have to remember a number:
+   what he lifted last time decides what to lift today. (The food helpers
+   that used to sit here moved to food.js, which owns them.)
 
    He has an SpLD around short-term memory and told me so. Everything here is
    built on the assumption that anything not written down is gone. */
-
-function kg(){ return Number(S.kg) > 0 ? Number(S.kg) : KG_DEFAULT; }
-function proteinTarget(){ return Math.round(1.8 * kg()); }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* --------------------------------------------------------------- the food */
-function foodOn(k){ return (S.food || {})[k] || []; }
-function proteinOn(k){
-  return foodOn(k).reduce(function(a, f){ return a + Number(f[1] || 0); }, 0);
-}
-function anchorDone(k, slot){
-  return foodOn(k).some(function(f){ return f[2] === slot; });
-}
-function logFood(name, grams, slot){
-  var k = today();
-  S.food = S.food || {};
-  S.food[k] = foodOn(k).concat([[String(name).slice(0, 60), Number(grams) || 0, slot || "any"]]);
-  save();
-  var left = proteinTarget() - proteinOn(k);
-  buzz(12); sfx(left <= 0 ? "done" : "tick");
-  toast(left <= 0 ? "Protein done for today." : num(left) + "g to go.");
-  render({ keepScroll: true });
-}
-function undoFood(){
-  var k = today(), list = foodOn(k);
-  if (!list.length) return;
-  list.pop(); S.food[k] = list; save(); sfx("untick");
-  render({ keepScroll: true });
-}
-/* The order that best closes the gap, rather than the biggest one. */
-function suggestOrder(slot){
-  var left = proteinTarget() - proteinOn(today());
-  if (left <= 0) return null;
-  var pool = ORDERS.filter(function(o){ return o[2] === "any" || o[2] === slot; });
-  if (!pool.length) pool = ORDERS;
-  var best = pool[0], gap = Math.abs(pool[0][1] - left);
-  pool.forEach(function(o){
-    var g = Math.abs(o[1] - left);
-    if (g < gap){ gap = g; best = o; }
-  });
-  return best;
-}
 
 /* -------------------------------------------------------------- the lifts */
 function liftDays(){ return Object.keys(S.lifts || {}).sort(); }
@@ -217,7 +210,131 @@ function stageLifts(sKey){
   return s ? s[1].slice(0, stage()[2]) : [];
 }
 function sessionFor(key){
+  if (key === "T") return TRAVEL;
   return SESSIONS.filter(function(s){ return s[0] === key; })[0];
+}
+/* TRAVEL is deliberately not in SESSIONS: nextSessionKey looks the last letter
+   up in that array, so a fortnight of hotel rooms leaves A - B - C exactly
+   where he left it. */
+
+/* ==================================================================== the plan
+   "When I go to the gym app, I want to know exactly what to train." Before
+   this the tab proposed the next letter of the rotation every single day,
+   including the morning after a session and the fourth time in a week - so
+   the honest answer to his question was sometimes "not this".
+
+   Five answers, in this order, all derived from what is in the record:
+     done    - the lifts are already logged today
+     walk    - three sessions since Monday; the week's lifting is done
+     rest    - he lifted yesterday, and the day after is when it is built
+     travel  - he is not in Singapore and has not said there is a gym here
+     session - the next letter, which is the normal answer
+   None of them is a refusal: a session is always one tap away underneath. */
+function liftsOn(k){
+  var e = (S.lifts || {})[k];
+  return !!(e && Object.keys(e.ex || {}).length);
+}
+function sessionsThisWeek(){
+  if (typeof weekKey !== "function") return 0;
+  return weekDays(weekKey()).filter(liftsOn).length;
+}
+/* Roughly how long it takes, so the hero can answer "have I got time". */
+function sessionMinutes(key){
+  var list = stageLifts(key), sets = stage()[3], m = 5;
+  list.forEach(function(ex){ m += sets * 0.75 + (sets - 1) * restOf(ex) / 60; });
+  if (key !== "T") m += finMinutes();
+  return Math.max(10, Math.round(m / 5) * 5);
+}
+function gymHere(){
+  var sit = situation();
+  return !!(S.gymHere && S.gymHere === sit.city);
+}
+function gymPlace(){
+  var sit = situation();
+  return sit.home ? "24/7 Tanjong Pagar" : sit.city;
+}
+function gymPlan(){
+  var t = today(), sit = situation();
+  if (liftsOn(t)) return { mode: "done", key: todaySession() || nextSessionKey(), sit: sit };
+  var wk = sessionsThisWeek();
+  if (wk >= 3) return { mode: "walk", key: nextSessionKey(), week: wk, sit: sit };
+  if (liftsOn(shift(-1))) return { mode: "rest", key: nextSessionKey(),
+                                   last: (S.lifts[shift(-1)] || {}).s, sit: sit };
+  if (!sit.home && !gymHere()) return { mode: "travel", key: "T", sit: sit };
+  return { mode: "session", key: nextSessionKey(), sit: sit };
+}
+/* When today's training fits, in his own shift's words. */
+function trainWhen(){
+  var sh = shape();
+  if (sh.noShift) return "No shift today. Earlier is more day.";
+  if (sh.now < sh.start) return "Before Malta wakes at " + sh.startT + " \u00b7 " + dur(sh.start - sh.now) + " of yours";
+  if (sh.working) return "Malta is on until " + sh.endT + ". Twenty minutes still counts.";
+  return "Malta is closed. A short one now, or tomorrow before " + sh.startT + ".";
+}
+/* The one instruction, for the Today card, the pillar row and the brief. */
+function gymAsk(){
+  var p = gymPlan(), n = stageLifts(p.key).length, mins = sessionMinutes(p.key);
+  var cta = { tab: "gym", label: p.mode === "travel" ? "Open the travel session" : "Open Session " + p.key };
+  if (p.mode === "done"){
+    var got = stageLifts(p.key).filter(function(ex, i){ return loggedToday(pickFor(p.key, i)); }).length;
+    return { ask: "Session " + p.key + " is logged.", sub: got + " of " + n + " moves in. Mark Trained on the Gym tab.",
+             row: "Session " + p.key + " \u00b7 " + got + " of " + n + " logged", cta: cta };
+  }
+  if (p.mode === "walk")
+    return { ask: "Three in. Walk today.", sub: "Legs, a push and a pull all covered since Monday.",
+             row: "Three sessions in this week \u2014 a walk is Trained" };
+  if (p.mode === "rest")
+    return { ask: "Rest day. Walk it.", sub: "Session " + p.last + " was yesterday. Session " + p.key + " tomorrow.",
+             row: "Rest day \u2014 a walk is Trained" };
+  if (p.mode === "travel")
+    return { ask: "Travel session, " + mins + " min.", sub: p.sit.city + " \u00b7 the room is the gym. " + n + " moves, no kit.",
+             row: "Travel session \u00b7 " + n + " moves \u00b7 ~" + mins + " min", cta: cta };
+  return { ask: "Train. Session " + p.key + ", " + mins + " min.",
+           sub: n + " moves \u00b7 " + trainWhen(),
+           row: "Session " + p.key + " \u00b7 " + n + " moves \u00b7 ~" + mins + " min", cta: cta };
+}
+/* The same plan in the brief's voice, for today or tomorrow. */
+function gymWords(k, key){
+  var t = today();
+  if (k === t){
+    var p = gymPlan(), n = stageLifts(p.key).length;
+    if (p.mode === "rest") return "Rest day \u2014 a walk is Trained";
+    if (p.mode === "walk") return "Lifting done for the week \u2014 walk";
+    if (p.mode === "travel") return "Travel session, " + n + " moves, ~" + sessionMinutes("T") + " min";
+    return "Session " + p.key + ", " + n + " moves, ~" + sessionMinutes(p.key) + " min";
+  }
+  if (liftsOn(t)) return "Rest day \u2014 a walk is Trained";
+  if (sessionsThisWeek() >= 3 && typeof weekKey === "function" && weekKeyOf(k) === weekKey())
+    return "Lifting done for the week \u2014 walk";
+  var sit = situation();
+  var kk = (!sit.home && !gymHere()) ? "T" : (key || nextSessionKey());
+  var nn = stageLifts(kk).length;
+  return (kk === "T" ? "Travel session, " : "Session " + kk + ", ") + nn + " moves, ~" + sessionMinutes(kk) + " min";
+}
+/* A walk is Trained and always has been; before v39 there was nowhere to say
+   so, so a rest day looked like a day the app had nothing for. */
+function askWalk(btn){
+  ask({
+    title: "A walk",
+    say: "Twenty minutes is a tick. Forty is the walk. It has always counted.",
+    options: [{ id: "20", label: "20 minutes", note: "a tick" },
+              { id: "40", label: "40 minutes", note: "the walk", pri: true },
+              { id: "60", label: "An hour or more", note: "the long one" }],
+    cancel: "Not today"
+  }).then(function(v){
+    if (!v || v === "__no") return;
+    S.walks = S.walks || {};
+    S.walks[today()] = Number(v);
+    save();
+    if (!day(today()).p.train) tapPillar("train", btn || document.querySelector("[data-walk]"));
+    else { toast("Walked. " + v + " minutes on the record."); render({ keepScroll: true }); }
+  });
+}
+function walkedToday(){ return Number((S.walks || {})[today()]) || 0; }
+function walksIn(n){
+  var out = 0, d = new Date();
+  for (var i = 0; i < n; i++){ if ((S.walks || {})[iso(d)]) out++; d.setDate(d.getDate() - 1); }
+  return out;
 }
 
 /* ------------------------------------------------------------ the finisher
@@ -342,10 +459,28 @@ function deloadFrom(w){
   return Math.max(stepFor(w), d);
 }
 
+/* A load, or the word for not having one. Without this a hotel-room push-up
+   reads "0kg" all the way through the copy. */
+function kgOr(w){ return w ? w + "kg" : "body"; }
 function nextTarget(ex, name){
   name = name || ex[0];
   var setsWant = stage()[3], lo = ex[2], hi = ex[3];
   var H = liftHistory(name, 3);
+
+  /* Bodyweight: there is no dial to turn, so the progression is reps and then
+     a harder variant. Every load branch below would otherwise compute a jump
+     from zero and print nonsense. */
+  if (BODYWEIGHT[name]){
+    var last0 = H[0];
+    if (!last0) return { first: true, w: 0, tag: "reps",
+      say: "Bodyweight. Stop two reps short of failure \u2014 the number you are chasing is the reps." };
+    var worst0 = lowRep(last0);
+    if (last0.r.length >= setsWant && worst0 >= hi)
+      return { w: 0, reps: hi, tag: "harder",
+        say: "Every set at " + hi + ". Slow the lowering to three seconds, or take the harder version with the arrows." };
+    return { w: 0, reps: null, tag: "add a rep",
+      say: "Same again. Add a rep wherever you can \u2014 " + worst0 + " is the set to beat." };
+  }
 
   if (!H.length){
     /* A blank is the worst thing to hand someone standing at a machine, so
@@ -415,7 +550,7 @@ function nextTarget(ex, name){
 
   /* IN THE RANGE. Hold and chase reps, and name the set that is holding it. */
   return { w: last.w, reps: null, tag: "add a rep",
-    say: "Stay at " + last.w + "kg. Add a rep wherever you can \u2014 "
+    say: "Stay at " + kgOr(last.w) + ". Add a rep wherever you can \u2014 "
        + worst + " is the set to beat." };
 }
 /* Which variant he is using in a slot. Stored per slot, so swapping to the
@@ -798,52 +933,6 @@ function askWaist(){
   });
 }
 
-function askFoodOther(slot){
-  ask({
-    title: "Something else",
-    say: "Roughly how much protein? A palm of meat or fish is about 25g.",
-    field: { label: "What, and grams", value: "", placeholder: "Chicken salad 30", type: "text" },
-    confirm: "Add", cancel: "Cancel"
-  }).then(function(v){
-    if (v === null || v === "__no") return;
-    var m = String(v).match(/(\d+)/);
-    if (!m) { toast("Give me a number of grams."); return; }
-    var name = String(v).replace(/\s*\d+\s*g?\s*$/i, "").trim() || "Something";
-    logFood(name, Number(m[1]), slot);
-  });
-}
-
-/* ------------------------------------------------------------------ view */
-
-
-/* Which anchor we are plausibly in, so the suggestion fits the hour. */
-function nowSlot(){
-  var m = new Date().getHours() * 60 + new Date().getMinutes();
-  if (m < 12 * 60) return "morning";
-  if (m < 16 * 60) return "midday";
-  return "dinner";
-}
-
-/* Tapping an anchor offers what fits that slot, plus a way out. */
-function askAnchor(slot){
-  var pool = ORDERS.filter(function(o){ return o[2] === "any" || o[2] === slot; });
-  var a = ANCHORS.filter(function(x){ return x[0] === slot; })[0];
-  ask({
-    title: a ? a[1] : "Add food",
-    say: "Tap what you had. The number is protein, roughly.",
-    options: pool.map(function(o){
-      return { id: o[0], label: o[0], note: o[1] + "g" };
-    }).concat([{ id: "__other", label: "Something else", note: "Type it" }]),
-    cancel: "Cancel"
-  }).then(function(v){
-    if (v === null || v === "__no") return;
-    if (v === "__other"){ askFoodOther(slot); return; }
-    var o = ORDERS.filter(function(x){ return x[0] === v; })[0];
-    if (o) logFood(o[0], o[1], slot);
-  });
-}
-
-
 /* ------------------------------------------------------------- progress
    Is it working. Sessions a week for the last eight weeks, the best lift on
    the two movements that matter most to what he asked for, and the waist -
@@ -904,6 +993,8 @@ function gymProgressHTML(){
     bits.push("waist " + (Math.abs(wd) >= 1 ? (wd > 0 ? "+" : "\u2212") + Math.abs(wd).toFixed(1) + "cm"
       : (w0 && w0 !== w1 ? "steady" : w1[1] + "cm")));
   }
+  var wlk = walksIn(56);
+  if (wlk) inner += "<p class='fine'>" + wlk + (wlk === 1 ? " walk" : " walks") + " logged in the last eight weeks.</p>";
   inner += "<p class='fine'>Three a week is the line."
     + (bits.length ? " Best so far: " + bits.join(" · ") + "." : "") + "</p>";
   if (finMinutes() > 0){
@@ -969,7 +1060,7 @@ function paintSession(){
   var list = sessionList(), n = list.length;
   var h = "<div class='ss'>";
   h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
-    + "<span class='ssk'>Session " + SESSION.key + "</span>"
+    + "<span class='ssk'>" + (SESSION.key === "T" ? "Travel session" : "Session " + SESSION.key) + "</span>"
     + "<span class='ssp'>" + (SESSION.warm ? Math.min(SESSION.i + 1, n) + " of " + n : "warm-up") + "</span></div>";
 
   if (!SESSION.warm){
@@ -990,7 +1081,7 @@ function paintSession(){
 
   if (SESSION.i >= n){
     var finDone = (S.lifts || {})[SESSION.day] && S.lifts[SESSION.day].fin;
-    if (finMinutes() > 0 && !SESSION.fin && !finDone){ paintFinisher(el); return; }
+    if (finMinutes() > 0 && !SESSION.fin && !finDone && SESSION.key !== "T"){ paintFinisher(el); return; }
     paintSummary(el); return;
   }
 
@@ -1020,8 +1111,8 @@ function paintSession(){
   if (!doneAll){
     h += "<label class='sslab'>Set " + (setNo + 1) + " &middot; " + (t.w ? "" : "pick a weight, ") + "how many did you do</label>";
     h += "<div class='lf'>"
-      + liftRow("Load", w, "kg", "sw", 0)
-      + liftRow("Reps", reps, "", "sr", 0)
+      + (BODYWEIGHT[name] ? "" : liftRow("Load", w, "kg", "sw", 0))
+      + liftRow(BODYWEIGHT[name] && ex[2] >= 25 ? "Seconds" : "Reps", reps, "", "sr", 0)
       + "</div>";
     var rl = restLeft();
     h += "<div id='ssRest' class='ssrest" + (rl > 0 ? " going" : "") + "'"
@@ -1068,15 +1159,16 @@ function paintFinisher(el){
 function paintSummary(el){
   var list = sessionList(), h = "<div class='ss'>";
   h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
-    + "<span class='ssk'>Session " + SESSION.key + "</span><span class='ssp'>done</span></div>";
+    + "<span class='ssk'>" + (SESSION.key === "T" ? "Travel session" : "Session " + SESSION.key)
+    + "</span><span class='ssp'>done</span></div>";
   h += "<div class='sshero'><div class='ssk2'>That is the session</div><h2>Turned up. Lifted. Logged.</h2></div>";
   h += "<div class='recs'>";
   list.forEach(function(ex, i){
     var name = pickFor(SESSION.key, i), had = sessionLogged(name);
     h += "<div class='rec'><span class='rd'>" + (i + 1) + "</span><span class='rt'>" + esc(name) + "</span>"
-      + "<b class='rv'>" + (had ? had.w + "kg \u00b7 " + had.r.join(",") : "skipped") + "</b></div>";
+      + "<b class='rv'>" + (had ? kgOr(had.w) + " \u00b7 " + had.r.join(",") : "skipped") + "</b></div>";
   });
-  if (finMinutes() > 0){
+  if (finMinutes() > 0 && SESSION.key !== "T"){
     var fe = (S.lifts || {})[SESSION.day], fin = fe && fe.fin ? fe.fin : null;
     h += "<div class='rec'><span class='rd'>+</span><span class='rt'>Finisher</span>"
       + "<b class='rv'>" + (fin ? esc(finLabel(fin.on)) + " \u00b7 " + fin.min + " min" : "skipped") + "</b></div>";

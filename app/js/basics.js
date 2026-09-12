@@ -107,9 +107,16 @@ function tapOut(){
    Five basics as one score, with sleep and getting out tappable where they
    are shown. This is a read on the whole day, so Today is where it belongs -
    it is the only screen whose subject is the day rather than one part of it. */
-function conditionHTML(){
+/* The header line when the five chips live inside a fold. */
+function conditionMeta(){
+  var t = today(), met = vitalsMet(t), clear = clearDays();
+  return met + " of " + VITALS.length
+    + (sleepOn(t) ? "" : " \u00b7 sleep?")
+    + (clear ? " \u00b7 " + clear + " clear" : "");
+}
+function conditionHTML(bare){
   var t = today(), met = vitalsMet(t), clear = clearDays(), h = "";
-  h += "<div class='rulehead'><h3>Today\u2019s basics</h3><span></span><em>" + met + " of " + VITALS.length
+  if (!bare) h += "<div class='rulehead'><h3>Today\u2019s basics</h3><span></span><em>" + met + " of " + VITALS.length
     + (clear ? " \u00b7 " + clear + " clear" : "") + "</em></div>";
   /* The five chips are the whole report. A summary card above them said the
      same number twice, in a bigger box; it is gone. */

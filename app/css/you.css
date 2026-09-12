@@ -38,13 +38,14 @@
 .rec .rv{font-family:"JetBrains Mono",monospace; font-variant-numeric:tabular-nums;
   font-size:14px; color:var(--ink)}
 
+/* the switches: one framed list, so the thing he came for is a labelled
    row on the screen instead of the last thing under forty rows of history. */
 .menu{display:grid; gap:1px; margin:14px 0; border-radius:var(--r2); overflow:hidden;
   border:1px solid var(--line); background:var(--line)}
 .mi{display:grid; grid-template-columns:38px 1fr 18px; align-items:center; gap:13px; width:100%;
   padding:14px 15px; border:0; background:var(--panel); color:var(--ink); font:inherit;
   text-align:left; cursor:pointer}
-.mi:active{background:var(--tap)}
+.mi:active{background:var(--sunk)}
 .mic{display:grid; place-items:center; width:38px; height:38px; border-radius:12px;
   background:var(--sunk); color:var(--ink2)}
 .menu:first-of-type .mi:first-child .mic{background:color-mix(in srgb,var(--gold) 17%,transparent); color:var(--gold)}

@@ -21,7 +21,8 @@ function load(){
             crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0,
             season:1, vault:{}, setsEver:0, liftPick:{}, work:{},
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
-            monthSeen:{}, pushOn:0, look:"sky", badge:1,
+            monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1,
+            where:{}, walks:{}, levelSeen:0, gymHere:null,
             lifts:{}, food:{}, waist:[], kg:0,
             water:{}, sleep:{}, out:{},
             hand:{ do:[], in:[] }, doneDo:{}, kept:{}, dealtDo:{}, dealtIn:{},
@@ -37,7 +38,7 @@ function load(){
   return d;
 }
 function save(){
-  FD = null;
+  FD = null; XPC = null;
   if (typeof TIERS !== "undefined") TIERS = null;
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
   mirrorState();
@@ -56,8 +57,11 @@ function mirrorState(){
     var briefs = {};
     briefs[t] = briefFor(t);
     briefs[tm] = briefFor(tm);
+    var sit = situation(), r = rank();
     var body = { day: t, open: open, run: dayRun(), best: bestRunEver(),
                  chip: chipNext(), week: weekScore(), briefs: briefs,
+                 where: sit.home ? null : { c: sit.city, k: sit.kind },
+                 level: { n: r.level, name: r.name, away: daysToNext(r) },
                  badgeOn: S.badge ? 1 : 0 };
     caches.open("daylight-state").then(function(c){
       return c.put("state", new Response(JSON.stringify(body),
@@ -96,24 +100,218 @@ function isWeekend(k){
 function t2m(s){ var p = s.split(":"); return Number(p[0])*60 + Number(p[1]); }
 function hhmm(m){ m = ((m % 1440) + 1440) % 1440;
   return String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0"); }
+/* ------------------------------------------------------------ the clock
+   Where he is standing, read off the phone with no permission: the IANA zone
+   names the place, the offset lands the shift, and both already follow the
+   clocks changing wherever he is. The manual camp is the fallback for a
+   phone left on Singapore time. */
+function deviceZone(){
+  try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch(e){ return ""; }
+}
+function deviceOffset(){ return -new Date().getTimezoneOffset(); }
+function zoneCity(z){
+  if (ZONES[z]) return ZONES[z][0];
+  var tail = String(z || "").split("/").pop().replace(/_/g, " ");
+  return tail || "somewhere new";
+}
 function offset(){
+  if (S.autoZone !== 0 && deviceZone()) return deviceOffset();
   for (var i=0;i<CAMPS.length;i++) if (CAMPS[i][0] === S.camp) return CAMPS[i][1];
   return 480;
+}
+/* --------------------------------------------------------- where he is
+   One record a day: the city the phone's clock says he woke up in, and what
+   a day there usually is. Written on the first open of each day and never
+   rewritten, so a flight keeps the city it started in and the past cannot
+   change under him.
+
+   The kind is a first guess only - Sofia reads as a work trip, Bali as a
+   holiday - and one tap on Today corrects it for the whole stay. Nothing is
+   ever ticked or untucked on his behalf; the only thing a holiday changes is
+   that Stopped is carried, exactly as it is at the weekend. */
+function whereOn(k){ return (S.where || {})[k] || null; }
+function whereKeys(){ return Object.keys(S.where || {}).sort(); }
+function campKind(name){
+  if (name === "Singapore") return "home";
+  if (/Sheffield|UK/.test(name || "")) return "family";
+  if (name === "Valletta") return "hq";
+  return "work";
+}
+function guessKind(z, k){
+  if (ZONES[z]) return ZONES[z][1];
+  return isWeekend(k) ? "holiday" : "work";       /* an unlisted zone: a weekday is work */
+}
+function noteWhere(){
+  var k = today();
+  if (whereOn(k)) return whereOn(k);              /* first write of a day wins */
+  var z = S.autoZone === 0 ? "" : deviceZone();
+  var rec = z
+    ? { c: zoneCity(z), z: z, k: guessKind(z, k) }
+    : { c: String(S.camp || "Singapore").replace(" / UK", ""), z: "", k: campKind(S.camp) };
+  /* a stay he has already corrected keeps its correction */
+  var y = whereOn(shift(-1));
+  if (y && y.z === rec.z && y.f){ rec.k = y.k; rec.f = 1; }
+  S.where = S.where || {};
+  S.where[k] = rec;
+  save();
+  return rec;
+}
+/* How many days this stay has run, counting back while the city holds. */
+function tripDay(k, rec){
+  if (!rec || rec.k === "home") return 0;
+  var n = 0, d = k;
+  for (var i = 0; i < 90; i++){
+    var r = whereOn(d);
+    if (!r || r.c !== rec.c) break;
+    n++;
+    d = shiftFrom(d, -1);
+  }
+  return Math.max(1, n);
+}
+function shiftFrom(k, n){
+  var d = new Date(k + "T00:00:00"); d.setDate(d.getDate() + n); return iso(d);
+}
+function kindWord(kind){
+  return kind === "holiday" ? "holiday" : kind === "work" ? "work trip"
+       : kind === "hq" ? "head office" : kind === "family" ? "home leave" : "home";
+}
+function situation(k){
+  k = k || today();
+  var rec = whereOn(k);
+  if (!rec && k === today()){
+    var z = S.autoZone === 0 ? "" : deviceZone();
+    rec = z ? { c: zoneCity(z), z: z, k: guessKind(z, k) }
+            : { c: String(S.camp || "Singapore").replace(" / UK", ""), z: "", k: campKind(S.camp) };
+  }
+  if (!rec) rec = { c: "Singapore", z: "Asia/Singapore", k: "home" };
+  var city = rec.c, pin = pinToday();
+  /* Sheffield and London are one time zone; only a pin can tell them apart */
+  if (rec.k === "family" && pin && pin.l) city = pin.l;
+  return { zone: rec.z, city: city, kind: rec.k, set: !!rec.f,
+           home: rec.k === "home", away: rec.k !== "home",
+           word: kindWord(rec.k), day: tripDay(k, rec) };
+}
+/* His correction, applied backwards over the whole stay so one tap covers it. */
+function flipWhere(){
+  var k = today(), rec = whereOn(k);
+  if (!rec || rec.k === "home") return null;
+  var to = rec.k === "holiday" ? "work" : "holiday";
+  var d = k;
+  for (var i = 0; i < 90; i++){
+    var r = whereOn(d);
+    if (!r || r.c !== rec.c) break;
+    r.k = to; r.f = 1;
+    d = shiftFrom(d, -1);
+  }
+  save();
+  return to;
+}
+function holidayOn(k){ var r = whereOn(k); return !!(r && r.k === "holiday"); }
+/* A day whose city is not the one before it: he was in the air. It carries
+   the run the way a freeze does, and costs him nothing - a routine that
+   survives travel is the whole point. */
+function flying(k){
+  var rec = whereOn(k);
+  if (!rec) return false;
+  var ks = whereKeys(), i = ks.indexOf(k);
+  if (i <= 0) return false;
+  return (S.where[ks[i - 1]] || {}).z !== rec.z;
+}
+function carried(k){ return frozen(k) || flying(k); }
+
+/* ------------------------------------------------------------- Sheffield
+   The one clock that is not his and not Malta's. Computed, never typed:
+   the app used to say "About 07:00 in Sheffield right now" at any hour, from
+   any city. */
+function ukOffset(when){ return euSummer(when || new Date()) ? 60 : 0; }
+function sheffieldMin(){
+  var n = new Date();
+  var utc = n.getUTCHours() * 60 + n.getUTCMinutes();
+  return ((utc + ukOffset(n)) % 1440 + 1440) % 1440;
+}
+function sheffieldAwake(){ var m = sheffieldMin(); return m >= 7 * 60 && m < 21 * 60 + 30; }
+function familyLine(){
+  var sit = situation();
+  if (sit.kind === "family") return "You are there. Sitting with someone is the call.";
+  var m = sheffieldMin(), t = hhmm(m);
+  if (m < 7 * 60 || m >= 22 * 60)
+    return t + " in Sheffield \u2014 asleep. The window opens in " + dur((7 * 60 - m + 1440) % 1440) + ".";
+  if (m < 9 * 60) return t + " in Sheffield \u2014 kettle-on hour.";
+  if (m < 12 * 60) return "Mid-morning in Sheffield, " + t + ". A good window.";
+  if (m < 17 * 60) return "Afternoon in Sheffield, " + t + ". They are about.";
+  return "Evening in Sheffield, " + t + " \u2014 the best window of the day.";
+}
+function stopLine(){
+  var sh = shape();
+  if (sh.noShift) return "No shift today \u2014 carried.";
+  if (sh.now >= sh.end) return "Malta closed at " + sh.endT + ". Shut the laptop and take the point.";
+  if (sh.working) return "Malta until " + sh.endT + " \u00b7 " + dur(sh.end - sh.now) + " to go.";
+  return "Malta runs " + sh.startT + "\u2013" + sh.endT + " here. Stopping on time is the whole skill.";
+}
+
+/* -------------------------------------------------------------- the pin
+   One location read, on a tap, never at launch: iOS re-asks home-screen apps
+   every time, so this is a button and not a background habit. It is kept
+   OUTSIDE the save - exportSave and the coach file carry everything in S, and
+   a coordinate has no business in either. Two decimals is about a kilometre:
+   enough to centre a map search, not enough to name a street. */
+var PIN_KEY = "daylight.pin";
+function pinToday(){
+  try {
+    var raw = localStorage.getItem(PIN_KEY);
+    if (!raw) return null;
+    var p = JSON.parse(raw);
+    return p && p.d === today() ? p : null;
+  } catch(e){ return null; }
+}
+function pinSave(la, lo){
+  var label = null;
+  if (kmBetween([la, lo], HOMES.Sheffield) <= 40) label = "Sheffield";
+  else if (kmBetween([la, lo], HOMES.Singapore) <= 40) label = "Singapore";
+  var p = { d: today(), la: la, lo: lo, l: label };
+  try { localStorage.setItem(PIN_KEY, JSON.stringify(p)); } catch(e){}
+  return p;
+}
+/* The maps link for a search, centred on the pin when there is a fresh one. */
+function nearHref(key){
+  var p = pinToday();
+  return mapsURL(NEAR[key] || key, p ? [p.la, p.lo] : null,
+    typeof isiOS === "function" ? isiOS() : false);
+}
+
+/* Great-circle km between two [lat, lng] pairs. */
+function kmBetween(a, b){
+  var R = 6371, dLat = (b[0] - a[0]) * Math.PI / 180, dLon = (b[1] - a[1]) * Math.PI / 180;
+  var s = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+        + Math.cos(a[0] * Math.PI / 180) * Math.cos(b[0] * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+}
+/* A search handed to the phone's own maps app - Apple on an iPhone, Google
+   elsewhere. Nothing is fetched; the URL is opened and the app steps back. */
+function mapsURL(q, pt, ios){
+  var query = encodeURIComponent(q);
+  if (ios) return "https://maps.apple.com/?q=" + query + (pt ? "&sll=" + pt[0].toFixed(2) + "," + pt[1].toFixed(2) : "");
+  return "https://www.google.com/maps/search/?api=1&query=" + query
+    + (pt ? "&center=" + pt[0].toFixed(2) + "," + pt[1].toFixed(2) : "");
 }
 function shape(){
   var off = offset(), wake = t2m(S.wake);
   var w = workUTC(new Date());
   var start = w[0] + off, end = w[1] + off;
   var n = new Date(), nowLocal = n.getHours()*60 + n.getMinutes();
+  var wknd = isWeekend(today()), hol = holidayOn(today());
   return {
     start:start, end:end, wake:wake, now:nowLocal,
     startT:hhmm(start), endT:hhmm(end),
     morning:Math.max(0, start - wake),
     evening:Math.max(0, 1380 - end),
     untilWork:start - nowLocal,
-    working: nowLocal >= start && nowLocal < end,
+    working: nowLocal >= start && nowLocal < end && !wknd && !hol,
     late: end >= 1440,
-    weekend: isWeekend(today())
+    weekend: wknd,
+    /* a holiday has no shift to finish, exactly like a Saturday */
+    holiday: hol,
+    noShift: wknd || hol
   };
 }
 function dur(m){
@@ -131,7 +329,10 @@ function dur(m){
    rather than counted as a failure. It only ever adds days; nothing he has
    already earned can go down. */
 function required(key, k){
-  if (key === "stop" && isWeekend(k)) return false;
+  /* A holiday is a weekend that lasts longer: there is no Malta shift to
+     finish, so Stopped is carried rather than owed. This only ever turns an
+     owed day into a met one, so nothing he has already earned can go down. */
+  if (key === "stop" && (isWeekend(k) || holidayOn(k))) return false;
   return true;
 }
 function pDone(k, key){
@@ -209,7 +410,7 @@ function bestRunEver(){
   while (d <= end){
     var k = iso(d);
     if (allThree(k)){ run++; if (run > best) best = run; }
-    else if (!frozen(k)) run = 0;
+    else if (!carried(k)) run = 0;
     d.setDate(d.getDate() + 1);
   }
   return best;
@@ -243,13 +444,18 @@ function backfillChips(){
    What the hour points at. The shift is the spine: train before Malta
    wakes, family in the Sheffield-friendly window, stop when it closes. */
 function nextUp(){
-  var t = today(), sh = shape(), h = new Date().getHours(), dw = new Date().getDay();
+  var t = today(), sh = shape(), dw = new Date().getDay();
   var open = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); })
                     .map(function(g){ return g[0]; });
   if (!open.length) return null;
-  if (open.indexOf("stop") >= 0 && !sh.weekend && sh.now >= sh.end) return "stop";
-  if (open.indexOf("family") >= 0 && (dw === 3 || (h >= 13 && h < 19))) return "family";
-  if (open.indexOf("train") >= 0 && (sh.weekend || sh.now < sh.start)) return "train";
+  var wake = sheffieldAwake();
+  if (open.indexOf("stop") >= 0 && !sh.noShift && sh.now >= sh.end) return "stop";
+  /* Mum's day, but only once there is somebody awake to answer. The old rule
+     fired at any hour on a Wednesday, which in Singapore meant being told to
+     ring Sheffield at two in the morning. */
+  if (open.indexOf("family") >= 0 && dw === 3 && wake) return "family";
+  if (open.indexOf("train") >= 0 && (sh.noShift || sh.now < sh.start)) return "train";
+  if (open.indexOf("family") >= 0 && wake) return "family";
   return open[0];
 }
 function tipFor(key, day){
@@ -258,6 +464,62 @@ function tipFor(key, day){
   var k = (day || today()) + key, h = 0;
   for (var j = 0; j < k.length; j++) h = (h * 33 + k.charCodeAt(j)) >>> 0;
   return pool[h % pool.length];
+}
+
+/* ------------------------------------------------------- the one instruction
+   His words: "when I go to the today page, I want to know what my top
+   priorities are without being overwhelmed by information." So the sky card
+   stops counting and starts instructing: one line saying what to do, one
+   saying when - or, on the last thing left, what is at stake.
+
+   Every screen and both pushes read this same function, so the app can never
+   tell him two different things about the same day. */
+function priority(){
+  var t = today(), sit = situation();
+  var w = packsWaiting(), packs = w.day + w.streak;
+  if (packs) return { ask: packs === 1 ? "That is a pack." : packs + " packs waiting.",
+                      sub: "Earned, not given. Open it below." };
+  var rc = recordChase(), r = rank(), dn = daysToNext(r);
+  if (allThree(t)){
+    var tb = briefFor(shift(1));
+    var sub = rc && rc.at ? "Record pace \u2014 " + rc.run + " days. Back tomorrow."
+            : dn && dn <= 3 ? "Level " + (r.level + 1) + " in " + dn + (dn === 1 ? " full day." : " full days.")
+            : "Tomorrow \u00b7 " + (tb.gym || tb.first);
+    return { ask: "Today is in.", sub: sub };
+  }
+  if (S.onboarded && isComebackDay(t))
+    return { ask: "Back.", sub: "That was the hard part. Today pays double." };
+
+  var owed = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
+  var up = nextUp();
+  /* the stake outranks the plan on the last thing left */
+  var stake = null;
+  if (owed === 1 && rc) stake = rc.at ? "One more \u2014 tonight beats your record of " + rc.best + "."
+                                      : "One more \u2014 " + rc.away + " from your record of " + rc.best + ".";
+  else if (owed === 1 && dn === 1) stake = "One more \u2014 tonight is a level.";
+  if (!up) return { ask: owed === 3 ? "Three things make a day."
+                       : "Two things make a " + DAY_NAMES[new Date().getDay()] + ".",
+                    sub: stake || "Tick what you have done." };
+  if (up === "train"){
+    var ga = typeof gymAsk === "function" ? gymAsk() : null;
+    return { ask: ga ? ga.ask : "Train.",
+             sub: stake || (ga ? ga.sub : "Gym, a run, or a long walk."),
+             cta: ga && ga.cta ? ga.cta : null };
+  }
+  if (up === "family") return { ask: "Call home.", sub: stake || familyLine() };
+  var sh = shape();
+  return { ask: sh.now >= sh.end && !sh.noShift ? "Stop. Malta closed at " + sh.endT + "."
+                                                : "Stop when Malta does.",
+           sub: stake || stopLine() };
+}
+/* What the row the hour points at says inside the row itself. */
+function planLine(key){
+  if (key === "train"){
+    var ga = typeof gymAsk === "function" ? gymAsk() : null;
+    return ga && ga.row ? ga.row : tipFor("train");
+  }
+  if (key === "family") return familyLine();
+  return stopLine();
 }
 
 /* ------------------------------------------------------------ the brief
@@ -270,13 +532,18 @@ function briefFor(k){
   var d = new Date(k + "T00:00:00"), dow = d.getDay(), t = today();
   var wkend = dow === 0 || dow === 6;
   var w = workUTC(d), start = hhmm(w[0] + offset());
+  var sit = situation(k > t ? t : k);        /* tomorrow is described from where he is tonight */
+  var hol = holidayOn(k) || (k > t && sit.kind === "holiday");
   var head = DAY_NAMES[dow]
-    + (dow === 3 ? " · Mum’s day" : wkend ? " · no shift" : "");
-  var first = dow === 0
+    + (sit.home ? "" : " · " + sit.city)
+    + (dow === 3 ? " · Mum’s day" : (wkend || hol) ? " · no shift" : "");
+  var first = hol
+    ? "Two things make a holiday: move, and call home."
+    : dow === 0
     ? "Two things make a Sunday. Train early, call home. Tape at the navel first, before you eat."
     : wkend
     ? "Two things make a " + DAY_NAMES[dow] + ". Train early, call home."
-    : "Train before Malta wakes at " + start + ".";
+    : "Train before Malta wakes at " + start + (sit.home ? "." : ", which is " + start + " where you are.");
   /* the gym only knows sessions once gym.js is loaded; the brief degrades */
   var gym = null;
   if (typeof stageLifts === "function" && typeof nextSessionKey === "function"){
@@ -289,8 +556,11 @@ function briefFor(k){
         key = SESSIONS[(at + 1) % SESSIONS.length][0];
       } else key = nextSessionKey();
     }
-    var n = stageLifts(key).length;
-    gym = "Session " + key + ", " + n + (n === 1 ? " move" : " moves");
+    if (typeof gymWords === "function") gym = gymWords(k, key);
+    if (!gym){
+      var n = stageLifts(key).length;
+      gym = "Session " + key + ", " + n + (n === 1 ? " move" : " moves");
+    }
   }
   var card = null;
   var hd = typeof handDo === "function" ? handDo() : [];
@@ -351,7 +621,7 @@ function gapBefore(k, first){
     d.setDate(d.getDate() - 1);
     var j = iso(d);
     if (!first || j < first) break;
-    if (allThree(j) || frozen(j)) break;
+    if (allThree(j) || carried(j)) break;
     n++;
   }
   return n;
@@ -400,7 +670,7 @@ function monthLedger(ym){
     back.setDate(back.getDate() - 1);
     var bk = iso(back);
     if (allThree(bk)) run++;
-    else if (!frozen(bk)) break;
+    else if (!carried(bk)) break;
   }
   var full = 0, possible = 0, best = run, frozenUsed = 0;
   var missPW = { train:[0,0,0,0,0,0,0], family:[0,0,0,0,0,0,0], stop:[0,0,0,0,0,0,0] };
@@ -413,7 +683,7 @@ function monthLedger(ym){
     if (k === t && !allThree(k)) break;
     possible++;
     if (allThree(k)){ full++; run++; if (run > best) best = run; }
-    else if (frozen(k)){ frozenUsed++; }
+    else if (carried(k)){ if (frozen(k)) frozenUsed++; }   /* a flight is not a miss either */
     else {
       run = 0;
       var dw = new Date(k + "T00:00:00").getDay();
@@ -526,7 +796,7 @@ function backupOverdue(){
 function dayRun(){
   var n = 0, d = new Date(), k = iso(d);
   if (!allThree(k)){ d.setDate(d.getDate() - 1); k = iso(d); }
-  while (allThree(k) || frozen(k)){
+  while (allThree(k) || carried(k)){
     if (allThree(k)) n++;
     d.setDate(d.getDate() - 1); k = iso(d);
   }
@@ -552,6 +822,7 @@ function freezesLeft(month){
 }
 function canFreeze(k){
   if (k > today() || allThree(k)) return false;
+  if (flying(k)) return false;            /* a travel day already carries */
   return frozen(k) || freezesLeft(monthOf(k)) > 0;
 }
 
@@ -567,7 +838,7 @@ function streak(key){
     if (pDone(k, key)){ n++; continue; }
     if (!required(key, k)) continue;        /* no shift to finish, so nothing owed */
     if (k === today()) continue;            /* today is not a miss until it is over */
-    if (frozen(k)) continue;                /* spent deliberately, on this date */
+    if (carried(k)) continue;               /* frozen on purpose, or a day in the air */
     break;
   }
   return n;
@@ -880,7 +1151,69 @@ function setsCompleteEver(){
 }
 function season(){ return Math.max(1, Number(S.season) || 1); }
 
+/* --------------------------------------------------- levelling by turning up
+   Everything here is a count of days already in the record, so it can only
+   rise as days are added, and the same record can never be worth less than it
+   was on the build before. The crest finally moves for the thing he is
+   actually training. */
+function mondayOf(k){
+  var d = new Date(k + "T00:00:00"), back = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - back);
+  return iso(d);
+}
+function weekFullMap(){
+  var m = {};
+  Object.keys(S.days || {}).forEach(function(k){
+    if (allThree(k)){ var w = mondayOf(k); m[w] = (m[w] || 0) + 1; }
+  });
+  return m;
+}
+function goodWeeks(){
+  var m = weekFullMap(), n = 0;
+  for (var w in m) if (m[w] >= GOOD_WEEK) n++;
+  return n;
+}
+function perfectWeeks(){
+  var m = weekFullMap(), n = 0;
+  for (var w in m) if (m[w] >= 7) n++;
+  return n;
+}
+function monthFull(ym){
+  return Object.keys(S.days || {}).filter(function(k){
+    return k.slice(0, 7) === ym && allThree(k);
+  }).length;
+}
+function solidMonths(){
+  return monthsWithData().filter(function(ym){ return monthFull(ym) >= SOLID_MONTH; }).length;
+}
+function chipXP(){
+  var n = 0;
+  chipsEarned().forEach(function(c){ n += STEADY.chips[CHIPS.indexOf(c)] || 0; });
+  return n;
+}
+function steadyXP(){
+  return fullDays() * STEADY.day
+       + comebackDays() * STEADY.comeback
+       + goodWeeks() * STEADY.goodWeek
+       + perfectWeeks() * STEADY.perfectWeek
+       + solidMonths() * STEADY.month
+       + chipXP();
+}
+/* How many full days to the next rank, at the value of a day that carries no
+   week or month bonus with it. A floor, so the line is a promise. */
+function daysToNext(r){
+  r = r || rank();
+  if (!r.to) return null;
+  return Math.max(1, Math.ceil((r.to - r.xp) / XP_PER_FULL_DAY));
+}
+function levelDue(){
+  var r = rank();
+  return r.level > (Number(S.levelSeen) || 0) ? r : null;
+}
+
+var XPC = null;
 function xp(){
+  if (XPC !== null) return XPC;
   var n = 0;
   /* A card is worth its full value the first time it is collected and a
      quarter of it in every season after, so the ladder keeps climbing without
@@ -898,6 +1231,8 @@ function xp(){
   n += doneDoCount() * 20;
   n += keptCount() * 5;
   n += comebackDays() * 15;          /* the first day back counts twice */
+  n += steadyXP();                   /* v39: the day itself, the week, the month, the chips */
+  XPC = n;
   return n;
 }
 

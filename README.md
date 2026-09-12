@@ -341,6 +341,88 @@ reduced motion). The browser chrome follows too: `theme-color` is re-set to
 the sky's own base colour every minute, so even Safari's frame is part of the
 scene.
 
+#### v39: it knows where he is standing
+
+> *"Optimise and enhance the design and the usability. Make the app feel intelligent and easy to use.
+> When I go to the gym app, I want to know exactly what to train. When I go to the food app I want to
+> know exactly what to eat and when. When I go to the today page, I want to know what my top
+> priorities are without being overwhelmed by information. And I want to feel like I'm levelling up
+> just by being consistent because being consistent is the most important thing. I want the app to
+> know my location and suggest things around me. If I'm not in Singapore or Sheffield then I'm
+> clearly on a work trip or on holiday. The app needs to react to my situation."*
+
+Six sentences, one release. The spine of it is that the app stops assuming he is in Singapore.
+
+**The phone's clock says where he is.** `Intl.DateTimeFormat().resolvedOptions().timeZone` names the
+city and `getTimezoneOffset()` lands Malta's 10:00–17:00 on the local clock, daylight saving
+included, with no permission asked and no prompt on arrival. A table of about seventy zones turns
+`Europe/Sofia` into "Sofia · work trip" and `Asia/Makassar` into "Bali · holiday"; a zone it does not
+know still gets its own name out of the string. One record a day — `S.where[iso] = {c, z, k}`,
+written on the first open and never rewritten, so a flight keeps the city it started in and the past
+cannot change under him. The old camp picker stays as the manual override for a phone left on
+Singapore time.
+
+**A holiday is a weekend that lasts longer.** Stopped is carried rather than owed, exactly as it is
+on a Saturday — there is no Malta shift to finish. The guess is his to correct: one button on Today
+flips the whole stay between work trip and holiday, and a corrected stay stays corrected. Because
+the rule only ever turns an owed day into a met one, no streak, chip, pack or pot line can go down.
+**A day in the air carries the run** the way a freeze does, and costs no freeze: the zone changed
+between two recorded days, so he was travelling, and the week strip shows a plane rather than a
+hollow miss. *A routine that survives travel is the whole point* — that sentence is from
+`docs/plan.html` and it took until v39 to be true in the code.
+
+**Today stops counting and starts instructing.** One function, `priority()`, decides the sky card's
+line, and the Gym hero, the pillar row, the brief and both pushes all read it, so the app can never
+say two things about one day. The card now reads *"Train. Session C, 30 min."* with *"3 moves ·
+before Malta wakes at 16:00 · 5h 40m of yours"* under it and a pill that opens the session — or
+*"Call home."* over a computed Sheffield clock, or *"Stop. Malta closed at 23:00."* On the last thing
+left, the stake replaces the plan. The five basics and the week's three challenges became one-line
+folds carrying their own score, and the paragraph that repeated the tip a second time is gone: **nine
+blocks at open became seven** (eight away, where one fold explains the day here).
+
+**Gym answers the question.** `gymPlan()` gives one of five answers — the session, a rest day the
+morning after he lifted, a walk day once three are in since Monday, the travel session when he is
+away, or the moves already logged — and the hero says which, with the number of moves and roughly
+how many minutes. None of them is a refusal: the session is always one quiet tap underneath. **A
+walk is Trained**, which has always been true and was never sayable; the button asks 20, 40 or 60
+minutes and marks the pillar. **Session T** is the hotel-room programme that `docs/train.html`
+promised from the start: six bodyweight moves, the dial reading *body* instead of a number, reps and
+then a harder variation as the progression, and it sits outside the A–B–C rotation so a fortnight
+away leaves the programme where he left it.
+
+**Food answers the other one.** The three meal times were typed into a table — `~09:00`, `~14:00`,
+"Grab" — which was wrong for half the year in Singapore and wrong every day of a trip. They are
+computed now, from his wake time and where Malta's hours land: 09:15 / 15:00 / 20:00 in Singapore in
+summer, 09:15 / 16:00 / 20:00 after the clocks change, 09:15 / 13:30 / 18:00 in Sheffield, 09:15 /
+14:00 / 18:30 in Sofia. The third one lands **inside** the shift, because a delivery at 23:30 is the
+diagnosis that tab was written about. The suggestion aims at one meal rather than the whole day's
+gap, so it stops proposing a chicken rice to close 129g. And the menu follows him: twelve hawker
+dishes at home, twelve British ones in Sheffield, twelve any-menu ones on the road.
+
+**Levelling by turning up.** A full day paid 15 XP and the three cards it dropped paid about sixty,
+so his sentence was false in the code: the crest was a card counter. It now pays **75 a day**, double
+on the first day back, 100 for a week with five full days, 50 more for all seven, 250 for twenty in a
+month, and 100 to 1,500 for a chip the day it is minted. Every term is a count derived from the
+record, so the same save can only ever be worth more than it was — a record of thirty full days goes
+from 450 XP to 3,250. The jump on first open is **silent** (`S.levelSeen` is stamped without applause,
+the rule `backfillChips` already follows), and from then on a level takes the screen in the chip's own
+grammar and names the reason: *"25 full days and 3 good weeks did that. Level 6 in 5 full days."*
+Ceremonies queue rather than collide — a chip first, then the level, then the daily confetti.
+
+**Around him, without a tracker.** No background location, ever. A tap in the "Where you are" sheet
+reads the phone's position once, keeps two decimals (about a kilometre) and a city label **outside the
+save**, so no backup and no coach file can carry a coordinate, and it is forgotten tomorrow. The
+Around-you buttons hand a search to Apple Maps on an iPhone and Google Maps elsewhere: a gym in
+Sofia, protein near you, a supermarket in Sheffield. Nothing is fetched and nothing leaves the phone.
+
+Also in this round: the family tip stopped claiming it was 07:00 in Sheffield at any hour from any
+city (it is computed, and the "Now" pointer no longer tells him to ring at two in the morning on a
+Wednesday); the shadowed copies of the food helpers were deleted from `gym.js`, which `food.js` had
+been silently overriding by load order; `.fine` finally has a rule, so twenty-five pieces of small
+print stopped rendering as body text; the modal sheet can scroll, so a ten-item order list is not
+clipped off the top of the screen; the toast is visible again under reduced motion; and a stray
+comment tail in `you.css` that was eating the settings-list frame is closed.
+
 #### v38: the belly, answered where he asked
 
 He sent a photo of his middle and asked how to deal with the belly fat and

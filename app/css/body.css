@@ -553,3 +553,13 @@ button.vc:not(.on) .vv{color:var(--goldEdge, #C98A08); font-family:"Nunito",sans
 .bellywhy{margin:8px 0 2px}
 /* specific enough to beat .btns.tight button.btn, so the tap target is 44px */
 .btns.tight.bellywhy button.btn{width:100%; text-transform:none; font-weight:800; font-size:13.5px; min-height:44px}
+
+/* ==================================================================== v39
+   The meal the clock is pointing at, on the Food tab. Same shape as a logged
+   anchor, in the colour of a thing to do rather than a thing done. */
+.an.next{border-color:#A6DFF7; background:var(--blueSoft)}
+.an.next .ak{color:var(--navOn); opacity:.9}
+.an.next .ad{color:var(--navOn); font-weight:800}
+/* The gym hero says a word on a rest day, where it says a number on a
+   lifting one; 44px is a count, a word needs to sit down a little. */
+.hero-n b.word{font-size:34px; letter-spacing:-.02em}
