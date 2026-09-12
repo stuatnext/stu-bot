@@ -76,10 +76,16 @@ body{
    crossed between them. Now the whole app is that column on every tab: the
    HUD on top, one scroller in the middle, the bar at the bottom. Nothing is
    fixed, so nothing can drift. */
-body{height:100dvh; overflow:hidden; display:flex; flex-direction:column}
-#screen{flex:1; min-height:0; overflow-y:auto; overflow-x:hidden;
+/* Pinned to the viewport by inset rather than sized by 100dvh: one source of
+   truth for the height, so the bar cannot end up short of the bottom edge. */
+body{position:fixed; inset:0; overflow:hidden; display:flex; flex-direction:column}
+/* The scroller is a plain block. It was a flex column on Today, which is what
+   broke scrolling outright: a flex child shrinks below its content by default,
+   so the box never grew past the viewport, scrollHeight never exceeded
+   clientHeight, and the page was clipped instead of scrollable. */
+#screen{flex:1 1 auto; min-height:0; display:block;
+  overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain; width:100%}
-body.scene #screen{display:flex; flex-direction:column}
 
 .mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums}
 .disp{font-family:"Nunito",sans-serif; font-weight:800}

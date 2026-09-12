@@ -6,7 +6,7 @@
    interactive element has a bottom edge that collapses under the thumb.
    ========================================================================== */
 
-body.scene #screen{justify-content:flex-start; gap:0}
+/* Today is a scroller like every other tab; nothing about it is a flex column. */
 
 /* the greeting */
 .hello{text-align:left; margin:4px 2px 8px}
