@@ -142,19 +142,56 @@ function guessKind(z, k){
   return isWeekend(k) ? "holiday" : "work";       /* an unlisted zone: a weekday is work */
 }
 function noteWhere(){
-  var k = today();
-  if (whereOn(k)) return whereOn(k);              /* first write of a day wins */
+  var k = today(), rec = whereOn(k);
   var z = S.autoZone === 0 ? "" : deviceZone();
-  var rec = z
+  if (rec){
+    /* The day used to be stamped on the first open and never looked at again,
+       so a flight home at noon left him standing in the country he took off
+       from until midnight. The phone's clock is the ground truth: if it has
+       moved since the stamp, and he has not set the place himself, the day
+       moves with it. */
+    if (z && !rec.m && rec.z !== z){
+      rec.c = zoneCity(z); rec.z = z; rec.k = guessKind(z, k);
+      delete rec.f;
+      var yz = whereOn(shift(-1));
+      if (yz && yz.z === z && yz.f){ rec.k = yz.k; rec.f = 1; }
+      save();
+    }
+    return rec;
+  }
+  var made = z
     ? { c: zoneCity(z), z: z, k: guessKind(z, k) }
     : { c: String(S.camp || "Singapore").replace(" / UK", ""), z: "", k: campKind(S.camp) };
   /* a stay he has already corrected keeps its correction */
   var y = whereOn(shift(-1));
-  if (y && y.z === rec.z && y.f){ rec.k = y.k; rec.f = 1; }
+  if (y && y.z === made.z && y.f){ made.k = y.k; made.f = 1; }
   S.where = S.where || {};
-  S.where[k] = rec;
+  S.where[k] = made;
   save();
-  return rec;
+  return made;
+}
+/* The zone we know a place by, so naming a city can set the clock with it. */
+function zoneFor(city){
+  for (var z in ZONES) if (ZONES[z][0] === city) return z;
+  return "";
+}
+/* His own answer, which beats the clock. Applied backwards over the stay the
+   way a work/holiday correction is, so one tap fixes the whole trip, and
+   marked so the next open does not quietly put it back. */
+function setWhere(city){
+  var k = today(), rec = whereOn(k) || {}, wasCity = rec.c;
+  var z = zoneFor(city);
+  var made = { c: city, z: z, k: campKind(city) === "home" ? "home" : (ZONES[z] ? ZONES[z][1] : "work"), m: 1 };
+  S.where = S.where || {};
+  var d = k;
+  for (var i = 0; i < 90; i++){
+    var r = whereOn(d);
+    if (i > 0 && (!r || r.c !== wasCity)) break;
+    S.where[d] = { c: made.c, z: made.z, k: made.k, m: 1 };
+    d = shiftFrom(d, -1);
+  }
+  save();
+  return made;
 }
 /* How many days this stay has run, counting back while the city holds. */
 function tripDay(k, rec){

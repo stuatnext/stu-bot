@@ -546,6 +546,36 @@ async function askCamp(){
   if (v === "__pin"){ pinMe(); return; }
   S.autoZone = 0; S.camp = v; save(); sfx("done"); render({ keepScroll: true });
 }
+/* "I am not there." The clock said one thing and he says another; his answer
+   wins, for today and back over the stay, and the clock is left switched on
+   for the next time it is right. */
+async function askWhere(){
+  var sit = situation();
+  var near = [];
+  if (sit.city !== "Singapore") near.push({ id: "Singapore", label: "Singapore", note: "home", pri: true });
+  ["Sheffield", "Malta"].forEach(function(c){
+    if (c !== sit.city) near.push({ id: c, label: c, note: c === "Malta" ? "the office" : "family" });
+  });
+  CAMPS.forEach(function(c){
+    var name = String(c[0]).replace(" / UK", "");
+    if (name !== sit.city && !near.filter(function(x){ return x.id === name; }).length){
+      near.push({ id: name, label: name, note: "" });
+    }
+  });
+  var v = await ask({
+    title: "Where are you really?",
+    say: "The phone’s clock says " + sit.city + ". If that is wrong, say so — it fixes "
+       + "this stay, not just today, and the clock keeps working for the next trip.",
+    options: near,
+    cancel: "Cancel"
+  });
+  if (!v || v === "__no") return;
+  setWhere(v);
+  sfx("done"); buzz(12);
+  toast(v === "Singapore" ? "Home. The record says so too." : "Set to " + v + ".");
+  render({ keepScroll: true });
+}
+
 /* One location read, on a tap, never at launch: an iPhone re-asks a
    home-screen app every time it is opened, so this is a button. Two decimals
    is about a kilometre - enough to centre a map search, not enough to name a

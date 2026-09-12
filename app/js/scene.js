@@ -392,6 +392,10 @@ function whereFoldHTML(sit){
     + ((sit.kind === "work" || sit.kind === "holiday")
         ? "<button class='btn quiet' data-flip='1'>Actually a "
           + (sit.kind === "work" ? "holiday" : "work trip") + "</button>" : "")
+    /* The clock can be wrong - a phone left on the old zone, a layover, a
+       flight home the app has not caught up with. This is the way to say so
+       without turning the clock off altogether. */
+    + "<button class='btn quiet' data-notthere='1'>Not in " + esc(sit.city) + "</button>"
     + "</div>";
   return fold("where:" + sit.city.toLowerCase().replace(/[^a-z]+/g, ""),
     esc(sit.city) + " \u00b7 " + sit.word, "day " + sit.day, inner, sit.day === 1);
