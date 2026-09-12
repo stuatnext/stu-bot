@@ -250,3 +250,9 @@ button.gem:active{transform:translateY(3px); border-bottom-width:2px}
 .skycard .skybd i .skyloc{font:inherit; color:inherit; background:none; padding:0 1px;
   border:0; border-bottom:1.5px dotted currentColor; cursor:pointer; letter-spacing:inherit}
 .skycard .skybd i .skyloc:active{opacity:.6}
+/* still only a guess from the clock: it wears the pin, and the tap asks the phone */
+.skycard .skybd i .skyloc.ask{border-bottom:0; padding:3px 7px 3px 8px; border-radius:999px;
+  background:color-mix(in srgb, var(--skyInk) 14%, transparent); display:inline-flex;
+  align-items:center; gap:3px}
+.skycard .skybd i .skyloc .lm{display:inline-flex}
+.skycard .skybd i .skyloc .lm svg{width:12px; height:12px; display:block}

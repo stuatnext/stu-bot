@@ -596,34 +596,59 @@ function pinMe(){ locate(false); }
    which is the whole difference between a feature he has to remember to use
    and one that simply works. Permissions.query is not on every browser, so a
    missing answer means "ask him", never "assume yes". */
-async function geoGranted(){
-  try {
-    if (!navigator.permissions || !navigator.permissions.query) return false;
-    var st = await navigator.permissions.query({ name: "geolocation" });
-    return st && st.state === "granted";
-  } catch(e){ return false; }
+/* What iOS actually does, which is not what the specification suggests.
+
+   Two facts decide the whole design here, and I had one of them wrong.
+
+   1. Safari does not implement navigator.permissions.query for geolocation
+      in a way that can be trusted - deny reads back as "prompt" - so gating
+      on it, as v44 did, means the automatic path never runs on his phone at
+      all. That gate is gone. The only honest test is to ask and see.
+
+   2. A web app on the Home Screen does not keep its location permission
+      between launches. iOS asks again each session, and it will only ask at
+      all in response to a tap. So "ask silently on every open" cannot work
+      on an iPhone, no matter how it is written.
+
+   What does work: ask once, on a tap, and keep the ANSWER for the day. The
+   permission does not survive the launch; the city does, in the record. One
+   tap a day, on the day he has actually moved, and nothing asks again. */
+var GEO_OK = "daylight.geoworks";
+function geoEverWorked(){
+  try { return !!localStorage.getItem(GEO_OK); } catch(e){ return false; }
 }
-/* Quietly, on opening the app: if the ground is available for free, take it.
-   Never prompts - a prompt on every open is exactly what made this a button
-   in the first place - and never argues with a place he set himself. */
-var GEO_LAST = 0;
-async function autoLocate(){
-  if (S.autoZone === 0) return;
+function geoWorked(){
+  try { localStorage.setItem(GEO_OK, "1"); } catch(e){}
+}
+/* Whether the day is still running on nothing but the phone's clock, which
+   is the case where a fix is worth a tap. */
+function whereIsGuessed(){
   var rec = whereOn(today());
-  if (rec && rec.m) return;                       /* his own word stands */
+  return !rec || (!rec.m && !rec.g);
+}
+/* The silent attempt. On a desktop or on Android, where the permission is
+   remembered, this quietly corrects the day and he never sees a prompt. On
+   iOS it will simply fail without one, which costs nothing and is why the
+   visible one-tap way in exists beside it. */
+var GEO_LAST = 0;
+function autoLocate(){
+  if (S.autoZone === 0) return;
+  if (!geoEverWorked()) return;            /* never nag a phone that has said no */
+  if (!whereIsGuessed()) return;           /* today is already answered */
+  if (!navigator.geolocation) return;
   if (Date.now() - GEO_LAST < 5 * 60 * 1000) return;
-  if (!(await geoGranted())) return;
   GEO_LAST = Date.now();
   navigator.geolocation.getCurrentPosition(function(pos){
     var la = Math.round(pos.coords.latitude * 100) / 100;
     var lo = Math.round(pos.coords.longitude * 100) / 100;
+    geoWorked();
     pinSave(la, lo);
     var hit = setWhereFromFix(la, lo);
     if (hit && hit.near && hit.changed){
       toast(hit.was ? hit.was + " → " + hit.city + "." : hit.city + ".");
       render({ keepScroll: true });
     }
-  }, function(){}, { enableHighAccuracy: false, timeout: 8000, maximumAge: 900000 });
+  }, function(){}, { enableHighAccuracy: false, timeout: 6000, maximumAge: 900000 });
 }
 
 
@@ -642,6 +667,7 @@ function locate(setPlace){
   navigator.geolocation.getCurrentPosition(function(pos){
     var la = Math.round(pos.coords.latitude * 100) / 100;
     var lo = Math.round(pos.coords.longitude * 100) / 100;
+    geoWorked();
     var p = pinSave(la, lo);
     var hit = setPlace ? setWhereFromFix(la, lo) : placeFromFix(la, lo);
     sfx("done"); buzz(12);

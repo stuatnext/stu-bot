@@ -57,10 +57,17 @@ function skyCardHTML(ask, sub, cta){
   h += "</svg>";
   var sit = situation();
   /* The city on the header is the thing that is wrong when it is wrong, so it
-     is also the button that fixes it: tap the word, get the ground and the
-     list. Nothing to find in a fold. */
+     is also the button that fixes it. iOS will only open its location prompt
+     in answer to a tap, and forgets the permission when the app closes, so
+     this tap is the whole mechanism rather than a fallback for one: while the
+     day is still a guess from the clock it goes straight to the phone and
+     wears a mark to say so. Once the day is answered it opens the list
+     instead, for correcting an answer rather than getting one. */
+  var guessed = !sit.home && typeof whereIsGuessed === "function" && whereIsGuessed();
   h += "<div class='skybd'><i>" + esc(niceToday())
-    + (sit.home ? "" : " \u00b7 <button class='skyloc' data-notthere='1'>" + esc(sit.city) + "</button>")
+    + (sit.home ? "" : " \u00b7 <button class='skyloc" + (guessed ? " ask" : "") + "' data-"
+        + (guessed ? "locate" : "notthere") + "='1'>" + esc(sit.city)
+        + (guessed ? "<span class='lm'>" + svg("pin", 13) + "</span>" : "") + "</button>")
     + " \u00b7 " + esc(dialLabel(s)) + "</i>"
     + "<b>" + esc(ask || "") + "</b>"
     + (sub ? "<span>" + esc(sub) + "</span>" : "")
