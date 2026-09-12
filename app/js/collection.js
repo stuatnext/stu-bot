@@ -93,6 +93,17 @@ function viewDeck(){
   }
 
 
+  /* The week's three pay into the pot, so they belong with the pot rather
+     than on Today, where they were a third door in a row of doors. Flat: a
+     heading and three bars, nothing to open. */
+  if (S.onboarded){
+    var wk = weekKey(), wqs = questsFor(wk);
+    var wdone = wqs.filter(function(q){ return questDoneQ(q, wk); }).length;
+    h += "<div class='rulehead'><h3>This week</h3><span></span><em>"
+      + (wdone === wqs.length ? "all three" : wdone + " of " + wqs.length) + "</em></div>";
+    h += questHTML(true);
+  }
+
   /* Then what is in his hand: the part of the deck that is about today. */
   h += handHTML();
   /* pick the set to show: last chosen, else the one nearest finishing */

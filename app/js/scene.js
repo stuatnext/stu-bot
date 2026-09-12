@@ -189,21 +189,19 @@ function viewToday(){
   });
   h += "</div>";
 
+  h += conditionHTML(true);
+
   /* the chest */
   h += "<" + (packs ? "button" : "div") + " class='gem" + (packs ? " won" : "") + "'"
     + (packs ? " data-open='1'" : "") + ">" + gemHTML(done, packs)
     + "</" + (packs ? "button" : "div") + ">";
 
-  /* The day as a whole waits under the day itself. Everything in here is read
-     rather than pressed on most opens, so it is one quiet list of doors at the
-     foot of the screen rather than three more blocks on it. */
-  var qk = weekKey(), qs = questsFor(qk);
-  var qdone = qs.filter(function(q){ return questDoneQ(q, qk); }).length;
-  TODAY_MORE = drawers([
-    !sit.home && S.onboarded ? whereFoldHTML(sit) : "",
-    fold("basics", "Today\u2019s basics", conditionMeta(), conditionHTML(true), false),
-    fold("week", "This week", qdone + " of " + qs.length, questHTML(true), false)
-  ]);
+  /* No drawer list. Seven doors in a row is a menu, not a screen - the load
+     is the same and the information is gone. The city lives on the header and
+     is tapped there; the five basics are five marks in the same language as
+     the week above them, flat and visible; the week's three moved to Cards,
+     where the pot they pay into already lives. */
+  TODAY_MORE = "";
 
   /* the side quest: one held card asks something of him. This is what makes
      the collection a deck instead of wallpaper - his call, his words. */

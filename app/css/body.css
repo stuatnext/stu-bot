@@ -588,3 +588,45 @@ button.vc:not(.on) .vv{color:var(--goldEdge, #C98A08); font-family:"Nunito",sans
 /* a door that opens elsewhere points across, not down like a fold */
 .drawers .drow i{margin-left:auto; display:flex; color:var(--ink3)}
 .drawers .drow:active{background:var(--sunk)}
+
+/* v47: the five basics as marks, not cards. Same language as the week dots
+   above them - no border, no fill, just the number and its word. */
+.vit.flat{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:12px 0 14px;
+  background:none}
+.vit.flat .vc{border:0; background:none; padding:4px 2px; min-height:0; gap:2px}
+.vit.flat .vc .vv{font-size:14px; color:var(--ink2)}
+.vit.flat .vc .vl{font-size:9.5px; color:var(--ink3)}
+.vit.flat .vc.on .vv{color:var(--greenInk)}
+.vit.flat .vc.on .vl{color:var(--greenInk); opacity:.75}
+.vit.flat button.vc:not(.on) .vv{font-size:17px}
+.vit.flat .vc:active{transform:scale(.94)}
+
+/* v47: the away actions as a line of links under the hero, not menu rows */
+.awayline{display:flex; flex-wrap:wrap; gap:14px; margin:-6px 0 14px; padding:0 2px}
+.awayline button{font:inherit; font-family:"Nunito",sans-serif; font-size:13.5px; font-weight:800;
+  color:var(--blue); background:none; border:0; padding:0; cursor:pointer;
+  border-bottom:1.5px solid color-mix(in srgb, var(--blue) 35%, transparent)}
+.awayline button:active{opacity:.6}
+/* the move that is up next is the only one wearing an accent */
+.liftrow.next{border-color:var(--edge2)}
+.liftrow.next .lift .lb2 b{color:var(--ink)}
+
+/* v47: the moves as one list with rules between them, not six cards. Same
+   move to flatten that the work items got - a border per row is six borders. */
+.lifts{border-radius:20px; background:var(--card); border:1.5px solid var(--edge);
+  border-bottom-width:3px; overflow:hidden}
+.lifts .liftrow{margin:0; border:0; border-radius:0; background:none}
+.lifts .liftrow + .liftrow{border-top:1.5px solid var(--edge)}
+.lifts .liftrow:has(.lift.on){background:color-mix(in srgb, var(--green) 8%, transparent)}
+.lifts .lift{min-height:70px}
+.lifts .lift .lv{width:52px; height:52px; font-size:13px}
+.lifts .lift .lv em{font-size:7px; max-width:46px}
+.lifts .swap{min-height:70px; width:36px}
+
+/* what is already done, counted rather than listed */
+.donerow{display:block; width:100%; text-align:left; padding:10px 4px; margin:2px 0 4px;
+  background:none; border:0; font:inherit; font-family:"JetBrains Mono",monospace;
+  font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3);
+  cursor:pointer}
+.donerow:active{opacity:.6}
+.wk.done .wi{opacity:.55}

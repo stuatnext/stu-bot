@@ -115,32 +115,24 @@ function conditionMeta(){
     + (clear ? " \u00b7 " + clear + " clear" : "");
 }
 function conditionHTML(bare){
-  var t = today(), met = vitalsMet(t), clear = clearDays(), h = "";
-  if (!bare) h += "<div class='rulehead'><h3>Today\u2019s basics</h3><span></span><em>" + met + " of " + VITALS.length
-    + (clear ? " \u00b7 " + clear + " clear" : "") + "</em></div>";
-  /* The five chips are the whole report. A summary card above them said the
-     same number twice, in a bigger box; it is gone. */
-  h += "<div class='vit'>";
+  /* Five marks, in the same language as the seven days above them: no card,
+     no heading, no chevron. Sleep and getting out are the two he can log, so
+     those two are buttons; the other three report and say so quietly. */
+  var t = today(), h = "<div class='vit" + (bare ? " flat" : "") + "'>";
   VITALS.forEach(function(v){
     var on = vitalMet(v[0], t);
-    /* Sleep and getting out are logged here because nowhere else owns them.
-       The other three are mirrors of Gym, Food and Water - tapping them would
-       be a second place to do the same thing, so they only report. */
     var act = v[0] === "sleep" ? " data-sleep='1'" : (v[0] === "out" ? " data-out='1'" : "");
-    /* The two he can log here say "+" until they are logged; the three that
-       only report say nothing rather than inviting a tap that does nothing. */
     var val = v[0] === "water"   ? waterOn(t) + "/" + WATER_GLASSES
             : v[0] === "sleep"   ? (sleepOn(t) ? sleepOn(t) + "h" : "+")
             : v[0] === "protein" ? num(proteinOn(t)) + "g"
-            : v[0] === "train"   ? (on ? "done" : "&mdash;")
+            : v[0] === "train"   ? (on ? "done" : "\u2014")
             : (on ? "yes" : "+");
     var tag = act ? "button" : "div";
     h += "<" + tag + " class='vc" + (on ? " on" : "") + "'" + act + ">"
       + "<span class='vv'>" + val + "</span>"
       + "<span class='vl'>" + esc(v[1]) + "</span></" + tag + ">";
   });
-  h += "</div>";
-  return h;
+  return h + "</div>";
 }
 
 /* ------------------------------------------------------------------- view

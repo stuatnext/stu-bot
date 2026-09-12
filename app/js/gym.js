@@ -67,14 +67,12 @@ function viewGym(){
 
   /* Away, the two things he cannot look up in his own history. Kept for the
      drawer list at the foot, so the top of the tab stays the session. */
-  var awayRows = "";
   if (!sit.home){
-    awayRows = "<button class='drow' data-near='gym'>Find a gym in " + esc(sit.city)
-      + "<i>" + svg("arrow", 16) + "</i></button>"
+    h += "<p class='awayline'><button data-near='gym'>Find a gym in " + esc(sit.city) + "</button>"
       + (p.mode === "travel"
-          ? "<button class='drow' data-gymhere='1'>There is a gym here<i>" + svg("arrow", 16) + "</i></button>"
-          : (gymHere() ? "<button class='drow' data-gymhere='0'>Back to the travel session<i>"
-             + svg("arrow", 16) + "</i></button>" : ""));
+          ? "<button data-gymhere='1'>There is one here</button>"
+          : (gymHere() ? "<button data-gymhere='0'>Back to the room</button>" : ""))
+      + "</p>";
   }
 
   if (!lifting){
@@ -89,11 +87,11 @@ function viewGym(){
     /* One move at a time. He asked to be shown one or two things and to open
        the rest himself, and on a gym floor the only move that matters is the
        one he has not done yet - the others are a list to scroll past. */
-    var rowFor = function(i){
+    var rowFor = function(i, isNext){
       var ex = list[i], name = pickFor(key, i);
       var had = loggedToday(name), t2 = nextTarget(ex, name);
       var swapped = name !== ex[0];
-      return "<div class='liftrow'>"
+      return "<div class='liftrow" + (isNext ? " next" : "") + "'>"
         + "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
         + "<span class='lb2'><b>" + esc(name) + "</b>"
         + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4])
@@ -109,38 +107,26 @@ function viewGym(){
         + "<button class='swap' data-swap='" + key + ":" + i + "'"
         + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
     };
-    var upNext = 0;
+    var upNext = -1;
     for (var li = 0; li < list.length; li++){ if (!loggedToday(pickFor(key, li))){ upNext = li; break; } }
-    if (doneN === list.length) upNext = -1;
 
-    if (upNext >= 0){
-      h += "<div class='rulehead'><h3>" + (upNext === 0 && !doneN
-          ? (p.mode === "travel" ? "First in the room" : "First move")
-          : "Next move") + "</h3><span></span>"
-        + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : list.length + " in all") + "</em></div>";
-      h += "<div class='lifts'>" + rowFor(upNext) + "</div>";
-    } else {
-      h += "<div class='rulehead'><h3>All logged</h3><span></span><em>"
-        + list.length + " of " + list.length + "</em></div>";
-    }
-
-    /* the others, behind one door, with the unlock and the locked moves */
-    var restRows = "";
-    for (var lj = 0; lj < list.length; lj++){ if (lj !== upNext) restRows += rowFor(lj); }
-    var moreInner = "<div class='lifts'>" + restRows + "</div>";
-    var held = sessionFor(key)[1].slice(list.length);
-    if (held.length){
-      moreInner += "<div class='hold'>" + held.length + " more "
-        + (held.length === 1 ? "move" : "moves") + " in this session, locked for now &mdash; "
-        + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</div>";
-    }
-    if (nx && p.mode !== "travel"){
-      moreInner += "<p class='fine'>" + (nx[0] - doneS) + " more "
+    h += "<div class='rulehead'><h3>" + (p.mode === "travel" ? "In the room" : "Today\u2019s moves")
+      + "</h3><span></span><em>"
+      + (doneN ? doneN + " of " + list.length + " logged" : list.length + " moves") + "</em></div>";
+    if (nx && p.mode !== "travel" && !doneN){
+      h += "<p class='fine' style='margin:-2px 0 8px'>" + (nx[0] - doneS) + " more "
         + (nx[0] - doneS === 1 ? "session" : "sessions") + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
     }
-    GYM_MORE = fold("moves", upNext < 0 ? "The session" : "The other moves",
-      (list.length - (upNext < 0 ? 0 : 1)) + (list.length - (upNext < 0 ? 0 : 1) === 1 ? " move" : " moves"),
-      moreInner, false);
+    h += "<div class='lifts'>";
+    for (var lk = 0; lk < list.length; lk++) h += rowFor(lk, lk === upNext);
+    h += "</div>";
+
+    var held = sessionFor(key)[1].slice(list.length);
+    if (held.length){
+      h += "<p class='fine'>" + held.length + " more "
+        + (held.length === 1 ? "move" : "moves") + " unlock later \u2014 "
+        + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</p>";
+    }
   }
 
   /* the finisher: easy minutes after the lifts, from the third visit. A row
@@ -177,14 +163,13 @@ function viewGym(){
       + "<p class='fine' style='margin:-2px 0 8px'>Navel, before you eat, same tape as last week.</p>" + wh;
   }
 
+  /* One door, and it holds the only thing here that is a record rather than
+     a task: how the body is going. The two documents moved to You, where the
+     rest of the reading lives, and the crunches answer is on the finisher's
+     own "?" where the question is actually asked. */
+  var prog = wh + gymProgressHTML(true);
   h += drawers([
-    GYM_MORE,
-    awayRows,
-    due ? "" : fold("waist", "Waist", waistMeta(ws, tr), wh, false),
-    gymProgressHTML(),
-    "<button class='drow' data-finwhy='1'>Why no crunches<i>" + svg("arrow", 16) + "</i></button>",
-    "<button class='drow' data-go='../docs/train.html'>The whole plan, on paper<i>"
-      + svg("arrow", 16) + "</i></button>"
+    due ? "" : fold("progress", "How it is going", waistMeta(ws, tr), prog, false)
   ]);
   return h;
 }
@@ -981,7 +966,7 @@ function bestOf(names){
   });
   return best;
 }
-function gymProgressHTML(){
+function gymProgressHTML(bare){
   var weeks = sessionsByWeek(8), total = weeks.reduce(function(a, w){ return a + w[1]; }, 0);
   if (!total) return "";
   /* Eight weeks of turning up, as eight bars. It used to be eight tall blue
@@ -1020,7 +1005,7 @@ function gymProgressHTML(){
   }
 
   var wk = weeks[weeks.length - 1][1];
-  return fold("gymprog", "Is it working", wk + " this week", inner, false);
+  return bare ? inner : fold("gymprog", "Is it working", wk + " this week", inner, false);
 }
 
 /* ------------------------------------------------------------- how-to */

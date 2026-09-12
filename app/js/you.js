@@ -132,6 +132,10 @@ function viewYou(){
     + mrow("go", "../docs/train.html", "run", "The training plan", "What Trained actually means")
     + mrow("go", "../docs/plan.html", "pen", "The plan on paper", "Why this app is shaped like this")
     + mrow("go", "../docs/admin.html", "clock", "The paperwork", "Company, pass, filings")
+    + mrow("go", "../docs/proposal.html", "case", "The October document",
+        "The rate conversation, written down")
+    + mrow("finwhy", "1", "ask", "Why no crunches",
+        "Where the belly actually comes from")
     + "</div>";
 
   h += "<div class='btns'><button class='btn quiet' data-reset='1'>Clear everything</button></div>";

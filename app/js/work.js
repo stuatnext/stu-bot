@@ -52,40 +52,52 @@ function viewWork(){
   }
   h += "</div>";
 
-  /* Everything under the next date is a list that waits, so it waits in the
-     drawer list: the later dates, then one door per area of the job. */
-  var tl = "";
+  /* The three areas ARE this tab. Behind three doors they were a menu of the
+     work rather than the work, so they are one list again - each area a small
+     heading, its open items under it, and what is done counted rather than
+     listed. The dates that follow are three lines, so they are three lines.
+     The two documents moved to You, where the reading lives. */
   if (soon.length > 1){
-    tl = "<div class='tl'>";
+    h += "<div class='rulehead'><h3>After that</h3><span></span><em>"
+      + (soon.length - 1) + " more</em></div><div class='tl'>";
     soon.slice(1).forEach(function(d){
-      tl += "<div class='tli'><b>" + esc(d[1]) + "</b><span>" + esc(nice(d[2]))
-        + " · " + num(daysTo(d[2])) + " days</span></div>";
+      h += "<div class='tli'><b>" + esc(d[1]) + "</b><span>" + esc(nice(d[2]))
+        + " \u00b7 " + num(daysTo(d[2])) + " days</span></div>";
     });
-    tl += "</div>";
+    h += "</div>";
   }
 
-  var areas = WORKAREAS.map(function(a){
+  WORKAREAS.forEach(function(a){
     var items = WORKITEMS.filter(function(i){ return i[1] === a[0]; });
-    var left = workLeft(a[0]);
-    var inner = "<p class='fine' style='margin:0 0 4px'>" + esc(a[2]) + "</p><div class='wk'>";
-    items.forEach(function(i){
-      var on = workDone(i[0]);
-      inner += "<button class='wi" + (on ? " on" : "") + "' data-work='" + i[0] + "'>"
-        + "<span class='wbox'>" + (on ? "&#10003;" : "") + "</span>"
+    var openItems = items.filter(function(i){ return !workDone(i[0]); });
+    var doneCount = items.length - openItems.length;
+    h += "<div class='rulehead'><h3>" + esc(a[1]) + "</h3><span></span><em>"
+      + (openItems.length ? openItems.length + " open" : "all done") + "</em></div>";
+    if (!openItems.length){
+      h += "<p class='fine'>" + esc(a[2]) + "</p>";
+      return;
+    }
+    h += "<div class='wk'>";
+    openItems.forEach(function(i){
+      h += "<button class='wi' data-work='" + i[0] + "'>"
+        + "<span class='wbox'></span>"
         + "<span class='wb'><b>" + esc(i[2]) + "</b>"
         + "<span>" + esc(i[3]) + "</span></span></button>";
     });
-    inner += "</div>";
-    return fold("work-" + a[0], esc(a[1]), left ? left + " open" : "all done", inner, false);
-  }).join("");
-
-  h += drawers([
-    tl ? fold("workdates", "After that", (soon.length - 1) + " more dates", tl, false) : "",
-    areas,
-    "<button class='drow' data-go='../docs/proposal.html'>The October document<i>"
-      + svg("arrow", 16) + "</i></button>",
-    "<button class='drow' data-go='../docs/admin.html'>Company, pass and filings<i>"
-      + svg("arrow", 16) + "</i></button>"
-  ]);
+    h += "</div>";
+    if (doneCount){
+      h += "<button class='donerow' data-workdone='" + a[0] + "'>"
+        + doneCount + " done" + (S.showDone && S.showDone[a[0]] ? " \u00b7 hide" : "") + "</button>";
+      if (S.showDone && S.showDone[a[0]]){
+        h += "<div class='wk done'>";
+        items.filter(function(i){ return workDone(i[0]); }).forEach(function(i){
+          h += "<button class='wi on' data-work='" + i[0] + "'>"
+            + "<span class='wbox'>&#10003;</span>"
+            + "<span class='wb'><b>" + esc(i[2]) + "</b></span></button>";
+        });
+        h += "</div>";
+      }
+    }
+  });
   return h;
 }
