@@ -3,8 +3,10 @@
    the gym and nothing but, and he was right that a tab holding training, food,
    water and sleep at once was four subjects wearing one hat. */
 
+var GYM_MORE = "";
 function viewGym(){
   var t = today(), h = "";
+  GYM_MORE = "";
   var p = gymPlan(), sit = p.sit, key = p.key;
   var st = stage(), nx = nextStage(), list = stageLifts(key);
   var doneN = 0;
@@ -63,48 +65,36 @@ function viewGym(){
       + "set by set, and times the rests.</p>";
   }
 
-  /* Away, the two things he cannot look up in his own history. */
+  /* Away, the two things he cannot look up in his own history. Kept for the
+     drawer list at the foot, so the top of the tab stays the session. */
+  var awayRows = "";
   if (!sit.home){
-    h += "<div class='btns tight'>"
-      + "<button class='btn quiet' data-near='gym'>Find a gym in " + esc(sit.city) + "</button>"
+    awayRows = "<button class='drow' data-near='gym'>Find a gym in " + esc(sit.city)
+      + "<i>" + svg("arrow", 16) + "</i></button>"
       + (p.mode === "travel"
-          ? "<button class='btn quiet' data-gymhere='1'>There is a gym here</button>"
-          : (gymHere() ? "<button class='btn quiet' data-gymhere='0'>Back to the travel session</button>" : ""))
-      + "</div>";
+          ? "<button class='drow' data-gymhere='1'>There is a gym here<i>" + svg("arrow", 16) + "</i></button>"
+          : (gymHere() ? "<button class='drow' data-gymhere='0'>Back to the travel session<i>"
+             + svg("arrow", 16) + "</i></button>" : ""));
   }
 
   if (!lifting){
     /* A rest or walk day shows no list: the answer is not a list. The session
        stays one tap away, because the app suggests and he decides. */
     var names = stageLifts(p.key).map(function(x){ return x[0].toLowerCase(); }).join(", ");
-    h += fold("nextmoves", "When you do lift", "Session " + p.key,
+    GYM_MORE = fold("nextmoves", "When you do lift", "Session " + p.key,
       "<p class='fine' style='margin:2px 0 10px'>" + esc(names) + ".</p>"
       + "<div class='btns'><button class='btn quiet' data-startsession='" + p.key + "'>"
       + "Lift anyway \u2014 Session " + p.key + "</button></div>", false);
   } else {
-    h += "<div class='rulehead'><h3>" + (p.mode === "travel" ? "In the room" : "Today\u2019s moves")
-      + "</h3><span></span>"
-      + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : "next up") + "</em></div>";
-
-    /* The programme's own level used to sit here in a fold, repeating what the
-       hero already says. What it alone knew - the next unlock - is one line. */
-    if (nx && p.mode !== "travel"){
-      h += "<p class='fine' style='margin:-2px 0 8px'>" + (nx[0] - doneS) + " more "
-        + (nx[0] - doneS === 1 ? "session" : "sessions") + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
-    }
-
-    if (!doneN && !doneS){
-      h += "<p class='fine' style='margin:0 0 10px'>Tap a move to log it. ? is how to do it, "
-        + "&#8646; swaps the machine.</p>";
-    }
-
-    h += "<div class='lifts'>";
-    list.forEach(function(ex, i){
-      var name = pickFor(key, i);
+    /* One move at a time. He asked to be shown one or two things and to open
+       the rest himself, and on a gym floor the only move that matters is the
+       one he has not done yet - the others are a list to scroll past. */
+    var rowFor = function(i){
+      var ex = list[i], name = pickFor(key, i);
       var had = loggedToday(name), t2 = nextTarget(ex, name);
       var swapped = name !== ex[0];
-      h += "<div class='liftrow'>";
-      h += "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
+      return "<div class='liftrow'>"
+        + "<button class='lift" + (had ? " on" : "") + "' data-lift='" + key + ":" + i + "'>"
         + "<span class='lb2'><b>" + esc(name) + "</b>"
         + "<span>" + esc(swapped ? "for " + ex[0].toLowerCase() : ex[4])
         + " &middot; " + stage()[3] + " x " + (ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3])
@@ -113,19 +103,44 @@ function viewGym(){
             ? kgOr(had.w) + "<em>" + had.r.join(" &middot; ") + "</em>"
             : (t2.w ? t2.w + "kg<em>" + esc(t2.tag || "") + "</em>"
                     : BODYWEIGHT[name] ? "body<em>" + esc(t2.tag || "") + "</em>"
-                    : "<span class='new'>new</span>")) + "</span></button>";
-      h += "<button class='swap' data-how='" + key + ":" + i + "' aria-label='How to do " + esc(name) + "'>" + svg("ask", 18) + "</button>"
+                    : "<span class='new'>new</span>")) + "</span></button>"
+        + "<button class='swap' data-how='" + key + ":" + i + "' aria-label='How to do " + esc(name) + "'>"
+        + svg("ask", 18) + "</button>"
         + "<button class='swap' data-swap='" + key + ":" + i + "'"
         + " aria-label='Swap " + esc(name) + "'>&#8646;</button></div>";
-    });
-    h += "</div>";
+    };
+    var upNext = 0;
+    for (var li = 0; li < list.length; li++){ if (!loggedToday(pickFor(key, li))){ upNext = li; break; } }
+    if (doneN === list.length) upNext = -1;
 
+    if (upNext >= 0){
+      h += "<div class='rulehead'><h3>" + (upNext === 0 && !doneN
+          ? (p.mode === "travel" ? "First in the room" : "First move")
+          : "Next move") + "</h3><span></span>"
+        + "<em>" + (doneN ? doneN + " of " + list.length + " logged" : list.length + " in all") + "</em></div>";
+      h += "<div class='lifts'>" + rowFor(upNext) + "</div>";
+    } else {
+      h += "<div class='rulehead'><h3>All logged</h3><span></span><em>"
+        + list.length + " of " + list.length + "</em></div>";
+    }
+
+    /* the others, behind one door, with the unlock and the locked moves */
+    var restRows = "";
+    for (var lj = 0; lj < list.length; lj++){ if (lj !== upNext) restRows += rowFor(lj); }
+    var moreInner = "<div class='lifts'>" + restRows + "</div>";
     var held = sessionFor(key)[1].slice(list.length);
     if (held.length){
-      h += "<div class='hold'>" + held.length + " more "
+      moreInner += "<div class='hold'>" + held.length + " more "
         + (held.length === 1 ? "move" : "moves") + " in this session, locked for now &mdash; "
         + esc(held.map(function(x){ return x[0].toLowerCase(); }).join(", ")) + ".</div>";
     }
+    if (nx && p.mode !== "travel"){
+      moreInner += "<p class='fine'>" + (nx[0] - doneS) + " more "
+        + (nx[0] - doneS === 1 ? "session" : "sessions") + " unlocks <b>" + esc(nx[1]) + "</b>.</p>";
+    }
+    GYM_MORE = fold("moves", upNext < 0 ? "The session" : "The other moves",
+      (list.length - (upNext < 0 ? 0 : 1)) + (list.length - (upNext < 0 ? 0 : 1) === 1 ? " move" : " moves"),
+      moreInner, false);
   }
 
   /* the finisher: easy minutes after the lifts, from the third visit. A row
@@ -140,36 +155,37 @@ function viewGym(){
       + "<span class='lv'>" + (ft ? "in<em>" + ft.min + " min</em>" : fm + "<em>min</em>") + "</span></button>"
       + "<button class='swap' data-finwhy='1' aria-label='Why the finisher'>" + svg("ask", 18) + "</button></div>";
   }
-  /* the question he actually asked, one tap away where he looks for the ab work */
-  h += "<div class='btns tight bellywhy'><button class='btn quiet' data-finwhy='1'>"
-    + "Why no crunches &mdash; and where the belly comes in</button></div>";
-
-  if ((doneN || ft) && lifting){
+  if ((doneN || finToday()) && lifting){
     var already = day(t).p.train;
     h += "<div class='btns'><button class='btn" + (already ? " quiet" : " pri") + "' data-finish='1'>"
       + (already ? "Trained is marked" : "Finish &mdash; mark Trained") + "</button></div>";
   }
 
-  /* --- the waist: the number that answers his actual question, read slowly.
-     On a Sunday with no reading yet it stands open under the lifts; every
-     other day it is a closed fold, and the hero carries the one-line read. */
+  /* --- everything the tab knows that is not today's session. The waist is
+     the one thing that can jump the queue: on a Sunday with no reading yet it
+     stands open under the lifts, because that is the day it is asked for. */
   var ws = waistSorted(), w = ws[ws.length - 1], tr = waistTrend(), due = waistDue();
   var wh = "<div class='panel wst'><div class='pnum'><b>"
     + (w ? w[1] + "<small>cm</small>" : "&mdash;")
     + "</b><span>" + (w ? "measured " + esc(nice(w[0])) : "not measured yet") + "</span></div>";
   wh += "<p class='fine" + (tr && tr.dir === "down" ? " good" : "") + "'>" + esc(waistLine(tr, ws)) + "</p>";
-  wh += "<p class='fine'>Not the scale \u2014 your weight is allowed to rise. Expect nothing here for "
+  wh += "<p class='fine'>Not the scale — your weight is allowed to rise. Expect nothing here for "
     + "eight weeks; a centimetre every two months after that is winning.</p>"
     + "<div class='btns'><button class='btn' data-waist='1'>Measure</button></div></div>";
-
-  h += gymProgressHTML();
   if (due){
     h += "<div class='rulehead'><h3>Tape day</h3><span></span><em>Sunday</em></div>"
       + "<p class='fine' style='margin:-2px 0 8px'>Navel, before you eat, same tape as last week.</p>" + wh;
-  } else {
-    h += fold("waist", "Waist", waistMeta(ws, tr), wh, false);
   }
-  h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>The whole plan, on paper</button></div>";
+
+  h += drawers([
+    GYM_MORE,
+    awayRows,
+    due ? "" : fold("waist", "Waist", waistMeta(ws, tr), wh, false),
+    gymProgressHTML(),
+    "<button class='drow' data-finwhy='1'>Why no crunches<i>" + svg("arrow", 16) + "</i></button>",
+    "<button class='drow' data-go='../docs/train.html'>The whole plan, on paper<i>"
+      + svg("arrow", 16) + "</i></button>"
+  ]);
   return h;
 }
 

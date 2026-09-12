@@ -563,3 +563,28 @@ button.vc:not(.on) .vv{color:var(--goldEdge, #C98A08); font-family:"Nunito",sans
 /* The gym hero says a word on a rest day, where it says a number on a
    lifting one; 44px is a count, a word needs to sit down a little. */
 .hero-n b.word{font-size:34px; letter-spacing:-.02em}
+
+/* ==========================================================================
+   The drawers. A closed fold used to be a card, so six of them read as six
+   more things on the screen. Inside a drawer list they are hairline rows -
+   one quiet block that says "there is more here" without shouting any of it.
+   ========================================================================== */
+.drawers{margin:18px 0 4px; border-radius:18px; background:var(--card);
+  border:1.5px solid var(--edge); border-bottom-width:3px; overflow:hidden}
+.drawers .fold{margin:0}
+.drawers .fold + .fold{border-top:1.5px solid var(--edge)}
+.drawers .fold .fh{border:0; border-radius:0; background:none; padding:15px 15px}
+.drawers .fold .fh b{font-size:15px; font-weight:800; color:var(--ink2); text-wrap:balance}
+.drawers .fold .fh em,.drawers .fold .fh i{flex:none}
+.drawers .fold.open .fh{border-radius:0; border-bottom:1.5px solid var(--edge)}
+.drawers .fold.open .fh b{color:var(--ink)}
+.drawers .fold .fb{border:0; border-radius:0; background:var(--card2); padding:13px 15px 16px}
+.drawers .fold.open + .fold{border-top:1.5px solid var(--edge)}
+/* a plain action can sit in the list too, reading the same as a door */
+.drawers .drow{display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  padding:15px; background:none; border:0; font:inherit; color:var(--ink2); cursor:pointer;
+  font-family:"Nunito",sans-serif; font-size:15px; font-weight:800}
+.drawers .fold + .drow,.drawers .drow + .fold,.drawers .drow + .drow{border-top:1.5px solid var(--edge)}
+/* a door that opens elsewhere points across, not down like a fold */
+.drawers .drow i{margin-left:auto; display:flex; color:var(--ink3)}
+.drawers .drow:active{background:var(--sunk)}

@@ -126,8 +126,10 @@ function gemHTML(done, packs){
 }
 
 /* ==================================================================== TODAY */
+var TODAY_MORE = "";
 function viewToday(){
   var t = today(), d = day(t);
+  TODAY_MORE = "";
   var w = packsWaiting(), packs = w.day + w.streak;
   var done = PILLARS.filter(function(g){ return pDone(t, g[0]); }).length;
   var h = "";
@@ -182,18 +184,16 @@ function viewToday(){
     + (packs ? " data-open='1'" : "") + ">" + gemHTML(done, packs)
     + "</" + (packs ? "button" : "div") + ">";
 
-  /* Away, one fold says what is different about a day here and hands him the
-     three things he cannot look up in his own history. */
-  if (!sit.home && S.onboarded) h += whereFoldHTML(sit);
-
-  /* The day as a whole. Both of these are read rather than pressed on most
-     opens, so they are one line each with their score on the header - his
-     words were "without being overwhelmed by information", and a fold he
-     opens stays open. */
-  h += fold("basics", "Today\u2019s basics", conditionMeta(), conditionHTML(true), false);
+  /* The day as a whole waits under the day itself. Everything in here is read
+     rather than pressed on most opens, so it is one quiet list of doors at the
+     foot of the screen rather than three more blocks on it. */
   var qk = weekKey(), qs = questsFor(qk);
   var qdone = qs.filter(function(q){ return questDoneQ(q, qk); }).length;
-  h += fold("week", "This week", qdone + " of " + qs.length, questHTML(true), false);
+  TODAY_MORE = drawers([
+    !sit.home && S.onboarded ? whereFoldHTML(sit) : "",
+    fold("basics", "Today\u2019s basics", conditionMeta(), conditionHTML(true), false),
+    fold("week", "This week", qdone + " of " + qs.length, questHTML(true), false)
+  ]);
 
   /* the side quest: one held card asks something of him. This is what makes
      the collection a deck instead of wallpaper - his call, his words. */
@@ -227,6 +227,7 @@ function viewToday(){
         + "</div>";
     }
   }
+  h += TODAY_MORE;
   return h;
 }
 

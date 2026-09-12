@@ -217,27 +217,20 @@ function viewFood(){
   });
   h += "</div>";
 
-  if (!sit.home){
-    h += "<div class='btns tight'><button class='btn quiet' data-near='"
-      + (sit.kind === "family" ? "shop" : "eat") + "'>Find protein near you</button></div>";
-  }
-
+  /* Everything else the tab knows - what he has already eaten, the menu, the
+     reason any of it is measured in protein - waits in the drawer list. */
+  var log = "";
   if (foodOn(t).length){
-    h += "<div class='recs'>";
+    log = "<div class='recs'>";
     foodOn(t).slice().reverse().forEach(function(f){
-      h += "<div class='rec'><span class='rd'>" + esc(f[2]) + "</span>"
+      log += "<div class='rec'><span class='rd'>" + esc(f[2]) + "</span>"
         + "<span class='rt'>" + esc(f[0]) + "</span>"
         + "<b class='rv'>" + num(f[1]) + "g</b></div>";
     });
-    h += "</div>";
-    h += "<div class='btns tight'><button class='btn quiet' data-undofood='1'>Undo the last one</button></div>";
-  } else {
-    h += "<p class='fine'>Three of them at 25 to 40g each gets you there.</p>";
+    log += "</div><div class='btns tight'><button class='btn quiet' data-undofood='1'>"
+      + "Undo the last one</button></div>";
   }
 
-  /* The whole list, so the answer to "what do I order" is never a decision -
-     behind a fold, because twenty rows of menu is the first thing that made
-     this tab feel like a spreadsheet. */
   var ordl = "<div class='ordl'>";
   ordersNow().forEach(function(o){
     ordl += "<button class='ord' data-order='" + esc(o[0]) + "'>"
@@ -245,10 +238,15 @@ function viewFood(){
       + "<span class='og'>" + num(o[1]) + "g</span></button>";
   });
   ordl += "</div>";
-  h += fold("orders", "What to order" + (sit.home ? "" : " in " + esc(sit.city)),
-    ordersNow().length + " " + ordersWord(), ordl, false);
 
-  h += "<div class='btns'><button class='btn quiet' data-go='../docs/train.html'>"
-    + "Why protein and not calories</button></div>";
+  h += drawers([
+    log ? fold("eaten", "What you have eaten", num(got) + "g today", log, false) : "",
+    fold("orders", "What to order",
+      (sit.home ? "" : esc(sit.city) + " \u00b7 ") + ordersNow().length + " " + ordersWord(), ordl, false),
+    sit.home ? "" : "<button class='drow' data-near='" + (sit.kind === "family" ? "shop" : "eat")
+      + "'>Find protein near you<i>" + svg("arrow", 16) + "</i></button>",
+    "<button class='drow' data-go='../docs/train.html'>Why protein and not calories<i>"
+      + svg("arrow", 16) + "</i></button>"
+  ]);
   return h;
 }

@@ -52,20 +52,19 @@ function viewWork(){
   }
   h += "</div>";
 
+  /* Everything under the next date is a list that waits, so it waits in the
+     drawer list: the later dates, then one door per area of the job. */
+  var tl = "";
   if (soon.length > 1){
-    var tl = "<div class='tl'>";
+    tl = "<div class='tl'>";
     soon.slice(1).forEach(function(d){
-      tl += "<div class='tli'><b>" + esc(d[1]) + "</b><span>" + esc(nice(d[2])) + " \u00b7 " + num(daysTo(d[2])) + " days</span></div>";
+      tl += "<div class='tli'><b>" + esc(d[1]) + "</b><span>" + esc(nice(d[2]))
+        + " · " + num(daysTo(d[2])) + " days</span></div>";
     });
     tl += "</div>";
-    h += fold("workdates", "After that", (soon.length - 1) + " more dates", tl, false);
   }
 
-  /* Three areas, fifteen items, all open at once was the whole tab as a wall.
-     Each area is a fold now with its open count on the front; the first one
-     with anything left is open, the rest wait. */
-  var opened = false;
-  WORKAREAS.forEach(function(a){
+  var areas = WORKAREAS.map(function(a){
     var items = WORKITEMS.filter(function(i){ return i[1] === a[0]; });
     var left = workLeft(a[0]);
     var inner = "<p class='fine' style='margin:0 0 4px'>" + esc(a[2]) + "</p><div class='wk'>";
@@ -77,14 +76,16 @@ function viewWork(){
         + "<span>" + esc(i[3]) + "</span></span></button>";
     });
     inner += "</div>";
-    var def = !opened && left > 0;
-    if (def) opened = true;
-    h += fold("work-" + a[0], esc(a[1]), left ? left + " open" : "all done", inner, def);
-  });
+    return fold("work-" + a[0], esc(a[1]), left ? left + " open" : "all done", inner, false);
+  }).join("");
 
-  h += "<div class='btns'><button class='btn quiet' data-go='../docs/proposal.html'>"
-    + "The October document</button></div>";
-  h += "<div class='btns'><button class='btn quiet' data-go='../docs/admin.html'>"
-    + "Company, pass and filings</button></div>";
+  h += drawers([
+    tl ? fold("workdates", "After that", (soon.length - 1) + " more dates", tl, false) : "",
+    areas,
+    "<button class='drow' data-go='../docs/proposal.html'>The October document<i>"
+      + svg("arrow", 16) + "</i></button>",
+    "<button class='drow' data-go='../docs/admin.html'>Company, pass and filings<i>"
+      + svg("arrow", 16) + "</i></button>"
+  ]);
   return h;
 }

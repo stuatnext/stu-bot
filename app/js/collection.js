@@ -174,41 +174,45 @@ function viewDeck(){
       : "Nothing found here yet.") + "</div>";
   }
 
-  /* spares, under the set they would finish */
+  /* Spares, the next door and the ladder are the collection talking about
+     itself. None of it is a thing to do today, so all of it waits in the
+     drawer list under the binder. */
   var sp = spares();
   var missing = cs.filter(function(c){ return !(S.cards || {})[c[0]] && c[1] !== 3; });
   var affordable = missing.filter(function(c){ return craftCost(c) <= sp; });
+  var spInner = "";
   if (DECKSET !== "gold"){
-    h += "<h2>Spares</h2><div class='panel'>";
-    h += "<div style='display:flex;align-items:center;gap:13px'>"
+    spInner = "<div style='display:flex;align-items:center;gap:13px'>"
       + "<span style='color:var(--jade);flex:none'>" + svg("spare", 30) + "</span>"
       + "<div style='flex:1'><div class='mono' style='font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--greenInk)'>"
       + num(sp) + "</div><div class='dim'>from " + num(sparesEarned()) + " earned</div></div></div>";
-    h += "<p class='dim' style='margin:10px 0 0'>Every card you pull twice is worth spares: "
+    spInner += "<p class='dim' style='margin:10px 0 0'>Every card you pull twice is worth spares: "
       + RARITY[0][4] + " for a common, " + RARITY[1][4] + " uncommon, " + RARITY[2][4] + " rare. "
       + "Trade them for a card you have not found — " + RARITY[0][5] + ", " + RARITY[1][5] + " or "
       + RARITY[2][5] + " — and nothing else. You choose the set and the rarity; the deck "
-      + "chooses the card. They are not money and they do not buy packs.</p>";
+      + "chooses the card.</p>";
     if (missing.length){
-      h += "<div class='btns'><button class='btn " + (affordable.length ? "go" : "quiet") + "'"
+      spInner += "<div class='btns'><button class='btn " + (affordable.length ? "go" : "quiet") + "'"
         + (affordable.length ? "" : " disabled") + " data-craft='" + DECKSET + "'>"
         + (affordable.length ? "Trade spares for a card" : "Not enough for anything in " + esc(st[1]))
         + "</button></div>";
     }
-    h += "</div>";
   }
 
-  /* the next door */
-  var door = nextDoor();
+  var door = nextDoor(), doorInner = "";
   if (door){
     var dleft = door[3] - fd;
-    h += "<div class='door'><span class='lk'>" + svg("lock", 18) + "</span>"
+    doorInner = "<div class='door'><span class='lk'>" + svg("lock", 18) + "</span>"
       + "<span class='bd'><b>" + esc(door[1]) + "</b><span>" + setCards(door[0]).length
       + " cards, locked until then.</span></span>"
       + "<span class='at'>" + dleft + " full<br>" + (dleft === 1 ? "day" : "days") + "</span></div>";
   }
-  /* the ladder lived on Today; progression belongs with the collection */
-  if (fd >= 3) h += seasonHTML();
+
+  h += drawers([
+    spInner ? fold("spares", "Spares", num(sp) + " held", spInner, false) : "",
+    doorInner ? fold("nextdoor", "The next set", (door[3] - fd) + " full days", doorInner, false) : "",
+    fd >= 3 ? fold("season", "The season", seasonMeta(), seasonHTML(true), false) : ""
+  ]);
   return h;
 }
 
@@ -272,13 +276,16 @@ function letGoUI(id){
 
 /* The doors were always a progression track; they were just never drawn as
    one. Nothing new is being invented here - these are the same six gates. */
-function seasonHTML(){
+/* how far through the deck he is, for the drawer header */
+function seasonMeta(){ return heldCount() + " of " + CARDS.length; }
+function seasonHTML(bare){
   var fd = fullDays(), locked = SETS.filter(function(s){ return s[3] > 0; })
     .sort(function(a,b){ return a[3] - b[3]; });
   if (!locked.length) return "";
   var next = locked.filter(function(s){ return fd < s[3]; })[0];
-  var h = "<div class='season'><div class='top'><b>The long game</b>"
-    + "<span class='mono'>" + heldCount() + " / " + CARDS.length + "</span></div>";
+  var h = "<div class='season" + (bare ? " bare" : "") + "'>"
+    + (bare ? "" : "<div class='top'><b>The long game</b>"
+      + "<span class='mono'>" + heldCount() + " / " + CARDS.length + "</span></div>");
   h += "<p>" + (next
       ? esc((next[3] - fd) + " more full " + (next[3] - fd === 1 ? "day" : "days") + " opens "
             + next[1] + " — " + setCards(next[0]).length + " cards that cannot turn up before then.")

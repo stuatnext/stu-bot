@@ -182,33 +182,31 @@ function viewBasics(){
     + "</div></div></div>";
 
 
-  var glasses = gl;
-  h += "<div class='glass' aria-label='Glasses'>";
+  /* The bottle is the whole interface. The eight marks are for correcting a
+     mis-tap and the week is history, so both wait in the drawer list. */
+  var marks = "<div class='glass' aria-label='Glasses'>";
   for (var gi = 1; gi <= WATER_GLASSES; gi++){
-    h += "<button class='gl" + (gi <= glasses ? " on" : "") + "' data-water='" + gi + "'"
+    marks += "<button class='gl" + (gi <= gl ? " on" : "") + "' data-water='" + gi + "'"
       + " aria-label='Glass " + gi + "'><i></i></button>";
   }
-  h += "</div>";
-  h += "<p class='fine'>" + (glasses >= WATER_GLASSES
-      ? "That is " + ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1) + "L, before the kopi."
-      : "The honest check is the colour, not the count.") + "</p>";
+  marks += "</div><p class='fine'>Tap any mark to set the count. "
+    + "The honest check is the colour, not the count.</p>";
 
-  /* The last seven days, as its own record rather than a line in a composite
-     score. A tab about water should be able to answer "am I actually doing
-     this" without sending him to another screen. */
-  h += "<div class='rulehead'><h3>The last week</h3><span></span><em>"
-    + hit7 + " of 7</em></div>";
-  h += "<div class='wk7'>";
+  var wk = "<div class='wk7'>";
   waterLast(7).forEach(function(row){
     var k = row[0], n = row[1], on = n >= WATER_GLASSES;
     var d = new Date(k + "T00:00:00");
-    h += "<div class='w7" + (on ? " on" : "") + (k === t ? " now" : "") + "'>"
+    wk += "<div class='w7" + (on ? " on" : "") + (k === t ? " now" : "") + "'>"
       + "<span class='w7b'><i style='height:"
       + Math.max(4, Math.round(100 * Math.min(n, WATER_GLASSES) / WATER_GLASSES)) + "%'></i></span>"
       + "<b>" + n + "</b>"
       + "<span class='w7d'>" + "SMTWTFS"[d.getDay()] + "</span></div>";
   });
-  h += "</div>";
-  h += "<p class='fine'>Eight is the line. Missing it breaks nothing.</p>";
+  wk += "</div><p class='fine'>Eight is the line. Missing it breaks nothing.</p>";
+
+  h += drawers([
+    fold("glasses", "Set the count", gl + " of " + WATER_GLASSES, marks, false),
+    fold("waterweek", "The last week", hit7 + " of 7 days", wk, false)
+  ]);
   return h;
 }

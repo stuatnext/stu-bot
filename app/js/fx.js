@@ -321,6 +321,16 @@ function fold(id, title, meta, inner, openDefault){
     + (open ? "<div class='fb'>" + inner + "</div>" : "")
     + "</div>";
 }
+/* Everything a tab knows that is not the answer to "what now" goes in here:
+   a single quiet list of doors at the foot of the screen. He asked to be
+   shown one or two things and to choose the rest, so a tab is now the
+   signature object, the next action, and this. */
+function drawers(rows){
+  var body = rows.filter(Boolean).join("");
+  if (!body) return "";
+  return "<div class='drawers'>" + body + "</div>";
+}
+
 function toggleFold(id){
   S.folds = S.folds || {};
   var f = S.folds, cur = document.querySelector("[data-fold='" + id + "']");
