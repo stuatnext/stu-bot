@@ -664,7 +664,19 @@ function autoLocate(){
 function locate(setPlace){
   if (!navigator.geolocation){ toast("This browser will not say where it is."); return; }
   toast("Asking the phone…");
+  /* On a Home Screen web app iOS sometimes never opens its prompt and never
+     answers either - a documented fault in standalone mode, where the alert is
+     aimed at a Safari tab that is not there. So there is a watchdog: silence
+     is a result too, and a different one from being told no. */
+  var answered = false;
+  var watch = setTimeout(function(){
+    if (answered) return;
+    answered = true;
+    if (setPlace) geoFailed({ code: 0, silent: true }); else toast("No location given.");
+  }, 9000);
   navigator.geolocation.getCurrentPosition(function(pos){
+    if (answered) return;
+    answered = true; clearTimeout(watch);
     var la = Math.round(pos.coords.latitude * 100) / 100;
     var lo = Math.round(pos.coords.longitude * 100) / 100;
     geoWorked();
@@ -682,23 +694,45 @@ function locate(setPlace){
     }
     render({ keepScroll: true });
   }, function(err){
-    toast(err && err.code === 1
-      ? "Location is off for this app. Settings → Daylight → Location."
-      : "No location given. The clock still knows the city.");
+    if (answered) return;
+    answered = true; clearTimeout(watch);
+    if (!setPlace){ toast("No location given."); return; }
+    geoFailed(err);
   }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
 }
 
 /* A toast is no use for something he has to go and change in Settings. */
 async function geoFailed(err){
   var denied = err && err.code === 1;
+  var silent = err && err.silent;
+  var standalone = false;
+  try {
+    standalone = !!(window.navigator.standalone
+      || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches));
+  } catch(e){}
+  /* The row this used to name does not exist. A web app on the Home Screen
+     does not get its own Location entry until iOS has actually asked, and it
+     may never ask: its location runs through the Safari setting, which is
+     where the switch really is. */
+  var say;
+  if (silent && standalone){
+    say = "The phone did not answer at all. That is a known fault in apps run from the "
+        + "Home Screen — iOS aims its location prompt at a Safari tab that is not "
+        + "there, so nothing opens and nothing comes back. Naming the place yourself "
+        + "works every time and outranks everything else.";
+  } else if (denied){
+    say = "Location for web pages is switched off, which is why there is no Location row "
+        + "under Daylight — that row only appears once iOS has asked. The switch is "
+        + "at Settings → Privacy & Security → Location Services → Safari "
+        + "Websites → While Using. Until then, name the place yourself.";
+  } else {
+    say = "No fix came back — indoors, or the phone was slow. Try again, or name the "
+        + "place yourself.";
+  }
   var v = await ask({
-    title: denied ? "Location is switched off" : "The phone would not say",
-    say: denied
-      ? "For an app on the Home Screen it is its own setting: Settings \u2192 Daylight "
-        + "\u2192 Location \u2192 While Using. Until then, name the place yourself \u2014 "
-        + "that works just as well and outranks everything."
-      : "No fix came back \u2014 indoors, or the phone was slow. Try again, or name the "
-        + "place yourself.",
+    title: silent ? "The phone said nothing" : denied ? "Location is off for web pages"
+                                                      : "The phone would not say",
+    say: say,
     options: [{ id: "__hand", label: "Name it myself", pri: true },
               { id: "__retry", label: "Try again" }],
     cancel: "Leave it"
