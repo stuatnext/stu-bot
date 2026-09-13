@@ -21,7 +21,7 @@ function load(){
             crafted:{}, sparesSpent:0, seen:{}, booted:0, onboarded:0, cardsWhy:0,
             season:1, vault:{}, setsEver:0, liftPick:{}, work:{},
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
-            monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1, showDone:{},
+            monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1, showDone:{}, notes:{},
             where:{}, walks:{}, levelSeen:0, gymHere:null,
             lifts:{}, food:{}, waist:[], kg:0,
             water:{}, sleep:{}, out:{},

@@ -126,6 +126,21 @@ function viewYou(){
         "A coach file — hand it back, get the next tuning")
     + "</div>";
 
+  /* Everything it has noticed, oldest at the bottom. This is the only part of
+     the app that is prose, and a year of it is a diary nobody had to keep. */
+  if (typeof dispatchLog === "function"){
+    var log = dispatchLog(60);
+    if (log.length){
+      var inner = "<div class='noteLog'>";
+      log.forEach(function(n){
+        inner += "<div class='note1'><span>" + esc(nice(n.day)) + "</span><p>" + esc(n.line) + "</p></div>";
+      });
+      inner += "</div>";
+      h += drawers([ fold("notes", "What it has noticed", num(log.length)
+        + (log.length === 1 ? " line" : " lines"), inner, false) ]);
+    }
+  }
+
   /* the paper that lives outside the game */
   h += "<div class='menu'>"
     + mrow("go", "../cal/", "gap", "Calendars", "Subscribe once in Apple Calendar")

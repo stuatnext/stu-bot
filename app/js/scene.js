@@ -95,6 +95,29 @@ function dayName(k){
 /* ------------------------------------------------------------ the week strip
    Seven dots ending on today: a full day burns green, a frozen one is ice,
    a miss is hollow, today is ringed. Consistency you can see at a glance. */
+/* The week, as the thing that is kept. Seven marks with the line drawn at
+   five, so the standard is visible rather than explained, and one sentence
+   saying where that leaves him. */
+function weekMeterHTML(){
+  var w = weekState(), days = weekAll(w.key), run = weekRun();
+  var h = "<div class='wkm" + (w.kept ? " kept" : "") + (!w.alive ? " gone" : "") + "'>";
+  h += "<div class='wkm-row'>";
+  days.forEach(function(k, i){
+    var future = k > today(), isToday = k === today();
+    var full = !future && allThree(k), ice = !future && frozen(k);
+    h += "<span class='wkm-d" + (full ? " on" : "") + (ice ? " ice" : "")
+      + (isToday ? " wkm-now" : "") + (future ? " soon" : "") + "'>"
+      + "<i>" + (full ? svg("tick", 12) : "") + "</i>"
+      + "<b>" + "MTWTFSS"[i] + "</b></span>";
+  });
+  h += "</div>";
+  h += "<div class='wkm-b'><span class='wkm-n'>" + w.full + "<em>/ " + WEEK_LINE + "</em></span>"
+    + "<span class='wkm-t'>" + esc(weekLine()) + "</span>"
+    + (run > 0 ? "<span class='wkm-r'>" + run + (run === 1 ? " week" : " weeks") + " kept</span>" : "")
+    + "</div></div>";
+  return h;
+}
+
 function weekHTML(){
   /* On day one the seven marks are seven blanks, which is a row of nothing
      across the top of the app. It appears once there is a day behind him. */
@@ -113,7 +136,7 @@ function weekHTML(){
     var full = allThree(k), ice = frozen(k), jet = !full && !ice && flying(k);
     var cls = full ? "on" : ice ? "ice" : jet ? "jet" : "";
     var started = PILLARS.some(function(g){ var f = firstDay(g[0]); return f && k >= f; });
-    h += "<span class='wd " + cls + (isToday ? " now" : "") + (started ? "" : " off") + "'>"
+    h += "<span class='wd " + cls + (isToday ? " wkm-now" : "") + (started ? "" : " off") + "'>"
       + "<i>" + (full ? svg("tick", 13) : ice ? svg("snow", 12) : jet ? svg("jet", 12) : "") + "</i>"
       + "<b>" + "SMTWTFS"[d.getDay()] + "</b></span>";
     d.setDate(d.getDate() + 1);
@@ -165,7 +188,11 @@ function viewToday(){
       + "</div>";
   }
 
-  h += weekHTML();
+  h += weekMeterHTML();
+  if (S.onboarded){
+    var dsp = dispatchFor(t);
+    if (dsp) h += "<p class='dispatch'>" + esc(dsp) + "</p>";
+  }
 
   /* the session: three big pressable rows. The hour points at one of them -
      that row wears the arrow and speaks the actual plan, so "what now?" never

@@ -93,6 +93,24 @@ function viewDeck(){
   }
 
 
+  /* The year, as the weeks behind him. A kept week is a thing you have; a
+     lost one is still on the shelf, because the record never deletes and the
+     pattern in a bad stretch is the lesson. */
+  if (S.onboarded && typeof weekShelf === "function"){
+    var shelf = weekShelf(14);
+    if (shelf.length){
+      h += "<div class='rulehead'><h3>The weeks</h3><span></span><em>"
+        + num(weeksKept()) + " kept" + (bestWeekRun() > 1 ? " \u00b7 best run " + bestWeekRun() : "")
+        + "</em></div>";
+      h += "<div class='shelf'>";
+      shelf.forEach(function(w){
+        h += "<div class='shw" + (w.kept ? " kept" : "") + "'>"
+          + "<b>" + w.full + "</b><span>" + esc(w.label) + "</span></div>";
+      });
+      h += "</div>";
+    }
+  }
+
   /* The week's three pay into the pot, so they belong with the pot rather
      than on Today, where they were a third door in a row of doors. Flat: a
      heading and three bars, nothing to open. */
