@@ -40,6 +40,15 @@ function viewYou(){
     + money(potTotal()) + " earned so far</span></span>"
     + "<span class='pd-c'>" + svg("arrow", 18) + "</span></button>";
 
+  /* The whole book, in five sentences. It sits under the crest because the
+     crest is the number and this is the meaning of it. */
+  h += soFarHTML();
+
+  /* who is at the other end of the third pillar, and what o'clock it is
+     there. This is the only panel on the screen that is about other people,
+     which is why it sits above his own streaks rather than below them. */
+  if (typeof peoplePanelHTML === "function") h += peoplePanelHTML();
+
   /* the streaks, and the net under them */
   h += "<div class='panel'><h3>Streaks</h3><div class='str3'>";
   PILLARS.forEach(function(g){
@@ -785,4 +794,163 @@ async function askReset(){
   S.quests = {}; S.lived = {}; S.chips = {}; S.chipRewards = {}; S.lastBackup = 0;
   save(); sfx("no");
   tab = "today"; render({ turn: true, animate: true });
+}
+
+/* ===================================================================== so far
+   The only screen in the app that is about the whole thing.
+
+   Everything else here answers a question about today, this week, or this
+   month, which between them add up to an app that has kept a year of his
+   life and never once shown it to him. That is the wrong shape for a
+   ledger belonging to someone who has said his short-term memory is where
+   the difficulty is: the app IS the memory, and a memory you cannot read
+   back is a filing cabinet.
+
+   So: a portrait, in prose, computed. No table, no chart, no achievement
+   grid - four or five sentences of plain fact, the way a person who had
+   been keeping the book would tell you what is in it. It changes slowly,
+   which is the point. It is the part he would show someone. */
+
+/* The day the record starts: the earliest any pillar was ever ticked. */
+function recordStart(){
+  var first = null;
+  PILLARS.forEach(function(g){
+    var f = firstDay(g[0]);
+    if (f && (!first || f < first)) first = f;
+  });
+  return first;
+}
+/* Every city the record has him standing in, and how many days in each. Home
+   is not a city he travelled to, so it is counted separately. */
+function citiesEver(){
+  var out = {}, home = 0;
+  Object.keys(S.where || {}).forEach(function(k){
+    var r = S.where[k];
+    if (!r || !r.c) return;
+    if (r.k === "home"){ home++; return; }
+    out[r.c] = (out[r.c] || 0) + 1;
+  });
+  return { list: Object.keys(out).sort(function(a, b){ return out[b] - out[a]; }),
+           days: out, home: home };
+}
+/* Weeks he kept while away from home - the ones that prove the thing is a
+   habit and not a routine that only survives at home. */
+function weeksKeptAway(){
+  if (typeof weekKeys !== "function") return 0;
+  return weekKeys().filter(function(wk){
+    if (!weekKept(wk)) return false;
+    return weekAll(wk).some(function(k){
+      var r = (S.where || {})[k];
+      return r && r.k && r.k !== "home";
+    });
+  }).length;
+}
+/* The weekday the record breaks on most often, across all three pillars.
+   monthLedger computes this a month at a time; this is the whole book. */
+function weakestDay(){
+  var first = recordStart();
+  if (!first) return null;
+  var miss = [0,0,0,0,0,0,0], t = today();
+  Object.keys(S.days).forEach(function(k){
+    if (k < first || k >= t) return;
+    if (allThree(k) || carried(k)) return;
+    var any = PILLARS.some(function(g){ return required(g[0], k) && !pDone(k, g[0]); });
+    if (any) miss[new Date(k + "T00:00:00").getDay()]++;
+  });
+  var top = 0;
+  for (var i = 1; i < 7; i++) if (miss[i] > miss[top]) top = i;
+  if (miss[top] < 3) return null;            /* not a pattern yet, just days */
+  return { dow: top, n: miss[top],
+           name: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][top] };
+}
+/* Every conversation logged, and the longest silence he has ever closed. */
+function callsEver(){
+  if (typeof people !== "function") return null;
+  var ps = people();
+  if (!ps.length) return null;
+  var n = 0, longest = null;
+  ps.forEach(function(p){
+    var l = spokeList(p.id);
+    n += l.length;
+    for (var i = 0; i + 1 < l.length; i++){
+      var gap = Math.round((new Date(l[i] + "T00:00:00") - new Date(l[i + 1] + "T00:00:00")) / 86400000);
+      if (!longest || gap > longest.gap) longest = { gap: gap, name: p.name };
+    }
+  });
+  return { n: n, people: ps.length, longest: longest };
+}
+
+/* The portrait itself. Sentences, built only from what is actually there -
+   a thin record produces two lines rather than five lines of zeroes. */
+function soFar(){
+  var first = recordStart();
+  if (!first) return null;
+  var t = today();
+  var days = Math.max(1, Math.round((new Date(t + "T00:00:00")
+    - new Date(first + "T00:00:00")) / 86400000) + 1);
+  var out = [], full = fullDays();
+
+  out.push("The record starts on " + nice(first) + ", " + num(days)
+    + (days === 1 ? " day" : " days") + " ago. "
+    + num(full) + " of them closed with all three.");
+
+  /* "47 x trained" is a spreadsheet. Each pillar gets the verb it actually
+     is, so the sentence reads as something a person would say. */
+  var SAY = { train: "Trained on %n days", family: "called home on %n",
+              stop:  "finished on time on %n" };
+  var bits = [];
+  PILLARS.forEach(function(g){
+    var n = totalDone(g[0]);
+    if (n > 0) bits.push((SAY[g[0]] || g[1] + " %n").replace("%n", num(n)));
+  });
+  if (bits.length){
+    var sess = typeof sessionsDone === "function" ? sessionsDone() : 0;
+    out.push(bits.join(", ") + (sess ? ", and " + num(sess)
+      + (sess === 1 ? " session" : " sessions") + " written down move by move" : "") + ".");
+  }
+
+  var best = bestRunEver(), wk = typeof weeksKept === "function" ? weeksKept() : 0;
+  var wrun = typeof bestWeekRun === "function" ? bestWeekRun() : 0;
+  if (best > 1 || wk > 0){
+    /* "6 weeks kept, 6 of them back to back" is the same fact twice - the
+       clause is only worth saying when the run is shorter than the total. */
+    out.push("The longest run is " + num(best) + (best === 1 ? " day" : " days")
+      + (wk ? ", and " + num(wk) + (wk === 1 ? " week has" : " weeks have") + " been kept"
+           + (wrun > 1 && wrun < wk ? ", " + num(wrun) + " of them back to back" : "") : "") + ".");
+  }
+
+  var c = citiesEver();
+  if (c.list.length){
+    var away = weeksKeptAway();
+    out.push("It has followed you to " + num(c.list.length)
+      + (c.list.length === 1 ? " place" : " places") + " — "
+      + c.list.slice(0, 4).join(", ")
+      + (c.list.length > 4 ? " and " + num(c.list.length - 4) + " more" : "") + "."
+      + (away ? " " + num(away) + (away === 1 ? " week was kept" : " weeks were kept")
+        + " from somewhere that was not home." : ""));
+  }
+
+  var calls = callsEver();
+  if (calls && calls.n > 0){
+    out.push(num(calls.n) + (calls.n === 1 ? " conversation" : " conversations")
+      + " with home, logged one at a time"
+      + (calls.longest && calls.longest.gap >= 14
+         ? ". The longest silence you have closed is " + num(calls.longest.gap)
+           + " days, with " + calls.longest.name : "") + ".");
+  }
+
+  var wd = weakestDay();
+  if (wd) out.push("The day it goes wrong most often is " + wd.name
+    + " — " + num(wd.n) + " times. That is worth knowing and not worth "
+    + "feeling bad about.");
+
+  return out;
+}
+
+function soFarHTML(){
+  var lines = soFar();
+  if (!lines || !lines.length) return "";
+  return "<div class='panel sofar'><h3>So far</h3>"
+    + lines.map(function(l){ return "<p>" + esc(l) + "</p>"; }).join("")
+    + "</div>";
 }

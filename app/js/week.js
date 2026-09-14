@@ -97,5 +97,8 @@ function weekLine(){
   var w = weekState();
   if (w.kept) return "kept";
   if (!w.alive) return "short this week";
-  return w.need === 1 ? "one day off keeping it" : w.need + " days off keeping it";
+  /* "5 days off keeping it" scans as "5 days off FROM keeping it", which is
+     the opposite of what it means. Say what is needed instead of what is
+     missing. */
+  return w.need === 1 ? "one more full day" : w.need + " more full days";
 }

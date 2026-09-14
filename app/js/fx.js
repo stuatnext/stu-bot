@@ -86,6 +86,10 @@ function ask(opts){
     h += "<h3>" + esc(opts.title || "") + "</h3>";
     if (opts.say) h += "<p class='say'>" + opts.say + "</p>";
     if (opts.pre) h += "<div class='pre'>" + esc(opts.pre) + "</div>";
+    /* Raw markup, for a sheet whose body is a list rather than a paragraph.
+       Any [data-mk] inside it resolves the promise exactly like an option
+       does, so a caller can build its own rows and still get one answer. */
+    if (opts.html) h += opts.html;
     if (opts.field){
       var f = opts.field;
       if (f.label) h += "<label for='mkField'>" + esc(f.label) + "</label>";

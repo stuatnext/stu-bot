@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v51";
+var BUILD = "v52";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -176,7 +176,13 @@ document.addEventListener("click", function(ev){
 
   if (ds.coachskip){ coachSkip(); return; }
   if (ds.tab){ go(ds.tab); return; }
-  if (ds.p){ tapPillar(ds.p, b); return; }
+  if (ds.p){
+    /* Family means people once he has named any, so the tap opens the roster
+       rather than toggling a box with nobody behind it. */
+    if (ds.p === "family" && typeof askPeople === "function"
+        && (!peopleEmpty() || !S.peopleSeeded)){ askPeople(); return; }
+    tapPillar(ds.p, b); return;
+  }
   if (ds.slot){ askAnchor(ds.slot); return; }
   if (ds.fin){ askFinisher(); return; }
   if (ds.walk){ askWalk(b); return; }
@@ -206,7 +212,10 @@ document.addEventListener("click", function(ev){
   if (ds.water){ tapWater(Number(ds.water)); return; }
   if (ds.sleep){ askSleep(); return; }
   if (ds.out){ tapOut(); return; }
+  if (ds.openclose){ closeOpening(); return; }
   if (ds.care){ tapCare(ds.care); return; }
+  if (ds.editpeople){ editPeople(); return; }
+  if (ds.addperson){ addPerson(); return; }
   if (ds.newseason){ askNewSeason(); return; }
   if (ds.work){ toggleWork(ds.work); return; }
   if (ds.workdone){ S.showDone = S.showDone || {};
@@ -280,7 +289,8 @@ document.addEventListener("click", function(ev){
 /* Back closes whatever is on top before it leaves the app. */
 window.addEventListener("keydown", function(ev){
   if (ev.key !== "Escape") return;
-  if (MODAL) MODAL.close(null);
+  if (typeof OPENING !== "undefined" && OPENING) closeOpening();
+  else if (MODAL) MODAL.close(null);
   else if (typeof SESSION !== "undefined" && SESSION) closeSession();
   else if (document.getElementById("sheet").className) closeSheet();
   else if (document.getElementById("chip").className) closeChip();
@@ -322,6 +332,11 @@ openGate();
 /* A rest running when the app was closed or reloaded is still running. */
 restPaint();
 restSync();
+
+/* The front page, if one is due. After the gate and the tour, never over a
+   ceremony, once a day. */
+setTimeout(function(){ if (typeof showOpening === "function") showOpening(); },
+  reduced() ? 40 : 900);
 
 /* Opening the app answers the badge; keep the mirror warm for tonight. */
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch(e){}

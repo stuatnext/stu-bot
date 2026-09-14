@@ -14,7 +14,13 @@
    Rules, not a model: this app is offline and the record never leaves the
    phone, so the writing is done here, in advance, and the record chooses
    which of it is true. Each entry is [ id, weight, test, write ]. Highest
-   weight that tests true wins; ties break on the day, so it varies. */
+   weight that tests true wins; ties break on the day, so it varies.
+
+   ONE INVARIANT: write() must be total. It is only ever called in anger on a
+   context its test() approved, but the suite renders every line against a
+   bare context to prove none of them can throw on a thin record - so a
+   writer that reaches into a nullable field has to carry its own fallback,
+   even a fallback nobody will read. */
 
 function dispatchCtx(k){
   var w = weekState(), run = weekRun();
@@ -33,7 +39,15 @@ function dispatchCtx(k){
     fam: (typeof streak === "function") ? streak("family") : 0,
     stop: (typeof streak === "function") ? streak("stop") : 0,
     waist: (typeof waistTrend === "function") ? waistTrend() : null,
-    sit: sit
+    sit: sit,
+    /* the people, if he has named any */
+    ppl: (typeof people === "function") ? people().length : 0,
+    due: (typeof personDue === "function") ? personDue() : null,
+    calls: (typeof people === "function") ? people().reduce(function(n, p){
+      return n + (typeof spokeCount === "function" ? spokeCount(p.id) : 0); }, 0) : 0,
+    /* a gap closed today: the only people-fact the Family row cannot show,
+       because by the time it renders the gap is nought */
+    closed: (typeof gapClosed === "function") ? gapClosed(k) : null
   };
 }
 
@@ -69,7 +83,7 @@ var DISPATCHES = [
     function(c){ return "The tape has moved the right way. That is eight weeks of work showing up late, "
       + "which is how it always shows up."; }],
 
-  /* --- the people -------------------------------------------------------- */
+  /* --- the streaks on the other two pillars ------------------------------ */
   ["f-run", 87, function(c){ return c.fam >= 7; },
     function(c){ return num(c.fam) + " days of calling home. Sheffield is eight hours behind and you "
       + "have managed it anyway."; }],
@@ -78,6 +92,25 @@ var DISPATCHES = [
   ["s-stop", 79, function(c){ return c.stop >= 5; },
     function(c){ return num(c.stop) + " days finishing when you said you would. The shift ends at 23:00 "
       + "whether or not you do."; }],
+
+  /* --- the people, once he has named them ---------------------------------
+     Nothing here repeats "N days since Mum": the Family row already says that,
+     in the right place, with her clock next to it. These are the things the
+     row cannot say - a gap that just closed, a list with nobody adrift on it,
+     a total nobody was counting. */
+  ["h-closed", 94, function(c){ return c.closed && c.closed.was >= 14; },
+    function(c){ var x = c.closed || { name: "home", was: 0, best: false };
+      return "You rang " + x.name + " after " + x.was + " days. That is the longest gap "
+        + "you have closed" + (x.best ? " yet" : " in a while") + "."; }],
+  ["h-all-in", 86, function(c){ return c.ppl >= 2 && !c.due; },
+    function(c){ return "Nobody on the list has drifted past their rhythm. That has not always "
+      + "been true."; }],
+  ["h-calls", 84, function(c){ return c.calls >= 25; },
+    function(c){ return num(c.calls) + " conversations logged with home since you started "
+      + "counting them. None of them happened by accident."; }],
+  ["h-first", 88, function(c){ return c.calls === 1; },
+    function(c){ return "One call on the record. The deck has had a card about this since the "
+      + "day it was written."; }],
 
   /* --- where he is ------------------------------------------------------- */
   ["t-away", 76, function(c){ return !c.sit.home && c.sit.day === 1; },

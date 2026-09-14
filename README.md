@@ -86,6 +86,67 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v52: who is at the other end of it
+
+Three rounds of design work had made the screens calm. None of them had made
+the app worth *opening* — every screen answered "what do I owe?", and opening
+it showed the state he closed it in. Nothing had happened.
+
+**The people.** The third pillar is "a conversation with someone at home", and
+the app's entire answer to it was a checkbox. His own deck already said this
+better than a spec could: the Sheffield set is subtitled *"Home, and the people
+you said you rarely speak to"*, and two of its cards are *"A call, not a text —
+you said you rarely speak to them. This is the card that fixes it"* and
+*"Germany — the friend since primary school, kept alive on almost nothing."* He
+told the app that. The app wrote it down and kept offering him a tickbox.
+
+So `people.js`: a roster, where each person has a place and therefore a clock
+and a rhythm — how often he actually wants to speak to them. Tapping Family
+opens *who did you speak to*, and a name is one tap that logs the call and
+ticks the day. The Family row on Today wears the live line whether or not the
+hour is pointing at it — "3 weeks since Mum · 09:42 there, mid-morning" — since
+burying it until Family happens to be up next would bury it on most days. The
+window arithmetic is the actual help: he is eight hours ahead of Sheffield on a
+shift fixed to Malta, so the honest reason he does not ring is that the window
+is narrow and moves twice a year. `Intl` does that, DST included, for anywhere
+on earth.
+
+Three rules it keeps. **It never invents a person** — the only name seeded is
+Mum, because `briefFor` has marked Wednesday as her day since long before this
+file; everyone else he adds. **Drifting is not failing** — nothing here touches
+the run, the week or the streak, and a person with no rhythm set is never
+"overdue". **He can decline it outright**, and the pillar goes back to being a
+box: an app that insists on knowing about your family is worse than one with a
+checkbox.
+
+**The front page.** Once a day, on the first open, `opening.js` has something
+ready: the day that just closed and what it did to the week, then today's
+fixture, then two or three facts. It is allowed to exist only because it is a
+*moment* and not a block — it takes the screen for four seconds and then it is
+not anywhere, and nothing was added to Today to build it. Come back after a
+fortnight away and it leads with "Nothing was lost", because the app that
+scolds you for returning is the app you stop returning to.
+
+**Tomorrow.** A finished day used to go silent: three ticks, a pack, nothing
+until morning. Now it faces forward — one line, only once all three have
+landed, carrying what the week still needs, tomorrow's session, and who is due.
+
+**So far.** The app had kept a year of his life and never once shown it to him,
+which is the wrong shape for a ledger belonging to someone whose stated
+difficulty is short-term memory. A portrait, in prose, computed: where the
+record starts, what is in it, the places it has followed him to, the weeks kept
+from somewhere that was not home, the longest silence he has closed, and the
+weekday it goes wrong on — said without turning it into a reprimand.
+
+**One thing came out.** The coach file is the single thing in this app meant to
+leave the phone, and it dumped all of `S`. Names are now the most personal
+thing in there and they add nothing to a tuning question, so the roster, the
+call log and the written notes all go out as "Person 1", "Person 2". The
+backup file is untouched — that one goes from his phone to his own storage and
+back.
+
+446 checks across six suites.
+
 #### Seasons, and why nothing here ends
 
 He put it plainly: *"there is no completing this game, because a healthy life and routine is

@@ -23,6 +23,7 @@ function load(){
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
             monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1, showDone:{}, notes:{},
             where:{}, walks:{}, levelSeen:0, gymHere:null, care:{},
+            people:[], spoke:{}, peopleSeeded:0, lastOpen:"",
             lifts:{}, food:{}, waist:[], kg:0,
             water:{}, sleep:{}, out:{},
             hand:{ do:[], in:[] }, doneDo:{}, kept:{}, dealtDo:{}, dealtIn:{},
@@ -72,6 +73,18 @@ function mirrorState(){
                  /* the shift, in the phone's own clock, so the middle-of-the-day
                     pings can say what is actually about to happen */
                  shift: { start: sh.startT, end: sh.endT, none: !!sh.noShift },
+                 /* whoever he has drifted furthest past, and what o'clock it
+                    is where they are - the one thing a push can tell him that
+                    he genuinely does not know */
+                 who: (function(){
+                   if (typeof personDue !== "function") return null;
+                   var d = personDue();
+                   if (!d) return null;
+                   var m = zoneMin(d.tz);
+                   return { name: d.name, since: sinceWord(d.id),
+                            at: m === null ? "" : hhmm(m),
+                            up: m === null ? 0 : (windowAt(m) === "asleep" ? 0 : 1) };
+                 })(),
                  badgeOn: S.badge ? 1 : 0 };
     caches.open("daylight-state").then(function(c){
       return c.put("state", new Response(JSON.stringify(body),
@@ -546,16 +559,25 @@ function tipFor(key, day){
 
    Every screen and both pushes read this same function, so the app can never
    tell him two different things about the same day. */
-function priority(){
+/* opts.noPacks: ask for the day rather than the backlog. The front page uses
+   it, because "open it below" is nonsense on a screen with no below - and
+   because a pile of unopened packs is a nice problem, not the thing the day
+   is about. */
+function priority(opts){
   var t = today(), sit = situation();
   var w = packsWaiting(), packs = w.day + w.streak;
-  if (packs) return { ask: packs === 1 ? "That is a pack." : packs + " packs waiting.",
-                      sub: "Earned, not given. Open it below." };
+  if (packs && !(opts && opts.noPacks))
+    return { ask: packs === 1 ? "That is a pack." : packs + " packs waiting.",
+             sub: "Earned, not given. Open it below." };
   var rc = recordChase(), r = rank(), dn = daysToNext(r);
   if (allThree(t)){
     var tb = briefFor(shift(1));
-    var sub = rc && rc.at ? "Record pace \u2014 " + rc.run + " days. Back tomorrow."
+    var wk = typeof weekState === "function" ? weekState() : null;
+    var sub = wk && !wk.kept && wk.alive && wk.need === 1
+                ? "One more full day keeps the week."
+            : rc && rc.at ? "Record pace \u2014 " + rc.run + " days. Back tomorrow."
             : dn && dn <= 3 ? "Level " + (r.level + 1) + " in " + dn + (dn === 1 ? " full day." : " full days.")
+            : wk && wk.kept ? "The week is kept. Nothing owed until Monday."
             : "Tomorrow \u00b7 " + (tb.gym || tb.first);
     return { ask: "Today is in.", sub: sub };
   }
@@ -578,7 +600,11 @@ function priority(){
              sub: stake || (ga ? ga.sub : "Gym, a run, or a long walk."),
              cta: ga && ga.cta ? ga.cta : null };
   }
-  if (up === "family") return { ask: "Call home.", sub: stake || familyLine() };
+  if (up === "family"){
+    var due = typeof personDue === "function" ? personDue() : null;
+    return { ask: due ? "Ring " + due.name + "." : "Call home.",
+             sub: stake || (typeof peopleLine === "function" ? peopleLine() : familyLine()) };
+  }
   var sh = shape();
   return { ask: sh.now >= sh.end && !sh.noShift ? "Stop. Malta finished at " + sh.endT + "."
                                                 : "Stop when Malta does.",
@@ -590,7 +616,7 @@ function planLine(key){
     var ga = typeof gymAsk === "function" ? gymAsk() : null;
     return ga && ga.row ? ga.row : tipFor("train");
   }
-  if (key === "family") return familyLine();
+  if (key === "family") return typeof peopleLine === "function" ? peopleLine() : familyLine();
   return stopLine();
 }
 
@@ -815,6 +841,51 @@ function monthRecapDue(){
    The loop he asked for: download this, hand it to Claude, get the next
    tuning of the game back. Instructions ride inside the file so any future
    session knows what it is holding. */
+/* The coach file is the one thing in this app that is meant to leave the
+   phone. Everything else - the pin, the backups, the push payloads - was
+   built on the rule that the record stays here, and this file is the single
+   deliberate exception, handed over by him, on purpose.
+
+   Which means the people have to come out of it. Their names are now the
+   most personal thing the app holds, and they add nothing whatsoever to a
+   tuning question: what a coach needs is the SHAPE - how many, what rhythm,
+   how far adrift, what time zone the call has to cross - and all of that
+   survives being anonymous. So the roster, the call log and the written
+   notes are all rewritten as "Person 1", "Person 2" on the way out.
+
+   exportSave is deliberately NOT touched. That file is his own restore
+   point; it goes from his phone to his own storage and back. */
+function coachSafe(){
+  var copy = {}, k;
+  for (k in S) copy[k] = S[k];
+  var names = [];
+  copy.people = (S.people || []).map(function(p, i){
+    names.push(String(p.name || ""));
+    return { id: "p" + (i + 1), name: "Person " + (i + 1),
+             where: p.where || "", tz: p.tz || "", every: p.every || 0 };
+  });
+  var spoke = {};
+  (S.people || []).forEach(function(p, i){
+    var l = (S.spoke || {})[p.id];
+    if (l && l.length) spoke["p" + (i + 1)] = l;
+  });
+  copy.spoke = spoke;
+  /* the day's written line can name them too, and that log is the part of
+     the file most worth reading, so it is rewritten rather than dropped */
+  if (S.notes){
+    var notes = {};
+    Object.keys(S.notes).forEach(function(d){
+      var line = String(S.notes[d]);
+      names.forEach(function(n, i){
+        if (n.length >= 3) line = line.split(n).join("Person " + (i + 1));
+      });
+      notes[d] = line;
+    });
+    copy.notes = notes;
+  }
+  return copy;
+}
+
 function coachExport(){
   var derived = {
     months: monthsWithData().map(monthLedger),
@@ -834,7 +905,13 @@ function coachExport(){
     comebacks: comebackDays(),
     look: S.look || "sky",
     badge: S.badge ? 1 : 0,
-    pushOn: S.pushOn ? 1 : 0
+    pushOn: S.pushOn ? 1 : 0,
+    people: (S.people || []).length,
+    callsLogged: Object.keys(S.spoke || {}).reduce(function(n, id){
+      return n + ((S.spoke[id] || []).length); }, 0),
+    adrift: (typeof personOver === "function")
+      ? (S.people || []).filter(function(p){ return personOver(p) > 0; }).length : 0,
+    routineDays: Object.keys(S.care || {}).length
   };
   return "# Daylight coach file\n\n"
     + "Exported " + today() + " from build " + (typeof BUILD !== "undefined" ? BUILD : "?") + ".\n\n"
@@ -846,8 +923,11 @@ function coachExport(){
     + "completion rate, lived cards, named rewards); then propose the smallest change to the\n"
     + "game that would most improve his consistency. Tune, do not redesign - and check the\n"
     + "proposal against what he has already approved before building anything.\n\n"
+    + "Names in the roster, the call log and the written notes are replaced with\n"
+    + "`Person 1`, `Person 2` and so on before export. That is deliberate: the shape\n"
+    + "is what a tuning question needs, and who they are is his business.\n\n"
     + "```json\n"
-    + JSON.stringify({ exported: today(), derived: derived, save: S }, null, 1)
+    + JSON.stringify({ exported: today(), derived: derived, save: coachSafe() }, null, 1)
     + "\n```\n";
 }
 

@@ -87,6 +87,15 @@ function niceToday(){
   return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()]
     + " " + d.getDate() + " " + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()];
 }
+/* A ticked row said "done" three times over. Family can say who, which is
+   the only one of the three where the answer is a person. */
+function doneLine(key){
+  if (key === "family" && typeof spokeToday === "function"){
+    var did = spokeToday();
+    if (did.length) return "spoke to " + did.map(function(p){ return p.name; }).join(" and ");
+  }
+  return "done";
+}
 function dayName(k){
   return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
     [new Date(k + "T00:00:00").getDay()];
@@ -211,7 +220,15 @@ function viewToday(){
       + "<span class='po-t'>" + esc(g[1]) + "</span>"
       + "<span class='po-s'>"
       + esc(carry ? (sit.kind === "holiday" ? "on holiday" : "no shift today")
-            : isUp ? planLine(g[0]) : on ? "done" : g[5]) + "</span>"
+            : isUp ? planLine(g[0])
+            : on ? doneLine(g[0])
+            /* Family wears the live line whether or not the hour is pointing
+               at it: "three weeks since Mum" is the whole reason the roster
+               exists, and burying it until Family happens to be up next
+               would be burying it on most days. */
+            : (g[0] === "family" && typeof peopleEmpty === "function" && !peopleEmpty())
+              ? peopleLine()
+            : g[5]) + "</span>"
       + (st > 0 && !carry ? "<span class='po-st'>" + st + "</span>" : "")
       + "<span class='po-c'>" + (on ? svg("tick", 19) : "") + "</span>"
       + "</button></li>";
@@ -229,6 +246,14 @@ function viewToday(){
       var cl = careLine();
       if (cl) h += "<p class='care-l'>" + esc(cl) + "</p>";
     }
+  }
+
+  /* A day that is in is not a day with nothing in it. One line, the fixture
+     list, and only once all three have landed - so it costs the screen
+     nothing on the days he is still working through it. */
+  if (S.onboarded && done === PILLARS.length && typeof tomorrowLine === "function"){
+    var tl = tomorrowLine();
+    if (tl) h += "<div class='tmw'><span>Tomorrow</span><b>" + esc(tl) + "</b></div>";
   }
 
   h += conditionHTML(true);

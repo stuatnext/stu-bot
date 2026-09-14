@@ -11,7 +11,7 @@
      files: freshness wins.
    - VERSION changes with every release, and the build number is painted on
      the title card and the You screen so what the phone runs is visible. */
-var VERSION = "daylight-v51";
+var VERSION = "daylight-v52";
 /* Written by the app on every save; read here when a push lands, because a
    service worker cannot see localStorage. Never versioned, never deleted. */
 var STATE_CACHE = "daylight-state";
@@ -24,7 +24,8 @@ var SHELL = [
   "./js/fx.js", "./js/art.js", "./js/cardui.js", "./js/scene.js",
   "./js/collection.js", "./js/quest.js", "./js/gym.js", "./js/food.js",
   "./js/week.js", "./js/dispatch.js",
-  "./js/basics.js", "./js/care.js", "./js/work.js", "./js/vault.js", "./js/you.js",
+  "./js/basics.js", "./js/care.js", "./js/people.js", "./js/opening.js",
+  "./js/work.js", "./js/vault.js", "./js/you.js",
   "./js/coach.js", "./js/app.js",
   "./fonts.css",
   "./fonts/nunito-latin.woff2", "./fonts/nunito-latin-ext.woff2",
@@ -131,6 +132,16 @@ function andList(a){
   if (a.length === 2) return a[0] + " and " + a[1];
   return a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
 }
+/* The one sentence a push can carry that he genuinely does not know, because
+   it is arithmetic across a time zone and a calendar: who he has drifted
+   furthest from, and whether they are awake right now. Only ever one, only
+   ever when they are actually past the rhythm he set himself. */
+function whoLine(st){
+  var w = st && st.who;
+  if (!w || !w.name) return "";
+  return w.since + " since " + w.name
+    + (w.at ? " \u00b7 " + w.at + " there" + (w.up ? " and up." : ", asleep.") : ".");
+}
 function careWord(st, part, label){
   var c = st && st.care && st.care[part];
   return !!(c && c.indexOf(label) !== -1);
@@ -173,7 +184,9 @@ function composeNudge(kind, st, nowISO, dow, hour){
     }
     /* one extra sentence at most: the chip if one is close, otherwise the level */
     var cl = chipLine(st);
-    if (cl) out.body += " " + cl;
+    var wl0 = whoLine(st);
+    if (wl0 && st && st.who && st.who.up) out.body += " " + wl0;
+    else if (cl) out.body += " " + cl;
     else if (st && st.level && st.level.away && st.level.away <= 2)
       out.body += " Level " + (st.level.n + 1) + " in " + st.level.away
         + (st.level.away === 1 ? " full day." : " full days.");
@@ -246,7 +259,10 @@ function composeNudge(kind, st, nowISO, dow, hour){
         out.title = run > 0 ? "The run is at stake" : "Day at risk";
         out.body = andList(open) + (open.length === 1 ? " is" : " are") + " still open"
           + (run > 0 ? ". " + run + " days on the line." : ".");
-        if (st.best >= 7 && run >= st.best) out.body += " Tonight is a new record.";
+        /* if home is one of the open ones, who it is beats what it is worth */
+        var wl = open.indexOf("Family") !== -1 ? whoLine(st) : "";
+        if (wl) out.body += " " + wl;
+        else if (st.best >= 7 && run >= st.best) out.body += " Tonight is a new record.";
         else if (st.best >= 7 && st.best - run <= 3) out.body += " " + (st.best - run) + " from your record.";
         else if (st.level && st.level.away === 1) out.body += " Tonight is a level.";
       } else {
