@@ -68,7 +68,7 @@ var TIERS = null;
 function tierTable(){
   if (TIERS) return TIERS;
   var keys = [];
-  [S.days, S.lifts, S.water, S.sleep, S.out, S.food].forEach(function(o){
+  [S.days, S.lifts, S.water, S.sleep, S.out, S.food, S.care].forEach(function(o){
     Object.keys(o || {}).forEach(function(k){ keys.push(k); });
   });
   Object.keys(S.done || {}).forEach(function(n){ keys.push(S.done[n]); });
@@ -110,6 +110,8 @@ function metricCount(metric, days){
     if (metric === "bed"    && d && d.bedok === true) n++;
     if (metric === "fam"    && pDone(k, "family")) n++;
     if (metric === "stop"   && pDone(k, "stop")) n++;
+    if (metric === "skin"   && careOn(k, "skin")) n++;
+    if (metric === "wind"   && careOn(k, "bed")) n++;
   });
   if (metric === "place"){
     n = Object.keys(S.done || {}).filter(function(name){

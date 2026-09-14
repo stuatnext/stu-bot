@@ -218,6 +218,19 @@ function viewToday(){
   });
   h += "</ol>";
 
+  /* The routines, and only the ones the hour is actually about. They sit with
+     the three things because that is what they are - things to do today - but
+     they are a line of chips rather than index rows, because they carry
+     nothing: no streak on the row, no arrow, no consequence. */
+  if (S.onboarded){
+    var cr = careHTML();
+    if (cr){
+      h += cr;
+      var cl = careLine();
+      if (cl) h += "<p class='care-l'>" + esc(cl) + "</p>";
+    }
+  }
+
   h += conditionHTML(true);
 
   /* the chest */

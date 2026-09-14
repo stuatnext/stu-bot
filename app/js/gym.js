@@ -273,7 +273,7 @@ function trainWhen(){
   if (sh.noShift) return "No shift today. Earlier is more day.";
   if (sh.now < sh.start) return "Before Malta wakes at " + sh.startT + " \u00b7 " + dur(sh.start - sh.now) + " of yours";
   if (sh.working) return "Malta is on until " + sh.endT + ". Twenty minutes still counts.";
-  return "Malta is closed. A short one now, or tomorrow before " + sh.startT + ".";
+  return "Malta is done for the day. A short one now, or tomorrow before " + sh.startT + ".";
 }
 /* The one instruction, for the Today card, the pillar row and the brief. */
 function gymAsk(){

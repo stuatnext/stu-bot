@@ -571,7 +571,7 @@ var TIPS = {
     "Five minutes counts if it is a real five minutes."
   ],
   stop: [
-    "Malta is closed. Shut the laptop and take the point.",
+    "Malta is done. Shut the laptop and take the point.",
     "The shift ends when it ends. That is the whole skill.",
     "Nothing after 23:00 is work; it is worry with a keyboard.",
     "Stopping on time tonight is tomorrow's energy."
@@ -1109,6 +1109,32 @@ var VITALS = [
   ["out",     "Outside", "left the flat"]
 ];
 
+/* ================================================================ routines
+   Three small things that are not pillars and never will be. He asked for a
+   skin-care routine, sunscreen "each day when needed", and to be better at
+   doing things before bed - none of which belong on the streak. The three
+   pillars carry the run; if forgetting a moisturiser could break it, a good
+   week would have three more ways to fail, and that is how this turns into a
+   chore he deletes. So these are counted, shown at the hour they apply, and
+   nothing more.
+
+   They are also time-gated rather than always-on, which is the whole point:
+   sunscreen asked at 9pm is noise, and a wind-down asked at breakfast is
+   noise. Each one appears in its own window and leaves when the window shuts.
+
+   [ key, label, the line it says, window, whether it can be "not needed" ] */
+var ROUTINES = [
+  ["sun",  "Sunscreen",   "Face, neck, the backs of your hands.",        "day",   1],
+  ["skin", "Moisturiser", "In the shower, on skin that is still wet.",   "day",   0],
+  ["bed",  "Wind down",   "Phone on the side, water poured, kit out.",   "night", 0]
+];
+/* Inside this band of latitude the sun is worth covering all year; outside
+   it, only across that hemisphere's summer half. Deliberately crude - the
+   question is "is it worth a thought today", not a UV index. */
+var TROPIC = 23.5;
+var SUN_MONTHS_N = [4,5,6,7,8,9];          /* Apr-Sep north of the tropics */
+var SUN_MONTHS_S = [10,11,12,1,2,3];       /* and the opposite half south  */
+
 /* ============================================================== challenges
    The engine that stops this having an ending. Cards run out, stages cap and
    ranks used to; a week never does. Three are drawn each Monday from the week
@@ -1131,7 +1157,15 @@ var CHALLENGES = [
   ["fam",    "Call home %n times",        "fam",     2, 0.2, 4],
   ["stop",   "Finish on time %n days",    "stop",    3, 0.4, 5],
   ["place",  "%n new places",             "place",   1, 0.2, 3],
-  ["lift",   "Beat %n of your own lifts", "beatlift",1, 0.4, 5]
+  ["lift",   "Beat %n of your own lifts", "beatlift",1, 0.4, 5],
+  /* Two of the three routines pay into the same pot as everything else, which
+     is the only reward they get - they still cannot break a thing. Sunscreen
+     is deliberately NOT here: a challenge is a fixed target drawn on Monday,
+     and a week that flies from Singapore to a Sheffield January has no days
+     the sun needs covering on. A target you cannot reach is worse than no
+     target. It is counted on Today and left at that. */
+  ["skin",   "Moisturiser on %n days",    "skin",    4, 0.4, 7],
+  ["wind",   "Wind down %n nights",       "wind",    3, 0.5, 6]
 ];
 
 /* What a cleared challenge pays, as a multiple of his daily rate. Clearing

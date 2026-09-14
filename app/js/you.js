@@ -105,8 +105,8 @@ function viewYou(){
         mrow("install", "1", "phone", "Put it on your Home Screen",
           "Full screen, its own icon — and it unlocks the nudge"))
     + mrow("push", "1", "clock", "The nudges",
-        S.pushOn ? "On — 08:00 the day’s shape, 22:15 what is still open"
-                 : "08:00 the day’s shape, 22:15 what is still open")
+        S.pushOn ? "On — five a day, from the day’s shape to last call"
+                 : "Five a day, from the day’s shape to last call")
     + mrow("look", "1", "moon", "Night look",
         S.look === "dark" ? "Always dark" : S.look === "light" ? "Always light"
                           : "With the sky — dark from dusk to dawn")
@@ -299,9 +299,11 @@ async function askPush(){
   if (S.pushOn){
     var v = await ask({
       title: "The nudges",
-      say: "On since " + esc(nice(S.pushMade || today())) + ". At 08:00 the game says what the "
-         + "day looks like \u2014 which pillar first, tonight\u2019s session, today\u2019s card. Around "
-         + "22:15 it names what is still open, or says the day is already in and asks nothing."
+      say: "On since " + esc(nice(S.pushMade || today())) + ". Five a day, on Singapore hours: "
+         + "08:00 the day\u2019s shape, 12:20 the open window before the shift, 15:40 as Malta wakes, "
+         + "22:15 what is still open, 23:40 last call and the wind-down. Each one is written on this "
+         + "phone from this phone\u2019s own record \u2014 and by the hour it lands at, so they still "
+         + "make sense on a week in Sheffield."
          + (S.pushBundle ? "<br><br>If the paste never happened, or GitHub lost it, show it again." : ""),
       options: S.pushBundle ? [{ id: "again", label: "Show the paste again" }] : [],
       confirm: "Turn it off", cancel: "Keep it"
@@ -331,10 +333,12 @@ async function askPush(){
   }
   var go = await ask({
     title: "The nudges",
-    say: "Twice a day. 08:00: what the day looks like \u2014 which pillar first, tonight\u2019s "
-       + "session, today\u2019s card. 22:15: what is still open, or that the day is already in. "
-       + "Two steps \u2014 your phone asks permission now, then one paste into the repo so the "
-       + "scheduler can reach this phone.",
+    say: "Five a day, on Singapore hours. 08:00: what the day looks like \u2014 which pillar "
+       + "first, tonight\u2019s session, today\u2019s card. 12:20: the open window before the shift. "
+       + "15:40: as Malta wakes. 22:15: what is still open. 23:40: last call and the wind-down. "
+       + "Nothing about you leaves this phone \u2014 the scheduler sends one word and this phone "
+       + "writes the sentence. Two steps: your phone asks permission now, then one paste into the "
+       + "repo so the scheduler can reach it.",
     confirm: "Turn it on", cancel: "Not now"
   });
   if (!go) return;
@@ -371,7 +375,7 @@ function showBundle(bundle){
     + "<h3>One paste, then it is live</h3>"
     + "<p class='say'>In GitHub, on any device: <b>stu-bot &rarr; Settings &rarr; Secrets and variables "
     + "&rarr; Actions &rarr; New repository secret</b>. Name it <b>PUSH_BUNDLE</b>, paste this in, "
-    + "save. From the next 22:15 the nudge arrives on this phone. Nothing else to set.</p>"
+    + "save. From the next slot the nudges arrive on this phone. Nothing else to set.</p>"
     + "<textarea class='bundle' readonly spellcheck='false'>" + esc(bundle) + "</textarea>"
     + "<div class='btns'>"
     + "<button class='btn pri' data-pushcopy='1'>Copy</button>"

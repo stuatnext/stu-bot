@@ -22,7 +22,7 @@ function load(){
             season:1, vault:{}, setsEver:0, liftPick:{}, work:{},
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
             monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1, showDone:{}, notes:{},
-            where:{}, walks:{}, levelSeen:0, gymHere:null,
+            where:{}, walks:{}, levelSeen:0, gymHere:null, care:{},
             lifts:{}, food:{}, waist:[], kg:0,
             water:{}, sleep:{}, out:{},
             hand:{ do:[], in:[] }, doneDo:{}, kept:{}, dealtDo:{}, dealtIn:{},
@@ -52,16 +52,26 @@ function mirrorState(){
   try {
     if (typeof caches === "undefined") return;
     var t = today(), tm = shift(1);
-    var open = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); })
-                      .map(function(g){ return g[1]; });
+    var owing = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); });
+    var open = owing.map(function(g){ return g[1]; });
+    var openKeys = owing.map(function(g){ return g[0]; });
     var briefs = {};
     briefs[t] = briefFor(t);
     briefs[tm] = briefFor(tm);
     var sit = situation(), r = rank();
-    var body = { day: t, open: open, run: dayRun(), best: bestRunEver(),
+    var sh = shape();
+    var body = { day: t, open: open, openKeys: openKeys, run: dayRun(), best: bestRunEver(),
                  chip: chipNext(), week: weekScore(), briefs: briefs,
                  where: sit.home ? null : { c: sit.city, k: sit.kind },
                  level: { n: r.level, name: r.name, away: daysToNext(r) },
+                 /* the routines still open, split by the part of the day they
+                    belong to, so a ping can ask for the one it is standing in
+                    without ever asking for the other */
+                 care: typeof careOpen === "function"
+                   ? { day: careOpen("day"), night: careOpen("night") } : null,
+                 /* the shift, in the phone's own clock, so the middle-of-the-day
+                    pings can say what is actually about to happen */
+                 shift: { start: sh.startT, end: sh.endT, none: !!sh.noShift },
                  badgeOn: S.badge ? 1 : 0 };
     caches.open("daylight-state").then(function(c){
       return c.put("state", new Response(JSON.stringify(body),
@@ -306,7 +316,7 @@ function familyLine(){
 function stopLine(){
   var sh = shape();
   if (sh.noShift) return "No shift today \u2014 carried.";
-  if (sh.now >= sh.end) return "Malta closed at " + sh.endT + ". Shut the laptop and take the point.";
+  if (sh.now >= sh.end) return "Malta finished at " + sh.endT + ". Shut the laptop and take the point.";
   if (sh.working) return "Malta until " + sh.endT + " \u00b7 " + dur(sh.end - sh.now) + " to go.";
   return "Malta runs " + sh.startT + "\u2013" + sh.endT + " here. Stopping on time is the whole skill.";
 }
@@ -570,7 +580,7 @@ function priority(){
   }
   if (up === "family") return { ask: "Call home.", sub: stake || familyLine() };
   var sh = shape();
-  return { ask: sh.now >= sh.end && !sh.noShift ? "Stop. Malta closed at " + sh.endT + "."
+  return { ask: sh.now >= sh.end && !sh.noShift ? "Stop. Malta finished at " + sh.endT + "."
                                                 : "Stop when Malta does.",
            sub: stake || stopLine() };
 }

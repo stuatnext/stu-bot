@@ -1,8 +1,13 @@
-// The nudges' sender half. Runs in GitHub Actions on two crons (see
-// .github/workflows/nudge.yml): KIND=morning at 08:00 Singapore, KIND=evening
-// at 22:15. The receiving half is app/sw.js, which reads the day's mirrored
-// state on the device and writes the actual words - this script sends one
-// dumb, unpersonalised ping carrying only which of the two it is.
+// The nudges' sender half. Runs in GitHub Actions on five crons (see
+// .github/workflows/nudge.yml): in Singapore they land at 08:07, 12:20,
+// 15:40, 22:15 and 23:40. The receiving half is app/sw.js, which reads the
+// day's mirrored state on the device and writes the actual words - this
+// script sends one dumb, unpersonalised ping carrying only which of the five
+// slots it is, and app/sw.js is free to ignore even that in favour of the
+// hour the ping actually arrived at on a phone that has since flown.
+//
+// It has never seen the record and never will. That is why the scheduler can
+// live in a public repository: there is nothing here worth reading.
 //
 // Secrets (repo -> Settings -> Secrets and variables -> Actions):
 //   PUSH_SUBSCRIPTION  - the JSON the app copies to the clipboard when the
@@ -55,8 +60,15 @@ const { subscription, pub: VAPID_PUBLIC, priv } = cfg;
 webpush.setVapidDetails("https://github.com/stuatnext/stu-bot", VAPID_PUBLIC, priv);
 
 try {
-  const kind = process.env.KIND === "morning" ? "morning" : "evening";
-  await webpush.sendNotification(subscription, JSON.stringify({ t: kind }), { TTL: 3600 });
+  // One word from a fixed list; anything unrecognised falls back to the
+  // check-in, which is the one that is safe to send at any hour.
+  const KINDS = ["morning", "midday", "shift", "evening", "bed"];
+  // trimmed, because the workflow builds KIND from a folded YAML expression
+  const want = String(process.env.KIND || "").trim();
+  const kind = KINDS.indexOf(want) === -1 ? "evening" : want;
+  // A slot is worthless once its hour has passed, so these expire rather than
+  // piling up behind a phone that was off: roughly until the next one.
+  await webpush.sendNotification(subscription, JSON.stringify({ t: kind }), { TTL: 7200 });
   console.log("Nudge sent (" + kind + ").");
 } catch (e){
   // 404/410 mean the phone unsubscribed or the subscription expired: the
