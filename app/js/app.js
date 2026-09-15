@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v52";
+var BUILD = "v53";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -213,6 +213,17 @@ document.addEventListener("click", function(ev){
   if (ds.sleep){ askSleep(); return; }
   if (ds.out){ tapOut(); return; }
   if (ds.openclose){ closeOpening(); return; }
+  /* The hero's one button. Some branches go to a tab, some do the thing here. */
+  if (ds.cta){
+    if (ds.cta === "people"){ askPeople(); return; }
+    if (ds.cta.indexOf("tick:") === 0){
+      var ck = ds.cta.slice(5);
+      var cb = b;
+      if (!pDone(today(), ck)) tapPillar(ck, cb);
+      return;
+    }
+    return;
+  }
   if (ds.care){ tapCare(ds.care); return; }
   if (ds.editpeople){ editPeople(); return; }
   if (ds.addperson){ addPerson(); return; }

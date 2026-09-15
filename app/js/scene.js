@@ -71,7 +71,10 @@ function skyCardHTML(ask, sub, cta){
     + " \u00b7 " + esc(dialLabel(s)) + "</i>"
     + "<b>" + esc(ask || "") + "</b>"
     + (sub ? "<span>" + esc(sub) + "</span>" : "")
-    + (cta ? "<button class='skygo' data-tab='" + esc(cta.tab) + "'>" + esc(cta.label) + "</button>" : "")
+    + (cta ? "<button class='skygo'"
+        + (cta.act ? " data-cta='" + esc(cta.act) + "'" : " data-tab='" + esc(cta.tab) + "'")
+        + "><span>" + esc(cta.label) + "</span><span class='gox'>"
+        + svg("arrow", 15) + "</span></button>" : "")
     + "</div></div>";
   return h;
 }
@@ -108,23 +111,51 @@ function dayName(k){
    five, so the standard is visible rather than explained, and one sentence
    saying where that leaves him. */
 function weekMeterHTML(){
-  var w = weekState(), days = weekAll(w.key), run = weekRun();
+  var w = weekState(), days = weekAll(w.key), run = weekRun(), t = today();
+  var pct = Math.min(100, Math.round(w.full / WEEK_LINE * 100));
   var h = "<div class='wkm" + (w.kept ? " kept" : "") + (!w.alive ? " gone" : "") + "'>";
+
+  /* Seven nodes on a rail. Seven identical grey rectangles is a form; a row
+     of nodes you are moving along is a track, and the difference between
+     those two readings is most of what "feels like a game" means here. */
   h += "<div class='wkm-row'>";
   days.forEach(function(k, i){
-    var future = k > today(), isToday = k === today();
+    var future = k > t, isToday = k === t;
     var full = !future && allThree(k), ice = !future && frozen(k);
+    var miss = !future && !isToday && !full && !ice && startedBy(k);
     h += "<span class='wkm-d" + (full ? " on" : "") + (ice ? " ice" : "")
-      + (isToday ? " wkm-now" : "") + (future ? " soon" : "") + "'>"
-      + "<i>" + (full ? svg("tick", 12) : "") + "</i>"
+      + (miss ? " miss" : "") + (isToday ? " wkm-now" : "") + (future ? " soon" : "") + "'>"
+      + "<i>" + (full ? svg("tick", 15) : ice ? svg("snow", 13) : "") + "</i>"
       + "<b>" + "MTWTFSS"[i] + "</b></span>";
   });
   h += "</div>";
+
+  /* The goal, made visible. The standard has been five full days since v50
+     and it was drawn as a hairline nobody could see - so here it is as a bar
+     with the prize on the end of it. */
+  h += "<div class='wkm-goal'>"
+    + "<span class='wkm-bar'><i style='width:" + pct + "%'></i></span>"
+    + "<span class='wkm-tro" + (w.kept ? " lit" : "") + "'>" + svg("pack", 17) + "</span>"
+    + "</div>";
+
+  /* A chip inside a fortnight is the most concrete reason to come back that
+     the record can offer, so it takes the right-hand slot from the week run
+     when one is close. Both at once is two counts in one line. */
+  var chip = typeof chipNext === "function" ? chipNext() : null;
+  var near = chip && chip.away > 0 && chip.away <= 14;
   h += "<div class='wkm-b'><span class='wkm-n'>" + w.full + "<em>/ " + WEEK_LINE + "</em></span>"
     + "<span class='wkm-t'>" + esc(weekLine()) + "</span>"
-    + (run > 0 ? "<span class='wkm-r'>" + run + (run === 1 ? " week" : " weeks") + " kept</span>" : "")
+    + (near ? "<span class='wkm-r chip'>" + svg("lock", 11) + chip.away
+        + (chip.away === 1 ? " day" : " days") + "</span>"
+      : run > 0 ? "<span class='wkm-r'>" + svg("flame", 11) + run
+        + (run === 1 ? " week" : " weeks") + "</span>" : "")
     + "</div></div>";
   return h;
+}
+/* A day only counts as missed once he had actually started - days before the
+   record begins are not failures, and never have been in this app. */
+function startedBy(k){
+  return PILLARS.some(function(g){ var f = firstDay(g[0]); return f && k >= f; });
 }
 
 function weekHTML(){
@@ -217,6 +248,7 @@ function viewToday(){
     h += "<li class='ixr" + (on ? " on" : "") + (carry ? " carried" : "") + (isUp ? " up" : "") + "'>"
       + "<button class='ixb' data-p='" + g[0] + "' style='--pil:" + g[4] + "'"
       + " aria-pressed='" + (on ? "true" : "false") + "'>"
+      + "<span class='po-i'>" + svg(g[2], 19) + "</span>"
       + "<span class='po-t'>" + esc(g[1]) + "</span>"
       + "<span class='po-s'>"
       + esc(carry ? (sit.kind === "holiday" ? "on holiday" : "no shift today")
@@ -229,46 +261,19 @@ function viewToday(){
             : (g[0] === "family" && typeof peopleEmpty === "function" && !peopleEmpty())
               ? peopleLine()
             : g[5]) + "</span>"
-      + (st > 0 && !carry ? "<span class='po-st'>" + st + "</span>" : "")
+      + (st > 0 && !carry ? "<span class='po-st'>" + svg("flame", 11) + st + "</span>" : "")
       + "<span class='po-c'>" + (on ? svg("tick", 19) : "") + "</span>"
       + "</button></li>";
   });
   h += "</ol>";
 
-  /* The routines, and only the ones the hour is actually about. They sit with
-     the three things because that is what they are - things to do today - but
-     they are a line of chips rather than index rows, because they carry
-     nothing: no streak on the row, no arrow, no consequence. */
-  if (S.onboarded){
-    var cr = careHTML();
-    if (cr){
-      h += cr;
-      var cl = careLine();
-      if (cl) h += "<p class='care-l'>" + esc(cl) + "</p>";
-    }
-  }
-
-  /* A day that is in is not a day with nothing in it. One line, the fixture
-     list, and only once all three have landed - so it costs the screen
-     nothing on the days he is still working through it. */
-  if (S.onboarded && done === PILLARS.length && typeof tomorrowLine === "function"){
-    var tl = tomorrowLine();
-    if (tl) h += "<div class='tmw'><span>Tomorrow</span><b>" + esc(tl) + "</b></div>";
-  }
-
-  h += conditionHTML(true);
-
-  /* the chest */
+  /* The chest, immediately under the three things it is the reward for.
+     It used to sit eighth on the screen, below the vitals - which meant the
+     one visibly filling thing in the app was off the bottom of it. A game
+     shows you the prize while you are working for it. */
   h += "<" + (packs ? "button" : "div") + " class='gem" + (packs ? " won" : "") + "'"
     + (packs ? " data-open='1'" : "") + ">" + gemHTML(done, packs)
     + "</" + (packs ? "button" : "div") + ">";
-
-  /* No drawer list. Seven doors in a row is a menu, not a screen - the load
-     is the same and the information is gone. The city lives on the header and
-     is tapped there; the five basics are five marks in the same language as
-     the week above them, flat and visible; the week's three moved to Cards,
-     where the pot they pay into already lives. */
-  TODAY_MORE = "";
 
   /* the side quest: one held card asks something of him. This is what makes
      the collection a deck instead of wallpaper - his call, his words. */
@@ -296,12 +301,44 @@ function viewToday(){
             : q.text) + "</span></span>"
         + (q.done
             ? "<span class='qwin'>" + svg("tick", 18) + "</span>"
-            : "<span class='qact'><button class='qgo' data-questdone='1'>Did it</button>"
+            : "<span class='qact'><span class='qpay'>+10 \u00b7 +20 XP</span>"
+              + "<button class='qgo' data-questdone='1'>Did it</button>"
               + (q.swaps ? "" : "<button class='qswap' data-questswap='1'>Swap</button>")
               + "</span>")
         + "</div>";
     }
   }
+
+  /* The routines, and only the ones the hour is actually about. They sit with
+     the three things because that is what they are - things to do today - but
+     they are a line of chips rather than index rows, because they carry
+     nothing: no streak on the row, no arrow, no consequence. */
+  if (S.onboarded){
+    var cr = careHTML();
+    if (cr){
+      h += cr;
+      var cl = careLine();
+      if (cl) h += "<p class='care-l'>" + esc(cl) + "</p>";
+    }
+  }
+
+  /* A day that is in is not a day with nothing in it. One line, the fixture
+     list, and only once all three have landed - so it costs the screen
+     nothing on the days he is still working through it. */
+  if (S.onboarded && done === PILLARS.length && typeof tomorrowLine === "function"){
+    var tl = tomorrowLine();
+    if (tl) h += "<div class='tmw'><span>Tomorrow</span><b>" + esc(tl) + "</b></div>";
+  }
+
+  h += conditionHTML(true);
+
+  /* No drawer list. Seven doors in a row is a menu, not a screen - the load
+     is the same and the information is gone. The city lives on the header and
+     is tapped there; the five basics are five marks in the same language as
+     the week above them, flat and visible; the week's three moved to Cards,
+     where the pot they pay into already lives. */
+  TODAY_MORE = "";
+
   h += TODAY_MORE;
   return h;
 }

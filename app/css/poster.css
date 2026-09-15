@@ -173,8 +173,9 @@ body[data-tab="gym"] #screen .rulehead{display:none}
    common, none happens whenever the hour has nothing to say. */
 #screen .care{display:flex; align-items:center; flex-wrap:wrap; gap:7px;
   margin:14px 0 0; padding:14px 0 0; border-top:1px solid var(--edge)}
-/* the checklist above it already closes with a rule; two is a seam */
-#screen ol.index.big + .care{border-top:0; padding-top:0; margin-top:16px}
+/* The chest now sits between the checklist and this row, and a card of its
+   own already separates them - so the exception that removed this rule when
+   the two were adjacent no longer has anything to fix. */
 #screen .care-k{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.1em;
   text-transform:uppercase; color:var(--ink3); margin-right:2px; flex:none}
 #screen .care-b{display:inline-flex; align-items:center; gap:6px; cursor:pointer;

@@ -566,9 +566,15 @@ function tipFor(key, day){
 function priority(opts){
   var t = today(), sit = situation();
   var w = packsWaiting(), packs = w.day + w.streak;
-  if (packs && !(opts && opts.noPacks))
+  /* A waiting pack used to take the hero on any day it existed, which meant
+     that once a few had stacked up the one sentence that says what to do
+     said "25 packs waiting" every hour of every day instead. The prize is
+     not the mission. It leads only when there is nothing left to ask for -
+     the rest of the time the chest below says so, which is its job. */
+  if (packs && !(opts && opts.noPacks) && allThree(t))
     return { ask: packs === 1 ? "That is a pack." : packs + " packs waiting.",
-             sub: "Earned, not given. Open it below." };
+             sub: "Earned, not given.",
+             cta: { tab: "cards", label: packs === 1 ? "Open it" : "Open them" } };
   var rc = recordChase(), r = rank(), dn = daysToNext(r);
   if (allThree(t)){
     var tb = briefFor(shift(1));
@@ -579,36 +585,63 @@ function priority(opts){
             : dn && dn <= 3 ? "Level " + (r.level + 1) + " in " + dn + (dn === 1 ? " full day." : " full days.")
             : wk && wk.kept ? "The week is kept. Nothing owed until Monday."
             : "Tomorrow \u00b7 " + (tb.gym || tb.first);
-    return { ask: "Today is in.", sub: sub };
+    return { ask: "Today is in.", sub: sub, won: 1 };
   }
-  if (S.onboarded && isComebackDay(t))
-    return { ask: "Back.", sub: "That was the hard part. Today pays double." };
+
+  /* A comeback is a fact about the day, not an instruction - so it colours
+     the line underneath rather than replacing the only sentence on the screen
+     that says what to do. "Back." on its own answers nothing. */
+  var come = S.onboarded && isComebackDay(t) ? gapBefore(t, recordStart()) : 0;
+  var back = come ? " Away " + come + " days \u2014 today pays double." : "";
 
   var owed = PILLARS.filter(function(g){ return required(g[0], t) && !pDone(t, g[0]); }).length;
   var up = nextUp();
-  /* the stake outranks the plan on the last thing left */
+  /* The stake. A game that never tells you what is on the line is a list of
+     chores, so this is checked on every owed day and not only on the last
+     thing left: the record first, then the level, then the chip, then the
+     week - and the week is the one that is true most often, which is the
+     whole reason it became the unit in v50. */
+  var wkS = typeof weekState === "function" ? weekState() : null;
+  var chip = typeof chipNext === "function" ? chipNext() : null;
   var stake = null;
   if (owed === 1 && rc) stake = rc.at ? "One more \u2014 tonight beats your record of " + rc.best + "."
                                       : "One more \u2014 " + rc.away + " from your record of " + rc.best + ".";
   else if (owed === 1 && dn === 1) stake = "One more \u2014 tonight is a level.";
+  else if (owed === 1 && chip && chip.away === 1) stake = "One more \u2014 tonight mints the "
+    + String(chip.name).toLowerCase() + " chip.";
+  else if (wkS && !wkS.kept && wkS.alive && wkS.need === wkS.left && wkS.left > 0)
+    stake = wkS.left === 1 ? "Last day of the week \u2014 this one keeps it."
+          : "Every day left has to land to keep the week.";
+  else if (wkS && !wkS.kept && wkS.alive && wkS.need === 1)
+    stake = "A full day today keeps the week.";
+
   if (!up) return { ask: owed === 3 ? "Three things make a day."
                        : "Two things make a " + DAY_NAMES[new Date().getDay()] + ".",
-                    sub: stake || "Tick what you have done." };
+                    sub: (stake || "Tick what you have done.") + back };
+
+  /* Every branch now carries ONE obvious thing to do. A game has a button
+     that starts the thing; this screen used to have a button on exactly one
+     of three branches, which is why it read as a list to be audited rather
+     than a session to be played. */
   if (up === "train"){
     var ga = typeof gymAsk === "function" ? gymAsk() : null;
     return { ask: ga ? ga.ask : "Train.",
-             sub: stake || (ga ? ga.sub : "Gym, a run, or a long walk."),
-             cta: ga && ga.cta ? ga.cta : null };
+             sub: (stake || (ga ? ga.sub : "Gym, a run, or a long walk.")) + back,
+             cta: (ga && ga.cta) ? ga.cta : { tab: "gym", label: "Open the gym" } };
   }
   if (up === "family"){
     var due = typeof personDue === "function" ? personDue() : null;
+    var roster = typeof peopleEmpty === "function" && !peopleEmpty();
     return { ask: due ? "Ring " + due.name + "." : "Call home.",
-             sub: stake || (typeof peopleLine === "function" ? peopleLine() : familyLine()) };
+             sub: (stake || (typeof peopleLine === "function" ? peopleLine() : familyLine())) + back,
+             cta: { act: "people", label: roster ? (due ? "Ring " + due.name : "Who did you speak to?")
+                                                 : "Log the call" } };
   }
   var sh = shape();
-  return { ask: sh.now >= sh.end && !sh.noShift ? "Stop. Malta finished at " + sh.endT + "."
-                                                : "Stop when Malta does.",
-           sub: stake || stopLine() };
+  var over = sh.now >= sh.end && !sh.noShift;
+  return { ask: over ? "Stop. Malta finished at " + sh.endT + "." : "Stop when Malta does.",
+           sub: (stake || stopLine()) + back,
+           cta: (over || sh.noShift) ? { act: "tick:stop", label: "I finished on time" } : null };
 }
 /* What the row the hour points at says inside the row itself. */
 function planLine(key){
@@ -724,10 +757,29 @@ function gapBefore(k, first){
   }
   return n;
 }
+/* A comeback needs something to come back TO. The first version tested only
+   for a three-day gap, which meant a two-day-old record with one gym session
+   in it greeted him as a returning veteran - "Back. That was the hard part."
+   on a screen showing 0/5 and an empty week. Nonsense, and the bad kind:
+   the app claiming to know him when it plainly does not.
+
+   So there has to be a habit behind the gap. Ten days of record and three
+   full days is the floor; below that a quiet few days is just a new thing
+   that has not started yet, and the app should say so rather than stage a
+   homecoming. */
+var COMEBACK_MIN_DAYS = 10, COMEBACK_MIN_FULL = 3;
+function recordAge(){
+  var first = recordStart();
+  if (!first) return 0;
+  return Math.round((new Date(today() + "T00:00:00")
+    - new Date(first + "T00:00:00")) / 86400000) + 1;
+}
 function isComebackDay(k){
   k = k || today();
   var first = recordStart();
   if (!first || k <= first) return false;
+  if (recordAge() < COMEBACK_MIN_DAYS) return false;
+  if (fullDays() < COMEBACK_MIN_FULL) return false;
   return gapBefore(k, first) >= 3;
 }
 function comebackDays(){

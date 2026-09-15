@@ -1,0 +1,209 @@
+/* ==========================================================================
+   game.css - Today is the game board. Everything else stays the ledger.
+
+   The history this file exists to resolve. He said the screens were too busy
+   (v47), then not beautiful (v48), then "be radical" (v49) - so calm.css
+   stripped the place back to type on a flat ground with hairlines, and
+   poster.css set it like an editorial page. That fixed the busyness. It also
+   deleted every bit of the thing he asked for at the very start: "like a
+   training app - a consistency training app - probably a little like
+   Duolingo." His words on the result: "so basic and awful and uninspiring.
+   I want it to feel like a game."
+
+   Both complaints are right, and they are not actually in conflict. They are
+   about different screens:
+
+     - The reference tabs (Food, Water, Work, Cards, You) are things he READS.
+       Busy is the failure mode there, and calm.css is correct for them.
+     - Today is the thing he PLAYS, once or twice a day, in thirty seconds.
+       Flat is the failure mode there. A board wants depth, colour, a prize in
+       sight and one obvious button.
+
+   So this file is scoped to body[data-tab="today"] #screen and loads last -
+   the #screen is not decoration, it is the only way to match the specificity
+   poster.css and calm.css already carry. Nothing in
+   here can reach another tab. The rules it adds back, deliberately and only
+   here: a hard bottom edge on anything pressable (the tokens have carried
+   --*Edge colours for this since v12), each pillar wearing its own colour,
+   the week drawn as a track with the prize on the end, and the reward bar
+   visible while it fills instead of below the fold.
+
+   What it does NOT bring back: drawers, gradients pretending to be glass,
+   competing boxes, or a second sentence saying what the first one said.
+   ========================================================================== */
+
+body[data-tab="today"] #screen{padding-bottom:34px}
+
+/* ------------------------------------------------------------- the mission
+   The sky card was a beautiful passive object: an hour, a date and a
+   sentence. It is the hero of the only screen that asks him to do something,
+   so it now ends in a button that does it. */
+body[data-tab="today"] #screen .skycard{border-radius:22px; overflow:hidden;
+  box-shadow:0 10px 26px -14px rgba(0,0,0,.5), 0 2px 0 0 rgba(0,0,0,.16)}
+body[data-tab="today"] #screen .skybd b{font-size:26px; letter-spacing:-.035em; line-height:1.1}
+/* scene.css styles this at .skycard .skybd .skygo, so the override has to
+   match that depth or the display mode never changes. */
+body[data-tab="today"] #screen .skycard .skybd .skygo{
+  display:inline-flex; align-items:center; gap:8px;
+  margin:14px 0 0; padding:0 18px; min-height:48px; border-radius:14px; cursor:pointer;
+  border:0; border-bottom:3px solid rgba(0,0,0,.28);
+  /* --skyInk is the INK on the sky card, not a light: using it as the button
+     ground gave dark-navy-on-blue in daylight. The chip is always white and
+     the label is always the deep end of the current sky. */
+  background:#FFFFFF; color:var(--sky2);
+  font:800 15px/1 "Nunito",sans-serif; letter-spacing:-.01em;
+  box-shadow:0 3px 12px -5px rgba(0,0,0,.5)}
+body[data-tab="today"] #screen .skycard .skybd .skygo span{display:inline; font:inherit;
+  margin:0; letter-spacing:inherit; color:inherit}
+body[data-tab="today"] #screen .skycard .skybd .skygo .gox{display:inline-flex; flex:none;
+  width:15px; height:15px; margin:0; padding:0; opacity:.5}
+body[data-tab="today"] #screen .skycard .skybd .skygo .gox svg{width:15px; height:15px; display:block}
+body[data-tab="today"] #screen .skycard .skybd .skygo:active{transform:translateY(2px);
+  border-bottom-width:1px}
+
+/* ------------------------------------------------------------- the track
+   Seven nodes and a rail with the prize on it. The five-day standard has
+   been the point of the week since v50 and was drawn as a hairline nobody
+   could see; now it is a bar that fills toward a chest. */
+body[data-tab="today"] #screen .wkm{margin:20px 0 4px}
+body[data-tab="today"] #screen .wkm-row{gap:6px}
+body[data-tab="today"] #screen .wkm-d i{height:38px; border-radius:12px; border:1.5px solid var(--edge2);
+  background:var(--sunk); transition:transform .18s var(--pop)}
+body[data-tab="today"] #screen .wkm-d.on i{background:var(--green); border-color:var(--greenEdge);
+  border-bottom-width:3px; color:#fff;
+  box-shadow:0 4px 10px -5px color-mix(in srgb, var(--green) 70%, transparent)}
+body[data-tab="today"] #screen .wkm-d.ice i{background:var(--blueSoft); border-color:var(--blue); color:var(--blue)}
+body[data-tab="today"] #screen .wkm-d.miss i{background:transparent; border-style:dashed; opacity:.5}
+body[data-tab="today"] #screen .wkm-d.soon i{opacity:.32; border-style:dashed}
+body[data-tab="today"] #screen .wkm-d.wkm-now i{border-color:var(--gold); border-width:2.5px;
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 26%, transparent)}
+body[data-tab="today"] #screen .wkm-d.wkm-now.on i{border-color:var(--greenEdge)}
+body[data-tab="today"] #screen .wkm-d b{font-size:10px; letter-spacing:.06em}
+
+/* The bar and the prize are one object: a gap between them reads as a stray
+   button parked beside a rule. */
+body[data-tab="today"] #screen .wkm-goal{display:flex; align-items:center; gap:0; margin:13px 0 0}
+body[data-tab="today"] #screen .wkm-bar{flex:1 1 auto; height:12px; border-radius:99px;
+  background:var(--sunk); border:1px solid var(--edge); overflow:hidden; margin-right:-10px}
+body[data-tab="today"] #screen .wkm-bar i{display:block; height:100%; border-radius:99px;
+  background:linear-gradient(90deg, var(--green), var(--greenEdge));
+  transition:width .55s var(--tap)}
+body[data-tab="today"] #screen .wkm-tro{flex:none; position:relative; z-index:1;
+  width:30px; height:30px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  border:1.5px solid var(--edge2); background:var(--card); color:var(--ink3)}
+body[data-tab="today"] #screen .wkm-tro.lit{background:var(--gold); border-color:var(--goldEdge);
+  border-bottom-width:3px; color:#4A3500;
+  box-shadow:0 5px 14px -6px color-mix(in srgb, var(--gold) 80%, transparent)}
+body[data-tab="today"] #screen .wkm-b{margin:11px 0 0; align-items:center}
+body[data-tab="today"] #screen .wkm-n{font-size:30px}
+body[data-tab="today"] #screen .wkm-r{display:inline-flex; align-items:center; gap:4px;
+  padding:4px 9px; border-radius:99px; background:var(--flameSoft); color:#B45309;
+  border:1px solid color-mix(in srgb, var(--flame) 35%, transparent)}
+:root[data-night] body[data-tab="today"] #screen .wkm-r{background:color-mix(in srgb, var(--flame) 18%, transparent);
+  color:#FFB35C}
+
+/* --------------------------------------------------------------- the three
+   Pressable objects with their own colour, not three lines of type with a
+   circle at the end. The tap target is the whole card and it presses. */
+body[data-tab="today"] #screen .index.big{display:grid; gap:10px; margin:20px 0 0}
+body[data-tab="today"] #screen .index.big .ixr{border:0; padding:0; grid-template-columns:1fr}
+body[data-tab="today"] #screen .index.big .ixr:last-child{border-bottom:0}
+body[data-tab="today"] #screen .index.big .ixb{
+  display:grid; grid-template-columns:auto 1fr auto auto; align-items:center;
+  column-gap:13px; row-gap:3px; padding:14px 15px;
+  border-radius:17px; border:1.5px solid var(--edge2); border-bottom-width:3.5px;
+  background:var(--card); transition:transform .12s var(--tap), background .18s ease}
+body[data-tab="today"] #screen .index.big .ixb:active{transform:translateY(2px); opacity:1;
+  border-bottom-width:1.5px}
+body[data-tab="today"] #screen .index.big .po-i{grid-column:1; grid-row:1/3;
+  width:40px; height:40px; border-radius:13px;
+  display:inline-flex; align-items:center; justify-content:center;
+  color:var(--pil); background:color-mix(in srgb, var(--pil) 15%, transparent)}
+body[data-tab="today"] #screen .index.big .po-t{grid-column:2; grid-row:1; font-size:18px}
+body[data-tab="today"] #screen .index.big .po-s{grid-column:2; grid-row:2; margin:0; font-size:12.5px;
+  color:var(--ink3); font-weight:600; line-height:1.35;
+  /* "2 weeks since Mum \u00b7 14:25 there, afternoon" is the whole reason the
+     roster exists; clipping it at one line throws away the half that says
+     whether he can actually ring her now. */
+  white-space:normal; overflow:visible; text-overflow:clip;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+body[data-tab="today"] #screen .index.big .po-st{grid-column:3; grid-row:1/3;
+  display:inline-flex; align-items:center; gap:3px; padding:4px 8px; border-radius:99px;
+  background:var(--flameSoft); color:#B45309; font-size:11.5px; font-weight:700;
+  border:1px solid color-mix(in srgb, var(--flame) 32%, transparent)}
+:root[data-night] body[data-tab="today"] #screen .index.big .po-st{
+  background:color-mix(in srgb, var(--flame) 18%, transparent); color:#FFB35C}
+body[data-tab="today"] #screen .index.big .po-c{grid-column:4; grid-row:1/3;
+  width:34px; height:34px; border-width:2.5px; border-color:var(--edge2)}
+
+/* up next: the one the hour is pointing at wears its colour */
+body[data-tab="today"] #screen .index.big .ixr.up .ixb{border-color:var(--pil);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--pil) 17%, transparent)}
+body[data-tab="today"] #screen .index.big .ixr.up .po-c{border-color:var(--pil)}
+
+/* done: the card itself goes green, not just the tick */
+body[data-tab="today"] #screen .index.big .ixr.on .ixb{
+  background:color-mix(in srgb, var(--green) 13%, var(--card));
+  border-color:var(--greenEdge)}
+body[data-tab="today"] #screen .index.big .ixr.on .po-i{color:var(--greenInk);
+  background:color-mix(in srgb, var(--green) 20%, transparent)}
+body[data-tab="today"] #screen .index.big .ixr.on .po-c{background:var(--green);
+  border-color:var(--greenEdge); color:#fff}
+body[data-tab="today"] #screen .index.big .ixr.carried .ixb{opacity:.6; border-bottom-width:1.5px}
+
+/* ---------------------------------------------------------------- the prize
+   Directly under the three it pays for, and visibly filling. */
+body[data-tab="today"] #screen .gem{margin:16px 0 0; border-radius:18px;
+  border:1.5px solid var(--edge2); border-bottom-width:3.5px; background:var(--card);
+  padding:14px 15px}
+body[data-tab="today"] #screen .gem.won{background:linear-gradient(180deg,
+  color-mix(in srgb, var(--gold) 22%, var(--card)), var(--card));
+  border-color:var(--goldEdge);
+  box-shadow:0 8px 22px -12px color-mix(in srgb, var(--gold) 85%, transparent)}
+body[data-tab="today"] #screen .gem.won:active{transform:translateY(2px); border-bottom-width:1.5px}
+body[data-tab="today"] #screen .gem .gcore{color:var(--goldEdge)}
+body[data-tab="today"] #screen .gem .gbar{height:10px; border-radius:99px; background:var(--sunk);
+  border:1px solid var(--edge); overflow:hidden}
+body[data-tab="today"] #screen .gem .gbar i{background:linear-gradient(90deg, var(--gold), var(--goldEdge));
+  transition:width .55s var(--tap)}
+
+/* ------------------------------------------------------------ the challenge
+   The day's card, which is the one thing on here that is a genuine dare. */
+body[data-tab="today"] #screen .quest{margin:14px 0 0; border-radius:18px;
+  border:1.5px solid var(--edge2); border-bottom-width:3.5px; background:var(--card)}
+body[data-tab="today"] #screen .quest.qdone{background:color-mix(in srgb, var(--green) 11%, var(--card));
+  border-color:var(--greenEdge)}
+body[data-tab="today"] #screen .qgo{border-bottom:3px solid var(--greenEdge)}
+body[data-tab="today"] #screen .qgo:active{transform:translateY(2px); border-bottom-width:1px}
+
+/* The line the app wrote stays quiet: it is the one piece of prose on a
+   screen that is otherwise all objects, and it earns that by not shouting. */
+body[data-tab="today"] #screen .dispatch{margin:18px 0 2px; font-size:16px}
+
+@media (prefers-reduced-motion:reduce){
+  body[data-tab="today"] #screen .wkm-bar i, body[data-tab="today"] #screen .gem .gbar i,
+  body[data-tab="today"] #screen .index.big .ixb{transition:none}
+}
+
+/* the chip countdown wears gold, because it is a different prize to the run */
+body[data-tab="today"] #screen .wkm-r.chip{background:var(--goldSoft); color:var(--goldInk);
+  border-color:color-mix(in srgb, var(--gold) 45%, transparent)}
+
+/* what the day's card pays, said on the card rather than discovered after */
+body[data-tab="today"] #screen .qpay{display:inline-flex; align-items:center;
+  padding:4px 9px; border-radius:99px; background:var(--goldSoft); color:var(--goldInk);
+  border:1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.03em;
+  margin-right:8px; white-space:nowrap}
+
+/* An empty board should read as "not yet", never as "nothing here". Today's
+   node breathes so there is always one thing on the screen that is alive. */
+@keyframes todayPulse{
+  0%,100%{box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 26%, transparent)}
+  50%    {box-shadow:0 0 0 6px color-mix(in srgb, var(--gold) 10%, transparent)}
+}
+body[data-tab="today"] #screen .wkm-d.wkm-now:not(.on) i{animation:todayPulse 2.6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){
+  body[data-tab="today"] #screen .wkm-d.wkm-now:not(.on) i{animation:none}
+}
