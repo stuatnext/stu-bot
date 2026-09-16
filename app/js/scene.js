@@ -29,10 +29,16 @@ function arcSeg(a, b){
   }
   return pts.join(" ");
 }
+/* The clock, the date and where he is standing. Called with no arguments
+   when the mission card underneath is carrying the instruction: the board
+   used to say "Travel session, 20 min" here AND "Trained - Travel session,
+   3 moves" in the row below it, which is the same order given twice in two
+   large objects, and is most of why the screen read as padded. */
 function skyCardHTML(ask, sub, cta){
   var s = shape(), ph = skyPhase();
   var night = ph === "night" || ph === "deepnight" || ph === "dusk";
-  var h = "<div class='skycard'>";
+  /* slim: no instruction to carry, so it is a clock and sized like one */
+  var h = "<div class='skycard" + (ask ? "" : " slim") + "'>";
   h += "<svg viewBox='0 0 124 64' aria-hidden='true'>";
   h += "<polyline class='arc' points='" + arcSeg(0, 1) + "'/>";
   if (!s.weekend && s.end > s.start){
@@ -64,12 +70,13 @@ function skyCardHTML(ask, sub, cta){
      wears a mark to say so. Once the day is answered it opens the list
      instead, for correcting an answer rather than getting one. */
   var guessed = !sit.home && typeof whereIsGuessed === "function" && whereIsGuessed();
-  h += "<div class='skybd'><i>" + esc(niceToday())
+  var slim = !ask;
+  h += "<div class='skybd'><i>" + esc(slim ? shortToday() : niceToday())
     + (sit.home ? "" : " \u00b7 <button class='skyloc" + (guessed ? " ask" : "") + "' data-"
         + (guessed ? "locate" : "notthere") + "='1'>" + esc(sit.city)
         + (guessed ? "<span class='lm'>" + svg("pin", 13) + "</span>" : "") + "</button>")
-    + " \u00b7 " + esc(dialLabel(s)) + "</i>"
-    + "<b>" + esc(ask || "") + "</b>"
+    + " \u00b7 " + esc(slim ? shortDial(s) : dialLabel(s)) + "</i>"
+    + (ask ? "<b>" + esc(ask) + "</b>" : "")
     + (sub ? "<span>" + esc(sub) + "</span>" : "")
     + (cta ? "<button class='skygo'"
         + (cta.act ? " data-cta='" + esc(cta.act) + "'" : " data-tab='" + esc(cta.tab) + "'")
@@ -77,6 +84,19 @@ function skyCardHTML(ask, sub, cta){
         + svg("arrow", 15) + "</span></button>" : "")
     + "</div></div>";
   return h;
+}
+/* The slim clock has one line for the date, the city and the shift, so both
+   halves lose their long forms. "Malta has 09:00 - 16:00" was always a
+   slightly odd sentence anyway. */
+function shortToday(){
+  var d = new Date();
+  return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]
+    + " " + d.getDate() + " " + MONTHS_SHORT[d.getMonth()];
+}
+function shortDial(s){
+  if (s.holiday) return "no shift";
+  if (s.weekend) return "no shift";
+  return "Malta " + s.startT + "\u2013" + s.endT;
 }
 function dialLabel(s){
   if (s.holiday) return "On holiday \u2014 no shift";
@@ -212,7 +232,12 @@ function viewToday(){
      read the same function - so the app can never say two things about one
      day. */
   var pr = priority();
-  h += skyCardHTML(pr.ask, pr.sub, pr.cta);
+  var up0 = nextUp();
+  /* When one of the three is up, IT is the mission and carries priority()'s
+     words. The sky card goes back to being the clock. When nothing is up -
+     the day is in, or everything is carried - the sky card keeps the line,
+     because then there is no card to put it on. */
+  h += skyCardHTML(up0 ? "" : pr.ask, up0 ? "" : pr.sub, up0 ? null : pr.cta);
 
   /* A month just closed: hold it up once before it is filed. Never deleted,
      never reset - the pattern in a bad month is the lesson (his call). */
@@ -228,16 +253,15 @@ function viewToday(){
       + "</div>";
   }
 
-  h += weekMeterHTML();
-  if (S.onboarded){
-    var dsp = dispatchFor(t);
-    if (dsp) h += "<p class='dispatch'>" + esc(dsp) + "</p>";
-  }
-
+  /* THE BOARD. The mission first, because the board has to have a subject
+     before it has a scoreboard: the week, the prize and the challenge are
+     all things he reads AFTER he knows what he is being asked to do. This
+     was the wrong way round, so the one coloured object on the screen sat
+     below the fold under two lines of prose. */
   /* the session: three big pressable rows. The hour points at one of them -
      that row wears the arrow and speaks the actual plan, so "what now?" never
      needs asking twice. */
-  var up = nextUp(), sit = situation();
+  var up = up0, sit = situation();
   /* The three things, as a checklist in large type rather than three tiles.
      A tile is a box competing with its neighbours; a line of type with a
      circle at the end of it is a thing to tick, which is what these are. */
@@ -248,11 +272,15 @@ function viewToday(){
     h += "<li class='ixr" + (on ? " on" : "") + (carry ? " carried" : "") + (isUp ? " up" : "") + "'>"
       + "<button class='ixb' data-p='" + g[0] + "' style='--pil:" + g[4] + "'"
       + " aria-pressed='" + (on ? "true" : "false") + "'>"
-      + "<span class='po-i'>" + svg(g[2], 19) + "</span>"
-      + "<span class='po-t'>" + esc(g[1]) + "</span>"
+      + "<span class='po-i'>" + svg(g[2], isUp ? 24 : 19) + "</span>"
+      /* the up-next card wears the pillar's name as a kicker and priority()'s
+         sentence as the headline, because that sentence is the best writing
+         on the screen and it was being spent on a second object */
+      + (isUp ? "<span class='po-k'>" + esc(g[1]) + "</span>" : "")
+      + "<span class='po-t'>" + esc(isUp ? pr.ask : g[1]) + "</span>"
       + "<span class='po-s'>"
       + esc(carry ? (sit.kind === "holiday" ? "on holiday" : "no shift today")
-            : isUp ? planLine(g[0])
+            : isUp ? (pr.sub || planLine(g[0]))
             : on ? doneLine(g[0])
             /* Family wears the live line whether or not the hour is pointing
                at it: "three weeks since Mum" is the whole reason the roster
@@ -263,9 +291,17 @@ function viewToday(){
             : g[5]) + "</span>"
       + (st > 0 && !carry ? "<span class='po-st'>" + svg("flame", 11) + st + "</span>" : "")
       + "<span class='po-c'>" + (on ? svg("tick", 19) : "") + "</span>"
-      + "</button></li>";
+      + "</button>"
+      /* the action sits inside the mission card, not on a separate hero */
+      + (isUp && pr.cta ? "<button class='po-go'"
+          + (pr.cta.act ? " data-cta='" + esc(pr.cta.act) + "'" : " data-tab='" + esc(pr.cta.tab) + "'")
+          + " style='--pil:" + g[4] + "'>" + esc(pr.cta.label) + svg("arrow", 15) + "</button>" : "")
+      + "</li>";
   });
   h += "</ol>";
+
+  /* the scoreboard: where the week stands, once he knows what today wants */
+  h += weekMeterHTML();
 
   /* The chest, immediately under the three things it is the reward for.
      It used to sit eighth on the screen, below the vitals - which meant the
@@ -331,6 +367,14 @@ function viewToday(){
   }
 
   h += conditionHTML(true);
+
+  /* The one piece of prose on the screen, at the bottom where prose belongs.
+     Two lines of serif in the middle of a board is a magazine, and it was
+     sitting between the scoreboard and the thing to do. */
+  if (S.onboarded){
+    var dsp = dispatchFor(t);
+    if (dsp) h += "<p class='dispatch'>" + esc(dsp) + "</p>";
+  }
 
   /* No drawer list. Seven doors in a row is a menu, not a screen - the load
      is the same and the information is gone. The city lives on the header and

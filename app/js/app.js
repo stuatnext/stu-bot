@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v53";
+var BUILD = "v54";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -380,7 +380,8 @@ setInterval(function(){
        the record and the clock, so re-reading it costs nothing and cannot eat
        anything typed - there is no input on this card. */
     var pr = priority();
-    sk.outerHTML = skyCardHTML(pr.ask, pr.sub, pr.cta);
+    var u = nextUp();
+    sk.outerHTML = skyCardHTML(u ? "" : pr.ask, u ? "" : pr.sub, u ? null : pr.cta);
   }
 }, 60000);
 
