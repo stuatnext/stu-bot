@@ -86,6 +86,51 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v60: it is a place now
+
+His verdict on v59, which had been a very tidy dashboard: *"Complete redesign.
+Like a real game not a dashboard."*
+
+He was right again, and the thing I had been missing for nine rounds is that
+**fewer panels is still panels.** A game screen is not a tidier readout. It is
+a SCENE — somewhere you are, something drawn, one thing your eye goes to, and
+you touch the thing itself rather than a button with a verb printed on it.
+
+So Today is his day, drawn side-on.
+
+- **The sky is the real hour** — the same seven phases Daylight has had since
+  v37 — with clouds drifting by day and stars at night.
+- **The sun rides the same arc** it has ridden since v4. It is just no longer
+  a 34px strip.
+- **The ground is the city he actually woke up in.** Singapore towers,
+  Sheffield hills and chimneys, a generic skyline elsewhere.
+- **A path runs across the day**, left to right, wake to wake.
+- **The things the day asks for are stations on that path**, standing at the
+  hour they are actually open. Lit when open, fallen over when shut, green
+  when done. Every other one on a post, so a crowded morning reads as
+  signposts rather than a smudge.
+- **And he is on it.** A small figure at this minute, walking right, all day,
+  whether the app is open or not.
+
+That last part is the whole thing. He opens it after nine hours asleep and
+does not *read* that time passed: he watches himself walk from where he was to
+where he is, past the stations he missed and the ones still lit. "The world
+moved while you were away" stops being a paragraph and becomes the reason to
+look.
+
+Underneath the scene is one card: what the station he is standing at asks, and
+the button that does it, in the thumb's reach.
+
+**What moved rather than went.** The stat bar is gone — a scene with a
+dashboard bolted to the top of it is a scene with a dashboard bolted to the
+top of it — but the pot is real money he pays himself and he has asked where
+it was once already, so the level, the streak and the pot sit in the corner
+the way a game keeps its currency. The five basics, the week's seven days and
+the day's arithmetic are one tap behind the clock. And the city under the
+clock is still the button that corrects the city: he is somewhere different
+most weeks, the app guesses from the phone's own clock, and that guess has to
+be correctable by touching it. It nearly went out with the dashboard.
+
 #### v59: ten boxes down to one
 
 He opened v58 on his phone at 22:43 and said it was overwhelming. He was

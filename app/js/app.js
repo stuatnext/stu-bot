@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v59";
+var BUILD = "v60";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -153,6 +153,7 @@ function render(opts){
   document.body.setAttribute("data-tab", tab);
   el.classList.toggle("arrive", !!opts.turn || !!opts.first);
   el.innerHTML = TABS[tab]();
+  if (tab === "today" && typeof scSettle === "function") scSettle();
   if (opts.turn){
     el.classList.remove("turn", "turn-back");
     void el.offsetWidth;
