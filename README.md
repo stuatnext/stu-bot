@@ -86,6 +86,71 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v58: a world that moves without you
+
+He looked at the table and said the sharpest thing anyone has said about this
+app: *"I didn't ask for a copy of Balatro. I asked for a game that can be as
+sticky as Balatro."*
+
+He was right and the distinction is exact. I had taken the reference literally
+— jokers, an ante, chips × mult, a fan of cream playing cards — which is that
+game's **nouns** wearing his life as a skin. Asked what the spine should
+actually be, he picked the one thing seven rounds had never tried: **the app
+moves while he is away, and opening it is finding out what happened.**
+
+That is available to this app honestly, which is the whole reason it is worth
+building. His life genuinely moves while he is not looking:
+
+- Sheffield wakes and goes to bed on a clock eight hours behind him.
+- Malta's shift starts and ends on a third clock.
+- The gap since he last rang his dad goes up by one every midnight.
+- Windows open and shut — the gym before the shift, the call while somebody is
+  awake, sunscreen while the sun is up, the wind-down.
+- He gets on a plane and the whole board shifts by a few hours.
+
+None of that needs inventing. `world.js` is the clock the app keeps for itself,
+and every event in it is a function of the record and the time — the same rule
+`run.js` has always run on. **The world can report that time passed; it can
+never report that he did something.**
+
+Today reads top to bottom as past, present, future:
+
+```
+the hour, one line
+WHILE YOU WERE AWAY   what the world did, with times on it
+THE DAY               his shift and home's waking hours on one axis,
+                      with now crossing it
+the five basics
+NEXT                  what is about to happen, and when
+what is in play, and the button that does it
+THE WINDOWS           open · shuts in · shut · done
+the week and what today is worth, quietly, at the bottom
+```
+
+**The day strip is the picture this app has owed him since v1.** He works
+Malta's hours from Singapore and his family is eight hours behind: the honest
+reason he does not ring home is not that he forgets, it is that the only window
+is inside his own shift. A list of three things can never say that. One axis
+says it at a glance, and says it differently every day, because he is on a
+plane most weeks. Its axis is *his* day, wake to wake — a midnight axis would
+cut his shift in half and put Sheffield's evening in two pieces — and a window
+that runs past the end of it is drawn as the two pieces it actually is.
+
+**The score moved to the bottom.** For seven rounds the biggest thing on the
+screen was a number about him, which is what made this a scoreboard attached to
+a chore list. It is now one line in the footer with the week's seven marks, and
+it opens its own working.
+
+**The casino vocabulary is gone.** Jokers are **conditions** — standing facts
+about how he lives, like weather, which is what they always were; the ante is
+just the week; the playing cards are instruments with a bar that fills as the
+window runs out. Not one number changed: `runchk` still hammers every read path
+a hundred times and asserts not one day moved.
+
+The pushes learned it too. A ping can now say *"Family shuts at 06:30 — 2h 10m
+left"* instead of counting what is open, and it only says it when the window is
+close enough for that to be true rather than manufactured.
+
 #### v57: Today is a table
 
 Six rounds of "make it feel like a game" and he answered the sixth with a

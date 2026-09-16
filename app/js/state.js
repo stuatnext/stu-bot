@@ -23,7 +23,7 @@ function load(){
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
             monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1, showDone:{}, notes:{},
             where:{}, walks:{}, levelSeen:0, gymHere:null, care:{},
-            people:[], spoke:{}, peopleSeeded:0, lastOpen:"",
+            people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
             water:{}, sleep:{}, out:{},
@@ -85,6 +85,19 @@ function mirrorState(){
                    return { name: d.name, since: sinceWord(d.id),
                             at: m === null ? "" : hhmm(m),
                             up: m === null ? 0 : (windowAt(m) === "asleep" ? 0 : 1) };
+                 })(),
+                 /* the window closing soonest, so a ping can say the one thing
+                    that is genuinely about to stop being possible rather than
+                    counting what is open */
+                 shut: (function(){
+                   if (typeof winClosing !== "function") return null;
+                   try {
+                     var w = winClosing(t);
+                     if (!w) return null;
+                     return { label: w.label, left: Math.round(winLeft(w)),
+                              at: hhmm(w.shut % 1440),
+                              who: w.who || "" };
+                   } catch(e){ return null; }
                  })(),
                  badgeOn: S.badge ? 1 : 0 };
     caches.open("daylight-state").then(function(c){

@@ -1,7 +1,15 @@
 "use strict";
 
 /* ========================================================================
-   jokers.js - the build.
+   jokers.js - the conditions.
+
+   The word "joker" is gone from everything he can see, and the reason is his:
+   "I didn't ask for a copy of Balatro." A card called a Joker sitting in a
+   slot above an Ante is that game's furniture wearing his life. What is
+   underneath it is not borrowed at all - these are standing facts about how
+   he lives, and each one changes what a day is worth. So they are called
+   conditions, like weather, which is what they are: things that are true of
+   the world today whether he arranged them or not.
 
    The deck has 188 cards in it, written about his actual life - the hawker
    stalls, the Sheffield set, the Mandarin, the Malta shift - and every one
@@ -121,10 +129,10 @@ function showJokerPull(){
   var inSlot = jokerHeld(j[0]);
   sfx("done"); buzz([20, 50, 30]);
   ask({
-    title: "New joker",
+    title: "A new condition",
     say: "<b>" + esc(j[1]) + "</b><br>" + esc(j[2]) + "<br><br>"
        + (inSlot ? "It is in a slot already \u2014 it scores from today."
-                 : "Your slots are full. Swap it in from the joker row when you want it."),
+                 : "No room for it yet. Swap it in from the conditions sheet."),
     confirm: inSlot ? "Good" : "Choose a slot", cancel: "Later"
   }).then(function(v){ if (v && !inSlot) askJokers(); else render({ keepScroll: true }); });
 }
@@ -230,7 +238,7 @@ function jokerSheetHTML(){
   var k = today(), live = jokerLive(k);
   var slots = jokerSlots(), used = jokerSlotsUsed();
   var owned = JOKERS.filter(function(j){ return jokerOwns(j[0]); });
-  var h = "<div class='jslots'>" + used + " of " + slots + " slots used</div>";
+  var h = "<div class='jslots'>" + used + " of " + slots + " in play</div>";
   if (!owned.length){
     return h + "<p class='say'>None yet. Every streak pack carries one, and every "
       + "third day pack — so the packs are finally worth opening.</p>";
@@ -244,7 +252,7 @@ function jokerSheetHTML(){
       + "<span class='jc-v'>" + (j[5].kind === "times" ? "×" + j[5].n
           : j[5].kind === "add" ? "+" + j[5].n + " mult" : "+" + j[5].n + " chips") + "</span></span>"
       + "<span class='jc-d'>" + esc(j[2]) + "</span>"
-      + "<span class='jc-s'>" + (inSlot ? (on ? "in · live today" : "in") : "on the bench")
+      + "<span class='jc-s'>" + (inSlot ? (on ? "in play · true today" : "in play") : "set aside")
       + (j[3] > 1 ? " · " + j[3] + " slots" : "") + "</span>"
       + "</button>";
   });
@@ -253,8 +261,8 @@ function jokerSheetHTML(){
 async function askJokers(){
   for (var guard = 0; guard < 40; guard++){
     var v = await ask({
-      title: "Jokers",
-      say: "They score the days you actually had. Tap one to put it in or take it out.",
+      title: "Conditions",
+      say: "Standing facts about how you live. Each one changes what a day is worth - and they only ever score days you actually had. Tap one to put it in or take it out.",
       html: jokerSheetHTML(),
       cancel: "Done"
     });

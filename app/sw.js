@@ -11,7 +11,7 @@
      files: freshness wins.
    - VERSION changes with every release, and the build number is painted on
      the title card and the You screen so what the phone runs is visible. */
-var VERSION = "daylight-v57";
+var VERSION = "daylight-v58";
 /* Written by the app on every save; read here when a push lands, because a
    service worker cannot see localStorage. Never versioned, never deleted. */
 var STATE_CACHE = "daylight-state";
@@ -21,7 +21,7 @@ var SHELL = [
   "./css/cards.css", "./css/body.css", "./css/you.css", "./css/overlays.css",
   "./css/calm.css", "./css/poster.css", "./css/board.css",
   "./js/data.js", "./js/state.js", "./js/audio.js", "./js/sky.js",
-  "./js/fx.js", "./js/art.js", "./js/cardui.js", "./js/scene.js", "./js/board.js",
+  "./js/world.js", "./js/fx.js", "./js/art.js", "./js/cardui.js", "./js/scene.js", "./js/board.js",
   "./js/collection.js", "./js/quest.js", "./js/gym.js", "./js/food.js",
   "./js/week.js", "./js/dispatch.js",
   "./js/basics.js", "./js/care.js", "./js/people.js",
@@ -143,6 +143,16 @@ function whoLine(st){
   return w.since + " since " + w.name
     + (w.at ? " \u00b7 " + w.at + " there" + (w.up ? " and up." : ", asleep.") : ".");
 }
+/* The other sentence he cannot work out for himself: which window is about to
+   shut. Only when it is close enough to matter - "eleven hours left" is not
+   news, and a push that manufactures urgency is one he turns off. */
+function shutLine(st){
+  var w = st && st.shut;
+  if (!w || !w.label || !(w.left > 0) || w.left > 170) return "";
+  var h = Math.floor(w.left / 60), m = w.left % 60;
+  var left = h && m ? h + "h " + m + "m" : h ? h + "h" : m + "m";
+  return w.label + " shuts at " + w.at + " \u2014 " + left + " left.";
+}
 function careWord(st, part, label){
   var c = st && st.care && st.care[part];
   return !!(c && c.indexOf(label) !== -1);
@@ -218,7 +228,9 @@ function composeNudge(kind, st, nowISO, dow, hour){
         ? "Everything you can do before the shift is done."
         : "All three are in. The rest of the day is yours.";
     }
-    if (fresh && careWord(st, "day", "Sunscreen")) out.body += " Sunscreen before you go out.";
+    var sl = fresh ? shutLine(st) : "";
+    if (sl) out.body += " " + sl;
+    else if (fresh && careWord(st, "day", "Sunscreen")) out.body += " Sunscreen before you go out.";
     return out;
   }
 
@@ -236,8 +248,9 @@ function composeNudge(kind, st, nowISO, dow, hour){
     }
     if (live.length){
       out.title = sh2 && !sh2.none ? "Before Malta takes the evening" : "Still open";
+      var sl2 = shutLine(st);
       out.body = andList(live) + (live.length === 1 ? " is" : " are") + " still open"
-        + (run > 0 ? ". " + run + " days on the line." : ".");
+        + (sl2 ? ". " + sl2 : run > 0 ? ". " + run + " days on the line." : ".");
     } else if (open.length){
       out.title = sh2 && !sh2.none ? "Finish at " + sh2.end : "One left";
       out.body = "Everything else is in. " + (sh2 && !sh2.none

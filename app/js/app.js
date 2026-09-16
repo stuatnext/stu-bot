@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v57";
+var BUILD = "v58";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -84,6 +84,15 @@ function badgeOut(){
 }
 document.addEventListener("visibilitychange", function(){
   if (document.hidden){ badgeOut(); return; }
+  /* Back in the foreground. If he has been gone long enough for the world to
+     have done something - an hour is about the resolution of the things it
+     reports, people waking, a shift ending - the news is read again and the
+     arrival is re-stamped. Anything shorter would clear the news he came
+     back to read. */
+  if (typeof awayMin === "function" && awayMin() >= 55){
+    arrive(true);
+    render({ animate: true });
+  }
   /* back in the foreground, possibly in another country: record the day's
      city if this is the first look at it */
   var before = today() + "|" + JSON.stringify(whereOn(today()));
@@ -387,11 +396,22 @@ if (S.pushOn && "serviceWorker" in navigator && "PushManager" in window){
 setInterval(function(){
   paintSky();
   if (tab !== "today" || ST || MODAL) return;
-  /* The hour line is one strip and holds nothing typed, so it can be
-     replaced outright. The rest of the table is only redrawn when the record
-     changes, which is the whole point of a board: it does not move on you. */
+  /* The world moves on its own, so the parts of the board that are made of
+     time are repainted every minute: the hour, the day strip with now
+     crossing it, and the windows with what is left of them. None of the
+     three holds anything typed. The panel and the news are left alone - the
+     panel can hold a half-made decision, and news that reshuffles under him
+     is worse than news that waits. */
   var sk = document.querySelector("#screen .b-hr");
   if (sk) sk.outerHTML = bHourHTML();
+  var wins = typeof winList === "function" ? winList() : null;
+  var tl = document.querySelector("#screen .w-tl");
+  if (tl && wins) tl.outerHTML = wDayHTML(wins);
+  var ws = document.querySelector("#screen .w-wins");
+  if (ws && wins){
+    var sel = boardPick(wins);
+    ws.outerHTML = wWindowsHTML(wins, sel);
+  }
 }, 60000);
 
 /* Hold the title card for a beat, then hand over. */
