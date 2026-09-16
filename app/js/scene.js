@@ -298,48 +298,38 @@ function viewToday(){
   TODAY_MORE = "";
   var w = packsWaiting(), packs = w.day + w.streak;
   var done = PILLARS.filter(function(g){ return pDone(t, g[0]); }).length;
+  var up = nextUp(), sit = situation(), pr = priority();
   var h = "";
 
-  /* One line, and it is an instruction now rather than a count. priority()
-     decides it, and the Gym hero, the pillar row, the brief and both pushes
-     read the same function - so the app can never say two things about one
-     day. */
-  var pr = priority();
-  var up0 = nextUp();
-  /* When one of the three is up, IT is the mission and carries priority()'s
-     words. The sky card goes back to being the clock. When nothing is up -
-     the day is in, or everything is carried - the sky card keeps the line,
-     because then there is no card to put it on. */
-  h += skyCardHTML(up0 ? "" : pr.ask, up0 ? "" : pr.sub, up0 ? null : pr.cta);
+  /* ------------------------------------------------------------ the clock */
+  h += skyCardHTML(up ? "" : pr.ask, up ? "" : pr.sub, up ? null : pr.cta);
 
-  /* A month just closed: hold it up once before it is filed. Never deleted,
-     never reset - the pattern in a bad month is the lesson (his call). */
+  /* A month just closed: hold it up once before it is filed. */
   var rec = S.onboarded ? monthRecapDue() : null;
   if (rec){
     h += "<div class='mrecap'>"
       + "<b>" + esc(monthName(rec.ym)) + ", filed.</b>"
       + "<span>" + rec.full + " of " + rec.possible + " full days &middot; best run "
-      + rec.best + (rec.quests ? " &middot; " + rec.quests
-      + (rec.quests === 1 ? " quest lived" : " quests lived") : "") + "</span>"
+      + rec.best + "</span>"
       + (rec.lesson ? "<span class='mles'>" + esc(rec.lesson) + "</span>" : "")
       + "<button class='mok' data-monthok='" + esc(rec.ym) + "'>Noted &middot; it keeps</button>"
       + "</div>";
   }
 
-  if (S.onboarded) h += shelfHTML();
+  /* ------------------------------------------------------------ the jokers
+     Across the top, where Balatro keeps them, because what they are worth
+     depends on the day and he should be able to see which ones are live
+     before he decides what to do with the afternoon. */
+  if (S.onboarded) h += jokerRowHTML(t);
 
-  /* THE BOARD. The mission first, because the board has to have a subject
-     before it has a scoreboard: the week, the prize and the challenge are
-     all things he reads AFTER he knows what he is being asked to do. This
-     was the wrong way round, so the one coloured object on the screen sat
-     below the fold under two lines of prose. */
-  /* the session: three big pressable rows. The hour points at one of them -
-     that row wears the arrow and speaks the actual plan, so "what now?" never
-     needs asking twice. */
-  var up = up0, sit = situation();
-  /* The three things, as a checklist in large type rather than three tiles.
-     A tile is a box competing with its neighbours; a line of type with a
-     circle at the end of it is a thing to tick, which is what these are. */
+  /* ------------------------------------------------------------- the score
+     The centrepiece. chips x mult, live, moving as he ticks. */
+  if (S.onboarded) h += scoreHTML(t);
+
+  /* --------------------------------------------------------- the three
+     Still the three things, still the mission card - but each row now wears
+     what it is worth in chips, because a thing to do that tells you its
+     price is a move in a game and a thing to do that does not is a chore. */
   h += "<ol class='index big'>";
   PILLARS.forEach(function(g){
     var on = pDone(t, g[0]), st = streak(g[0]), carry = !on && !required(g[0], t);
@@ -348,26 +338,18 @@ function viewToday(){
       + "<button class='ixb' data-p='" + g[0] + "' style='--pil:" + g[4] + "'"
       + " aria-pressed='" + (on ? "true" : "false") + "'>"
       + "<span class='po-i'>" + svg(g[2], isUp ? 24 : 19) + "</span>"
-      /* the up-next card wears the pillar's name as a kicker and priority()'s
-         sentence as the headline, because that sentence is the best writing
-         on the screen and it was being spent on a second object */
       + (isUp ? "<span class='po-k'>" + esc(g[1]) + "</span>" : "")
       + "<span class='po-t'>" + esc(isUp ? pr.ask : g[1]) + "</span>"
       + "<span class='po-s'>"
       + esc(carry ? (sit.kind === "holiday" ? "on holiday" : "no shift today")
             : isUp ? (pr.sub || planLine(g[0]))
             : on ? doneLine(g[0])
-            /* Family wears the live line whether or not the hour is pointing
-               at it: "three weeks since Mum" is the whole reason the roster
-               exists, and burying it until Family happens to be up next
-               would be burying it on most days. */
             : (g[0] === "family" && typeof peopleEmpty === "function" && !peopleEmpty())
               ? peopleLine()
             : g[5]) + "</span>"
-      + (st > 0 && !carry ? "<span class='po-st'>" + svg("flame", 11) + st + "</span>" : "")
+      + (carry ? "" : "<span class='po-chip" + (on ? " got" : "") + "'>+" + CHIP.pillar + "</span>")
       + "<span class='po-c'>" + (on ? svg("tick", 19) : "") + "</span>"
       + "</button>"
-      /* the action sits inside the mission card, not on a separate hero */
       + (isUp && pr.cta ? "<button class='po-go'"
           + (pr.cta.act ? " data-cta='" + esc(pr.cta.act) + "'" : " data-tab='" + esc(pr.cta.tab) + "'")
           + " style='--pil:" + g[4] + "'>" + esc(pr.cta.label) + svg("arrow", 15) + "</button>" : "")
@@ -375,25 +357,28 @@ function viewToday(){
   });
   h += "</ol>";
 
-  /* THE RIG. Balatro's left rail is one framed column holding the score, the
-     hands, the discards, the money, the ante and the round - six numbers in
-     one instrument rather than six numbers floating on baize. This is that:
-     where the week stands, what today is worth, and how close the pack is. */
-  h += "<div class='rig'>" + weekMeterHTML() + payoutHTML();
+  /* ------------------------------------------------------------- the ante
+     The week, as a target that climbs. */
+  if (S.onboarded) h += anteHTML();
 
-  /* The chest, immediately under the three things it is the reward for.
-     It used to sit eighth on the screen, below the vitals - which meant the
-     one visibly filling thing in the app was off the bottom of it. A game
-     shows you the prize while you are working for it. */
+  /* the pack, which now carries jokers and therefore matters */
   h += "<" + (packs ? "button" : "div") + " class='gem" + (packs ? " won" : "") + "'"
     + (packs ? " data-open='1'" : "") + ">" + gemHTML(done, packs)
     + "</" + (packs ? "button" : "div") + ">";
-  h += "</div>";        /* .rig */
 
-  /* the side quest: one held card asks something of him. This is what makes
-     the collection a deck instead of wallpaper - his call, his words. */
-  /* The oldest Do card in his hand is the day's quest. Only when the hand is
-     empty does a held collectible stand in, the way it always did. */
+  /* --------------------------------------------------------- the small ones
+     Everything that scores but is not one of the three. Chips on each, so
+     the reason to bother is a number rather than a virtue. */
+  if (S.onboarded){
+    var cr = careHTML();
+    if (cr){
+      h += cr;
+      var cl = careLine();
+      if (cl) h += "<p class='care-l'>" + esc(cl) + "</p>";
+    }
+  }
+
+  /* the day's card - the one genuine dare on the board */
   var hd = S.onboarded ? handDo() : [];
   if (hd.length){
     var a = hd[0];
@@ -411,12 +396,10 @@ function viewToday(){
       h += "<div class='quest" + (q.done ? " qdone" : "") + "'>"
         + "<span class='qgl" + (q.card[2] === "zh" ? " zh" : "") + "'>" + esc(qa) + "</span>"
         + "<span class='qtx'><b>" + (q.done ? "Done \u00b7 " + esc(q.card[0]) : "Today\u2019s card \u00b7 " + esc(q.card[0])) + "</b>"
-        + "<span>" + esc(q.done
-            ? "+10 spares, +20 XP. That card is done."
-            : q.text) + "</span></span>"
+        + "<span>" + esc(q.done ? "+" + CHIP.card + " chips. That card is done." : q.text) + "</span></span>"
         + (q.done
             ? "<span class='qwin'>" + svg("tick", 18) + "</span>"
-            : "<span class='qact'><span class='qpay'>+10 \u00b7 +20 XP</span>"
+            : "<span class='qact'><span class='qpay'>+" + CHIP.card + " chips</span>"
               + "<button class='qgo' data-questdone='1'>Did it</button>"
               + (q.swaps ? "" : "<button class='qswap' data-questswap='1'>Swap</button>")
               + "</span>")
@@ -424,46 +407,113 @@ function viewToday(){
     }
   }
 
-  /* The routines, and only the ones the hour is actually about. They sit with
-     the three things because that is what they are - things to do today - but
-     they are a line of chips rather than index rows, because they carry
-     nothing: no streak on the row, no arrow, no consequence. */
-  if (S.onboarded){
-    var cr = careHTML();
-    if (cr){
-      h += cr;
-      var cl = careLine();
-      if (cl) h += "<p class='care-l'>" + esc(cl) + "</p>";
-    }
-  }
+  h += conditionHTML(true);
 
-  /* A day that is in is not a day with nothing in it. One line, the fixture
-     list, and only once all three have landed - so it costs the screen
-     nothing on the days he is still working through it. */
   if (S.onboarded && done === PILLARS.length && typeof tomorrowLine === "function"){
     var tl = tomorrowLine();
     if (tl) h += "<div class='tmw'><span>Tomorrow</span><b>" + esc(tl) + "</b></div>";
   }
 
-  h += conditionHTML(true);
-
-  /* The one piece of prose on the screen, at the bottom where prose belongs.
-     Two lines of serif in the middle of a board is a magazine, and it was
-     sitting between the scoreboard and the thing to do. */
   if (S.onboarded){
     var dsp = dispatchFor(t);
     if (dsp) h += "<p class='dispatch'>" + esc(dsp) + "</p>";
   }
-
-  /* No drawer list. Seven doors in a row is a menu, not a screen - the load
-     is the same and the information is gone. The city lives on the header and
-     is tapped there; the five basics are five marks in the same language as
-     the week above them, flat and visible; the week's three moved to Cards,
-     where the pot they pay into already lives. */
-  TODAY_MORE = "";
-
   h += TODAY_MORE;
   return h;
+}
+
+/* ---------------------------------------------------------------- the score
+   Balatro's readout, and the reason this app now has an engine: two framed
+   numbers with an operator between them and the result underneath, all of it
+   moving as he ticks. The working is shown - every chip that scored and
+   every multiplier that applied is a line he can read - because a number you
+   cannot account for is a number you stop believing. */
+function scoreHTML(k){
+  var chips = chipsOn(k), mult = multOn(k), score = scoreOn(k);
+  var ceil = scoreCeiling(k), maxc = chipsMax(k);
+  var left = Math.max(0, ceil - score);
+  var h = "<div class='sc" + (score > 0 ? " live" : "") + "'>";
+  h += "<div class='sc-eq'>"
+    + "<span class='sc-c'><b>" + num(chips) + "</b><i>chips</i></span>"
+    + "<span class='sc-x'>\u00d7</span>"
+    + "<span class='sc-m'><b>" + mult.toFixed(2).replace(/0$/, "") + "</b><i>mult</i></span>"
+    + "</div>";
+  h += "<div class='sc-out'><b>" + num(score) + "</b><i>today</i></div>";
+  if (left > 0)
+    h += "<div class='sc-left'>" + num(left) + " still on the table \u00b7 "
+      + num(maxc - chips) + " chips unclaimed</div>";
+  /* the working */
+  var lines = chipLines(k), mlines = multLines(k).filter(function(x){ return x.id !== "base"; });
+  if (lines.length || mlines.length){
+    h += "<div class='sc-work'>";
+    lines.forEach(function(x){
+      h += "<span class='wk-l" + (x.joker ? " j" : "") + "'>" + esc(x.label)
+        + "<em>+" + x.n + "</em></span>";
+    });
+    mlines.forEach(function(x){
+      h += "<span class='wk-l m" + (x.joker ? " j" : "") + "'>" + esc(x.label)
+        + "<em>" + (x.kind === "times" ? "\u00d7" + x.n : "+" + x.n) + "</em></span>";
+    });
+    h += "</div>";
+  }
+  return h + "</div>";
+}
+
+/* ---------------------------------------------------------------- the ante */
+function anteHTML(){
+  var a = anteState();
+  var h = "<div class='ante" + (a.beat ? " beat" : "") + "'>";
+  h += "<div class='ante-t'><span class='ante-k'>Week " + a.n + "</span>"
+    + "<b>" + num(a.got) + "<em>/ " + num(a.target) + "</em></b>"
+    + (a.beat ? "<span class='ante-w'>" + svg("tick", 13) + " beaten</span>"
+              : "<span class='ante-n'>" + num(a.need) + " to go</span>")
+    + "</div>";
+  /* The seven days, inside the ante rather than as a panel of their own.
+     The bar says how the week is scoring; the nodes say which days actually
+     landed, and "did I do Tuesday" is still worth being able to answer at a
+     glance. One instrument, two readings. */
+  var days = weekAll(a.wk), t2 = today();
+  h += "<div class='ante-days'>";
+  days.forEach(function(k, i){
+    var future = k > t2, isToday = k === t2;
+    var full = !future && allThree(k), ice = !future && frozen(k);
+    var miss = !future && !isToday && !full && !ice && startedBy(k);
+    h += "<span class='and" + (full ? " on" : "") + (ice ? " ice" : "")
+      + (miss ? " miss" : "") + (isToday ? " now" : "") + (future ? " soon" : "") + "'>"
+      + "<i>" + (full ? svg("tick", 11) : ice ? svg("snow", 10) : "") + "</i>"
+      + "<b>" + "MTWTFSS"[i] + "</b></span>";
+  });
+  h += "</div>";
+  h += "<div class='ante-bar'><i style='width:" + a.pct + "%'></i></div>";
+  h += "<div class='ante-s'>" + esc(a.beat
+        ? "Beaten with " + (a.left === 0 ? "nothing" : a.left + (a.left === 1 ? " day" : " days"))
+          + " to spare."
+        : a.left === 0 ? "Last day of the week."
+        : "About " + num(a.pace) + " a day for the rest of the week.") + "</div>";
+  return h + "</div>";
+}
+
+/* ------------------------------------------------------------- the jokers */
+function jokerRowHTML(k){
+  var held = jokersHeld();
+  var slots = jokerSlots(), used = jokerSlotsUsed();
+  if (!held.length && !jokersOwned().length) return "";
+  var live = jokerLive(k);
+  var h = "<button class='jrow' data-jokers='1' aria-label='Your jokers'>";
+  h += "<span class='jrow-r'>";
+  held.forEach(function(j, i){
+    var on = live[j[0]];
+    h += "<span class='jkr" + (on ? " on" : "") + (j[3] > 1 ? " big" : "") + "' style='--i:" + i + "'>"
+      + "<b>" + esc(j[6] || j[1]) + "</b>"
+      + "<i>" + (j[5].kind === "times" ? "\u00d7" + j[5].n
+               : j[5].kind === "add" ? "+" + j[5].n : "+" + j[5].n + "c") + "</i>"
+      + "</span>";
+  });
+  for (var e = used; e < slots; e++)
+    h += "<span class='jkr empty'><b>+</b></span>";
+  h += "</span>";
+  h += "<span class='jrow-n'>" + used + "<em>/" + slots + "</em></span>";
+  return h + "</button>";
 }
 
 /* The most important interaction in the app. When the third one lands, the

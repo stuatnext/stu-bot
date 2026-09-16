@@ -273,6 +273,9 @@ function closeStage(){
   ST = null;
   paintHud();
   render();
+  /* a joker from this pack gets the clear screen it deserves */
+  if (typeof showJokerPull === "function")
+    setTimeout(showJokerPull, reduced() ? 0 : 420);
 }
 
 /* One card, turned over on the stage: a crafted card, or a trophy. Same

@@ -24,6 +24,7 @@ function load(){
             monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1, showDone:{}, notes:{},
             where:{}, walks:{}, levelSeen:0, gymHere:null, care:{},
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"",
+            jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
             water:{}, sleep:{}, out:{},
             hand:{ do:[], in:[] }, doneDo:{}, kept:{}, dealtDo:{}, dealtIn:{},
@@ -1151,6 +1152,20 @@ function openPack(kind){
     while (S.hand.in.length > 3) S.hand.in.shift();
     S.dealtIn = S.dealtIn || {}; S.dealtIn[ins[0]] = (S.dealtIn[ins[0]] || 0) + 1;
     got.push({ k: "in", id: ins[0] });
+  }
+  /* Every streak pack, and every third day pack, carries a joker. This is
+     the reason a pack is worth opening: until now it paid cards into a
+     binder nobody played with, and the loop dead-ended there. */
+  if (typeof jokerDue === "function"){
+    var owed = kind === "streak" || ((S.openedDay || 0) + 1) % 3 === 0;
+    if (owed){
+      /* Granted, but deliberately NOT pushed into got: that array drives the
+         card ceremony, which counts every entry as a card and stalls on one
+         it cannot draw. A joker is also too big to bury between two hawker
+         cards - it gets its own reveal once the stage has closed. */
+      var j = jokerDue();
+      if (j){ grantJoker(j[0]); JOKER_PULLED = j[0]; }
+    }
   }
   if (kind === "streak") S.openedStreak = (S.openedStreak || 0) + 1;
   else S.openedDay = (S.openedDay || 0) + 1;

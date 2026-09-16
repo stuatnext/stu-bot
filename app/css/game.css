@@ -389,3 +389,165 @@ body[data-tab="today"] #screen .gshelf-n{flex:none; font-family:"Nunito",sans-se
   font-size:18px; font-weight:800; letter-spacing:-.03em; color:var(--ink)}
 body[data-tab="today"] #screen .gshelf-n em{font-style:normal; font-size:12px; font-weight:700;
   color:var(--ink3)}
+
+/* ======================================================= THE RUN (v56)
+   Checked every class in here against the other sheets before writing a
+   line of it, which is the habit .pk should have taught me two rounds ago. */
+
+/* ---------------------------------------------------------------- the score
+   Two framed numbers, an operator, and the result. It is the middle of the
+   board because it is the thing that moves when he ticks something, and a
+   board where nothing moves is a form. */
+body[data-tab="today"] #screen .sc{margin:12px 0 0; padding:15px 15px 13px;
+  border-radius:20px; border:1.5px solid var(--edge2); border-bottom-width:3px;
+  background:var(--card)}
+body[data-tab="today"] #screen .sc.live{
+  border-color:color-mix(in srgb, var(--violet) 40%, var(--edge2));
+  box-shadow:0 10px 26px -16px color-mix(in srgb, var(--violet) 80%, transparent)}
+body[data-tab="today"] #screen .sc-eq{display:flex; align-items:stretch; gap:9px}
+body[data-tab="today"] #screen .sc-c, body[data-tab="today"] #screen .sc-m{
+  flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:1px; padding:10px 6px 9px; border-radius:13px}
+body[data-tab="today"] #screen .sc-c{background:color-mix(in srgb, var(--blue) 16%, var(--bg));
+  border:1.5px solid color-mix(in srgb, var(--blue) 45%, transparent)}
+body[data-tab="today"] #screen .sc-m{background:color-mix(in srgb, var(--rose) 16%, var(--bg));
+  border:1.5px solid color-mix(in srgb, var(--rose) 48%, transparent)}
+body[data-tab="today"] #screen .sc-c b, body[data-tab="today"] #screen .sc-m b{
+  font-family:"Nunito",sans-serif; font-size:27px; font-weight:800; letter-spacing:-.04em;
+  line-height:1}
+body[data-tab="today"] #screen .sc-c b{color:#0B72BD}
+body[data-tab="today"] #screen .sc-m b{color:#C2405F}
+:root[data-night] body[data-tab="today"] #screen .sc-c b{color:#5CC8FF}
+:root[data-night] body[data-tab="today"] #screen .sc-m b{color:#FF8FA3}
+body[data-tab="today"] #screen .sc-c i, body[data-tab="today"] #screen .sc-m i{
+  font-family:"JetBrains Mono",monospace; font-size:8.5px; font-style:normal;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink3)}
+body[data-tab="today"] #screen .sc-x{flex:none; align-self:center;
+  font-family:"Nunito",sans-serif; font-size:19px; font-weight:800; color:var(--ink3)}
+body[data-tab="today"] #screen .sc-out{display:flex; align-items:baseline; justify-content:center;
+  gap:8px; margin:12px 0 0}
+body[data-tab="today"] #screen .sc-out b{font-family:"Nunito",sans-serif; font-size:40px;
+  font-weight:800; letter-spacing:-.05em; line-height:1; color:var(--ink)}
+body[data-tab="today"] #screen .sc.live .sc-out b{color:var(--violetInk)}
+body[data-tab="today"] #screen .sc-out i{font-family:"JetBrains Mono",monospace; font-size:9px;
+  font-style:normal; letter-spacing:.14em; text-transform:uppercase; color:var(--ink3)}
+body[data-tab="today"] #screen .sc-left{margin:7px 0 0; text-align:center;
+  font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.04em;
+  color:var(--ink3)}
+/* the working: every chip and every multiplier, itemised */
+body[data-tab="today"] #screen .sc-work{display:flex; flex-wrap:wrap; gap:5px; margin:12px 0 0;
+  padding-top:11px; border-top:1px solid var(--edge)}
+body[data-tab="today"] #screen .wk-l{display:inline-flex; align-items:center; gap:5px;
+  padding:3px 8px; border-radius:99px; font-size:11px; font-weight:700; color:var(--ink2);
+  background:var(--bg); border:1px solid var(--edge2)}
+body[data-tab="today"] #screen .wk-l em{font-style:normal; font-family:"JetBrains Mono",monospace;
+  font-size:10px; color:#0B72BD}
+body[data-tab="today"] #screen .wk-l.m em{color:#C2405F}
+:root[data-night] body[data-tab="today"] #screen .wk-l em{color:#5CC8FF}
+:root[data-night] body[data-tab="today"] #screen .wk-l.m em{color:#FF8FA3}
+body[data-tab="today"] #screen .wk-l.j{border-color:color-mix(in srgb, var(--gold) 55%, transparent);
+  background:color-mix(in srgb, var(--gold) 12%, var(--bg))}
+
+/* ----------------------------------------------------------------- the ante */
+body[data-tab="today"] #screen .ante{margin:12px 0 0; padding:13px 15px 12px;
+  border-radius:18px; border:1.5px solid var(--edge2); border-bottom-width:3px;
+  background:var(--card)}
+body[data-tab="today"] #screen .ante.beat{border-color:var(--greenEdge);
+  background:color-mix(in srgb, var(--green) 11%, var(--card))}
+body[data-tab="today"] #screen .ante-t{display:flex; align-items:baseline; gap:9px}
+body[data-tab="today"] #screen .ante-k{font-family:"JetBrains Mono",monospace; font-size:9px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink3); flex:none}
+body[data-tab="today"] #screen .ante-t b{flex:1; font-family:"Nunito",sans-serif; font-size:19px;
+  font-weight:800; letter-spacing:-.03em; color:var(--ink)}
+body[data-tab="today"] #screen .ante-t b em{font-style:normal; font-size:12px; font-weight:700;
+  color:var(--ink3)}
+body[data-tab="today"] #screen .ante-n{flex:none; font-family:"JetBrains Mono",monospace;
+  font-size:10px; color:var(--ink3)}
+body[data-tab="today"] #screen .ante-w{flex:none; display:inline-flex; align-items:center; gap:4px;
+  font-family:"JetBrains Mono",monospace; font-size:10px; color:var(--greenInk)}
+body[data-tab="today"] #screen .ante-bar{height:10px; margin:10px 0 0; border-radius:99px;
+  background:var(--sunk); border:1px solid var(--edge); overflow:hidden}
+body[data-tab="today"] #screen .ante-bar i{display:block; height:100%; border-radius:99px;
+  background:linear-gradient(90deg, var(--violet), var(--violetEdge));
+  transition:width .55s var(--tap)}
+body[data-tab="today"] #screen .ante.beat .ante-bar i{
+  background:linear-gradient(90deg, var(--green), var(--greenEdge))}
+body[data-tab="today"] #screen .ante-s{margin:8px 0 0; font-size:12px; color:var(--ink3)}
+
+/* ---------------------------------------------------------------- the jokers */
+body[data-tab="today"] #screen .jrow{display:flex; align-items:center; gap:9px; width:100%;
+  margin:10px 0 0; padding:8px 12px 8px 9px; cursor:pointer; text-align:left;
+  border-radius:16px; border:1.5px solid var(--edge2); border-bottom-width:3px;
+  background:var(--card)}
+body[data-tab="today"] #screen .jrow:active{transform:translateY(2px); border-bottom-width:1.5px}
+body[data-tab="today"] #screen .jrow-r{flex:1 1 auto; display:flex; align-items:center; gap:5px;
+  min-width:0; overflow:hidden}
+body[data-tab="today"] #screen .jkr{flex:none; width:52px; height:50px; border-radius:9px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  border:1.5px solid var(--edge2); background:var(--bg); overflow:hidden}
+body[data-tab="today"] #screen .jkr b{font-size:9.5px; font-weight:800; letter-spacing:-.02em;
+  color:var(--ink3); max-width:46px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+body[data-tab="today"] #screen .jkr i{font-family:"JetBrains Mono",monospace; font-size:10px;
+  font-style:normal; color:var(--ink3)}
+body[data-tab="today"] #screen .jkr.on{border-color:var(--goldEdge);
+  background:color-mix(in srgb, var(--gold) 20%, var(--bg));
+  box-shadow:0 3px 10px -4px color-mix(in srgb, var(--gold) 80%, transparent)}
+body[data-tab="today"] #screen .jkr.on b{color:var(--goldInk)}
+body[data-tab="today"] #screen .jkr.on i{color:var(--goldInk); font-weight:700}
+body[data-tab="today"] #screen .jkr.big{border-width:2px}
+body[data-tab="today"] #screen .jkr.empty{border-style:dashed; opacity:.45}
+body[data-tab="today"] #screen .jkr.empty b{font-size:15px}
+body[data-tab="today"] #screen .jrow-n{flex:none; font-family:"Nunito",sans-serif; font-size:16px;
+  font-weight:800; letter-spacing:-.03em; color:var(--ink)}
+body[data-tab="today"] #screen .jrow-n em{font-style:normal; font-size:11px; color:var(--ink3)}
+
+/* what a pillar row is worth, on the row */
+body[data-tab="today"] #screen .index.big .po-chip{grid-column:3; grid-row:1/3;
+  font-family:"JetBrains Mono",monospace; font-size:11px; color:#0B72BD;
+  padding:3px 7px; border-radius:99px; background:color-mix(in srgb, var(--blue) 13%, transparent);
+  border:1px solid color-mix(in srgb, var(--blue) 35%, transparent)}
+:root[data-night] body[data-tab="today"] #screen .index.big .po-chip{color:#5CC8FF}
+body[data-tab="today"] #screen .index.big .ixr.on .po-chip{color:var(--greenInk);
+  background:color-mix(in srgb, var(--green) 18%, transparent);
+  border-color:color-mix(in srgb, var(--green) 40%, transparent)}
+body[data-tab="today"] #screen .index.big .ixr.up .po-chip{grid-column:3; grid-row:1;
+  color:#fff; background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.3)}
+
+/* the joker sheet */
+#modal .jslots{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink3); margin:2px 0 10px}
+#modal .jlist{display:grid; gap:8px; max-height:52vh; overflow-y:auto; margin-bottom:12px}
+#modal .jcard{display:grid; gap:3px; width:100%; text-align:left; cursor:pointer;
+  padding:11px 12px; border-radius:14px; border:1.5px solid var(--edge2);
+  background:var(--card); font-family:inherit; color:var(--ink)}
+#modal .jcard.in{border-color:var(--goldEdge);
+  background:color-mix(in srgb, var(--gold) 10%, var(--card))}
+#modal .jcard.live{box-shadow:0 0 0 2px color-mix(in srgb, var(--gold) 35%, transparent)}
+#modal .jc-h{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
+#modal .jc-h b{font-size:15px; font-weight:800; letter-spacing:-.02em}
+#modal .jc-v{flex:none; font-family:"JetBrains Mono",monospace; font-size:11px;
+  color:var(--goldInk)}
+#modal .jc-d{font-size:12.5px; line-height:1.4; color:var(--ink3)}
+#modal .jc-s{font-family:"JetBrains Mono",monospace; font-size:9.5px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--ink3)}
+#modal .jcard.in .jc-s{color:var(--goldInk)}
+
+/* the seven days, inside the ante — the bar is the score, these are the days */
+body[data-tab="today"] #screen .ante-days{display:grid; grid-template-columns:repeat(7,1fr);
+  gap:5px; margin:11px 0 0}
+body[data-tab="today"] #screen .and{display:flex; flex-direction:column; align-items:center; gap:3px}
+body[data-tab="today"] #screen .and i{width:100%; height:26px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; color:transparent;
+  border:1.5px solid color-mix(in srgb, var(--violet) 24%, var(--edge2));
+  background:color-mix(in srgb, var(--violet) 8%, var(--sunk))}
+body[data-tab="today"] #screen .and b{font-family:"JetBrains Mono",monospace; font-size:8.5px;
+  font-weight:700; letter-spacing:.06em; color:var(--ink3)}
+body[data-tab="today"] #screen .and.on i{background:var(--green); border-color:var(--greenEdge);
+  border-bottom-width:2.5px; color:#fff}
+body[data-tab="today"] #screen .and.on b{color:var(--greenInk)}
+body[data-tab="today"] #screen .and.ice i{background:var(--blueSoft); border-color:var(--blue);
+  color:var(--blue)}
+body[data-tab="today"] #screen .and.miss i{background:transparent; border-style:dashed; opacity:.45}
+body[data-tab="today"] #screen .and.soon i{opacity:.5}
+body[data-tab="today"] #screen .and.now i{border-color:var(--gold); border-width:2.5px;
+  box-shadow:0 0 0 2.5px color-mix(in srgb, var(--gold) 24%, transparent)}
