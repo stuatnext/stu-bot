@@ -86,6 +86,62 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v57: Today is a table
+
+Six rounds of "make it feel like a game" and he answered the sixth with a
+photograph of his own phone: *"Why haven't you changed the layout, design or
+structure? It still looks entirely the same."*
+
+He was right, and it is worth being exact about how. v53 to v56 each changed
+what sat **inside** one frame that never moved: a pale ground, a stat bar on
+top, a vertically scrolling column of white rounded cards, a six-tab light bar
+underneath. v56 added a real engine — chips x mult, jokers, a weekly ante — and
+then rendered it as two more white rounded cards in that same column. A list of
+numbers about a game is not a game.
+
+Balatro and AdVenture Capitalist are not scrolling columns. They are **boards**:
+one screen, nothing below the fold, everything in a fixed place, read in a
+second because nothing has moved since yesterday. So Today is now a board.
+
+     the hour, one line, because Daylight is still a day
+    +-----------------------------------------------------+
+    |  JOKERS (slots, always drawn)  |  THE FIVE BASICS    |
+    +--------------+--------------------------------------+
+    |  THE WEEK    |        chips  x  mult  =  SCORE       |
+    +--------------+--------------------------------------+
+    |  what the card in play asks, and the button          |
+    +-----------------------------------------------------+
+    |        [ THE HAND - cards, tappable ]                |
+    +-----------------------------------------------------+
+
+**The hand is the change that matters.** The three pillars, the day's card, the
+routines the hour has actually asked for and any waiting pack are no longer rows
+in a list — they are cards he holds, each with its chip value printed in the
+corner. Picking one up puts what it asks in the panel above; the button plays
+it. A second tap on a card already in his hand plays it directly, so the
+commonest action on the screen — tick the thing it just asked for — still costs
+one tap.
+
+Everything else follows from the board being a board. The whole app goes dark on
+this tab, bar and stat row included, because a board framed by a white app is a
+picture of a board. The joker shelf is **always** drawn, empty slots and all —
+the old row returned an empty string until he owned one, which is why the single
+new mechanic of v56 was invisible on the only account that matters. A score of
+`0 x 1.0` now says what finishing would be worth underneath it. The month recap
+stopped being a slab across the top and became a card like everything else. And
+the working — every chip that scored, every multiplier that applied — moved into
+a sheet the score panel opens, because a number you cannot account for is a
+number you stop believing, but it does not need eighty pixels every day.
+
+Two files were deleted rather than left lying around: `scene.css`, which was
+entirely the old Today screen, and `game.css`, which was six rounds of trying to
+paint a game onto it. `scene.js` kept only what the board is built out of — the
+sun's arc, the day's short labels, and the ceremonies that take the screen.
+
+The rule the engine was built on did not move: the board **reads** the record
+and can never write to it. `runchk` still hammers every read path a hundred
+times and asserts not one day changed.
+
 #### v52: who is at the other end of it
 
 Three rounds of design work had made the screens calm. None of them had made

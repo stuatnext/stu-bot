@@ -114,26 +114,6 @@ function conditionMeta(){
     + (sleepOn(t) ? "" : " \u00b7 sleep?")
     + (clear ? " \u00b7 " + clear + " clear" : "");
 }
-function conditionHTML(bare){
-  /* Five marks, in the same language as the seven days above them: no card,
-     no heading, no chevron. Sleep and getting out are the two he can log, so
-     those two are buttons; the other three report and say so quietly. */
-  var t = today(), h = "<div class='vit" + (bare ? " flat" : "") + "'>";
-  VITALS.forEach(function(v){
-    var on = vitalMet(v[0], t);
-    var act = v[0] === "sleep" ? " data-sleep='1'" : (v[0] === "out" ? " data-out='1'" : "");
-    var val = v[0] === "water"   ? waterOn(t) + "/" + WATER_GLASSES
-            : v[0] === "sleep"   ? (sleepOn(t) ? sleepOn(t) + "h" : "+")
-            : v[0] === "protein" ? num(proteinOn(t)) + "g"
-            : v[0] === "train"   ? (on ? "done" : "\u2014")
-            : (on ? "yes" : "+");
-    var tag = act ? "button" : "div";
-    h += "<" + tag + " class='vc" + (on ? " on" : "") + "'" + act + ">"
-      + "<span class='vv'>" + val + "</span>"
-      + "<span class='vl'>" + esc(v[1]) + "</span></" + tag + ">";
-  });
-  return h + "</div>";
-}
 
 /* ------------------------------------------------------------------- view
    Water. Only water. */

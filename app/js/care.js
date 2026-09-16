@@ -145,38 +145,16 @@ function tapCare(key){
   render({ keepScroll: true });
 }
 
-/* --------------------------------------------------------------- the row
-   One line on Today, under the three things: the routines that are live at
-   this minute and nothing else. Same flat language as the basics under it -
-   no card, no heading, no chevron - because it is the same kind of thing. */
-function careHTML(){
-  var live = careNow();
-  if (!live.length) return "";
-  var t = today(), w = careWindow();
-  var h = "<div class='care' data-win='" + w + "'>";
-  h += "<span class='care-k'>" + (w === "night" ? "Before bed" : "Also today") + "</span>";
-  live.forEach(function(r){
-    var on = careOn(t, r[0]);
-    h += "<button class='care-b" + (on ? " on" : "") + "' data-care='" + r[0] + "'"
-      + " aria-pressed='" + (on ? "true" : "false") + "'>"
-      + "<span class='care-c'>" + (on ? svg("tick", 13) : "") + "</span>"
-      + "<span class='care-t'>" + esc(r[1]) + "</span>"
-      + "</button>";
-  });
-  return h + "</div>";
-}
-/* The line under the row, when there is something worth saying. Kept to one
-   sentence and often nothing at all.
-
-   The exception is sunscreen on a day away from home: the chip appears and
-   disappears as he crosses latitudes and seasons, so on those days the line
-   says why it is there rather than what to do with it. */
-function careLine(){
-  var live = careNow();
-  if (!live.length) return "";
-  var t = today();
-  var open = live.filter(function(r){ return !careOn(t, r[0]); });
-  if (!open.length) return "";
-  if (open[0][0] === "sun" && !situation(t).home) return sunWhy(t);
-  return open[0][2];
+/* --------------------------------------------------------- what it says
+   The line a routine carries on the board. Usually just what to do - the
+   exception is sunscreen away from home, where the card appears and
+   disappears as he crosses latitudes and seasons, so on those days it says
+   why it is there rather than what to do with it. */
+function careSay(key, k){
+  k = k || today();
+  var row = null;
+  for (var i = 0; i < ROUTINES.length; i++) if (ROUTINES[i][0] === key) row = ROUTINES[i];
+  if (!row) return "";
+  if (key === "sun" && !situation(k).home) return sunWhy(k);
+  return row[2];
 }

@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v56";
+var BUILD = "v57";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -128,7 +128,7 @@ function doFlip(){
 }
 
 /* ------------------------------------------------------------------ router */
-var TABS = { today: viewToday, gym: viewGym, food: viewFood, basics: viewBasics,
+var TABS = { today: viewBoard, gym: viewGym, food: viewFood, basics: viewBasics,
              work: viewWork, cards: viewDeck, vault: viewVault, you: viewYou };
 var tab = "today";
 
@@ -137,9 +137,10 @@ function render(opts){
   var el = document.getElementById("screen");
   var scr = document.getElementById("screen");
   var keep = opts.keepScroll ? scr.scrollTop : null;
-  /* Today is a scene: one viewport, no scrolling, staged entrance. The other
-     two are lists and scroll like lists. */
-  document.body.classList.toggle("scene", tab === "today");
+  /* Today is a table and the rest are lists, and the whole difference is
+     carried on one attribute: board.css is scoped to [data-tab="today"] and
+     reaches nothing else. The old body.scene class had no rules left behind
+     it once scene.css went. */
   document.body.setAttribute("data-tab", tab);
   el.classList.toggle("arrive", !!opts.turn || !!opts.first);
   el.innerHTML = TABS[tab]();
@@ -175,6 +176,17 @@ document.addEventListener("click", function(ev){
   var ds = b.dataset || {};
 
   if (ds.coachskip){ coachSkip(); return; }
+  /* Picking a card up off the table. It changes nothing in the record, so
+     it repaints and stops there - unless the card is already the one in his
+     hand, in which case the second tap plays it. */
+  if (ds.pick){
+    if (B_PICK === ds.pick){ boardPlay(); return; }
+    B_PICK = ds.pick;
+    sfx("tap"); buzz(6);
+    render({ keepScroll: true });
+    return;
+  }
+  if (ds.work){ askWorking(); return; }
   if (ds.tab){ go(ds.tab); return; }
   if (ds.p){
     /* Family means people once he has named any, so the tap opens the roster
@@ -375,15 +387,11 @@ if (S.pushOn && "serviceWorker" in navigator && "PushManager" in window){
 setInterval(function(){
   paintSky();
   if (tab !== "today" || ST || MODAL) return;
-  var sk = document.querySelector("#screen .skycard");
-  if (sk){
-    /* the sun has moved, and so may the instruction: priority() is pure over
-       the record and the clock, so re-reading it costs nothing and cannot eat
-       anything typed - there is no input on this card. */
-    var pr = priority();
-    var u = nextUp();
-    sk.outerHTML = skyCardHTML(u ? "" : pr.ask, u ? "" : pr.sub, u ? null : pr.cta);
-  }
+  /* The hour line is one strip and holds nothing typed, so it can be
+     replaced outright. The rest of the table is only redrawn when the record
+     changes, which is the whole point of a board: it does not move on you. */
+  var sk = document.querySelector("#screen .b-hr");
+  if (sk) sk.outerHTML = bHourHTML();
 }, 60000);
 
 /* Hold the title card for a beat, then hand over. */

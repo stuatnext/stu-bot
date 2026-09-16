@@ -1,0 +1,272 @@
+/* ==========================================================================
+   board.css - the table.
+
+   Loaded last, and the only file that is allowed to change what the whole
+   app looks like on one tab. Today is not a page in this app any more: it is
+   a dark table with the game laid out on it, and the furniture above and
+   below it goes dark too, because a board framed by a white app is a picture
+   of a board.
+
+   SPECIFICITY. poster.css and calm.css scope their rules with #screen, an
+   ID, which outranks any number of classes. Every rule here that has to win
+   against them carries #screen as well. That mistake cost a whole broken
+   layout in v53 and it is not being made a third time.
+   ========================================================================== */
+
+/* --------------------------------------------------------------- the room */
+body[data-tab="today"]{
+  --felt:#101322; --felt2:#191E31; --pane:#1B2133; --pane2:#232A40;
+  --pedge:#2E3651; --pink:#EFEAF6; --pink2:#A8AFC7; --pink3:#6E7692;
+  --chipc:#3D9BE9; --multc:#F0544B; --won:#3FD9A0;
+  background:
+    radial-gradient(120% 70% at 50% 0%, #202944 0%, transparent 58%),
+    radial-gradient(100% 60% at 50% 100%, #1A2036 0%, transparent 62%),
+    var(--felt);
+  color:var(--pink);
+}
+body[data-tab="today"] #hud{background:none}
+body[data-tab="today"] .crest{background:var(--pane); border-color:var(--pedge)}
+body[data-tab="today"] .crest .bg{stroke:#2B3350}
+body[data-tab="today"] .crest b{color:var(--pink)}
+body[data-tab="today"] .chip{background:var(--pane); border-color:var(--pedge); color:var(--pink)}
+body[data-tab="today"] .chip.cold b{color:var(--pink3)}
+body[data-tab="today"] #nav{background:#141828; border-top-color:#252C44}
+body[data-tab="today"] #nav button{color:#7B839E}
+body[data-tab="today"] #nav button[aria-current="true"]{color:#8FD4FF}
+body[data-tab="today"] #nav button[aria-current="true"]::before{
+  background:rgba(61,155,233,.16); border-color:rgba(61,155,233,.42)}
+body[data-tab="today"] .badge{border-color:#141828}
+
+/* One screen. The board sizes itself to the space between the bar and the
+   HUD and does not scroll - if a small phone cannot hold it, it scrolls
+   rather than clipping, which is the honest failure mode. */
+body[data-tab="today"] #screen{padding:0; max-width:520px; overscroll-behavior:contain}
+body[data-tab="today"] #screen .b-t{display:flex; flex-direction:column; height:100%;
+  min-height:100%; gap:6px; padding:3px 12px calc(4px + env(safe-area-inset-bottom))}
+
+/* ---------------------------------------------------------------- the hour */
+body[data-tab="today"] #screen .b-hr{flex:none; display:flex; align-items:center; gap:8px;
+  padding:0 2px; min-height:20px}
+body[data-tab="today"] #screen .b-hr svg{width:34px; height:18px; flex:none; overflow:visible}
+body[data-tab="today"] #screen .b-hr .arc{fill:none; stroke:#39415F; stroke-width:4}
+body[data-tab="today"] #screen .b-hr .band{fill:none; stroke:#F2B735; stroke-width:5; opacity:.85}
+body[data-tab="today"] #screen .b-hr .orb{fill:#FFD166}
+body[data-tab="today"] #screen .b-hr .orb.moon{fill:#C9D2F2}
+body[data-tab="today"] #screen .b-hr i{font-family:"JetBrains Mono",monospace; font-style:normal;
+  font-size:9.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--pink3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+body[data-tab="today"] #screen .b-loc{font:inherit; color:#8FD4FF; background:none;
+  border:0; padding:0; letter-spacing:inherit; text-transform:inherit; cursor:pointer}
+body[data-tab="today"] #screen .b-loc.ask{color:#FFD166; text-decoration:underline}
+
+/* ------------------------------------------------------------ the top rail
+   Jokers left, the five basics right. Both permanent, both small, neither
+   ever absent - the shelf with gaps in it is the invitation. */
+body[data-tab="today"] #screen .b-rail{flex:none; display:grid;
+  grid-template-columns:auto 1fr; gap:7px; align-items:stretch}
+body[data-tab="today"] #screen .b-jk{display:flex; gap:3px; padding:5px; border-radius:11px;
+  background:var(--pane); border:1px solid var(--pedge); cursor:pointer; font:inherit}
+body[data-tab="today"] #screen .b-j{width:26px; height:38px; border-radius:6px; flex:none;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+  background:linear-gradient(#2C3450,#222942); border:1px solid #3A4368; overflow:hidden;
+  padding:2px}
+body[data-tab="today"] #screen .b-j.w{width:34px}
+body[data-tab="today"] #screen .b-j.x{background:none; border:1px dashed #39415F}
+body[data-tab="today"] #screen .b-j.x b{font-size:12px; color:#39415F}
+body[data-tab="today"] #screen .b-j b{font-family:"Nunito",sans-serif; font-size:7.5px;
+  font-weight:900; line-height:1.05; text-align:center; color:var(--pink2);
+  overflow:hidden; max-height:17px}
+body[data-tab="today"] #screen .b-j i{font-family:"JetBrains Mono",monospace; font-style:normal;
+  font-size:8px; font-weight:700; color:var(--pink3)}
+body[data-tab="today"] #screen .b-j.on{border-color:#F0544B;
+  background:linear-gradient(#3A2740,#2A1E36); box-shadow:0 0 0 1px rgba(240,84,75,.35)}
+body[data-tab="today"] #screen .b-j.on b{color:#FFE2D6}
+body[data-tab="today"] #screen .b-j.on i{color:#FF8A7A}
+
+body[data-tab="today"] #screen .b-vt{display:grid; grid-template-columns:repeat(5,1fr); gap:3px;
+  padding:5px; border-radius:11px; background:var(--pane); border:1px solid var(--pedge)}
+body[data-tab="today"] #screen .b-v{display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:1px; min-height:38px; border-radius:6px; padding:2px 1px;
+  background:#232A40; border:1px solid #2E3651; color:var(--pink2); font:inherit; cursor:pointer}
+body[data-tab="today"] #screen .b-v.on{background:rgba(63,217,160,.14); border-color:rgba(63,217,160,.45)}
+body[data-tab="today"] #screen .b-vv{font-family:"Nunito",sans-serif; font-size:12px;
+  font-weight:900; color:var(--pink); line-height:1}
+body[data-tab="today"] #screen .b-v.on .b-vv{color:var(--won)}
+body[data-tab="today"] #screen .b-vl{font-family:"JetBrains Mono",monospace; font-size:7px;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--pink3); line-height:1}
+
+/* ------------------------------------------------- the week and the score */
+body[data-tab="today"] #screen .b-mid{flex:none; display:grid;
+  grid-template-columns:minmax(104px,34%) 1fr; gap:7px}
+body[data-tab="today"] #screen .b-wk{display:flex; flex-direction:column; gap:2px;
+  padding:8px 10px; border-radius:13px; background:var(--pane);
+  border:1px solid var(--pedge); box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+body[data-tab="today"] #screen .b-wk-k{font-family:"JetBrains Mono",monospace; font-size:8.5px;
+  font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--pink3)}
+body[data-tab="today"] #screen .b-wk-n{font-family:"Nunito",sans-serif; font-size:24px;
+  font-weight:900; line-height:1; color:#FFD166; letter-spacing:-.02em}
+body[data-tab="today"] #screen .b-wk-g{font-family:"JetBrains Mono",monospace; font-size:9px;
+  color:var(--pink2)}
+body[data-tab="today"] #screen .b-wk-b{display:block; height:4px; border-radius:2px;
+  background:#2B3350; overflow:hidden; margin:2px 0 1px}
+body[data-tab="today"] #screen .b-wk-b i{display:block; height:100%; border-radius:2px;
+  background:linear-gradient(90deg,#F2B735,#FFD166); transition:width .5s var(--tap)}
+body[data-tab="today"] #screen .b-wk.beat .b-wk-b i{background:var(--won)}
+body[data-tab="today"] #screen .b-wk-d{display:flex; gap:2px}
+body[data-tab="today"] #screen .b-wk-d em{flex:1; font-family:"JetBrains Mono",monospace;
+  font-style:normal; font-size:8px; font-weight:700; text-align:center; line-height:14px;
+  border-radius:3px; background:#232A40; color:#5E6685}
+body[data-tab="today"] #screen .b-wk-d em.on{background:var(--won); color:#0C2A1E}
+body[data-tab="today"] #screen .b-wk-d em.ice{background:#3D9BE9; color:#06243D}
+body[data-tab="today"] #screen .b-wk-d em.miss{background:#33253A; color:#8A6478}
+body[data-tab="today"] #screen .b-wk-d em.now{box-shadow:inset 0 0 0 1.5px #FFD166; color:#FFD166}
+body[data-tab="today"] #screen .b-wk-s{font-family:"JetBrains Mono",monospace; font-size:8.5px;
+  letter-spacing:.06em; color:var(--pink3)}
+
+body[data-tab="today"] #screen .b-sc{position:relative; font:inherit; color:inherit;
+  cursor:pointer; text-align:center; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:1px; padding:6px 10px; border-radius:13px;
+  background:linear-gradient(#20263C,#171C2D); border:1px solid var(--pedge); overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+body[data-tab="today"] #screen .b-sc-k{font-family:"JetBrains Mono",monospace; font-size:8.5px;
+  font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--pink3)}
+body[data-tab="today"] #screen .b-sc-v{font-family:"Nunito",sans-serif; font-size:clamp(34px,10.6vw,46px);
+  font-weight:900; line-height:1; letter-spacing:-.035em; color:#FFF6E5;
+  text-shadow:0 2px 0 rgba(0,0,0,.35)}
+body[data-tab="today"] #screen .b-sc.live .b-sc-v{color:#FFD166}
+body[data-tab="today"] #screen .b-sc.up .b-sc-v{animation:bpop .5s var(--pop)}
+@keyframes bpop{0%{transform:none}35%{transform:scale(1.16)}100%{transform:none}}
+body[data-tab="today"] #screen .b-sc-eq{display:flex; align-items:center; gap:5px; margin-top:2px}
+body[data-tab="today"] #screen .b-sc-eq em{font-style:normal; font-family:"Nunito",sans-serif;
+  font-size:14px; font-weight:900; padding:2px 9px; border-radius:6px; min-width:44px;
+  text-align:center; color:#08131E}
+body[data-tab="today"] #screen .b-sc-c{background:var(--chipc)}
+body[data-tab="today"] #screen .b-sc-m{background:var(--multc); color:#2A0A08}
+body[data-tab="today"] #screen .b-sc-eq i{font-style:normal; font-size:12px; color:var(--pink3)}
+body[data-tab="today"] #screen .b-sc-p{margin-top:3px; font-family:"JetBrains Mono",monospace;
+  font-size:8.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:#C79A3E}
+
+/* ------------------------------------------------------------- the play
+   The card in hand, face up. It takes whatever height is left, which is how
+   the board absorbs a tall phone without anything scrolling. */
+body[data-tab="today"] #screen .b-pl{flex:3 0 auto; display:flex;
+  flex-direction:column; justify-content:center; gap:3px; padding:10px 13px;
+  border-radius:15px; overflow:hidden; position:relative;
+  background:linear-gradient(135deg,
+    color-mix(in srgb, var(--pil,#8FD4FF) 22%, #1B2133), #1B2133);
+  border:1px solid color-mix(in srgb, var(--pil,#8FD4FF) 34%, var(--pedge))}
+body[data-tab="today"] #screen .b-pl-h{display:flex; align-items:center; gap:8px}
+body[data-tab="today"] #screen .b-pl-n{font-family:"JetBrains Mono",monospace; font-size:9px;
+  font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+  color:color-mix(in srgb, var(--pil,#8FD4FF) 72%, #FFFFFF)}
+body[data-tab="today"] #screen .b-pl-c{order:2; margin-left:auto; font-style:normal;
+  font-family:"JetBrains Mono",monospace; font-size:9px; font-weight:700; letter-spacing:.08em;
+  padding:3px 7px; border-radius:6px; background:rgba(61,155,233,.2); color:#8FD4FF}
+body[data-tab="today"] #screen .b-pl b{font-family:"Nunito",sans-serif;
+  font-size:clamp(19px,5.6vw,24px); font-weight:900; line-height:1.15; letter-spacing:-.02em;
+  color:#FFF6E5; text-wrap:balance}
+body[data-tab="today"] #screen .b-pl > span:not([class]){font-size:13px; font-weight:600;
+  line-height:1.35; color:var(--pink2); display:-webkit-box; -webkit-line-clamp:2;
+  -webkit-box-orient:vertical; overflow:hidden}
+body[data-tab="today"] #screen .b-pl.got{opacity:.82}
+body[data-tab="today"] #screen .b-pl.won{background:linear-gradient(135deg,#1E3A31,#18202F);
+  border-color:rgba(63,217,160,.4)}
+body[data-tab="today"] #screen .b-pl-t{margin-top:5px; font-family:"JetBrains Mono",monospace;
+  font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:var(--won);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+body[data-tab="today"] #screen .b-pl-a{display:flex; gap:7px; margin-top:5px}
+body[data-tab="today"] #screen .b-go,
+body[data-tab="today"] #screen .b-do{font:inherit; font-family:"Nunito",sans-serif;
+  font-size:14px; font-weight:900; letter-spacing:.01em; padding:9px 14px; min-height:44px;
+  border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;
+  justify-content:center; transition:transform .1s var(--tap)}
+body[data-tab="today"] #screen .b-go{flex:1 1 auto; border:0; color:#08131E;
+  background:linear-gradient(var(--pil,#8FD4FF), color-mix(in srgb, var(--pil,#8FD4FF) 78%, #000));
+  box-shadow:0 3px 0 color-mix(in srgb, var(--pil,#8FD4FF) 45%, #000)}
+body[data-tab="today"] #screen .b-go svg{width:15px; height:15px}
+body[data-tab="today"] #screen .b-do{flex:0 1 auto; background:rgba(255,255,255,.07);
+  border:1px solid var(--pedge); color:var(--pink)}
+body[data-tab="today"] #screen .b-go:active,
+body[data-tab="today"] #screen .b-do:active{transform:translateY(2px)}
+
+/* --------------------------------------------------------------- the hand
+   Cards, fanned from the centre, the picked one lifted out. The whole point
+   of the rebuild: the things he has to do are objects he holds, not rows in
+   a list he scrolls. */
+/* No overlap. A fanned hand looked right in a mock-up and hid half the names
+   on a real phone - the cards divide the width instead, and only lean. */
+body[data-tab="today"] #screen .b-gap{flex:2 0 0; min-height:0}
+body[data-tab="today"] #screen .b-hd{flex:none; display:flex; gap:4px;
+  justify-content:center; align-items:flex-end; padding:22px 4px 12px}
+body[data-tab="today"] #screen .b-c{position:relative; flex:1 1 0; min-width:0;
+  max-width:76px; aspect-ratio:5/7; padding:5px 3px 6px; border-radius:9px; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:3px;
+  font:inherit; color:#23262F; background:linear-gradient(#FBF7EC,#EAE3D2);
+  border:1px solid #C9C0AA; box-shadow:0 4px 10px rgba(0,0,0,.45);
+  transform-origin:50% 120%;
+  transform:rotate(calc(var(--d) * 2.6deg)) translateY(calc(var(--d) * var(--d) * 1.3px));
+  transition:transform .18s var(--tap), box-shadow .18s var(--tap), filter .18s}
+body[data-tab="today"] #screen .b-c::before{content:""; position:absolute; inset:3px 3px auto;
+  height:4px; border-radius:3px; background:var(--pil,#8FD4FF)}
+body[data-tab="today"] #screen .b-c-v{position:absolute; top:10px; left:5px;
+  font-family:"JetBrains Mono",monospace; font-size:9px; font-weight:700; color:#8A8270}
+body[data-tab="today"] #screen .b-c-p{display:flex; align-items:center; justify-content:center;
+  flex:1; width:100%; color:var(--pil,#8FD4FF); font-size:22px; line-height:1; padding-top:6px}
+body[data-tab="today"] #screen .b-c-p svg{width:26px; height:26px}
+body[data-tab="today"] #screen .b-c-n{font-family:"Nunito",sans-serif;
+  font-size:clamp(7.5px,2.45vw,10px);
+  font-weight:900; letter-spacing:-.02em; text-align:center; line-height:1.02;
+  width:100%; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2;
+  -webkit-box-orient:vertical; max-height:19px}
+body[data-tab="today"] #screen .b-c-t{position:absolute; inset:9px 4px auto auto;
+  width:17px; height:17px; border-radius:50%; background:var(--won); color:#0C2A1E;
+  display:flex; align-items:center; justify-content:center}
+body[data-tab="today"] #screen .b-c-t svg{width:12px; height:12px}
+body[data-tab="today"] #screen .b-c.got{background:linear-gradient(#2A3A33,#22302B);
+  border-color:#3A5247; color:#9FC7B5; box-shadow:0 2px 6px rgba(0,0,0,.4)}
+body[data-tab="today"] #screen .b-c.got .b-c-v{color:#6E8C7E}
+body[data-tab="today"] #screen .b-c.got .b-c-p{opacity:.55}
+body[data-tab="today"] #screen .b-c.nxt{box-shadow:0 0 0 2px var(--pil,#8FD4FF),
+  0 6px 16px rgba(0,0,0,.5)}
+body[data-tab="today"] #screen .b-c.up{z-index:3;
+  transform:translateY(-16px) rotate(0deg) scale(1.06);
+  box-shadow:0 0 0 2px #FFD166, 0 10px 22px rgba(0,0,0,.6)}
+body[data-tab="today"] #screen .b-c:active{transform:translateY(-8px) rotate(0deg)}
+
+/* ---------------------------------------------------------------- the foot */
+body[data-tab="today"] #screen .b-ft{flex:none; display:flex; gap:8px; justify-content:center;
+  align-items:baseline; padding:0 2px 2px; overflow:hidden; font-family:"JetBrains Mono",monospace;
+  font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--pink3);
+  min-height:12px}
+body[data-tab="today"] #screen .b-ft > span:first-child{flex:none; white-space:nowrap}
+body[data-tab="today"] #screen .b-ft-s{opacity:.55}
+body[data-tab="today"] #screen .b-ft-d{text-transform:none; letter-spacing:.02em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+/* -------------------------------------------------------- the working
+   In the sheet, not on the table: it lives in #modal, so it is the one part
+   of the board that is not scoped to the today tab. */
+#modal .b-wl{display:flex; flex-direction:column; margin:4px 0 2px}
+#modal .b-wr{display:flex; align-items:baseline; gap:10px; padding:7px 0;
+  border-bottom:1px solid var(--sunk)}
+#modal .b-wr em{flex:1; font-style:normal; font-size:14px; font-weight:600; color:var(--ink2)}
+#modal .b-wr b{font-family:"JetBrains Mono",monospace; font-size:13px; font-weight:700;
+  color:var(--blueEdge)}
+#modal .b-wr.m b{color:var(--crit)}
+#modal .b-wr.j em{color:var(--violetInk)}
+#modal .b-wr.j em::before{content:"Joker \00b7 "; font-family:"JetBrains Mono",monospace;
+  font-size:9px; letter-spacing:.1em; text-transform:uppercase; opacity:.8}
+#modal .b-wr.tot{border-bottom-width:2px; border-color:var(--edge2)}
+#modal .b-wr.tot em{font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink3)}
+#modal .b-wr.sum{border-bottom:0; padding-top:10px}
+#modal .b-wr.sum em{font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink3)}
+#modal .b-wr.sum b{font-family:"Nunito",sans-serif; font-size:26px; font-weight:900;
+  color:var(--goldInk)}
+
+@media (prefers-reduced-motion:reduce){
+  body[data-tab="today"] #screen .b-c{transition:none}
+  body[data-tab="today"] #screen .b-sc.up .b-sc-v{animation:none}
+}
