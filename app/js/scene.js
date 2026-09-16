@@ -218,6 +218,79 @@ function gemHTML(done, packs){
   return h;
 }
 
+/* ================================================================ the engine
+   Balatro shows you chips x mult before you play the hand. That is most of
+   why it is sticky: the reward is legible in advance, so setting one up is
+   the game. This app has had a real economy since v39 - a full day is worth
+   the daily rate in the pot and 75 XP, a comeback pays both twice over, a
+   kept week adds 100, three ticks drop a pack - and every number of it was
+   invisible until after the fact.
+
+   So: what today is worth, said before he does it. Computed from the same
+   functions that actually pay out, never from a table, so it can never
+   promise something the ledger will not honour. */
+function todayPays(){
+  var t = today(), r = rate();
+  var come = typeof isComebackDay === "function" && isComebackDay(t);
+  var w = typeof weekState === "function" ? weekState() : null;
+  var keeps = !!(w && !w.kept && w.need === 1);          /* today would keep it */
+  var out = {
+    cash: r * (come ? 2 : 1),
+    xp: (15 + STEADY.day) * 1 + (come ? 15 + STEADY.comeback : 0)
+        + (keeps ? STEADY.goodWeek : 0),
+    pack: 1, come: come, keeps: keeps,
+    done: allThree(t)
+  };
+  return out;
+}
+function payoutHTML(){
+  var p = todayPays(), t = today();
+  var got = PILLARS.filter(function(g){ return pDone(t, g[0]); }).length;
+  var need = PILLARS.filter(function(g){ return required(g[0], t); }).length || 3;
+  var h = "<div class='pays" + (p.done ? " paid" : "") + "'>";
+  h += "<div class='pays-k'>" + (p.done ? "Today paid" : "Today pays") + "</div>";
+  h += "<div class='pays-row'>"
+    + "<span class='pv cash'><b>" + money(p.cash) + "</b><i>pot</i></span>"
+    + "<span class='pv xp'><b>" + num(p.xp) + "</b><i>xp</i></span>"
+    /* a number, like the other three - an inline svg here sized itself to
+       twice the tile and dragged the whole row with it */
+    + "<span class='pv gv-pack'><b>" + p.pack + "</b><i>pack</i></span>"
+    + "<span class='pv gv-got'><b>" + got + "<em>/" + need + "</em></b><i>done</i></span>"
+    + "</div>";
+  if (p.come || p.keeps){
+    h += "<div class='pays-m'>"
+      + (p.come ? "<span class='mlt'>\u00d72 comeback</span>" : "")
+      + (p.keeps ? "<span class='mlt wk'>+" + STEADY.goodWeek + " keeps the week</span>" : "")
+      + "</div>";
+  }
+  return h + "</div>";
+}
+
+/* ---------------------------------------------------------- the joker row
+   Balatro keeps your jokers across the top of every screen; AdVenture
+   Capitalist keeps every business you own in view. The deck here is the
+   stickiest thing in the app and it lived on another tab, so from Today
+   there was no evidence any of it existed. */
+function shelfHTML(){
+  var held = Object.keys(S.cards || {});
+  if (!held.length) return "";
+  /* newest first, because the last one found is the one he wants to see */
+  held.sort(function(a, b){ return String(S.cards[b]).localeCompare(String(S.cards[a])); });
+  var by = {};
+  CARDS.forEach(function(c){ by[c[0]] = c; });
+  var show = held.slice(0, 6).map(function(n){ return by[n]; }).filter(Boolean);
+  if (!show.length) return "";
+  var h = "<button class='gshelf' data-tab='cards' aria-label='Your cards'>";
+  h += "<span class='gshelf-r'>";
+  show.forEach(function(c, i){
+    var art = c[2] === "zh" ? (c[4] || "\u8bcd") : (CARD_ART[c[0]] || SET_ART[c[2]] || "\u2b50");
+    h += "<span class='gjk gr" + c[1] + "' style='--i:" + i + "'>" + esc(art) + "</span>";
+  });
+  h += "</span>";
+  h += "<span class='gshelf-n'>" + held.length + "<em>/" + CARDS.length + "</em></span>";
+  return h + "</button>";
+}
+
 /* ==================================================================== TODAY */
 var TODAY_MORE = "";
 function viewToday(){
@@ -252,6 +325,8 @@ function viewToday(){
       + "<button class='mok' data-monthok='" + esc(rec.ym) + "'>Noted &middot; it keeps</button>"
       + "</div>";
   }
+
+  if (S.onboarded) h += shelfHTML();
 
   /* THE BOARD. The mission first, because the board has to have a subject
      before it has a scoreboard: the week, the prize and the challenge are
@@ -300,8 +375,11 @@ function viewToday(){
   });
   h += "</ol>";
 
-  /* the scoreboard: where the week stands, once he knows what today wants */
-  h += weekMeterHTML();
+  /* THE RIG. Balatro's left rail is one framed column holding the score, the
+     hands, the discards, the money, the ante and the round - six numbers in
+     one instrument rather than six numbers floating on baize. This is that:
+     where the week stands, what today is worth, and how close the pack is. */
+  h += "<div class='rig'>" + weekMeterHTML() + payoutHTML();
 
   /* The chest, immediately under the three things it is the reward for.
      It used to sit eighth on the screen, below the vitals - which meant the
@@ -310,6 +388,7 @@ function viewToday(){
   h += "<" + (packs ? "button" : "div") + " class='gem" + (packs ? " won" : "") + "'"
     + (packs ? " data-open='1'" : "") + ">" + gemHTML(done, packs)
     + "</" + (packs ? "button" : "div") + ">";
+  h += "</div>";        /* .rig */
 
   /* the side quest: one held card asks something of him. This is what makes
      the collection a deck instead of wallpaper - his call, his words. */
