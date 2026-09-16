@@ -125,7 +125,12 @@ function winList(k){
       col: "#FF8FA3", chip: CHIP.pillar, rank: 0, short: "Family", done: famDone,
       open: fo === null ? wake : fo, shut: fc === null ? bed : fc,
       who: best ? best.label : "",
-      why: best ? best.why : "A conversation with someone at home" });
+      /* peopleLine is the single most useful sentence this app writes - who,
+         what o'clock it is there, and how long it has been. The window's own
+         hours are drawn on the strip above; the panel gets the sentence. */
+      why: (typeof peopleLine === "function" && typeof peopleEmpty === "function"
+            && !peopleEmpty()) ? peopleLine()
+         : best ? best.why : "A conversation with someone at home" });
   } else {
     out.push({ id: "p:family", kind: "pillar", key: "family", label: "Family",
       col: "#FF8FA3", chip: CHIP.pillar, rank: 0, short: "Family", done: famDone,
@@ -152,7 +157,7 @@ function winList(k){
       var night = r[3] === "night";
       out.push({ id: "c:" + r[0], kind: "care", key: r[0], label: r[1],
         short: { sun: "Sun", skin: "Skin", bed: "Bed" }[r[0]] || r[1],
-        col: "#3FD9A0", chip: CHIP.routine, rank: 2, done: careOn(k, r[0]),
+        col: "#3FD9A0", chip: CHIP.routine, rank: 1, done: careOn(k, r[0]),
         open: night ? dayShut : dayOpen, shut: night ? bed + 60 : dayShut,
         why: r[2] });
     });
@@ -163,12 +168,12 @@ function winList(k){
   var hd = (typeof handDo === "function" && S.onboarded) ? handDo() : [];
   if (hd.length){
     out.push({ id: "todo", kind: "todo", label: hd[0][1], short: "To do",
-      col: "#CE82FF", chip: 0, rank: 1, done: 0, open: wake, shut: bed + 15,
+      col: "#CE82FF", chip: 0, rank: 2, done: 0, open: wake, shut: bed + 15,
       todo: hd[0], why: hd[0][2] });
   } else if (typeof questFor === "function" && S.onboarded){
     var q = questFor(k);
     if (q) out.push({ id: "card", kind: "card", label: "The card", short: "Card",
-      col: "#CE82FF", chip: CHIP.card, rank: 1, done: !!q.done,
+      col: "#CE82FF", chip: CHIP.card, rank: 2, done: !!q.done,
       open: wake, shut: bed + 15, card: q,
       why: q.done ? "Done." : q.text });
   }

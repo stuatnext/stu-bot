@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v58";
+var BUILD = "v59";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -196,6 +196,7 @@ document.addEventListener("click", function(ev){
     return;
   }
   if (ds.work){ askWorking(); return; }
+  if (ds.news){ askNews(); return; }
   if (ds.tab){ go(ds.tab); return; }
   if (ds.p){
     /* Family means people once he has named any, so the tap opens the roster

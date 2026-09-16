@@ -61,10 +61,9 @@ function viewBoard(){
   h += bHourHTML();
   h += wNewsHTML();
   h += wDayHTML(wins);
-  h += bVitalsHTML(k);
-  h += wNextHTML();
   h += bPlayHTML(sel, k);
   h += wWindowsHTML(wins, sel);
+  h += bVitalsHTML(k);
   h += wFootHTML(k);
   h += TODAY_MORE;
   return h + "</div>";
@@ -100,36 +99,44 @@ function bHourHTML(){
 function wNewsHTML(){
   var items = [], rec = S.onboarded ? monthRecapDue() : null;
   if (rec) items.push({ month: 1, tone: "good", head: monthName(rec.ym) + ", filed.",
-    sub: rec.full + " of " + rec.possible + " full days · best run " + rec.best
-       + (rec.lesson ? ". " + rec.lesson : ""), ym: rec.ym });
+    sub: rec.full + " of " + rec.possible + " full days \u00b7 best run " + rec.best,
+    ym: rec.ym });
   (NEWS || []).forEach(function(n){ items.push(n); });
-  var dsp = S.onboarded && typeof dispatchFor === "function" ? dispatchFor(today()) : "";
-  if (!items.length && !dsp) return "";
-  /* Three on a phone with room for three. A 4.7-inch screen has room for two
-     and the board is supposed to fit one screen, which is worth more than
-     the third item - the news is sorted with the newest first, so what goes
-     is always the oldest thing that happened. */
-  var room = (typeof window !== "undefined" && window.innerHeight < 700) ? 2 : 3;
-  /* The day's dispatch is pinned to the bottom of the feed. It is an
-     observation rather than an event, which is why it has a bullet instead
-     of a time - and it is the one line that is always there, so a morning
-     with nothing to report still has something true to say. */
-  items = items.slice(0, Math.max(0, room - (dsp ? 1 : 0)));
-  if (dsp) items.push({ dispatch: 1, tone: "flat", head: dsp });
-
-  var h = "<div class='w-news'><div class='w-nh'>"
-    + (AWAY >= 25 ? "While you were away · " + dur(AWAY) : "Since you looked")
-    + "</div>";
-  items.forEach(function(n){
-    var at = n.at ? hhmm(new Date(n.at).getHours() * 60 + new Date(n.at).getMinutes()) : "";
-    h += "<div class='w-n " + esc(n.tone || "flat") + (n.dispatch ? " w-nd" : "") + "'>"
-      + (at ? "<em>" + at + "</em>" : "<em class='w-nm'>•</em>")
-      + "<span><b>" + esc(n.head) + "</b>"
-      + (n.sub ? "<i>" + esc(n.sub) + "</i>" : "") + "</span>"
-      + (n.month ? "<button class='w-nok' data-monthok='" + esc(n.ym) + "'>Noted</button>" : "")
-      + "</div>";
-  });
+  var n0 = items[0];
+  if (!n0){
+    /* Nothing happened while he was away, so the line the app wrote about the
+       day stands in. There is always something true to say. */
+    var dsp = S.onboarded && typeof dispatchFor === "function" ? dispatchFor(today()) : "";
+    if (!dsp) return "";
+    n0 = { dispatch: 1, tone: "flat", head: dsp };
+  }
+  var at = n0.at ? hhmm(new Date(n0.at).getHours() * 60 + new Date(n0.at).getMinutes()) : "";
+  var h = "<div class='w-news " + esc(n0.tone || "flat") + (n0.dispatch ? " w-nd" : "") + "'>";
+  h += "<span class='w-nh'>" + (n0.dispatch ? "Today" : "While you were away") + "</span>";
+  h += "<b>" + (at ? "<em>" + at + "</em> " : "") + esc(n0.head) + "</b>";
+  if (n0.sub) h += "<i>" + esc(n0.sub) + "</i>";
+  var rest = (NEWS || []).length - (rec ? 0 : 1);
+  if (n0.month || rest > 0){
+    h += "<span class='w-na'>";
+    if (n0.month) h += "<button class='w-nok' data-monthok='" + esc(n0.ym) + "'>Noted</button>";
+    if (rest > 0) h += "<button class='w-nmore' data-news='1'>" + rest + " more</button>";
+    h += "</span>";
+  }
   return h + "</div>";
+}
+
+/* The rest of what happened, on request. One thing on the board and the
+   others a tap away is the difference between news and a wall. */
+function askNews(){
+  var h = "<div class='b-wl'>";
+  (NEWS || []).forEach(function(n){
+    var at = n.at ? hhmm(new Date(n.at).getHours() * 60 + new Date(n.at).getMinutes()) : "\u00b7";
+    h += "<span class='b-wr'><em>" + esc(at + "  " + n.head)
+      + (n.sub ? " " + n.sub : "") + "</em></span>";
+  });
+  return ask({ title: "While you were away",
+    say: AWAY >= 25 ? "You were gone " + dur(AWAY) + "." : "Since you last looked.",
+    html: h + "</div>", cancel: "Done" });
 }
 
 /* ================================================================= the day
@@ -149,48 +156,37 @@ function wDayHTML(wins){
   var nowPos = sinceWake(nowMin()) / 1440 * 100;
   var h = "<div class='w-tl'>";
 
-  /* Lane one: Malta. Lane two: home. The labels live in a gutter on the left
-     rather than inside the bands - a band is two hours wide on a phone and
-     any word put inside it is a word cut in half. */
+  /* Lane one: Malta. Lane two: home, and only when there is somebody on the
+     roster to be awake - an empty lane with a dash in it was pure furniture. */
   h += "<div class='w-lane'><span class='w-lk'>Malta</span><span class='w-tr'>";
   if (!s.noShift) h += wBands("shift", s.start, s.end);
   h += wNow(nowPos, 1);
-  h += "</span><span class='w-lv'>" + esc(s.noShift ? "none" : s.startT + "\u2013" + s.endT)
-    + "</span></div>";
+  h += "</span></div>";
 
   var ppl = (typeof people === "function" ? people() : []).filter(function(p){
     return zoneMin(p.tz) !== null;
   });
-  /* Whoever is furthest past their rhythm gets the lane - the point of the
-     picture is the window he keeps missing, not a roster. */
   var lead = null;
   ppl.forEach(function(p){
     var over = typeof personOver === "function" ? personOver(p) : 0;
     if (!lead || over > lead.over) lead = { p: p, over: over };
   });
-  h += "<div class='w-lane'><span class='w-lk'>"
-    + esc(lead ? (lead.p.where || lead.p.name) : "Home") + "</span><span class='w-tr'>";
-  if (lead) h += wBands("ppl", myMinFor(lead.p.tz, PWAKE), myMinFor(lead.p.tz, PSLEEP));
-  h += wNow(nowPos, 0);
-  h += "</span><span class='w-lv'>"
-    + esc(lead ? hhmm(myMinFor(lead.p.tz, PWAKE)) + "\u2013"
-                 + hhmm(myMinFor(lead.p.tz, PSLEEP)) : "\u2013")
-    + "</span></div>";
+  if (lead){
+    h += "<div class='w-lane'><span class='w-lk'>"
+      + esc(lead.p.where || lead.p.name) + "</span><span class='w-tr'>";
+    h += wBands("ppl", myMinFor(lead.p.tz, PWAKE), myMinFor(lead.p.tz, PSLEEP));
+    h += wNow(nowPos, 0);
+    h += "</span></div>";
+  }
 
-  /* The hours it is crossing, in the same column as the tracks so the ticks
-     line up with the bands above them. */
   h += "<div class='w-lane ax'><span class='w-lk'></span><span class='w-tr w-ax'>";
   for (var q = 0; q <= 4; q++){
     h += "<span style='left:" + (q * 25) + "%'>" + hhmm(anchor + q * 360) + "</span>";
   }
-  h += "</span><span class='w-lv'></span></div>";
+  h += "</span></div>";
   return h + "</div>";
 }
-/* A window that runs past the end of his day comes back round at the start
-   of it, so it is drawn as the two pieces it actually is. Sheffield is awake
-   from half past two in his afternoon until half past six the next morning;
-   one rectangle cannot say that, and the version that tried drew a four-hour
-   stub against the right-hand edge. */
+
 function wBands(cls, openMin, shutMin){
   var a = sinceWake(openMin) / 1440 * 100, b = sinceWake(shutMin) / 1440 * 100;
   function bar(x, w){
@@ -221,36 +217,11 @@ function bVitalsHTML(k){
             : v[0] === "protein" ? " data-tab='food'"
             : " data-tab='gym'";
     var val = v[0] === "water"   ? waterOn(k) + "/" + WATER_GLASSES
-            : v[0] === "sleep"   ? (sleepOn(k) ? sleepOn(k) + "h" : "–")
+            : v[0] === "sleep"   ? (sleepOn(k) ? sleepOn(k) + "h" : "\u2013")
             : v[0] === "protein" ? num(proteinOn(k)) + "g"
-            : (on ? "✓" : "–");
+            : (on ? "yes" : "\u2013");
     h += "<button class='b-v" + (on ? " on" : "") + "'" + act + ">"
-      + "<span class='b-vv'>" + esc(val) + "</span>"
-      + "<span class='b-vl'>" + esc(v[1]) + "</span></button>";
-  });
-  return h + "</div>";
-}
-
-/* ================================================================== next
-   The world has a past, a now and a future, and the board now shows all
-   three: the news above, the day strip in the middle, and this. It also
-   earns the space between the basics and the panel, which on a tall phone
-   was a band of empty felt.
-
-   Only boundaries go here - a shift ending, somebody waking, a window
-   shutting - because those are the things that happen without him. */
-function wNextHTML(){
-  if (!S.onboarded || typeof worldNext !== "function") return "<div class='b-gap'></div>";
-  /* A 4.7-inch screen does not have room for the future as well as the past,
-     and the past is the half he cannot get anywhere else. */
-  if (typeof window !== "undefined" && window.innerHeight < 700) return "<div class='b-gap'></div>";
-  var next = worldNext(2), now = Date.now();
-  if (!next.length) return "<div class='b-gap'></div>";
-  var h = "<div class='w-next'><div class='w-nh'>Next</div>";
-  next.forEach(function(x){
-    h += "<div class='w-x'><em>" + esc(dur((x.at - now) / 60000)) + "</em>"
-      + "<b>" + esc(x.label) + "</b>"
-      + (x.sub ? "<i>" + esc(x.sub) + "</i>" : "") + "</div>";
+      + esc(v[1].toLowerCase()) + " <b>" + esc(val) + "</b></button>";
   });
   return h + "</div>";
 }
@@ -264,29 +235,16 @@ function wNextHTML(){
    closing at four is a fact about the day; the app saying so plainly is the
    difference between a world and a nag. */
 function wWindowsHTML(wins, sel){
-  var h = "<div class='w-wins' data-n='" + wins.length + "'>";
+  var h = "<div class='w-wins'>";
   wins.forEach(function(w){
-    var left = winLeft(w), picked = sel && w.id === sel.id;
-    var n = sinceWake(nowMin());
-    var pct = w.state === "open" ? Math.max(0, Math.min(100, (n - w.a) / (w.b - w.a) * 100))
-            : w.state === "shut" ? 100 : 0;
+    var picked = sel && w.id === sel.id;
     h += "<button class='w-w " + w.state + (picked ? " up" : "") + "'"
       + " data-pick='" + esc(w.id) + "' style='--pil:" + w.col + "'>"
-      + "<span class='w-wt'>" + esc(w.short || w.label) + "</span>"
-      + "<span class='w-ws'>" + esc(
-          w.state === "done" ? ""
-        : w.state === "soon" ? hhmm(w.open)
-        : wDur(left)) + "</span>"
-      + "<span class='w-wb'><i style='width:" + pct.toFixed(0) + "%'></i></span>"
-      + "<span class='w-wk'>" + (w.state === "done" ? svg("tick", 13)
-        : w.state === "shut" ? "shut" : w.state === "soon" ? "opens" : "open") + "</span>"
-      + "</button>";
+      + "<i></i>" + esc(w.short || w.label) + "</button>";
   });
   return h + "</div>";
 }
-/* dur() to the minute is right in a sentence and wrong on a tile fifty
-   pixels wide: with eleven hours left the minutes are noise that pushes the
-   hours out of view. */
+
 function wDur(m){
   m = Math.max(0, Math.round(m));
   return m >= 180 ? Math.round(m / 60) + "h" : dur(m);
@@ -398,17 +356,9 @@ function bSecond(ask, sub){
    the screen, which is what made this a scoreboard attached to a chore list.
    It opens its own working. */
 function wFootHTML(k){
-  if (!S.onboarded) return "<div class='w-ft'></div>";
+  if (!S.onboarded) return "";
   var a = typeof anteState === "function" ? anteState() : null;
-  var score = scoreOn(k), mult = multOn(k);
-  var live = typeof jokerLive === "function" ? jokerLive(k) : {};
-  var on = Object.keys(live).filter(function(x){ return live[x]; }).length;
   var h = "<button class='w-ft' data-work='1'>";
-
-  /* The seven days, still. They have been on Today since v50 and "did I do
-     Tuesday" is worth being able to answer without navigating - but the week
-     is state, not news, so it is seven marks in the footer rather than a
-     panel of its own. */
   if (a){
     h += "<span class='w-fd'>";
     weekAll(a.wk).forEach(function(d, i){
@@ -416,14 +366,17 @@ function wFootHTML(k){
       var full = !future && allThree(d), ice = !future && frozen(d);
       var miss = !future && !isToday && !full && !ice && startedBy(d);
       h += "<em class='" + (full ? "on" : ice ? "ice" : miss ? "miss"
-        : isToday ? "now" : "soon") + "'>" + "MTWTFSS"[i] + "</em>";
+        : isToday ? "now" : "soon") + "'></em>";
     });
     h += "</span>";
-    h += "<span class='w-fw'><b>" + num(a.got) + "</b>/" + num(a.target) + "</span>";
+    h += "<span class='w-fw'>" + num(a.got) + " of " + num(a.target) + " this week</span>";
   }
-  h += "<span class='w-fs'>Today <b>" + num(score) + "</b></span>";
-  h += "<span class='w-fm'>\u00d7" + mult.toFixed(2).replace(/0$/, "")
-    + (on ? " \u00b7 " + on : "") + "</span>";
+  /* The multiplier stays, in six characters. It is the only sign on the
+     board that the conditions do anything at all, and a build you cannot see
+     working is a build you stop believing in. */
+  var m = multOn(k);
+  h += "<span class='w-fs'>today <b>" + num(scoreOn(k)) + "</b>"
+    + (m > 1 ? " \u00d7" + m.toFixed(1) : "") + "</span>";
   return h + "</button>";
 }
 

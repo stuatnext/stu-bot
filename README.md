@@ -86,6 +86,42 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v59: ten boxes down to one
+
+He opened v58 on his phone at 22:43 and said it was overwhelming. He was
+right, and the failure is easy to name: **v58 added the news, the day strip
+and a "Next" panel and removed nothing.** The screen ended up as ten bordered
+containers stacked on a phone — HUD, hour, news, timeline, basics, next,
+panel, seven window tiles, footer, nav. Ten containers *is* the overwhelm; it
+was never the information inside them.
+
+So the rule for this screen from here: **one panel, and it is the thing he is
+being asked to do.** Everything else sits bare on the felt, separated by space
+and one hairline.
+
+What went:
+
+- **"Next" deleted outright.** It duplicated countdowns the windows already
+  carried.
+- **The news shows one thing**, not three, with no box. The rest is a `2 more`
+  tap. When the world did nothing, the line the app wrote about the day stands
+  in, so it is never silent.
+- **The day strip lost its panel** — two bars and four numbers floating on the
+  felt, and the home lane is not drawn at all when nobody is on the roster.
+- **Seven window tiles became one row of chips.** A dot says the state; the
+  panel above says the rest. They were carrying three lines of type each,
+  which is a second screen's worth of reading underneath the thing he is
+  actually being asked to do.
+- **Five bordered basics tiles became five words and five numbers** on one
+  quiet line. Same facts, no furniture.
+- **The footer is seven dots and two small numbers** on a hairline.
+
+Nothing was hidden behind a drawer — he has told me before that hiding things
+is not a fix. The information is all still on the screen; it is drawn at the
+weight it deserves instead of every item shouting in its own box. The slack
+that opens up sits between the context at the top and the action at the
+bottom, which puts the one button in the thumb zone.
+
 #### v58: a world that moves without you
 
 He looked at the table and said the sharpest thing anyone has said about this
