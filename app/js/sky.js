@@ -28,11 +28,13 @@ function skyPhase(){
   if (h < 21) return "dusk";
   return "night";
 }
+/* v63: the rooms are interiors and the window carries the hour, so the app
+   itself stays dark all day. Before this, Today was a bright sky over a dark
+   ground at two in the afternoon while every other tab was a white page -
+   two different apps on the same phone. He can still pin it light in You. */
 function isNightLook(ph){
   var look = (typeof S !== "undefined" && S && S.look) || "sky";
-  if (look === "dark") return true;
-  if (look === "light") return false;
-  return ph === "dusk" || ph === "night" || ph === "deepnight";
+  return look !== "light";
 }
 function paintSky(){
   var ph = skyPhase(), root = document.documentElement;

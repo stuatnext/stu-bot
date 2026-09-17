@@ -88,10 +88,21 @@ function careDue(key, k){
   if (key === "sun") return sunNeeded(k || today());
   return true;
 }
+/* Due today is not the same as worth asking for now. The day window runs
+   until two and a half hours before bed, which put "Sunscreen" on the screen
+   at nine at night - the app asking him to put sunscreen on in the dark.
+   Whether a day needs it is careDue; whether this MINUTE does is this. */
+function careLive(key){
+  if (key !== "sun") return true;
+  var ph = typeof skyPhase === "function" ? skyPhase() : "day";
+  return !(ph === "dusk" || ph === "night" || ph === "deepnight");
+}
 /* The routines live at this minute: due today, and in the window we are in. */
 function careNow(){
   var w = careWindow(), t = today();
-  return ROUTINES.filter(function(r){ return r[3] === w && careDue(r[0], t); });
+  return ROUTINES.filter(function(r){
+    return r[3] === w && careDue(r[0], t) && careLive(r[0]);
+  });
 }
 /* Every routine that applies today, whatever the hour - for the mirror the
    push reads, which has to describe a day rather than a minute. */

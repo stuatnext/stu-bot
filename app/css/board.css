@@ -533,3 +533,107 @@ body[data-tab="today"] #screen .b-do:active{transform:translateY(2px)}
   border-color:#4A557A}
 #screen .stage.deck .b1::after{content:""; position:absolute; inset:7px; border-radius:7px;
   border:1px dashed rgba(255,200,0,.28)}
+
+/* ===================================================== the room: Skin
+   The same ring the Gym uses, because a routine is the same shape of thing:
+   a short fixed order you either start or do not. */
+#screen .stage.skin .rig{position:relative; width:clamp(190px,54vw,232px)}
+#screen .stage.skin .rig svg{display:block; width:100%; height:auto}
+#screen .stage.skin .rg{fill:none; stroke:var(--edge); stroke-width:13; stroke-linecap:round}
+#screen .stage.skin .rg.on{stroke:#7FD4C1}
+#screen .stage.skin .rig-c{position:absolute; inset:0; display:flex; align-items:baseline;
+  justify-content:center; gap:3px}
+#screen .stage.skin .rig-c b{font-family:"Nunito",sans-serif; font-size:52px; font-weight:900;
+  letter-spacing:-.045em; color:var(--ink)}
+#screen .stage.skin .rig-c span{font-family:"Nunito",sans-serif; font-size:20px;
+  font-weight:800; color:var(--ink3)}
+
+/* the shelf of runs, shared by Skin and Work */
+#screen .runs{display:flex; flex-direction:column}
+#screen .rr{display:grid; grid-template-columns:1fr auto; grid-template-areas:"t n" "s n";
+  gap:1px 12px; padding:11px 0; border-bottom:1px solid var(--edge)}
+#screen .rr:last-child{border-bottom:0}
+#screen .rr-t{grid-area:t; font-family:"Nunito",sans-serif; font-size:15px; font-weight:800;
+  color:var(--ink)}
+#screen .rr-s{grid-area:s; font-size:12.5px; color:var(--ink3); line-height:1.35}
+#screen .rr-n{grid-area:n; align-self:center; font-family:"JetBrains Mono",monospace;
+  font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink3); white-space:nowrap}
+#screen .rr.on .rr-n{color:var(--greenInk)}
+#screen .rr.off{opacity:.5}
+
+/* ====================================================== the start button
+   One button per room, in the thumb's reach, with what it is about to walk
+   him through printed on it. */
+#screen .tk-start{display:flex; align-items:center; justify-content:center; gap:10px;
+  width:calc(100% - 32px); margin:0 16px calc(14px + env(safe-area-inset-bottom));
+  min-height:56px; border-radius:17px; border:0; cursor:pointer; font:inherit;
+  font-family:"Nunito",sans-serif; font-size:16.5px; font-weight:900; color:#08131E;
+  background:linear-gradient(#FFD166,#E0A82A); box-shadow:0 3px 0 #9E7011}
+#screen .tk-start em{font-style:normal; font-family:"JetBrains Mono",monospace;
+  font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  padding:4px 8px; border-radius:7px; background:rgba(0,0,0,.16)}
+#screen .tk-start:active{transform:translateY(2px); box-shadow:0 1px 0 #9E7011}
+#screen .actionbar button em{font-style:normal; margin-left:10px;
+  font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; padding:4px 8px; border-radius:7px;
+  background:rgba(0,0,0,.16)}
+
+/* ========================================================== the runner
+   One thing on the screen at a time, which is the whole request: "if you
+   press start and then you get the first task then I know exactly what to
+   focus on". */
+#task{position:fixed; inset:0; z-index:140; display:none; background:var(--bg)}
+#task.on{display:block; animation:fadein .18s ease-out both}
+#task .tk{display:flex; flex-direction:column; height:100%;
+  padding:calc(12px + env(safe-area-inset-top)) 20px calc(16px + env(safe-area-inset-bottom))}
+#task .tk-top{display:flex; align-items:center; gap:12px; flex:none}
+#task .tk-x{width:38px; height:38px; margin-left:-8px; border:0; background:none;
+  cursor:pointer; font-size:26px; line-height:1; color:var(--ink3)}
+#task .tk-k{font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--ink3)}
+#task .tk-c{margin-left:auto; font-family:"JetBrains Mono",monospace; font-size:10px;
+  font-weight:700; letter-spacing:.1em; color:var(--ink3)}
+#task .tk-pips{display:flex; gap:5px; flex:none; margin:14px 0 0}
+#task .tk-pips i{flex:1 1 0; height:4px; border-radius:2px; background:var(--sunk)}
+#task .tk-pips i[data-s="did"]{background:var(--greenInk)}
+#task .tk-pips i[data-s="skip"]{background:var(--edge)}
+#task .tk-pips i[data-s="now"]{background:var(--gold)}
+/* The step sits in the middle of the screen, not pinned under the pips with
+   a phone's worth of nothing beneath it. One thing, in the middle, with the
+   two answers under his thumb. */
+#task .tk{--pil:#8FD4FF}
+#task .tk-body{position:relative; flex:1 1 auto; display:flex; flex-direction:column;
+  justify-content:center; gap:11px; padding:24px 0 28px}
+/* Each step wears the colour of the thing it belongs to - a wash behind it
+   and its number ghosted in the corner - so seven steps in a row read as
+   seven different things rather than seven screens of black. */
+#task .tk-body::before{content:""; position:absolute; z-index:-1;
+  left:-28%; right:-28%; top:6%; bottom:6%; border-radius:50%;
+  background:radial-gradient(closest-side, var(--pil) 0%, transparent 72%);
+  opacity:.16; pointer-events:none}
+#task .tk-body::after{content:attr(data-n); position:absolute; z-index:-1;
+  right:-4px; top:-4px; font-family:"Nunito",sans-serif; font-weight:900;
+  font-size:min(38vw,170px); line-height:.8; color:var(--pil); opacity:.10;
+  pointer-events:none}
+#task .tk-body.done::after{content:""}
+#task .tk-kk{font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase;
+  color:color-mix(in srgb, var(--pil,#8FD4FF) 78%, var(--ink))}
+#task .tk-body h2{margin:0; font-family:"Nunito",sans-serif;
+  font-size:clamp(30px,9vw,42px); font-weight:900; line-height:1.08; letter-spacing:-.035em;
+  color:var(--ink); text-wrap:balance}
+#task .tk-body p{margin:0; font-size:16px; line-height:1.45; font-weight:600; color:var(--ink2)}
+#task .tk-shut{color:#FF8A7A !important; font-size:13.5px !important}
+#task .tk-body.done h2{color:var(--greenInk)}
+#task .tk-body.done.none h2{color:var(--ink)}
+#task .tk-acts{flex:none; display:flex; flex-direction:column; gap:9px}
+#task .tk-go{width:100%; min-height:58px; border-radius:17px; border:0; cursor:pointer;
+  font:inherit; font-family:"Nunito",sans-serif; font-size:17px; font-weight:900;
+  color:#08131E;
+  background:linear-gradient(var(--pil,#8FD4FF), color-mix(in srgb, var(--pil,#8FD4FF) 78%, #000));
+  box-shadow:0 3px 0 color-mix(in srgb, var(--pil,#8FD4FF) 42%, #000)}
+#task .tk-go:active{transform:translateY(2px)}
+#task .tk-skip{width:100%; min-height:48px; border-radius:15px; cursor:pointer; font:inherit;
+  font-family:"Nunito",sans-serif; font-size:14.5px; font-weight:800; color:var(--ink3);
+  background:none; border:1px solid var(--edge)}

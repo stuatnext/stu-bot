@@ -154,6 +154,7 @@ function winList(k){
     if (dayShut <= dayOpen) dayShut = dayOpen + 600;
     ROUTINES.forEach(function(r){
       if (!careDue(r[0], k)) return;
+      if (typeof careLive === "function" && !careLive(r[0])) return;
       var night = r[3] === "night";
       out.push({ id: "c:" + r[0], kind: "care", key: r[0], label: r[1],
         short: { sun: "Sun", skin: "Skin", bed: "Bed" }[r[0]] || r[1],

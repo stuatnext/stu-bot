@@ -3,10 +3,10 @@
    the gym and nothing but, and he was right that a tab holding training, food,
    water and sleep at once was four subjects wearing one hat. */
 
-var GYM_MORE = "", GYM_CTA = "";
+var GYM_MORE = "";
 function viewGym(){
   var t = today(), h = "";
-  GYM_MORE = ""; GYM_CTA = "";
+  GYM_MORE = "";
   var p = gymPlan(), sit = p.sit, key = p.key;
   var st = stage(), nx = nextStage(), list = stageLifts(key);
   var doneN = 0;
@@ -63,7 +63,11 @@ function viewGym(){
   h += "<div class='stage-h'>" + esc(kicker) + "</div>";
   var segs = (p.mode === "rest") ? 0 : Math.max(1, list.length);
   if (segs){
-    var gapA = 5, stepA = 360 / segs, RR = 78, CC = 2 * Math.PI * RR;
+    /* Three moves at five degrees apart is a hairline: the ring read as one
+       unbroken track, so a session you have not started looked like a thing
+       with no parts. The fewer the moves, the wider the gap between them. */
+    var gapA = segs <= 1 ? 0 : segs === 2 ? 16 : segs <= 4 ? 10 : 6;
+    var stepA = 360 / segs, RR = 78, CC = 2 * Math.PI * RR;
     var segLen = (CC * (stepA - gapA) / 360).toFixed(1);
     h += "<div class='rig'><svg viewBox='0 0 200 200' aria-hidden='true'>";
     for (var si = 0; si < segs; si++){
@@ -82,8 +86,10 @@ function viewGym(){
         : "Turning up is the thing being trained.")
         + (waistFoot() ? "  \u00b7  " + waistFoot() : "") + "</div>";
   h += "</div>";
-  /* The one action lives where the thumb is, not where the reading stops. */
-  if (cta) GYM_CTA = "<div class='actionbar'><button " + cta.attr + ">"
+  /* The one action sits under the object, the way it does on every other
+     tab. At the foot of the page it was a sticky bar floating over the move
+     list - "02 Dumbbell bench" read through the middle of it. */
+  if (cta) h += "<div class='actionbar'><button " + cta.attr + ">"
     + esc(cta.label) + "</button></div>";
 
   /* Away, the two things he cannot look up in his own history. Kept for the
@@ -192,7 +198,6 @@ function viewGym(){
   h += drawers([
     due ? "" : fold("progress", "How it is going", waistMeta(ws, tr), prog, false)
   ]);
-  h += GYM_CTA;
   return h;
 }
 

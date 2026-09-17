@@ -67,52 +67,40 @@ function viewWork(){
     + ", " + esc(dayName(t)) + "</div>";
   h += "</div>";
 
-  /* The three areas ARE this tab. Behind three doors they were a menu of the
-     work rather than the work, so they are one list again - each area a small
-     heading, its open items under it, and what is done counted rather than
-     listed. The dates that follow are three lines, so they are three lines.
-     The two documents moved to You, where the reading lives. */
+  /* One button that walks the open work, one item at a time. His words:
+     "it's a hell of a lot of information on the work tab". It was three
+     headed sections of fourteen items with a note under each, which is a
+     backlog, and a backlog on a phone is a thing you close.
+
+     So the page keeps the date, the run-up and a count of what is open; the
+     items themselves live inside the run, where he only ever sees one. */
+  var openAll = typeof runCount === "function" ? runCount("work") : openN;
+  if (openAll) h += "<div class='actionbar'><button data-run='work'>"
+    + "Work through them<em>" + openAll + " open</em></button></div>";
+
   if (soon.length > 1){
     h += "<div class='rulehead'><h3>After that</h3><span></span><em>"
       + (soon.length - 1) + " more</em></div><div class='tl'>";
-    soon.slice(1).forEach(function(d){
+    soon.slice(1, 4).forEach(function(d){
       h += "<div class='tli'><b>" + esc(d[1]) + "</b><span>" + esc(nice(d[2]))
         + " \u00b7 " + num(daysTo(d[2])) + " days</span></div>";
     });
     h += "</div>";
   }
 
+  /* Three lines, one per area: what is open and what it is for. The list
+     itself is the run. */
+  h += "<div class='shelf7'><div class='shelf7-h'>The work<em>"
+    + doneN + " of " + WORKITEMS.length + " done</em></div><div class='runs'>";
   WORKAREAS.forEach(function(a){
     var items = WORKITEMS.filter(function(i){ return i[1] === a[0]; });
     var openItems = items.filter(function(i){ return !workDone(i[0]); });
-    var doneCount = items.length - openItems.length;
-    h += "<div class='rulehead'><h3>" + esc(a[1]) + "</h3><span></span><em>"
-      + (openItems.length ? openItems.length + " open" : "all done") + "</em></div>";
-    if (!openItems.length){
-      h += "<p class='fine'>" + esc(a[2]) + "</p>";
-      return;
-    }
-    h += "<div class='wk'>";
-    openItems.forEach(function(i){
-      h += "<button class='wi' data-work='" + i[0] + "'>"
-        + "<span class='wbox'></span>"
-        + "<span class='wb'><b>" + esc(i[2]) + "</b>"
-        + "<span>" + esc(i[3]) + "</span></span></button>";
-    });
-    h += "</div>";
-    if (doneCount){
-      h += "<button class='donerow' data-workdone='" + a[0] + "'>"
-        + doneCount + " done" + (S.showDone && S.showDone[a[0]] ? " \u00b7 hide" : "") + "</button>";
-      if (S.showDone && S.showDone[a[0]]){
-        h += "<div class='wk done'>";
-        items.filter(function(i){ return workDone(i[0]); }).forEach(function(i){
-          h += "<button class='wi on' data-work='" + i[0] + "'>"
-            + "<span class='wbox'>&#10003;</span>"
-            + "<span class='wb'><b>" + esc(i[2]) + "</b></span></button>";
-        });
-        h += "</div>";
-      }
-    }
+    h += "<div class='rr" + (openItems.length ? "" : " on") + "'>"
+      + "<span class='rr-t'>" + esc(a[1]) + "</span>"
+      + "<span class='rr-s'>" + esc(a[2]) + "</span>"
+      + "<span class='rr-n'>" + (openItems.length ? openItems.length + " open" : "done") + "</span>"
+      + "</div>";
   });
+  h += "</div></div>";
   return h;
 }

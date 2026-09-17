@@ -1124,9 +1124,11 @@ var VITALS = [
 
    [ key, label, the line it says, window, whether it can be "not needed" ] */
 var ROUTINES = [
-  ["sun",  "Sunscreen",   "Face, neck, the backs of your hands.",        "day",   1],
-  ["skin", "Moisturiser", "In the shower, on skin that is still wet.",   "day",   0],
-  ["bed",  "Wind down",   "Phone on the side, water poured, kit out.",   "night", 0]
+  ["skin",    "Moisturiser",  "In the shower, on skin that is still wet.",   "day",   0],
+  ["sun",     "Sunscreen",    "Face, neck, the backs of your hands.",        "day",   1],
+  ["cleanse", "Wash it off",  "The day, the sunscreen, the flight. Warm water, not hot.", "night", 0],
+  ["night",   "Night cream",  "Heavier than the morning one. Neck as well.", "night", 0],
+  ["bed",     "Wind down",    "Phone on the side, water poured, kit out.",   "night", 0]
 ];
 /* Inside this band of latitude the sun is worth covering all year; outside
    it, only across that hemisphere's summer half. Deliberately crude - the

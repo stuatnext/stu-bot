@@ -137,9 +137,13 @@ function mealLine(){
   if (!n) return num(left) + "g short after three. A shake or a yoghurt closes it.";
   var o = suggestOrder(n.meal.slot);
   var what = o ? esc(o[0].toLowerCase()) + ", " + o[1] + "g. " : "";
+  /* "you are past the 09:15. protein shake, 25g. Then 13:30 still stands."
+     was three fragments and two full stops in a row. One sentence. */
   if (n.late)
-    return "<b>Now</b> \u2014 you are past the " + hhmm(n.meal.at) + ". " + what
-         + (n.after ? "Then " + hhmm(n.after.at) + " still stands." : num(left) + "g to go.");
+    return "<b>Now</b> \u2014 the " + hhmm(n.meal.at) + " has gone. "
+         + (o ? "A " + esc(o[0].toLowerCase()) + " still closes " + o[1] + "g of it. " : "")
+         + (n.after ? hhmm(n.after.at) + " is the next one."
+                    : num(left) + "g to go.");
   if (n.soon)
     return "<b>Now \u00b7 " + esc(n.meal.label) + "</b> \u2014 " + what + num(left) + "g to go.";
   return "<b>" + hhmm(n.meal.at) + " \u00b7 " + esc(n.meal.label) + "</b> \u2014 " + what + num(left) + "g to go.";
@@ -151,7 +155,8 @@ function askAnchor(slot){
   var pool = all.filter(function(o){ return o[2] === "any" || o[2] === slot; });
   var m = mealPlan().filter(function(x){ return x.slot === slot; })[0];
   var sug = suggestOrder(slot);
-  ask({
+  /* returns the promise so the runner can wait for it and move on */
+  return ask({
     title: m ? m.label + " \u00b7 " + hhmm(m.at) : "Add food",
     say: "Tap what you had. The number is protein, roughly.",
     options: pool.map(function(o){
@@ -220,6 +225,11 @@ function viewFood(){
       + "<span class='av'>" + esc(a.label) + "</span></button>";
   });
   h += "</div></div>";
+
+  var mleft = typeof runCount === "function" ? runCount("food") : 0;
+  if (mleft) h += "<div class='actionbar'><button data-run='food'>"
+    + (mleft === plan.length ? "Start the day\u2019s food" : "Log the next one")
+    + "</button></div>";
 
   /* Everything else the tab knows - what he has already eaten, the menu, the
      reason any of it is measured in protein - waits in the drawer list. */

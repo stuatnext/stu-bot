@@ -83,9 +83,23 @@ function viewBoard(){
   var k = today();
   TODAY_MORE = "";
   arrive();
-  var wins = winList(k), sel = boardPick(wins);
+  var wins = sceneWins(winList(k)), sel = boardPick(wins);
+  /* One button that walks the day, because he should not have to choose
+     which station to stand at before he can start. */
+  /* ONE action on this screen. The card used to carry its own button and the
+     runner another underneath it, which is two ways to do the same thing
+     stacked on top of each other. The card says what he is standing at; the
+     button starts there. */
+  var left = typeof runCount === "function" ? runCount("day") : 0;
+  var at = sel && sel.kind !== "pack" ? (sel.kind === "skinset" ? sel.first : sel.id) : "";
+  var start = left
+    ? "<button class='tk-start' data-run='day'"
+      + (at ? " data-runat='" + esc(at) + "'" : "") + ">"
+      + (at && sel.state === "open" ? "Start here" : "Start the day")
+      + "<em>" + left + " left</em></button>"
+    : "";
   return "<div class='b-t'>" + scWorldHTML(wins, sel) + scCardHTML(sel, k)
-    + TODAY_MORE + "</div>";
+    + start + TODAY_MORE + "</div>";
 }
 
 /* ===================================================== the world, elsewhere
@@ -130,97 +144,36 @@ function worldHead(name){
   return h + "</div>";
 }
 
-/* ------------------------------------------------------------- the world */
-function scWorldHTML(wins, sel){
-  var s = shape(), sit = situation(), ph = skyPhase();
-  var night = ph === "night" || ph === "deepnight";
-  var nowPos = sinceWake(nowMin()) / 1440 * 100;
-  /* where he was standing when he last closed it, so the walk back is real */
-  var wasPos = nowPos;
-  if (AWAY > 2) wasPos = sinceWake(((nowMin() - AWAY) % 1440 + 1440) % 1440) / 1440 * 100;
-  if (wasPos > nowPos) wasPos = 1.5;            /* he slept through the fold */
-  nowPos = Math.max(1.5, Math.min(98.5, nowPos));
-  wasPos = Math.max(1.5, Math.min(98.5, wasPos));
-
-  var h = "<div class='sc' data-sky='" + esc(ph) + "'>";
-
-  /* the sky: stars and the sun on the arc it has ridden since v4. Drawn as
-     elements rather than inside a stretched SVG, because a circle in a
-     viewBox scaled to fill a phone is an egg. */
-  if (night){
-    h += "<div class='sc-stars'>";
-    for (var i = 0; i < 20; i++){
-      h += "<i style='left:" + ((hashOf("s" + i) % 980) / 10).toFixed(1)
-        + "%;top:" + ((hashOf("y" + i) % 520) / 10).toFixed(1)
-        + "%;opacity:" + (0.25 + (hashOf("o" + i) % 55) / 100).toFixed(2) + "'></i>";
+/* The routines are one station on the path rather than five: they have a tab
+   of their own now, and five pins inside the same half hour is a smudge, not
+   a signpost. The run still walks them one at a time - this is the scene's
+   reading of the day, not the day's. */
+function sceneWins(wins){
+  var out = [], care = null;
+  wins.forEach(function(w){
+    if (w.kind !== "care"){ out.push(w); return; }
+    if (!care){
+      care = { id: "skin", kind: "skinset", label: "Skin", short: "Skin", col: "#7FD4C1",
+               open: w.open, shut: w.shut, n: 0, on: 0, first: "" };
+      out.push(care);
     }
-    h += "</div>";
-  }
-  /* three clouds by day, because a flat blue half-screen is a wall and a sky
-     with something moving across it is a sky */
-  if (!night && ph !== "dusk"){
-    h += "<div class='sc-cl'><i style='--t:12%;--l:-18%;--d:0s;--s:1'></i>"
-      + "<i style='--t:26%;--l:-46%;--d:-38s;--s:.72'></i>"
-      + "<i style='--t:6%;--l:-78%;--d:-74s;--s:.55'></i></div>";
-  }
-  var p = arcPt(s.now / 1440);
-  var sunX = 6 + (p[0] - 12) / 100 * 88, sunY = 8 + (p[1] / 58) * 52;
-  h += "<span class='sc-sun" + (night ? " moon" : "") + "' style='left:" + sunX.toFixed(1)
-    + "%; top:" + sunY.toFixed(1) + "%'></span>";
-
-  /* the ground he woke up on */
-  h += scGroundHTML(sit);
-  h += "<span class='sc-path'></span>";
-
-  /* the stations, in time order. Two that share an hour are pushed apart
-     rather than drawn on top of each other - a signpost you cannot read is
-     worse than one a few minutes out of true. */
-  h += "<div class='sc-pins'>";
-  var placed = wins.map(function(w){
-    return { w: w, x: sinceWake(w.open) / 1440 * 100 };
-  }).sort(function(a, b){ return a.x - b.x; });
-  var MIN = 13.5;
-  placed.forEach(function(q, i){
-    q.x = Math.max(7, Math.min(93, q.x));
-    if (i && q.x - placed[i - 1].x < MIN) q.x = placed[i - 1].x + MIN;
+    care.n++;
+    if (w.done) care.on++; else if (!care.first) care.first = w.id;
+    care.shut = Math.max(care.shut, w.shut);
   });
-  /* if that pushed the last one off the end, shuffle the whole line back */
-  var over = placed.length ? placed[placed.length - 1].x - 93 : 0;
-  if (over > 0) placed.forEach(function(q){ q.x = q.x - over; });
-  placed.forEach(function(q){ q.x = Math.max(8, Math.min(92, q.x)); });
-  placed.forEach(function(q, i){
-    var w = q.w, picked = sel && w.id === sel.id;
-    h += "<button class='sc-p " + w.state + (picked ? " up" : "") + (i % 2 ? " hi" : "")
-      + "' data-pick='" + esc(w.id) + "' style='left:" + q.x.toFixed(1)
-      + "%; --pil:" + w.col + "'>"
-      + "<span class='sc-pk'>" + svg(scPin(w), 17) + "</span>"
-      + "<span class='sc-pn'>" + esc(w.short || w.label) + "</span>"
-      + "</button>";
-  });
-
-  /* him, walking */
-  h += "<span class='sc-me' style='left:" + wasPos.toFixed(2) + "%' data-to='"
-    + nowPos.toFixed(2) + "'>" + scWalker() + "</span>";
-  h += "</div>";
-
-  /* The clock, and under it the place. The city is not decoration: he is in
-     a different one most weeks, the app guesses it from the phone's own
-     clock, and the guess has to be correctable by touching it. That button
-     has existed since v39 and it nearly went out with the dashboard. */
-  var guessed = !sit.home && typeof whereIsGuessed === "function" && whereIsGuessed();
-  h += "<div class='sc-hud'><button class='sc-t' data-work='1'>"
-    + esc(hhmm(nowMin())) + "</button>";
-  h += sit.home
-    ? "<button class='b-loc sc-c' data-notthere='1'>" + esc(shortToday()) + "</button>"
-    : "<button class='b-loc sc-c" + (guessed ? " ask" : "") + "' data-"
-      + (guessed ? "locate" : "notthere") + "='1'>" + esc(sit.city)
-      + (guessed ? " " + svg("pin", 11) : "") + "</button>";
-  h += "</div>";
-  h += scStatsHTML();
-  h += scNewsHTML();
-  return h + "</div>";
+  if (care){
+    var left = care.n - care.on;
+    care.done = left === 0;
+    care.why = care.done ? "The routine is done."
+      : left + (left === 1 ? " step left" : " steps left") + " in the routine.";
+    care.a = sinceWake(care.open); care.b = sinceWake(care.shut);
+    if (care.b <= care.a) care.b = 1440;
+    care.state = winState(care);
+  }
+  return out;
 }
 
+/* ------------------------------------------------------------- the world */
 /* The three numbers that used to live in the stat bar. The bar went with the
    dashboard - a scene with a dashboard bolted to the top of it is a scene
    with a dashboard bolted to the top of it - but the pot is real money he
@@ -286,9 +239,6 @@ function scWorldHTML(wins, sel){
   h += scGroundHTML(sit);
   h += "<span class='sc-path'></span>";
 
-  /* the stations, in time order. Two that share an hour are pushed apart
-     rather than drawn on top of each other - a signpost you cannot read is
-     worse than one a few minutes out of true. */
   h += "<div class='sc-pins'>";
   var placed = wins.map(function(w){
     return { w: w, x: sinceWake(w.open) / 1440 * 100 };
@@ -301,7 +251,7 @@ function scWorldHTML(wins, sel){
   /* if that pushed the last one off the end, shuffle the whole line back */
   var over = placed.length ? placed[placed.length - 1].x - 93 : 0;
   if (over > 0) placed.forEach(function(q){ q.x = q.x - over; });
-  placed.forEach(function(q){ q.x = Math.max(8, Math.min(92, q.x)); });
+  placed.forEach(function(q){ q.x = Math.max(12, Math.min(88, q.x)); });
   placed.forEach(function(q, i){
     var w = q.w, picked = sel && w.id === sel.id;
     h += "<button class='sc-p " + w.state + (picked ? " up" : "") + (i % 2 ? " hi" : "")
@@ -344,7 +294,7 @@ function scWorldHTML(wins, sel){
 function scPin(w){
   if (w.kind === "pillar") return w.key === "train" ? "run"
     : w.key === "family" ? "phone" : "clock";
-  if (w.kind === "care") return "drop";
+  if (w.kind === "care" || w.kind === "skinset") return "drop";
   if (w.kind === "pack") return "pack";
   return "cards";
 }
@@ -401,6 +351,8 @@ function scNewsHTML(){
 /* --------------------------------------------------------------- the card
    What the station he is standing at asks, and the one button that does it.
    It sits at the bottom because that is where his thumb is. */
+/* On Today the card is the label on the station he is standing at, not a
+   second control surface: the run is the way things get done here. */
 function scCardHTML(sel, k){
   var fwd = "";
   if (S.onboarded && allThree(k) && typeof tomorrowLine === "function"){
@@ -412,7 +364,7 @@ function scCardHTML(sel, k){
     return "<div class='b-pl won'><b>" + esc(pr0.ask) + "</b>"
       + "<span>" + esc(pr0.sub || "") + "</span>" + fwd + "</div>";
   }
-  return bPlayHTML(sel, k, fwd);
+  return bPlayHTML(sel, k, fwd, 1);
 }
 
 /* Which station he is standing at. His pick if it is still there, else the
@@ -438,7 +390,7 @@ function boardPick(wins){
 }
 
 /* --------------------------------------------------------------- the card */
-function bPlayHTML(sel, k, fwd){
+function bPlayHTML(sel, k, fwd, quiet){
   fwd = fwd || "";
   var up = nextUp(), pr = priority({ noPacks: 1 });
   var isUp = sel.kind === "pillar" && sel.key === up && !sel.done;
@@ -462,6 +414,7 @@ function bPlayHTML(sel, k, fwd){
     + "<em class='b-pl-c'>" + esc(state) + "</em></span>";
   h += "<b>" + esc(ask) + "</b>";
   h += "<span>" + esc(say) + "</span>";
+  if (quiet) return h + fwd + "</div>";
   h += "<span class='b-pl-a'>";
   if (sel.kind === "pillar"){
     var lab = sel.done ? "Undo" : sel.key === "family" ? "Log the call" : "Mark done";

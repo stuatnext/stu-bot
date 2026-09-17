@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v62";
+var BUILD = "v63";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -138,10 +138,10 @@ function doFlip(){
 
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewBoard, gym: viewGym, food: viewFood, basics: viewBasics,
-             work: viewWork, cards: viewDeck, vault: viewVault, you: viewYou };
+             skin: viewSkin, work: viewWork, cards: viewDeck, vault: viewVault, you: viewYou };
 /* What the horizon is called on each of the other tabs. Today has no label:
    it is the place itself rather than a room in it. */
-var TAB_NAMES = { gym:"Gym", food:"Food", basics:"Water", work:"Work",
+var TAB_NAMES = { gym:"Gym", food:"Food", basics:"Water", skin:"Skin", work:"Work",
                   cards:"Cards", vault:"The pot", you:"You" };
 var tab = "today";
 
@@ -180,7 +180,7 @@ function go(next){
   if (next === tab) return;
   /* Matches the bar left to right, so a swipe goes the way the eye does. You is
    last because it is reached from the crest rather than the bar. */
-var order = ["today", "gym", "food", "basics", "work", "cards", "vault", "you"];
+var order = ["today", "gym", "food", "basics", "skin", "work", "cards", "vault", "you"];
   var back = order.indexOf(next) < order.indexOf(tab);
   tab = next;
   sfx("nav"); buzz(8);
@@ -204,6 +204,10 @@ document.addEventListener("click", function(ev){
     render({ keepScroll: true });
     return;
   }
+  if (ds.run){ startRun(ds.run, ds.runat || ""); return; }
+  if (ds.runop){ runOp(ds.runop); return; }
+  if (ds.runskip){ sfx("tap"); runNext(); return; }
+  if (ds.runclose){ closeRun(); return; }
   if (ds.work){ askWorking(); return; }
   if (ds.news){ askNews(); return; }
   if (ds.tab){ go(ds.tab); return; }
