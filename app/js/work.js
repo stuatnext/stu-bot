@@ -39,17 +39,32 @@ function viewWork(){
      counted. The dates after that run down a line. */
   var td = new Date(t + "T00:00:00");
   var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  h += "<div class='leafrow'>"
-    + "<div class='leaf'><div class='lm'>" + MON[td.getMonth()] + "</div>"
-    + "<div class='ld'>" + td.getDate() + "</div><div class='lw'>" + esc(dayName(t)) + "</div></div>";
+
+  /* ------------------------------------------------------------ the room
+     The countdown is the tab. Everything on it waits for one date, so that
+     date is the object: the number at the size of the thing it stands for,
+     the day it lands on a torn calendar leaf beside it. It was a small panel
+     next to a small panel. */
+  h += "<div class='stage work'>";
   if (next){
-    var n = daysTo(next[2]);
-    h += "<div class='until'><b>" + (n === 0 ? "Today" : num(n) + "<i>" + (n === 1 ? "day" : "days") + "</i>") + "</b>"
-      + "<div class='ut'>" + esc(next[1]) + "</div><div class='un'>" + esc(next[3]) + "</div></div>";
+    var n = daysTo(next[2]), nd = new Date(next[2] + "T00:00:00");
+    h += "<div class='cd'>"
+      + "<div class='cd-n'>" + (n === 0 ? "Today" : num(n)) + "</div>"
+      + (n === 0 ? "" : "<div class='cd-u'>" + (n === 1 ? "day" : "days") + "</div>")
+      + "</div>";
+    h += "<div class='stage-n cd-t'>" + esc(next[1]) + "</div>";
+    h += "<div class='stage-l'>" + esc(next[3]) + "</div>";
+    h += "<div class='cd-d'>" + MON[nd.getMonth()] + " " + nd.getDate()
+      + " \u00b7 " + esc(dayName(next[2])) + "</div>";
   } else {
-    h += "<div class='until'><b>" + doneN + "<i>/ " + WORKITEMS.length + "</i></b>"
-      + "<div class='ut'>" + (openN ? openN + (openN === 1 ? " thing still open" : " things still open") : "Every one of them done.") + "</div></div>";
+    h += "<div class='cd'><div class='cd-n'>" + doneN + "</div>"
+      + "<div class='cd-u'>of " + WORKITEMS.length + "</div></div>";
+    h += "<div class='stage-l'>" + (openN ? openN
+        + (openN === 1 ? " thing still open" : " things still open")
+        : "Every one of them done.") + "</div>";
   }
+  h += "<div class='fine'>Today is " + MON[td.getMonth()] + " " + td.getDate()
+    + ", " + esc(dayName(t)) + "</div>";
   h += "</div>";
 
   /* The three areas ARE this tab. Behind three doors they were a menu of the

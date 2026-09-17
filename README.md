@@ -86,6 +86,45 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v62: five rooms, not five headers
+
+*"You've just added a moon. That's a shit design change."* Correct. v61 pasted
+a band of sky across the top of five unchanged lists. A banner is not a
+redesign.
+
+So two things changed properly.
+
+**The sky comes indoors through a window.** Not a full-bleed header — a small
+framed rectangle in the wall with a mullion across it, the same hour and the
+same skyline inside it. Everything under it is then *indoors*, which is the
+whole point: five rooms in one place rather than five pages with a picture on
+top.
+
+**Each tab became the room it is about, with the thing itself drawn big enough
+to touch.** The rule: one object, one action, and the lists that used to sit
+above the object go below it.
+
+- **Water** — the bottle *is* the tab. It was a thumbnail beside a paragraph
+  with the eight marks and the week folded into two drawers, which is a
+  settings page about drinking. It now stands at the height of the screen, it
+  is the tap target, the count is inside the water, and the eight marks and
+  the week's seven bottles are on the page where he can see them.
+- **Food** — one ring at the size of a plate with the number in the middle,
+  and the day's three meals as three places laid at it. They were a strip of
+  chips; a strip of chips is a toolbar.
+- **Gym** — the session is a *ring of moves*, one segment each, filling as
+  they land. It was a big numeral over a paragraph, which is a poster about
+  training rather than a session.
+- **Work** — everything on that tab waits for one date, so the date is the
+  object: the count at the size of the thing it stands for, with the run-up
+  underneath it.
+- **Cards** — three card backs on the table with the season count across them.
+  It was a stat panel with a progress bar, and a progress bar about a
+  collection is a receipt for one.
+
+The stat bar stays gone; the clock, the place and the currency live in the
+wall beside the window.
+
 #### v61: the other five rooms
 
 *"These pages should also match the new design."* They did not: v60 made Today

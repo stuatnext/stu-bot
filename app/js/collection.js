@@ -63,18 +63,25 @@ function viewDeck(){
      hero only takes the top of the screen on a day with nothing to open. */
 
   if (!(w.streak || w.day)){
+    /* ---------------------------------------------------------- the room
+       The deck is the tab. Three card backs on the table, the season count
+       across them, and what is still out there underneath. It was a stat
+       panel with a progress bar - a progress bar about a collection is a
+       receipt for one. */
     var heldN = heldCount(), sealed = CARDS.length - heldN;
-    h += hero({
-      tone: "gold", icon: "cards", kicker: "Season " + season(),
-      big: num(heldN), unit: "/ " + num(CARDS.length),
-      line: sealed ? num(sealed) + (sealed === 1 ? " card still to find" : " cards still to find")
-                   : "Every card in the deck, found.",
-      pct: Math.round(100 * heldN / CARDS.length),
-      foot2: heldN ? num(livedCount()) + " lived \u00b7 " + num(heldN - livedCount())
-                     + " held and still to go and do" : null,
-      foot: fd ? "Close all three pillars today and a pack lands tonight."
-               : "A full day \u2014 all three pillars \u2014 earns the first pack."
-    });
+    h += "<div class='stage deck'>";
+    h += "<div class='stack'><i class='bk b3'></i><i class='bk b2'></i>"
+      + "<i class='bk b1'>" + svg("cards", 34) + "</i></div>";
+    h += "<div class='stage-n'>" + num(heldN) + "<small>/" + num(CARDS.length) + "</small></div>";
+    h += "<div class='stage-l'>" + (sealed
+        ? num(sealed) + (sealed === 1 ? " card still to find" : " cards still to find")
+        : "Every card in the deck, found.") + "</div>";
+    if (heldN) h += "<div class='stage-h'>" + num(livedCount()) + " lived \u00b7 "
+      + num(heldN - livedCount()) + " held</div>";
+    h += "<div class='fine'>" + (fd
+        ? "Close all three pillars today and a pack lands tonight."
+        : "A full day \u2014 all three pillars \u2014 earns the first pack.") + "</div>";
+    h += "</div>";
   }
 
   if (w.streak || w.day){

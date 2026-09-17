@@ -119,18 +119,21 @@ function conditionMeta(){
    Water. Only water. */
 function viewBasics(){
   var t = today(), h = "";
-
   var gl = waterOn(t);
   var litres = ((gl * GLASS_ML) / 1000).toFixed(1);
   var full = ((WATER_GLASSES * GLASS_ML) / 1000).toFixed(1);
   var hit7 = waterHit(7);
 
-  /* The bottle. It fills as he drinks and it is the tap target: one tap, one
-     glass. The row of glasses under it is there for putting one back. */
+  /* ------------------------------------------------------------ the room
+     The bottle IS the tab. It was a thumbnail beside a paragraph with the
+     eight marks and the week folded away behind two drawers, which is a
+     settings page about drinking rather than a thing you drink from. Now it
+     stands at the height of the screen, it is the tap target, and everything
+     that was in a drawer is drawn underneath it where he can see it. */
   var level = Math.min(1, gl / WATER_GLASSES), top = 172 - level * 140;
-  h += "<div class='bottle'>"
-    + "<button class='bt' data-water='" + Math.min(WATER_GLASSES, gl + 1) + "' aria-label='Add a glass'"
-    + (gl >= WATER_GLASSES ? " disabled" : "") + ">"
+  h += "<div class='stage water" + (gl >= WATER_GLASSES ? " full" : "") + "'>";
+  h += "<button class='bt' data-water='" + Math.min(WATER_GLASSES, gl + 1) + "'"
+    + " aria-label='Add a glass'" + (gl >= WATER_GLASSES ? " disabled" : "") + ">"
     + "<svg viewBox='0 0 100 200' aria-hidden='true'>"
     + "<defs><linearGradient id='waterGrad' x1='0' y1='0' x2='0' y2='1'>"
     + "<stop offset='0' stop-color='#7ED4FF'/><stop offset='1' stop-color='#1CB0F6'/></linearGradient>"
@@ -144,41 +147,37 @@ function viewBasics(){
     + "</g>"
     + "<g class='ticks'>" + [1,2,3,4,5,6,7].map(function(i){ var y = 172 - i * 140 / 8;
         return "<line x1='20' y1='" + y + "' x2='28' y2='" + y + "'/>"; }).join("") + "</g>"
-    + "</svg></button>"
-    + "<div class='bside'><div class='bn'>" + gl + "<small>/ " + WATER_GLASSES + "</small></div>"
-    + "<div class='bl'>" + (gl >= WATER_GLASSES
-        ? litres + "L. That is the day\u2019s water, before the kopi."
-        : litres + "L of " + full + "L. " + (WATER_GLASSES - gl) + " to go.") + "</div>"
-    + "<div class='bh2'>Tap the bottle for a glass</div>"
-    + "<div class='bacts'>" + (gl > 0 ? "<button class='btn quiet' data-water='" + gl + "'>Put one back</button>" : "")
-    + "</div></div></div>";
+    + "</svg>"
+    + "<span class='bt-n'>" + gl + "<small>/" + WATER_GLASSES + "</small></span>"
+    + "</button>";
+  h += "<div class='stage-l'>" + (gl >= WATER_GLASSES
+      ? litres + "L. That is the day\u2019s water, before the kopi."
+      : litres + "L of " + full + "L \u00b7 " + (WATER_GLASSES - gl) + " to go") + "</div>";
+  h += "<div class='stage-h'>" + (gl >= WATER_GLASSES ? "Done for today"
+      : "Tap the bottle for a glass") + "</div>";
 
-
-  /* The bottle is the whole interface. The eight marks are for correcting a
-     mis-tap and the week is history, so both wait in the drawer list. */
-  var marks = "<div class='glass' aria-label='Glasses'>";
+  /* the eight marks, on the page rather than behind a drawer: one tap fixes
+     a mis-tap, which is the only reason they exist */
+  h += "<div class='glass' aria-label='Glasses'>";
   for (var gi = 1; gi <= WATER_GLASSES; gi++){
-    marks += "<button class='gl" + (gi <= gl ? " on" : "") + "' data-water='" + gi + "'"
+    h += "<button class='gl" + (gi <= gl ? " on" : "") + "' data-water='" + gi + "'"
       + " aria-label='Glass " + gi + "'><i></i></button>";
   }
-  marks += "</div><p class='fine'>Tap any mark to set the count. "
-    + "The honest check is the colour, not the count.</p>";
+  h += "</div>";
+  h += "</div>";
 
-  var wk = "<div class='wk7'>";
+  /* the week, as seven bottles along the shelf */
+  h += "<div class='shelf7'><div class='shelf7-h'>The last week<em>"
+    + hit7 + " of 7</em></div><div class='wk7'>";
   waterLast(7).forEach(function(row){
     var k = row[0], n = row[1], on = n >= WATER_GLASSES;
     var d = new Date(k + "T00:00:00");
-    wk += "<div class='w7" + (on ? " on" : "") + (k === t ? " now" : "") + "'>"
+    h += "<div class='w7" + (on ? " on" : "") + (k === t ? " now" : "") + "'>"
       + "<span class='w7b'><i style='height:"
-      + Math.max(4, Math.round(100 * Math.min(n, WATER_GLASSES) / WATER_GLASSES)) + "%'></i></span>"
+      + Math.max(5, Math.round(100 * Math.min(n, WATER_GLASSES) / WATER_GLASSES)) + "%'></i></span>"
       + "<b>" + n + "</b>"
       + "<span class='w7d'>" + "SMTWTFS"[d.getDay()] + "</span></div>";
   });
-  wk += "</div><p class='fine'>Eight is the line. Missing it breaks nothing.</p>";
-
-  h += drawers([
-    fold("glasses", "Set the count", gl + " of " + WATER_GLASSES, marks, false),
-    fold("waterweek", "The last week", hit7 + " of 7 days", wk, false)
-  ]);
+  h += "</div><p class='fine'>Eight is the line. Missing it breaks nothing.</p></div>";
   return h;
 }

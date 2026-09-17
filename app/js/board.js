@@ -99,26 +99,34 @@ function viewBoard(){
 function worldHead(name){
   var sit = situation(), ph = skyPhase();
   var night = ph === "night" || ph === "deepnight";
-  var h = "<div class='sc wh' data-sky='" + esc(ph) + "'>";
+  var h = "<div class='rm'>";
+
+  /* A WINDOW, not a banner. v61 pasted a band of sky across the top of five
+     unchanged lists and he called it what it was: a moon. The sky belongs in
+     these rooms the way sky belongs in a room - through a window in the wall,
+     small, with the same hour and the same skyline in it. Everything below it
+     is then indoors, which is the point: five rooms in one place. */
+  h += "<div class='rm-win' data-sky='" + esc(ph) + "'>";
   if (night){
     h += "<div class='sc-stars'>";
-    for (var i = 0; i < 10; i++){
-      h += "<i style='left:" + ((hashOf("w" + i) % 980) / 10).toFixed(1)
-        + "%;top:" + ((hashOf("v" + i) % 620) / 10).toFixed(1)
-        + "%;opacity:" + (0.25 + (hashOf("u" + i) % 55) / 100).toFixed(2) + "'></i>";
+    for (var i = 0; i < 7; i++){
+      h += "<i style='left:" + ((hashOf("q" + i) % 900) / 10).toFixed(1)
+        + "%;top:" + ((hashOf("z" + i) % 560) / 10).toFixed(1) + "%'></i>";
     }
     h += "</div>";
   }
   var p = arcPt(shape().now / 1440);
   h += "<span class='sc-sun" + (night ? " moon" : "") + "' style='left:"
-    + (6 + (p[0] - 12) / 100 * 88).toFixed(1) + "%; top:"
-    + (14 + (p[1] / 58) * 46).toFixed(1) + "%'></span>";
+    + (8 + (p[0] - 12) / 100 * 84).toFixed(1) + "%; top:"
+    + (16 + (p[1] / 58) * 44).toFixed(1) + "%'></span>";
   h += scGroundHTML(sit);
-  h += "<div class='sc-hud'><button class='sc-t' data-tab='today'>"
+  h += "<i class='rm-bar'></i><i class='rm-bar v'></i></div>";
+
+  h += "<div class='rm-c'><button class='rm-t' data-tab='today'>"
     + esc(hhmm(nowMin())) + "</button>"
-    + "<span class='sc-c'>" + esc(sit.home ? shortToday() : sit.city) + "</span></div>";
+    + "<span class='rm-p'>" + esc(sit.home ? shortToday() : sit.city) + "</span>"
+    + (name ? "<span class='rm-n'>" + esc(name) + "</span>" : "") + "</div>";
   h += scStatsHTML();
-  if (name) h += "<span class='wh-n'>" + esc(name) + "</span>";
   return h + "</div>";
 }
 

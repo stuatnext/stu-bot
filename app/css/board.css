@@ -63,27 +63,62 @@ body[data-tab="today"] #screen .b-loc{font:inherit; color:#8FD4FF; background:no
   border:0; padding:0; letter-spacing:inherit; text-transform:inherit; cursor:pointer}
 body[data-tab="today"] #screen .b-loc.ask{color:#FFD166; text-decoration:underline}
 
-/* ============================================== the same world, every tab
-   The stat bar is gone everywhere, not just on Today: the sky carries the
-   clock, the place and the currency now, so a bar doing the same job under
-   it is the dashboard growing back. */
+/* ================================================ five rooms in one place
+   v61 put a band of sky across the top of five unchanged lists, and his
+   verdict was exact: "You've just added a moon." It was a banner on a
+   dashboard.
+
+   So the sky comes indoors the way sky does - through a WINDOW in the wall -
+   and each tab becomes the room it is about, with the thing itself drawn big
+   enough to touch. The bottle is the Water tab. The ring is the Food tab. A
+   list under a header is not a room. */
 #hud{display:none}
 #screen{padding:0}
-#screen .wbody{padding:14px 18px 34px; max-width:560px; margin:0 auto}
+#screen .wbody{padding:6px 18px 34px; max-width:560px; margin:0 auto}
 
-/* The horizon band the other five tabs open on: the same sky at the same
-   hour, the same skyline, and then their own business underneath. */
-/* straight-edged and blended into the page, because content follows it
-   immediately - the rounded bottom belongs to Today, where the scene ends */
-#screen .sc.wh{flex:none; height:clamp(126px,17vh,162px); border-radius:0}
-#screen .sc.wh .sc-far{bottom:24px; height:clamp(56px,11vh,84px)}
-#screen .sc.wh .sc-gr{height:26px; background:var(--bg)}
-#screen .sc.wh .sc-hud{top:12px}
-#screen .sc.wh .sc-t{font-size:21px}
-#screen .sc.wh .sc-stats{top:14px; padding:4px 9px; gap:8px}
-#screen .wh-n{position:absolute; left:16px; bottom:6px; z-index:4;
-  font-family:"JetBrains Mono",monospace; font-size:9px; font-weight:700;
-  letter-spacing:.2em; text-transform:uppercase; color:rgba(255,246,229,.52)}
+#screen .rm{position:relative; display:flex; align-items:flex-start; gap:14px;
+  padding:14px 16px 12px; max-width:560px; margin:0 auto}
+#screen .rm-win{position:relative; width:108px; height:74px; flex:none;
+  border-radius:9px; overflow:hidden; border:2px solid #2C3550;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.45), 0 8px 18px -12px rgba(0,0,0,.9)}
+#screen .rm-win .sc-sun{width:20px; height:20px; margin:-10px 0 0 -10px;
+  box-shadow:0 0 22px 7px rgba(255,214,130,.35)}
+#screen .rm-win .sc-sun.moon{width:15px; height:15px; margin:-7.5px 0 0 -7.5px}
+#screen .rm-win .sc-sun.moon::after{top:-2px; right:-3px; width:12px; height:12px}
+#screen .rm-win .sc-far{bottom:0; height:34px}
+#screen .rm-win .sc-gr{display:none}
+#screen .rm-win .sc-stars i{width:1.5px; height:1.5px; opacity:.6}
+/* the mullion - two bars are what make a rectangle of sky a window */
+#screen .rm-bar{position:absolute; left:0; right:0; top:50%; height:2px; margin-top:-1px;
+  background:#2C3550}
+#screen .rm-bar.v{left:50%; right:auto; top:0; bottom:0; width:2px; height:auto;
+  margin:0 0 0 -1px}
+
+#screen .rm-c{display:flex; flex-direction:column; gap:1px; padding-top:2px}
+#screen .rm-t{padding:0; border:0; background:none; cursor:pointer; text-align:left;
+  font:inherit; font-family:"Nunito",sans-serif; font-size:30px; font-weight:900;
+  letter-spacing:-.035em; line-height:1; color:var(--ink)}
+#screen .rm-p{font-family:"JetBrains Mono",monospace; font-size:9px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink3)}
+#screen .rm-n{margin-top:7px; font-family:"Nunito",sans-serif; font-size:17px;
+  font-weight:900; letter-spacing:-.02em; color:var(--ink2)}
+#screen .rm .sc-stats{top:16px; right:16px; background:rgba(255,255,255,.05);
+  border-color:var(--edge)}
+
+/* ---------------------------------------------------------------- a stage
+   Every room has one object and one action. The object is the size of the
+   thing it stands for and it is the tap target; the lists that used to sit
+   above it are below the fold where history belongs. */
+#screen .stage{display:flex; flex-direction:column; align-items:center;
+  gap:10px; padding:10px 0 18px; text-align:center}
+#screen .stage-n{font-family:"Nunito",sans-serif; font-size:44px; font-weight:900;
+  letter-spacing:-.04em; line-height:1; color:var(--ink)}
+#screen .stage-n small{font-size:.44em; font-weight:800; color:var(--ink3);
+  letter-spacing:-.01em; margin-left:2px}
+#screen .stage-l{font-size:14.5px; font-weight:700; line-height:1.4; color:var(--ink2);
+  max-width:26ch; text-wrap:balance}
+#screen .stage-h{font-family:"JetBrains Mono",monospace; font-size:9px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink3)}
 
 /* ================================================================= the scene
    Today is a place. The sky is the real hour, the ground is the city he woke
@@ -357,3 +392,144 @@ body[data-tab="today"] #screen .b-do:active{transform:translateY(2px)}
   body[data-tab="today"] #screen .w-w{transition:none}
   body[data-tab="today"] #screen .w-wb i{transition:none}
 }
+
+/* ===================================================== the room: Water
+   The bottle is the tab. It was a thumbnail beside a paragraph with the
+   marks and the week folded into two drawers. */
+#screen .stage.water .bt{position:relative; padding:0; border:0; background:none;
+  cursor:pointer; width:clamp(150px,44vw,190px)}
+#screen .stage.water .bt svg{display:block; width:100%; height:auto}
+#screen .stage.water .bt:disabled{cursor:default}
+#screen .stage.water .bt:active{transform:scale(.97)}
+#screen .stage.water .cap{fill:#1CB0F6}
+#screen .stage.water .glass-body{fill:rgba(255,255,255,.1);
+  stroke:rgba(255,255,255,.5); stroke-width:3}
+#screen .stage.water .liquid{fill:url(#waterGrad)}
+#screen .stage.water .wave{fill:#8FDCFF; opacity:.9}
+#screen .stage.water .ticks line{stroke:rgba(255,255,255,.4); stroke-width:2.6;
+  stroke-linecap:round}
+#screen .stage.water .bt-n{position:absolute; left:50%; top:54%; transform:translate(-50%,-50%);
+  font-family:"Nunito",sans-serif; font-size:46px; font-weight:900; letter-spacing:-.04em;
+  color:#06283C; text-shadow:0 2px 0 rgba(255,255,255,.35)}
+#screen .stage.water .bt-n small{font-size:.42em; opacity:.6; margin-left:1px}
+#screen .stage.water.full .bt-n{color:#04202F}
+#screen .stage.water .glass{display:flex; gap:6px; margin-top:2px}
+#screen .stage.water .gl{width:26px; height:32px; padding:0; border-radius:5px 5px 8px 8px;
+  border:1.5px solid var(--edge2); background:none; cursor:pointer; position:relative}
+#screen .stage.water .gl i{position:absolute; inset:auto 2px 2px; height:0; border-radius:3px;
+  background:#1CB0F6; transition:height .2s var(--tap)}
+#screen .stage.water .gl.on{border-color:#1CB0F6}
+#screen .stage.water .gl.on i{height:68%}
+
+#screen .shelf7{margin-top:4px; padding-top:16px; border-top:1px solid var(--edge)}
+#screen .shelf7-h{display:flex; align-items:baseline; font-family:"JetBrains Mono",monospace;
+  font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink3); margin-bottom:12px}
+#screen .shelf7-h em{margin-left:auto; font-style:normal; color:var(--ink2)}
+#screen .wk7{display:flex; gap:8px; align-items:flex-end}
+#screen .w7{flex:1; display:flex; flex-direction:column; align-items:center; gap:4px}
+#screen .w7b{display:block; width:100%; height:56px; border-radius:4px 4px 6px 6px;
+  border:1.5px solid var(--edge2); position:relative}
+#screen .w7b i{position:absolute; inset:auto 2px 2px; border-radius:3px;
+  background:var(--edge2)}
+#screen .w7.on .w7b{border-color:#1CB0F6}
+#screen .w7.on .w7b i{background:#1CB0F6}
+#screen .w7.now .w7b{box-shadow:0 0 0 1.5px var(--gold)}
+#screen .w7 b{font-family:"Nunito",sans-serif; font-size:12px; font-weight:800; color:var(--ink2)}
+#screen .w7d{font-family:"JetBrains Mono",monospace; font-size:8.5px; color:var(--ink3)}
+#screen .fine{margin:14px 0 0; font-size:12px; color:var(--ink3); text-align:center}
+
+/* ====================================================== the room: Food
+   One ring at the size of a plate, the number in the middle, and the day's
+   three meals laid at it. */
+#screen .stage.food .plate{position:relative; width:clamp(200px,58vw,248px)}
+#screen .stage.food .plate svg{display:block; width:100%; height:auto; overflow:visible}
+#screen .stage.food .rim{fill:none; stroke:var(--edge); stroke-width:13}
+#screen .stage.food .rimx{fill:none; stroke:var(--edge); stroke-width:1.5; opacity:.5}
+#screen .stage.food .fill{fill:none; stroke:#3FD9A0; stroke-width:13; stroke-linecap:round;
+  transition:stroke-dasharray .7s var(--tap)}
+#screen .stage.food.done .fill{stroke:#3FD9A0}
+#screen .stage.food .pc{position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:2px}
+#screen .stage.food .pc b{font-family:"Nunito",sans-serif; font-size:46px; font-weight:900;
+  letter-spacing:-.04em; line-height:1; color:var(--ink)}
+#screen .stage.food .pc b small{font-size:.4em; font-weight:800; color:var(--ink3)}
+#screen .stage.food .pc span{font-family:"JetBrains Mono",monospace; font-size:9px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink3)}
+#screen .stage.food .anch{display:flex; gap:9px; width:100%; margin-top:2px}
+#screen .stage.food .an{flex:1 1 0; min-width:0; display:flex; flex-direction:column;
+  align-items:center; gap:5px; padding:13px 6px; border-radius:15px; cursor:pointer;
+  background:var(--card); border:1px solid var(--edge); color:var(--ink2); font:inherit}
+#screen .stage.food .an-r{width:34px; height:34px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center; background:var(--sunk); color:var(--ink3);
+  font-family:"Nunito",sans-serif; font-size:19px; font-weight:800}
+#screen .stage.food .ak{font-family:"JetBrains Mono",monospace; font-size:9px;
+  letter-spacing:.06em; color:var(--ink3)}
+#screen .stage.food .av{font-family:"Nunito",sans-serif; font-size:11.5px; font-weight:800;
+  color:var(--ink); text-align:center; line-height:1.15}
+#screen .stage.food .an.next{border-color:#3D9BE9; background:rgba(61,155,233,.1)}
+#screen .stage.food .an.next .an-r{background:#3D9BE9; color:#08131E}
+#screen .stage.food .an.on .an-r{background:#3FD9A0; color:#06251A}
+#screen .stage.food .an.on .av{color:var(--ink2)}
+#screen .stage.food .an:active{transform:translateY(1px)}
+
+/* ======================================================= the room: Gym
+   A ring of moves rather than a numeral: one segment per move, filling as
+   they land. */
+#screen .stage.gym .rig{position:relative; width:clamp(196px,56vw,240px)}
+#screen .stage.gym .rig svg{display:block; width:100%; height:auto}
+#screen .stage.gym .rg{fill:none; stroke:var(--edge); stroke-width:13; stroke-linecap:round}
+#screen .stage.gym .rg.on{stroke:#F2B735}
+#screen .stage.gym.done .rg.on{stroke:#3FD9A0}
+#screen .stage.gym .rig.rest::after{content:""; position:absolute; inset:14px;
+  border-radius:50%; border:13px solid var(--edge)}
+#screen .stage.gym .rig-c{position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:1px}
+#screen .stage.gym .rig-c b{font-family:"Nunito",sans-serif; font-size:52px; font-weight:900;
+  letter-spacing:-.045em; line-height:1; color:var(--ink)}
+#screen .stage.gym .rig-c span{font-family:"JetBrains Mono",monospace; font-size:10px;
+  letter-spacing:.1em; color:var(--ink3)}
+
+/* the one action, where the thumb is */
+#screen .actionbar{position:sticky; bottom:8px; z-index:5; margin:18px 0 4px}
+#screen .actionbar button{width:100%; font:inherit; font-family:"Nunito",sans-serif;
+  font-size:16px; font-weight:900; min-height:54px; border-radius:16px; border:0;
+  cursor:pointer; color:#08131E;
+  background:linear-gradient(#F2B735,#D79A19); box-shadow:0 3px 0 #9E7011}
+#screen .actionbar button:active{transform:translateY(2px); box-shadow:0 1px 0 #9E7011}
+
+/* ====================================================== the room: Work
+   Everything on this tab waits for one date, so the date is the object. */
+#screen .stage.work{gap:4px; padding-bottom:22px}
+#screen .stage.work .cd{display:flex; align-items:baseline; gap:8px}
+#screen .stage.work .cd-n{font-family:"Nunito",sans-serif;
+  font-size:clamp(76px,24vw,108px); font-weight:900; letter-spacing:-.06em; line-height:.9;
+  color:#D7A6FF}
+#screen .stage.work .cd-u{font-family:"Nunito",sans-serif; font-size:19px; font-weight:800;
+  color:var(--ink3)}
+#screen .stage.work .cd-t{font-size:26px; margin-top:6px; letter-spacing:-.03em}
+#screen .stage.work .cd-d{margin-top:4px; font-family:"JetBrains Mono",monospace;
+  font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:#D7A6FF}
+#screen .stage.work .fine{margin-top:10px}
+
+/* the sticky action needs the page to end above it */
+#screen .wbody{padding-bottom:78px}
+#screen .actionbar::before{content:""; position:absolute; inset:-22px -18px -14px;
+  background:linear-gradient(rgba(11,15,28,0), var(--bg) 42%); z-index:-1}
+
+/* ===================================================== the room: Cards
+   Three card backs on the table and the season count across them. It was a
+   stat panel with a progress bar, which is a receipt for a collection. */
+#screen .stage.deck{gap:8px}
+#screen .stage.deck .stack{position:relative; width:118px; height:150px; margin-bottom:6px}
+#screen .stage.deck .bk{position:absolute; inset:0; border-radius:11px;
+  background:linear-gradient(150deg,#232B44,#171D2F); border:1.5px solid #333D5C;
+  box-shadow:0 10px 22px -12px rgba(0,0,0,.9)}
+#screen .stage.deck .b3{transform:rotate(-11deg) translate(-12px,4px)}
+#screen .stage.deck .b2{transform:rotate(7deg) translate(11px,2px)}
+#screen .stage.deck .b1{display:flex; align-items:center; justify-content:center;
+  color:var(--gold); background:linear-gradient(150deg,#2A3350,#1B2136);
+  border-color:#4A557A}
+#screen .stage.deck .b1::after{content:""; position:absolute; inset:7px; border-radius:7px;
+  border:1px dashed rgba(255,200,0,.28)}

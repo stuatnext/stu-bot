@@ -55,14 +55,33 @@ function viewGym(){
   /* A statement, not a card. The number is the size of the thing it stands
      for, the label is small above it, and the qualifier is one line under. No
      panel, no border, no icon in a circle - the page is the object. */
-  h += "<div class='poster'>"
-    + "<div class='po-k'>" + esc(kicker) + "</div>"
-    + "<div class='pbig'><b>" + big + "</b>" + (unit ? "<i>" + esc(unit) + "</i>" : "") + "</div>"
-    + "<div class='psub'>" + esc(line) + "</div>"
-    + "<div class='pfoot'>" + (doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged"
+  /* ------------------------------------------------------------ the room
+     The session is the tab, and a session is a ring of moves rather than a
+     numeral: one segment per move, filling as they land. It was a big number
+     over a paragraph, which is a poster about training. */
+  h += "<div class='stage gym" + (pct === 100 ? " done" : "") + "'>";
+  h += "<div class='stage-h'>" + esc(kicker) + "</div>";
+  var segs = (p.mode === "rest") ? 0 : Math.max(1, list.length);
+  if (segs){
+    var gapA = 5, stepA = 360 / segs, RR = 78, CC = 2 * Math.PI * RR;
+    var segLen = (CC * (stepA - gapA) / 360).toFixed(1);
+    h += "<div class='rig'><svg viewBox='0 0 200 200' aria-hidden='true'>";
+    for (var si = 0; si < segs; si++){
+      var lit = si < doneN;
+      h += "<circle class='rg" + (lit ? " on" : "") + "' cx='100' cy='100' r='" + RR + "'"
+        + " stroke-dasharray='" + segLen + " " + CC.toFixed(1) + "'"
+        + " transform='rotate(" + (-90 + si * stepA + gapA / 2).toFixed(1) + " 100 100)'/>";
+    }
+    h += "</svg><div class='rig-c'><b>" + big + "</b>"
+      + (unit ? "<span>" + esc(unit) + "</span>" : "") + "</div></div>";
+  } else {
+    h += "<div class='rig rest'><div class='rig-c'><b>" + big + "</b></div></div>";
+  }
+  h += "<div class='stage-l'>" + esc(line) + "</div>";
+  h += "<div class='fine'>" + (doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged"
         : "Turning up is the thing being trained.")
-        + (waistFoot() ? "  \u00b7  " + waistFoot() : "") + "</div>"
-    + "</div>";
+        + (waistFoot() ? "  \u00b7  " + waistFoot() : "") + "</div>";
+  h += "</div>";
   /* The one action lives where the thumb is, not where the reading stops. */
   if (cta) GYM_CTA = "<div class='actionbar'><button " + cta.attr + ">"
     + esc(cta.label) + "</button></div>";

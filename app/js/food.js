@@ -192,18 +192,22 @@ function viewFood(){
   var left = Math.max(0, target - got);
 
   var plan = mealPlan(), sit = situation();
-  /* The plate: one ring, one hue, the number in the middle. A single series
-     needs no legend and the value wears ink, not green. */
+  /* ------------------------------------------------------------ the room
+     The plate is the tab. One ring at the size of a plate, the number in the
+     middle of it, and the day's three meals as three places laid at it. The
+     ring was a thumbnail with a paragraph under it and the meals were a strip
+     of chips; a strip of chips is a toolbar, not a table. */
   var R = 82, C = 2 * Math.PI * R, dash = (C * Math.min(1, got / target)).toFixed(1);
-  h += "<div class='plate" + (left === 0 ? " done" : "") + "'>"
+  h += "<div class='stage food" + (left === 0 ? " done" : "") + "'>";
+  h += "<div class='plate'>"
     + "<svg viewBox='0 0 200 200' aria-label='Protein today'>"
     + "<circle class='rim' cx='100' cy='100' r='" + R + "'/>"
     + "<circle class='rimx' cx='100' cy='100' r='" + (R - 12) + "'/>"
     + "<circle class='fill' cx='100' cy='100' r='" + R + "' transform='rotate(-90 100 100)'"
     + " stroke-dasharray='" + dash + " " + C.toFixed(1) + "'/></svg>"
-    + "<div class='pc'><b>" + num(got) + "<small>/ " + num(target) + "g</small></b>"
+    + "<div class='pc'><b>" + num(got) + "<small>/" + num(target) + "g</small></b>"
     + "<span>protein today</span></div></div>";
-  h += "<p class='pnote'>" + mealLine() + "</p>";
+  h += "<div class='stage-l'>" + mealLine() + "</div>";
 
   var nx = nextMeal();
   h += "<div class='anch'>";
@@ -211,11 +215,11 @@ function viewFood(){
     var on = anchorDone(t, a.slot);
     var now = !on && nx && nx.meal.slot === a.slot;
     h += "<button class='an" + (on ? " on" : "") + (now ? " next" : "") + "' data-slot='" + a.slot + "'>"
+      + "<span class='an-r'>" + (on ? svg("tick", 20) : now ? svg("arrow", 18) : "+") + "</span>"
       + "<span class='ak'>" + hhmm(a.at) + "</span>"
-      + "<span class='av'>" + esc(a.label) + "</span>"
-      + "<span class='ad'>" + (on ? "logged" : now ? "next" : "+") + "</span></button>";
+      + "<span class='av'>" + esc(a.label) + "</span></button>";
   });
-  h += "</div>";
+  h += "</div></div>";
 
   /* Everything else the tab knows - what he has already eaten, the menu, the
      reason any of it is measured in protein - waits in the drawer list. */
