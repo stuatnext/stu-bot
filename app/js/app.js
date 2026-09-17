@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v60";
+var BUILD = "v61";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -139,6 +139,10 @@ function doFlip(){
 /* ------------------------------------------------------------------ router */
 var TABS = { today: viewBoard, gym: viewGym, food: viewFood, basics: viewBasics,
              work: viewWork, cards: viewDeck, vault: viewVault, you: viewYou };
+/* What the horizon is called on each of the other tabs. Today has no label:
+   it is the place itself rather than a room in it. */
+var TAB_NAMES = { gym:"Gym", food:"Food", basics:"Water", work:"Work",
+                  cards:"Cards", vault:"The pot", you:"You" };
 var tab = "today";
 
 function render(opts){
@@ -152,7 +156,11 @@ function render(opts){
      it once scene.css went. */
   document.body.setAttribute("data-tab", tab);
   el.classList.toggle("arrive", !!opts.turn || !!opts.first);
-  el.innerHTML = TABS[tab]();
+  /* Today IS the scene; every other tab gets the same sky over its own
+     content, so crossing between them is walking into another room rather
+     than opening another app. */
+  el.innerHTML = tab === "today" ? TABS[tab]()
+    : worldHead(TAB_NAMES[tab] || "") + "<div class='wbody'>" + TABS[tab]() + "</div>";
   if (tab === "today" && typeof scSettle === "function") scSettle();
   if (opts.turn){
     el.classList.remove("turn", "turn-back");

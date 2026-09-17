@@ -111,10 +111,12 @@ a{color:var(--blue)}
    rather than hunted through six files.
    ========================================================================== */
 :root[data-night]{
-  --bg:#14151A;
-  --card:#1E2028; --card2:#232630; --sunk:#2A2D38;
-  --edge:#30343F; --edge2:#3E4352;
-  --ink:#ECEAE2; --ink2:#B9B6AA; --ink3:#8E8C81;
+  /* v61: the same palette the scene is painted in. It used to be grey ink on
+     near-black, which read as a different app from the one on Today. */
+  --bg:#0B0F1C;
+  --card:#141A2B; --card2:#1A2134; --sunk:#1E2639;
+  --edge:#242C42; --edge2:#2F3850;
+  --ink:#FFF6E5; --ink2:#B6BDD1; --ink3:#7B8399;
 
   --greenSoft:#1B3312; --greenInk:#9BE85A;
   --blueSoft:#10293A;

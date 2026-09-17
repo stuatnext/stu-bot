@@ -88,6 +88,40 @@ function viewBoard(){
     + TODAY_MORE + "</div>";
 }
 
+/* ===================================================== the world, elsewhere
+   Every other tab is a room in the same place, so every other tab opens on
+   the same sky at the same hour, above the same skyline, with the same
+   currency in the corner. Only Today gets the path, the stations and him
+   walking on them - the rest get the horizon and then their own business.
+
+   Without this the app was a scene plus five dashboards, which is five
+   dashboards. */
+function worldHead(name){
+  var sit = situation(), ph = skyPhase();
+  var night = ph === "night" || ph === "deepnight";
+  var h = "<div class='sc wh' data-sky='" + esc(ph) + "'>";
+  if (night){
+    h += "<div class='sc-stars'>";
+    for (var i = 0; i < 10; i++){
+      h += "<i style='left:" + ((hashOf("w" + i) % 980) / 10).toFixed(1)
+        + "%;top:" + ((hashOf("v" + i) % 620) / 10).toFixed(1)
+        + "%;opacity:" + (0.25 + (hashOf("u" + i) % 55) / 100).toFixed(2) + "'></i>";
+    }
+    h += "</div>";
+  }
+  var p = arcPt(shape().now / 1440);
+  h += "<span class='sc-sun" + (night ? " moon" : "") + "' style='left:"
+    + (6 + (p[0] - 12) / 100 * 88).toFixed(1) + "%; top:"
+    + (14 + (p[1] / 58) * 46).toFixed(1) + "%'></span>";
+  h += scGroundHTML(sit);
+  h += "<div class='sc-hud'><button class='sc-t' data-tab='today'>"
+    + esc(hhmm(nowMin())) + "</button>"
+    + "<span class='sc-c'>" + esc(sit.home ? shortToday() : sit.city) + "</span></div>";
+  h += scStatsHTML();
+  if (name) h += "<span class='wh-n'>" + esc(name) + "</span>";
+  return h + "</div>";
+}
+
 /* ------------------------------------------------------------- the world */
 function scWorldHTML(wins, sel){
   var s = shape(), sit = situation(), ph = skyPhase();
@@ -186,15 +220,118 @@ function scWorldHTML(wins, sel){
    hidden. So they sit in the corner, the way a game keeps its currency. */
 function scStatsHTML(){
   var r = rank(), run = dayRun(), pt = pot(), sp = spares();
-  var h = "<button class='sc-stats' data-tab='cards'>";
-  h += "<span class='sc-lv'>" + r.level + "</span>";
+  /* Three separate buttons, not one: the old stat bar's crest went to You,
+     its pot chip opened the vault and its shards went to the deck, and all
+     three of those routes have to survive the bar going. */
+  var h = "<div class='sc-stats'>";
+  h += "<button class='sc-lv' data-tab='you' aria-label='Rank'>" + r.level + "</button>";
   if (fullDays() > 0)
-    h += "<span class='sc-s" + (run === 0 ? " cold" : "") + "'>"
-      + svg("flame", 12) + num(run) + "</span>";
-  h += "<span class='sc-s gold'>" + num(pt) + "</span>";
-  if (sparesEarned() > 0) h += "<span class='sc-s jade'>" + num(sp) + "</span>";
-  return h + "</button>";
+    h += "<button class='sc-s" + (run === 0 ? " cold" : "") + "' data-tab='cards'"
+      + " aria-label='Streak'>" + svg("flame", 12) + num(run) + "</button>";
+  h += "<button class='sc-s gold' data-tab='vault' aria-label='The pot'>"
+    + num(pt) + "</button>";
+  if (sparesEarned() > 0)
+    h += "<button class='sc-s jade' data-tab='cards' aria-label='Spares'>"
+      + num(sp) + "</button>";
+  return h + "</div>";
 }
+
+/* ------------------------------------------------------------- the world */
+function scWorldHTML(wins, sel){
+  var s = shape(), sit = situation(), ph = skyPhase();
+  var night = ph === "night" || ph === "deepnight";
+  var nowPos = sinceWake(nowMin()) / 1440 * 100;
+  /* where he was standing when he last closed it, so the walk back is real */
+  var wasPos = nowPos;
+  if (AWAY > 2) wasPos = sinceWake(((nowMin() - AWAY) % 1440 + 1440) % 1440) / 1440 * 100;
+  if (wasPos > nowPos) wasPos = 1.5;            /* he slept through the fold */
+  nowPos = Math.max(1.5, Math.min(98.5, nowPos));
+  wasPos = Math.max(1.5, Math.min(98.5, wasPos));
+
+  var h = "<div class='sc' data-sky='" + esc(ph) + "'>";
+
+  /* the sky: stars and the sun on the arc it has ridden since v4. Drawn as
+     elements rather than inside a stretched SVG, because a circle in a
+     viewBox scaled to fill a phone is an egg. */
+  if (night){
+    h += "<div class='sc-stars'>";
+    for (var i = 0; i < 20; i++){
+      h += "<i style='left:" + ((hashOf("s" + i) % 980) / 10).toFixed(1)
+        + "%;top:" + ((hashOf("y" + i) % 520) / 10).toFixed(1)
+        + "%;opacity:" + (0.25 + (hashOf("o" + i) % 55) / 100).toFixed(2) + "'></i>";
+    }
+    h += "</div>";
+  }
+  /* three clouds by day, because a flat blue half-screen is a wall and a sky
+     with something moving across it is a sky */
+  if (!night && ph !== "dusk"){
+    h += "<div class='sc-cl'><i style='--t:12%;--l:-18%;--d:0s;--s:1'></i>"
+      + "<i style='--t:26%;--l:-46%;--d:-38s;--s:.72'></i>"
+      + "<i style='--t:6%;--l:-78%;--d:-74s;--s:.55'></i></div>";
+  }
+  var p = arcPt(s.now / 1440);
+  var sunX = 6 + (p[0] - 12) / 100 * 88, sunY = 8 + (p[1] / 58) * 52;
+  h += "<span class='sc-sun" + (night ? " moon" : "") + "' style='left:" + sunX.toFixed(1)
+    + "%; top:" + sunY.toFixed(1) + "%'></span>";
+
+  /* the ground he woke up on */
+  h += scGroundHTML(sit);
+  h += "<span class='sc-path'></span>";
+
+  /* the stations, in time order. Two that share an hour are pushed apart
+     rather than drawn on top of each other - a signpost you cannot read is
+     worse than one a few minutes out of true. */
+  h += "<div class='sc-pins'>";
+  var placed = wins.map(function(w){
+    return { w: w, x: sinceWake(w.open) / 1440 * 100 };
+  }).sort(function(a, b){ return a.x - b.x; });
+  var MIN = 13.5;
+  placed.forEach(function(q, i){
+    q.x = Math.max(7, Math.min(93, q.x));
+    if (i && q.x - placed[i - 1].x < MIN) q.x = placed[i - 1].x + MIN;
+  });
+  /* if that pushed the last one off the end, shuffle the whole line back */
+  var over = placed.length ? placed[placed.length - 1].x - 93 : 0;
+  if (over > 0) placed.forEach(function(q){ q.x = q.x - over; });
+  placed.forEach(function(q){ q.x = Math.max(8, Math.min(92, q.x)); });
+  placed.forEach(function(q, i){
+    var w = q.w, picked = sel && w.id === sel.id;
+    h += "<button class='sc-p " + w.state + (picked ? " up" : "") + (i % 2 ? " hi" : "")
+      + "' data-pick='" + esc(w.id) + "' style='left:" + q.x.toFixed(1)
+      + "%; --pil:" + w.col + "'>"
+      + "<span class='sc-pk'>" + svg(scPin(w), 17) + "</span>"
+      + "<span class='sc-pn'>" + esc(w.short || w.label) + "</span>"
+      + "</button>";
+  });
+
+  /* him, walking */
+  h += "<span class='sc-me' style='left:" + wasPos.toFixed(2) + "%' data-to='"
+    + nowPos.toFixed(2) + "'>" + scWalker() + "</span>";
+  h += "</div>";
+
+  /* The clock, and under it the place. The city is not decoration: he is in
+     a different one most weeks, the app guesses it from the phone's own
+     clock, and the guess has to be correctable by touching it. That button
+     has existed since v39 and it nearly went out with the dashboard. */
+  var guessed = !sit.home && typeof whereIsGuessed === "function" && whereIsGuessed();
+  h += "<div class='sc-hud'><button class='sc-t' data-work='1'>"
+    + esc(hhmm(nowMin())) + "</button>";
+  h += sit.home
+    ? "<button class='b-loc sc-c' data-notthere='1'>" + esc(shortToday()) + "</button>"
+    : "<button class='b-loc sc-c" + (guessed ? " ask" : "") + "' data-"
+      + (guessed ? "locate" : "notthere") + "='1'>" + esc(sit.city)
+      + (guessed ? " " + svg("pin", 11) : "") + "</button>";
+  h += "</div>";
+  h += scStatsHTML();
+  h += scNewsHTML();
+  return h + "</div>";
+}
+
+/* The three numbers that used to live in the stat bar. The bar went with the
+   dashboard - a scene with a dashboard bolted to the top of it is a scene
+   with a dashboard bolted to the top of it - but the pot is real money he
+   pays himself, and he has asked where it was once already when it was
+   hidden. So they sit in the corner, the way a game keeps its currency. */
 
 function scPin(w){
   if (w.kind === "pillar") return w.key === "train" ? "run"

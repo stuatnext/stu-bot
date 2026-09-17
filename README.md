@@ -86,6 +86,29 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v61: the other five rooms
+
+*"These pages should also match the new design."* They did not: v60 made Today
+a scene and left Gym, Food, Water, Work and Cards as the old flat dashboard
+underneath a stat bar. A scene plus five dashboards is five dashboards.
+
+So every tab now opens on **the same sky at the same hour** — the same moon or
+sun on the same arc, the same skyline of the city he actually woke up in, and
+the same currency in the corner — and then gets on with its own business
+underneath. Crossing between tabs is walking into another room in one place,
+not opening another app.
+
+- **The stat bar is gone everywhere**, not just on Today. The sky carries the
+  clock, the place and the currency; a bar doing the same job under it is the
+  dashboard growing back. Every route the bar had survives: the level goes to
+  You, the pot opens the vault, the streak and the spares go to the deck.
+- **The night palette is the scene's palette.** It was grey ink on near-black,
+  which read as a different app from the one on Today; it is now warm cream on
+  the same deep navy the sky fades into.
+- The horizon band is straight-edged and blends into the page, because content
+  follows it immediately. The rounded bottom belongs to Today, where the scene
+  ends and the card begins.
+
 #### v60: it is a place now
 
 His verdict on v59, which had been a very tidy dashboard: *"Complete redesign.

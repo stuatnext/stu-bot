@@ -63,6 +63,28 @@ body[data-tab="today"] #screen .b-loc{font:inherit; color:#8FD4FF; background:no
   border:0; padding:0; letter-spacing:inherit; text-transform:inherit; cursor:pointer}
 body[data-tab="today"] #screen .b-loc.ask{color:#FFD166; text-decoration:underline}
 
+/* ============================================== the same world, every tab
+   The stat bar is gone everywhere, not just on Today: the sky carries the
+   clock, the place and the currency now, so a bar doing the same job under
+   it is the dashboard growing back. */
+#hud{display:none}
+#screen{padding:0}
+#screen .wbody{padding:14px 18px 34px; max-width:560px; margin:0 auto}
+
+/* The horizon band the other five tabs open on: the same sky at the same
+   hour, the same skyline, and then their own business underneath. */
+/* straight-edged and blended into the page, because content follows it
+   immediately - the rounded bottom belongs to Today, where the scene ends */
+#screen .sc.wh{flex:none; height:clamp(126px,17vh,162px); border-radius:0}
+#screen .sc.wh .sc-far{bottom:24px; height:clamp(56px,11vh,84px)}
+#screen .sc.wh .sc-gr{height:26px; background:var(--bg)}
+#screen .sc.wh .sc-hud{top:12px}
+#screen .sc.wh .sc-t{font-size:21px}
+#screen .sc.wh .sc-stats{top:14px; padding:4px 9px; gap:8px}
+#screen .wh-n{position:absolute; left:16px; bottom:6px; z-index:4;
+  font-family:"JetBrains Mono",monospace; font-size:9px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase; color:rgba(255,246,229,.52)}
+
 /* ================================================================= the scene
    Today is a place. The sky is the real hour, the ground is the city he woke
    up in, and the path across the middle is his day - wake on the left, wake
@@ -74,52 +96,52 @@ body[data-tab="today"] #screen .b-loc.ask{color:#FFD166; text-decoration:underli
 body[data-tab="today"] #screen .b-t{display:flex; flex-direction:column; height:100%;
   min-height:100%; gap:0; padding:0}
 
-body[data-tab="today"] #screen .sc{position:relative; flex:1 1 auto; min-height:230px;
+#screen .sc{position:relative; flex:1 1 auto; min-height:230px;
   overflow:hidden; border-radius:0 0 26px 26px;
   background:linear-gradient(#0E1120, #131A2E 52%, #101524)}
-body[data-tab="today"] #screen .sc[data-sky="dawn"]    {background:linear-gradient(#3B2B52,#8E5A6B 55%,#C58468)}
-body[data-tab="today"] #screen .sc[data-sky="morning"] {background:linear-gradient(#2E6FA8,#69AFD8 58%,#A8D4E8)}
-body[data-tab="today"] #screen .sc[data-sky="day"]     {background:linear-gradient(#2A78BE,#67B6E4 60%,#B6DCF0)}
-body[data-tab="today"] #screen .sc[data-sky="gold"]    {background:linear-gradient(#2E3E77,#C4713F 62%,#E8A758)}
-body[data-tab="today"] #screen .sc[data-sky="dusk"]    {background:linear-gradient(#211A45,#5A3C78 58%,#A45F76)}
-body[data-tab="today"] #screen .sc[data-sky="night"]   {background:linear-gradient(#0B0E1E,#151B36 58%,#1E2547)}
-body[data-tab="today"] #screen .sc[data-sky="deepnight"]{background:linear-gradient(#070911,#0D1120 58%,#141A30)}
+#screen .sc[data-sky="dawn"]    {background:linear-gradient(#3B2B52,#8E5A6B 55%,#C58468)}
+#screen .sc[data-sky="morning"] {background:linear-gradient(#2E6FA8,#69AFD8 58%,#A8D4E8)}
+#screen .sc[data-sky="day"]     {background:linear-gradient(#2A78BE,#67B6E4 60%,#B6DCF0)}
+#screen .sc[data-sky="gold"]    {background:linear-gradient(#2E3E77,#C4713F 62%,#E8A758)}
+#screen .sc[data-sky="dusk"]    {background:linear-gradient(#211A45,#5A3C78 58%,#A45F76)}
+#screen .sc[data-sky="night"]   {background:linear-gradient(#0B0E1E,#151B36 58%,#1E2547)}
+#screen .sc[data-sky="deepnight"]{background:linear-gradient(#070911,#0D1120 58%,#141A30)}
 
 /* the sky: stars, and the sun on the arc Daylight has drawn since v4 */
-body[data-tab="today"] #screen .sc-stars{position:absolute; inset:0}
-body[data-tab="today"] #screen .sc-stars i{position:absolute; width:2px; height:2px;
+#screen .sc-stars{position:absolute; inset:0}
+#screen .sc-stars i{position:absolute; width:2px; height:2px;
   border-radius:50%; background:#FFFFFF}
-body[data-tab="today"] #screen .sc-cl{position:absolute; inset:0; overflow:hidden}
-body[data-tab="today"] #screen .sc-cl i{position:absolute; top:var(--t); left:var(--l);
+#screen .sc-cl{position:absolute; inset:0; overflow:hidden}
+#screen .sc-cl i{position:absolute; top:var(--t); left:var(--l);
   width:118px; height:34px; border-radius:999px; background:rgba(255,255,255,.17);
   transform:scale(var(--s)); animation:scdrift 120s linear var(--d) infinite}
-body[data-tab="today"] #screen .sc-cl i::before,
-body[data-tab="today"] #screen .sc-cl i::after{content:""; position:absolute; border-radius:50%;
+#screen .sc-cl i::before,
+#screen .sc-cl i::after{content:""; position:absolute; border-radius:50%;
   background:inherit}
-body[data-tab="today"] #screen .sc-cl i::before{left:20px; top:-16px; width:46px; height:46px}
-body[data-tab="today"] #screen .sc-cl i::after{left:56px; top:-24px; width:58px; height:58px}
+#screen .sc-cl i::before{left:20px; top:-16px; width:46px; height:46px}
+#screen .sc-cl i::after{left:56px; top:-24px; width:58px; height:58px}
 @keyframes scdrift{from{margin-left:0} to{margin-left:190%}}
 @media (prefers-reduced-motion:reduce){
   body[data-tab="today"] #screen .sc-cl i{animation:none; margin-left:70%}
 }
-body[data-tab="today"] #screen .sc-sun{position:absolute; width:46px; height:46px;
+#screen .sc-sun{position:absolute; width:46px; height:46px;
   margin:-23px 0 0 -23px; border-radius:50%; background:#FFE49B;
   box-shadow:0 0 50px 14px rgba(255,214,130,.3)}
-body[data-tab="today"] #screen .sc-sun.moon{width:34px; height:34px; margin:-17px 0 0 -17px;
+#screen .sc-sun.moon{width:34px; height:34px; margin:-17px 0 0 -17px;
   background:#E8ECFF; box-shadow:0 0 34px 8px rgba(220,228,255,.16)}
-body[data-tab="today"] #screen .sc-sun.moon::after{content:""; position:absolute;
+#screen .sc-sun.moon::after{content:""; position:absolute;
   top:-4px; right:-5px; width:28px; height:28px; border-radius:50%;
   background:var(--scCut,#141A30)}
-body[data-tab="today"] #screen .sc[data-sky="night"]{--scCut:#171E3B}
-body[data-tab="today"] #screen .sc[data-sky="deepnight"]{--scCut:#0E1324}
-body[data-tab="today"] #screen .sc[data-sky="dusk"]{--scCut:#4A3266}
+#screen .sc[data-sky="night"]{--scCut:#171E3B}
+#screen .sc[data-sky="deepnight"]{--scCut:#0E1324}
+#screen .sc[data-sky="dusk"]{--scCut:#4A3266}
 
 /* the ground: a silhouette of where he woke up, then the earth he stands on */
-body[data-tab="today"] #screen .sc-far{position:absolute; left:0; right:0; bottom:96px;
+#screen .sc-far{position:absolute; left:0; right:0; bottom:96px;
   width:100%; height:clamp(86px,21vh,148px); display:block}
-body[data-tab="today"] #screen .sc-far .f1{fill:rgba(6,9,18,.55)}
-body[data-tab="today"] #screen .sc-far .f2{fill:rgba(6,9,18,.38)}
-body[data-tab="today"] #screen .sc-gr{position:absolute; left:0; right:0; bottom:0; height:104px;
+#screen .sc-far .f1{fill:rgba(6,9,18,.55)}
+#screen .sc-far .f2{fill:rgba(6,9,18,.38)}
+#screen .sc-gr{position:absolute; left:0; right:0; bottom:0; height:104px;
   background:linear-gradient(#0B0F1C, #070A12)}
 body[data-tab="today"] #screen .sc-path{position:absolute; left:0; right:0; bottom:46px;
   height:0; border-top:2px dashed rgba(255,246,229,.18)}
@@ -180,38 +202,41 @@ body[data-tab="today"] #screen .sc-me::after{content:""; position:absolute; left
 /* ------------------------------------------------------------- the clock
    Top left, where a game puts it, and the way into every number the scene
    deliberately does not draw. */
-body[data-tab="today"] #screen .sc-hud{position:absolute; top:10px; left:14px; z-index:4;
+#screen .sc-hud{position:absolute; top:10px; left:14px; z-index:4;
   display:flex; align-items:baseline; gap:8px; text-shadow:0 1px 4px rgba(0,0,0,.6)}
-body[data-tab="today"] #screen .sc-t{padding:0; border:0; background:none; cursor:pointer;
+#screen .sc-t{padding:0; border:0; background:none; cursor:pointer;
   font:inherit; font-family:"Nunito",sans-serif; font-size:26px; font-weight:900;
   letter-spacing:-.03em; color:#FFF6E5}
-body[data-tab="today"] #screen .sc-c{padding:0; border:0; background:none; cursor:pointer;
+#screen .sc-c{padding:0; border:0; background:none; cursor:pointer;
   font:inherit; font-family:"JetBrains Mono",monospace; font-size:9px; font-weight:700;
   letter-spacing:.14em; text-transform:uppercase; color:rgba(255,246,229,.66);
   display:inline-flex; align-items:center; gap:3px}
-body[data-tab="today"] #screen .sc-c.ask{color:#FFD166; text-decoration:underline}
-body[data-tab="today"] #screen .sc-c svg{width:11px; height:11px}
+#screen .sc-c.ask{color:#FFD166; text-decoration:underline}
+#screen .sc-c svg{width:11px; height:11px}
 
 /* ------------------------------------------------------------- the news
    One line, in the sky. The only sentence on the screen not attached to
    something he can touch, so it is written small and there is never a
    second one. */
 /* the corner currency, the way a game keeps it */
-body[data-tab="today"] #screen .sc-stats{position:absolute; top:12px; right:14px; z-index:4;
-  display:flex; align-items:center; gap:9px; padding:5px 10px; border-radius:999px;
+#screen .sc-stats{position:absolute; top:12px; right:14px; z-index:4;
+  display:flex; align-items:center; gap:2px; padding:3px 6px; border-radius:999px;
   border:1px solid rgba(255,246,229,.16); background:rgba(8,11,20,.5);
-  cursor:pointer; font:inherit; text-shadow:0 1px 3px rgba(0,0,0,.5)}
-body[data-tab="today"] #screen .sc-lv{width:18px; height:18px; border-radius:50%;
+  text-shadow:0 1px 3px rgba(0,0,0,.5)}
+#screen .sc-lv{width:19px; height:19px; margin:2px 3px; border-radius:50%; border:0;
   display:flex; align-items:center; justify-content:center; background:rgba(255,246,229,.18);
-  font-family:"Nunito",sans-serif; font-size:10.5px; font-weight:900; color:#FFF6E5}
-body[data-tab="today"] #screen .sc-s{display:flex; align-items:center; gap:3px;
+  font:inherit; font-family:"Nunito",sans-serif; font-size:10.5px; font-weight:900;
+  color:#FFF6E5; cursor:pointer}
+#screen .sc-s{display:flex; align-items:center; gap:3px; border:0; background:none;
+  cursor:pointer; padding:4px 5px; font:inherit;
   font-family:"Nunito",sans-serif; font-size:12.5px; font-weight:900; color:#FFB84D}
-body[data-tab="today"] #screen .sc-s svg{width:12px; height:12px}
-body[data-tab="today"] #screen .sc-s.cold{color:rgba(255,246,229,.45)}
-body[data-tab="today"] #screen .sc-s.gold{color:#FFD166}
-body[data-tab="today"] #screen .sc-s.gold::before{content:"$"; opacity:.7; font-size:10px}
-body[data-tab="today"] #screen .sc-s.jade{color:#3FD9A0}
-body[data-tab="today"] #screen .sc-s.jade::before{content:"\25c8"; opacity:.7; font-size:9px}
+#screen .sc-s:active,#screen .sc-lv:active{transform:scale(.92)}
+#screen .sc-s svg{width:12px; height:12px}
+#screen .sc-s.cold{color:rgba(255,246,229,.45)}
+#screen .sc-s.gold{color:#FFD166}
+#screen .sc-s.gold::before{content:"$"; opacity:.7; font-size:10px}
+#screen .sc-s.jade{color:#3FD9A0}
+#screen .sc-s.jade::before{content:"\25c8"; opacity:.7; font-size:9px}
 
 /* the news, low in the sky where a game puts a toast */
 body[data-tab="today"] #screen .sc-news{position:absolute; left:14px; right:14px;
@@ -288,7 +313,7 @@ body[data-tab="today"] #screen .b-do:active{transform:translateY(2px)}
 #modal .w-fd em.now{box-shadow:0 0 0 2px var(--gold)}
 
 @media (max-height:700px){
-  body[data-tab="today"] #screen .sc{min-height:190px}
+  #screen .sc{min-height:190px}
   body[data-tab="today"] #screen .sc-hud b{font-size:22px}
   body[data-tab="today"] #screen .b-pl{padding:11px 14px calc(11px + env(safe-area-inset-bottom))}
   body[data-tab="today"] #screen .b-go,
