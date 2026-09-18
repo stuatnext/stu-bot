@@ -183,6 +183,15 @@ function paintRun(){
         : "Nothing ticked this time.") + "</h2>";
     if (RUN.kind === "day" && typeof scoreOn === "function")
       h += "<p>Today is worth " + num(scoreOn(today())) + " so far.</p>";
+    /* The prize, said out loud at the moment it is won. A mini game that
+       pays silently is not a game, it is a checklist with a number on it. */
+    var gid = { work: "work", food: "food", skin: "skin" }[RUN.kind];
+    if (gid && typeof gameClear === "function" && gameClear(gid, today())){
+      h += "<p class='tk-prize'>" + esc(gameName(gid)) + " cleared. +"
+        + gamePrize(gid) + " spares."
+        + (gameSwept(today()) ? " All five today \u2014 +" + SWEEP + " more." : "")
+        + "</p>";
+    }
     h += "</div>";
     h += "<div class='tk-acts'><button class='tk-go' data-runclose='1'>Done</button></div>";
   }

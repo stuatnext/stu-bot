@@ -94,7 +94,8 @@ body[data-tab="today"] #screen .b-loc.ask{color:#FFD166; text-decoration:underli
 #screen .rm-bar.v{left:50%; right:auto; top:0; bottom:0; width:2px; height:auto;
   margin:0 0 0 -1px}
 
-#screen .rm-c{display:flex; flex-direction:column; gap:1px; padding-top:2px}
+#screen .rm-c{flex:1 1 auto; min-width:0; display:flex; flex-direction:column;
+  gap:1px; padding-top:2px}
 #screen .rm-t{padding:0; border:0; background:none; cursor:pointer; text-align:left;
   font:inherit; font-family:"Nunito",sans-serif; font-size:30px; font-weight:900;
   letter-spacing:-.035em; line-height:1; color:var(--ink)}
@@ -102,8 +103,22 @@ body[data-tab="today"] #screen .b-loc.ask{color:#FFD166; text-decoration:underli
   letter-spacing:.16em; text-transform:uppercase; color:var(--ink3)}
 #screen .rm-n{margin-top:7px; font-family:"Nunito",sans-serif; font-size:17px;
   font-weight:900; letter-spacing:-.02em; color:var(--ink2)}
-#screen .rm .sc-stats{top:16px; right:16px; background:rgba(255,255,255,.05);
-  border-color:var(--edge)}
+/* In a room the counters are the third thing in the row, not a badge floating
+   over it: the moment a fourth counter appeared - spares, which the mini
+   games now pay - an absolute pill ran straight through the clock. In the
+   row, flexbox keeps them apart whatever is in either of them. */
+#screen .rm .sc-stats{position:static; flex:none; align-self:flex-start;
+  margin-top:2px; padding:2px 4px; background:rgba(255,255,255,.05); border-color:var(--edge)}
+/* A room's header carries a window, the hour, the tab's name and four
+   counters across 393 points. The counters are the one part that grows, so
+   in here everything else gives it room: a smaller window, a smaller clock,
+   and counters at the size of counters rather than of headlines. */
+#screen .rm{padding-left:14px; padding-right:14px; gap:11px}
+#screen .rm-win{width:88px; height:60px}
+#screen .rm-t{font-size:23px}
+#screen .rm .sc-lv{width:16px; height:16px; margin:2px; font-size:9.5px}
+#screen .rm .sc-s{padding:3px 4px; gap:2px; font-size:11px}
+#screen .rm .sc-s svg{width:10px; height:10px}
 
 /* ---------------------------------------------------------------- a stage
    Every room has one object and one action. The object is the size of the
@@ -396,8 +411,12 @@ body[data-tab="today"] #screen .b-do:active{transform:translateY(2px)}
 /* ===================================================== the room: Water
    The bottle is the tab. It was a thumbnail beside a paragraph with the
    marks and the week folded into two drawers. */
+/* The bottle is twice as tall as it is wide, so sizing it off the width
+   alone pushed the marks and the button off the bottom of a shorter phone.
+   It takes the smaller of the two: a share of the width, or a share of the
+   height it actually has. */
 #screen .stage.water .bt{position:relative; padding:0; border:0; background:none;
-  cursor:pointer; width:clamp(150px,44vw,190px)}
+  cursor:pointer; width:clamp(112px, min(44vw, 21vh), 190px)}
 #screen .stage.water .bt svg{display:block; width:100%; height:auto}
 #screen .stage.water .bt:disabled{cursor:default}
 #screen .stage.water .bt:active{transform:scale(.97)}
@@ -489,6 +508,41 @@ body[data-tab="today"] #screen .b-do:active{transform:translateY(2px)}
   letter-spacing:-.045em; line-height:1; color:var(--ink)}
 #screen .stage.gym .rig-c span{font-family:"JetBrains Mono",monospace; font-size:10px;
   letter-spacing:.1em; color:var(--ink3)}
+
+/* ================================================== the mini game's bar
+   Five tabs, five short games, and the same three facts under every one of
+   them: what clearing it pays, how many days running he has, and how many
+   of the five are in today. Above it the object; below it the button and
+   one closed door. Nothing else on the screen. */
+#screen .gm-bar{display:flex; align-items:center; gap:8px; margin:14px 0 0;
+  font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase}
+#screen .gm-bar span{padding:5px 9px; border-radius:999px; border:1px solid var(--edge);
+  color:var(--ink3); white-space:nowrap}
+#screen .gm-w{color:var(--gold) !important; border-color:color-mix(in srgb, var(--gold) 34%, transparent) !important}
+#screen .gm-bar.on .gm-w{color:var(--greenInk) !important;
+  border-color:color-mix(in srgb, var(--greenInk) 38%, transparent) !important}
+#screen .gm-n{margin-left:auto}
+#screen .gm-sweep{margin:9px 0 0; padding:9px 12px; border-radius:13px;
+  font-size:13.5px; font-weight:800; color:#08131E;
+  background:linear-gradient(var(--gold), color-mix(in srgb, var(--gold) 76%, #000))}
+#task .tk-prize{color:var(--gold) !important; font-weight:800 !important}
+
+/* the five, on the tab their prize is spent on */
+#screen .gm-five{display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr));
+  gap:7px; margin:2px 0 8px}
+#screen .gm-g{display:flex; flex-direction:column; align-items:flex-start; gap:2px;
+  padding:9px 10px; border-radius:13px; border:1px solid var(--edge); cursor:pointer;
+  background:var(--sunk); font:inherit; text-align:left}
+#screen .gm-g.on{border-color:color-mix(in srgb, var(--greenInk) 45%, transparent);
+  background:color-mix(in srgb, var(--greenInk) 12%, var(--sunk))}
+#screen .gm-g:active{transform:scale(.97)}
+#screen .gm-gt{font-family:"Nunito",sans-serif; font-size:13px; font-weight:900;
+  color:var(--ink); line-height:1.15}
+#screen .gm-gs{font-family:"JetBrains Mono",monospace; font-size:9.5px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--gold)}
+#screen .gm-g.on .gm-gs{color:var(--greenInk)}
+#screen .gm-gr{font-family:"JetBrains Mono",monospace; font-size:9.5px; color:var(--ink3)}
 
 /* the one action, where the thumb is */
 #screen .actionbar{position:sticky; bottom:8px; z-index:5; margin:18px 0 4px}
@@ -637,3 +691,63 @@ body[data-tab="today"] #screen .b-do:active{transform:translateY(2px)}
 #task .tk-skip{width:100%; min-height:48px; border-radius:15px; cursor:pointer; font:inherit;
   font-family:"Nunito",sans-serif; font-size:14.5px; font-weight:800; color:var(--ink3);
   background:none; border:1px solid var(--edge)}
+
+/* ================================================ a start screen that fits
+   Every one of the five games is an object, a bar and a button, and all of
+   it has to be on the screen before he scrolls - a start screen you have to
+   scroll to start is not a start screen. These sit at the foot of the file
+   on purpose: the objects' own sizes are set further up, and at equal
+   specificity the last rule is the one that counts.
+
+   Each object is round or tall, so on a short phone it takes its size from
+   the height it has rather than from the width. */
+@media (max-height:760px){
+  #screen .stage{gap:7px; padding:6px 0 12px}
+  #screen .stage.water .bt{width:clamp(112px, min(44vw, 19vh), 190px)}
+  #screen .stage.water .gl{width:22px; height:26px}
+  #screen .stage.water .glass{gap:5px}
+  #screen .stage.food .plate{width:clamp(146px, min(58vw, 21vh), 248px)}
+  #screen .stage.gym .rig{width:clamp(144px, min(56vw, 22vh), 240px)}
+  #screen .stage.skin .rig{width:clamp(144px, min(54vw, 24vh), 232px)}
+  #screen .stage.food .anch{gap:7px}
+  /* the three places lay flat: the tick and the name on one line, the hour
+     dropped - it is in the sentence above them and the run says it again.
+     Three stacked cards were a third of the screen on a short phone. */
+  #screen .stage.food .an{flex-direction:row; align-items:center; justify-content:center;
+    gap:6px; padding:7px 5px}
+  #screen .stage.food .an .ak{display:none}
+  #screen .stage.food .an .av{font-size:11.5px}
+  /* the header gives up a little too - the window is a window, not a view */
+  #screen .rm{padding-top:10px; padding-bottom:8px}
+  #screen .rm-win{width:76px; height:52px}
+  #screen .rm-t{font-size:21px}
+  #screen .stage.gym .rig-c b,#screen .stage.skin .rig-c b{font-size:40px}
+  #screen .gm-bar{margin-top:10px}
+  #screen .actionbar{margin-top:12px}
+}
+/* the smallest phone he might be holding - a four-inch SE */
+@media (max-height:620px){
+  #screen .stage{gap:5px; padding:4px 0 10px}
+  /* the object's own sentence gets three lines at most: on a 320-point
+     screen the food line was running to five, and the whole of it is said
+     again inside the run */
+  #screen .stage-l{font-size:13.5px; max-width:30ch; display:-webkit-box;
+    -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden}
+  #screen .stage.water .bt{width:clamp(92px, min(38vw, 16vh), 190px)}
+  #screen .stage.water .gl{width:19px; height:22px}
+  #screen .stage.food .plate{width:clamp(112px, min(50vw, 17vh), 248px)}
+  #screen .stage.gym .rig{width:clamp(112px, min(48vw, 18vh), 240px)}
+  #screen .stage.skin .rig{width:clamp(116px, min(48vw, 20vh), 232px)}
+  #screen .stage.gym .rig-c b,#screen .stage.skin .rig-c b{font-size:32px}
+  #screen .stage.food .pc b{font-size:26px}
+  /* four inches: the three places are three ticks, the way the eight
+     glasses are eight marks. The names are in the run. */
+  #screen .stage.food .an{padding:6px 4px}
+  #screen .stage.food .an .av{display:none}
+  #screen .stage.food .anch{gap:6px}
+  #screen .stage.food .an-r{width:24px; height:24px}
+  #screen .rm{padding-top:8px; padding-bottom:6px}
+  #screen .rm-win{width:66px; height:46px}
+  #screen .rm-n{margin-top:3px; font-size:15px}
+  #screen .actionbar button{min-height:48px; font-size:15px}
+}

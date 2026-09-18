@@ -100,6 +100,11 @@ function viewDeck(){
   }
 
 
+  /* The five mini games, on the tab their prize is spent on. His framing:
+     the tabs are the small games, consistency is the big one, and the cards
+     are what consistency pays. This row is the join between them. */
+  if (S.onboarded && typeof gamesRowHTML === "function") h += gamesRowHTML();
+
   /* The year, as the weeks behind him. A kept week is a thing you have; a
      lost one is still on the shelf, because the record never deletes and the
      pattern in a bad stretch is the lesson. */

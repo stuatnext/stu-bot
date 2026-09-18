@@ -63,24 +63,26 @@ function viewSkin(){
            .map(function(r){ return r[1]; }).join(" · ")) + "</div>";
   h += "</div>";
 
-  if (done < n) h += "<div class='actionbar'><button data-run='skin'>"
-    + (done ? "Carry on" : "Start the " + skinName().toLowerCase() + " routine") + "</button></div>";
+  h += gameBar("skin",
+    done >= n ? "" : done ? "Carry on" : "Start the " + skinName().toLowerCase() + " routine",
+    done >= n ? "" : "data-run='skin'");
 
-  /* Under it: every routine in the app with how long it has been kept. This
-     is the only page where a skincare streak is the subject rather than a
-     footnote on somebody else's screen. */
-  h += "<div class='shelf7'><div class='shelf7-h'>Kept<em>"
-    + ROUTINES.length + " routines</em></div><div class='runs'>";
+  /* Behind the one door: every routine in the app with how long it has been
+     kept. This is the only page where a skincare streak is the subject
+     rather than a footnote on somebody else's screen - but it is a record,
+     and a record belongs under the game, not in front of it. */
+  var kept = "<div class='runs'>";
   ROUTINES.forEach(function(r){
     var on = careOn(t, r[0]), due = careDue(r[0], t), run = careRun(r[0]);
-    h += "<div class='rr" + (on ? " on" : "") + (due ? "" : " off") + "'>"
+    kept += "<div class='rr" + (on ? " on" : "") + (due ? "" : " off") + "'>"
       + "<span class='rr-t'>" + esc(r[1]) + "</span>"
       + "<span class='rr-s'>" + esc(!due ? "not needed here" : on ? "done today"
           : r[3] === "night" ? "tonight" : "in the day") + "</span>"
       + "<span class='rr-n'>" + (run ? run + (run === 1 ? " day" : " days") : "—") + "</span>"
       + "</div>";
   });
-  h += "</div><p class='fine'>None of these touch the streak. They are kept "
-    + "because they are kept.</p></div>";
+  kept += "</div><p class='fine'>None of these touch the streak. They are kept "
+    + "because they are kept.</p>";
+  h += drawers([ fold("keptroutines", "Kept", ROUTINES.length + " routines", kept, false) ]);
   return h;
 }

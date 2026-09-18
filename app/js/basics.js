@@ -152,7 +152,7 @@ function viewBasics(){
     + "</button>";
   h += "<div class='stage-l'>" + (gl >= WATER_GLASSES
       ? litres + "L. That is the day\u2019s water, before the kopi."
-      : litres + "L of " + full + "L \u00b7 " + (WATER_GLASSES - gl) + " to go") + "</div>";
+      : gameGoal("water") + " " + litres + "L of " + full + "L so far.") + "</div>";
   h += "<div class='stage-h'>" + (gl >= WATER_GLASSES ? "Done for today"
       : "Tap the bottle for a glass") + "</div>";
 
@@ -166,18 +166,25 @@ function viewBasics(){
   h += "</div>";
   h += "</div>";
 
-  /* the week, as seven bottles along the shelf */
-  h += "<div class='shelf7'><div class='shelf7-h'>The last week<em>"
-    + hit7 + " of 7</em></div><div class='wk7'>";
+  /* What it pays, how long the run is, and how many of the five are in. The
+     bottle IS the button here, so this game has no separate Start - it is
+     the one mini game that is a single object with a single tap. */
+  h += gameBar("water", "", "");
+
+  /* the week, as seven bottles along the shelf - behind the one door, like
+     every other tab's record. The start screen is the game; this is the
+     cabinet you open afterwards. */
+  var wk = "<div class='wk7'>";
   waterLast(7).forEach(function(row){
     var k = row[0], n = row[1], on = n >= WATER_GLASSES;
     var d = new Date(k + "T00:00:00");
-    h += "<div class='w7" + (on ? " on" : "") + (k === t ? " now" : "") + "'>"
+    wk += "<div class='w7" + (on ? " on" : "") + (k === t ? " now" : "") + "'>"
       + "<span class='w7b'><i style='height:"
       + Math.max(5, Math.round(100 * Math.min(n, WATER_GLASSES) / WATER_GLASSES)) + "%'></i></span>"
       + "<b>" + n + "</b>"
       + "<span class='w7d'>" + "SMTWTFS"[d.getDay()] + "</span></div>";
   });
-  h += "</div><p class='fine'>Eight is the line. Missing it breaks nothing.</p></div>";
+  wk += "</div><p class='fine'>Eight is the line. Missing it breaks nothing.</p>";
+  h += drawers([ fold("waterweek", "The last week", hit7 + " of 7", wk, false) ]);
   return h;
 }

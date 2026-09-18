@@ -72,35 +72,33 @@ function viewWork(){
      headed sections of fourteen items with a note under each, which is a
      backlog, and a backlog on a phone is a thing you close.
 
-     So the page keeps the date, the run-up and a count of what is open; the
-     items themselves live inside the run, where he only ever sees one. */
+     Now the tab is a start screen: the date, what it pays, and the button.
+     The items live inside the run, where he only ever sees one, and the
+     run-up and the area lines wait behind the one door. */
   var openAll = typeof runCount === "function" ? runCount("work") : openN;
-  if (openAll) h += "<div class='actionbar'><button data-run='work'>"
-    + "Work through them<em>" + openAll + " open</em></button></div>";
+  h += gameBar("work", openAll ? "Work through them" : "", openAll ? "data-run='work'" : "");
 
+  var rec = "";
   if (soon.length > 1){
-    h += "<div class='rulehead'><h3>After that</h3><span></span><em>"
-      + (soon.length - 1) + " more</em></div><div class='tl'>";
-    soon.slice(1, 4).forEach(function(d){
-      h += "<div class='tli'><b>" + esc(d[1]) + "</b><span>" + esc(nice(d[2]))
+    rec += "<div class='tl'>";
+    soon.slice(1, 5).forEach(function(d){
+      rec += "<div class='tli'><b>" + esc(d[1]) + "</b><span>" + esc(nice(d[2]))
         + " \u00b7 " + num(daysTo(d[2])) + " days</span></div>";
     });
-    h += "</div>";
+    rec += "</div>";
   }
-
-  /* Three lines, one per area: what is open and what it is for. The list
-     itself is the run. */
-  h += "<div class='shelf7'><div class='shelf7-h'>The work<em>"
-    + doneN + " of " + WORKITEMS.length + " done</em></div><div class='runs'>";
+  rec += "<div class='runs'>";
   WORKAREAS.forEach(function(a){
     var items = WORKITEMS.filter(function(i){ return i[1] === a[0]; });
     var openItems = items.filter(function(i){ return !workDone(i[0]); });
-    h += "<div class='rr" + (openItems.length ? "" : " on") + "'>"
+    rec += "<div class='rr" + (openItems.length ? "" : " on") + "'>"
       + "<span class='rr-t'>" + esc(a[1]) + "</span>"
       + "<span class='rr-s'>" + esc(a[2]) + "</span>"
       + "<span class='rr-n'>" + (openItems.length ? openItems.length + " open" : "done") + "</span>"
       + "</div>";
   });
-  h += "</div></div>";
+  rec += "</div>";
+  h += drawers([ fold("thework", "The work", doneN + " of " + WORKITEMS.length + " done",
+    rec, false) ]);
   return h;
 }

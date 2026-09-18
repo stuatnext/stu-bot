@@ -42,6 +42,7 @@ function load(){
 function save(){
   FD = null; XPC = null;
   if (typeof TIERS !== "undefined") TIERS = null;
+  if (typeof GMC !== "undefined") GMC = null;
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
   mirrorState();
 }
@@ -1263,6 +1264,11 @@ function sparesEarned(){
   });
   n += livedCount() * 10;
   n += doneDoCount() * 10;
+  /* The five mini games pay spares. His framing, and the right one: the
+     small loop should feed the big one rather than run beside it. Derived
+     from the record like everything else in here, so a day he cleared last
+     month is already paid for. */
+  if (typeof gamesPaid === "function") n += gamesPaid();
   return n;
 }
 function spares(){ return Math.max(0, sparesEarned() - (S.sparesSpent || 0)); }

@@ -3,10 +3,8 @@
    the gym and nothing but, and he was right that a tab holding training, food,
    water and sleep at once was four subjects wearing one hat. */
 
-var GYM_MORE = "";
 function viewGym(){
   var t = today(), h = "";
-  GYM_MORE = "";
   var p = gymPlan(), sit = p.sit, key = p.key;
   var st = stage(), nx = nextStage(), list = stageLifts(key);
   var doneN = 0;
@@ -52,6 +50,13 @@ function viewGym(){
     cta = { attr: "data-startsession='" + key + "'",
             label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session" };
   }
+  /* Trained already marked and the session not started is a real state - a
+     walk earns it, and so does a session logged on the floor without the
+     phone. Say that rather than inviting him to start something he has
+     already been paid for. */
+  if (typeof gameClear === "function" && gameClear("gym", t) && doneN === 0 && lifting)
+    line = "Trained is marked. The session is still here if you want it.";
+
   /* A statement, not a card. The number is the size of the thing it stands
      for, the label is small above it, and the qualifier is one line under. No
      panel, no border, no icon in a circle - the page is the object. */
@@ -89,26 +94,35 @@ function viewGym(){
   /* The one action sits under the object, the way it does on every other
      tab. At the foot of the page it was a sticky bar floating over the move
      list - "02 Dumbbell bench" read through the middle of it. */
-  if (cta) h += "<div class='actionbar'><button " + cta.attr + ">"
-    + esc(cta.label) + "</button></div>";
+  /* ------------------------------------------------------- the start screen
+     His words: "I want a start screen before seeing any exercises though -
+     treat it like mini games." He is right, and it is the same note as the
+     work tab: a list in front of the button is a backlog. So the tab is the
+     ring, what the game asks, what it pays, the run behind it, and one
+     button. The moves are inside the session, which is where he reads them
+     anyway - on the floor, one at a time. */
+  h += gameBar("gym", cta ? cta.label : "", cta ? cta.attr : "");
 
-  /* Away, the two things he cannot look up in his own history. Kept for the
-     drawer list at the foot, so the top of the tab stays the session. */
+  /* The claim. Half a session logged and nothing marked is the one state
+     where the prize is sitting there unclaimed, so the button stays on the
+     page rather than going behind the door with the rest. */
+  if ((doneN || finToday()) && lifting && !day(t).p.train){
+    h += "<div class='btns'><button class='btn pri' data-finish='1'>"
+      + "Finish &mdash; mark Trained</button></div>";
+  }
+
+  /* ------------------------------------------------------------- the door
+     Everything that is a record rather than the game: the moves themselves,
+     the finisher, the tape, how the body is going, and a gym to walk to. */
+  var moves = "";
   if (!lifting){
-    /* A rest or walk day shows no list: the answer is not a list. The session
+    /* A rest or walk day has no list: the answer is not a list. The session
        stays one tap away, because the app suggests and he decides. */
     var names = stageLifts(p.key).map(function(x){ return x[0].toLowerCase(); }).join(", ");
-    GYM_MORE = fold("nextmoves", "When you do lift", "Session " + p.key,
-      "<p class='fine' style='margin:2px 0 10px'>" + esc(names) + ".</p>"
+    moves = "<p class='fine' style='margin:2px 0 10px'>" + esc(names) + ".</p>"
       + "<div class='btns'><button class='btn quiet' data-startsession='" + p.key + "'>"
-      + "Lift anyway \u2014 Session " + p.key + "</button></div>", false);
+      + "Lift anyway — Session " + p.key + "</button></div>";
   } else {
-    /* One move at a time. He asked to be shown one or two things and to open
-       the rest himself, and on a gym floor the only move that matters is the
-       one he has not done yet - the others are a list to scroll past. */
-    /* A row is a line of type. The figure on the right exists only when there
-       is a number to put there - a bodyweight move has none, and a wide word
-       in that column was squeezing every title into three wrapped lines. */
     /* An index. Two columns of type: the number and the move. What it weighs
        sits at the end of the line only when there is a weight. Everything
        else about it - the cue, the sets, the rest - is one tap away, and is
@@ -120,11 +134,8 @@ function viewGym(){
       var had = loggedToday(name), t2 = nextTarget(ex, name);
       var fig = had ? kgOr(had.w) : (t2.w ? t2.w + "<small>kg</small>" : "");
       var reps = ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3];
-      /* The move he is about to do says what it takes - the sets, and the rest
-         between them, which he asked to be clear. The ones behind it are just
-         their names until their turn comes. */
-      var meta = had ? had.w + "kg \u00b7 " + had.r.join(" \u00b7 ")
-               : (i === upNext ? stage()[3] + " \u00d7 " + reps + " \u00b7 "
+      var meta = had ? had.w + "kg · " + had.r.join(" · ")
+               : (i === upNext ? stage()[3] + " × " + reps + " · "
                    + restClock(restOf(ex)) + " rest" : "");
       return "<li class='ixr" + (had ? " on" : "") + (i === upNext ? " up" : "") + "'>"
         + "<button class='ixb' data-lift='" + key + ":" + i + "'>"
@@ -137,13 +148,13 @@ function viewGym(){
         + "<button class='po-g' data-swap='" + key + ":" + i + "'"
         + " aria-label='Swap " + esc(name) + "'>&#8646;</button></li>";
     };
-    h += "<ol class='index'>";
-    for (var lk = 0; lk < list.length; lk++) h += rowFor(lk);
-    h += "</ol>";
+    moves += "<ol class='index'>";
+    for (var lk = 0; lk < list.length; lk++) moves += rowFor(lk);
+    moves += "</ol>";
 
     var held = sessionFor(key)[1].slice(list.length);
     if (held.length){
-      h += "<p class='note'>" + held.length + " more "
+      moves += "<p class='note'>" + held.length + " more "
         + (held.length === 1 ? "move" : "moves") + " unlock later</p>";
     }
   }
@@ -153,22 +164,17 @@ function viewGym(){
   var fm = finMinutes(), ft = finToday();
   if (fm > 0 && lifting && key !== "T"){
     var onName = ft ? finLabel(ft.on) : finLabel(lastFinOn() || "Bike");
-    h += "<div class='liftrow finrow'>"
+    moves += "<div class='liftrow finrow'>"
       + "<button class='lift fin" + (ft ? " on" : "") + "' data-fin='1'>"
       + "<span class='lb2'><b>Finisher</b><span>" + esc(onName)
       + " &middot; " + (ft ? ft.min : fm) + " min &middot; talking pace</span></span>"
       + "<span class='lv'>" + (ft ? "in<em>" + ft.min + " min</em>" : fm + "<em>min</em>") + "</span></button>"
       + "<button class='swap' data-finwhy='1' aria-label='Why the finisher'>" + svg("ask", 18) + "</button></div>";
   }
-  if ((doneN || finToday()) && lifting){
-    var already = day(t).p.train;
-    h += "<div class='btns'><button class='btn" + (already ? " quiet" : " pri") + "' data-finish='1'>"
-      + (already ? "Trained is marked" : "Finish &mdash; mark Trained") + "</button></div>";
-  }
 
-  /* --- everything the tab knows that is not today's session. The waist is
-     the one thing that can jump the queue: on a Sunday with no reading yet it
-     stands open under the lifts, because that is the day it is asked for. */
+  /* --- the waist. It is the one thing that can jump the queue: on a Sunday
+     with no reading yet its door stands open, because that is the day it is
+     asked for. */
   var ws = waistSorted(), w = ws[ws.length - 1], tr = waistTrend(), due = waistDue();
   var wh = "<div class='panel wst'><div class='pnum'><b>"
     + (w ? w[1] + "<small>cm</small>" : "&mdash;")
@@ -177,26 +183,22 @@ function viewGym(){
   wh += "<p class='fine'>Not the scale — your weight is allowed to rise. Expect nothing here for "
     + "eight weeks; a centimetre every two months after that is winning.</p>"
     + "<div class='btns'><button class='btn' data-waist='1'>Measure</button></div></div>";
-  if (due){
-    h += "<div class='rulehead'><h3>Tape day</h3><span></span><em>Sunday</em></div>"
-      + "<p class='fine' style='margin:-2px 0 8px'>Navel, before you eat, same tape as last week.</p>" + wh;
-  }
 
-  /* One door, and it holds the only thing here that is a record rather than
-     a task: how the body is going. The two documents moved to You, where the
-     rest of the reading lives, and the crunches answer is on the finisher's
-     own "?" where the question is actually asked. */
   var prog = wh + gymProgressHTML(true);
-  if (!sit.home){
-    h += "<p class='awayline'><button data-near='gym'>Find a gym in " + esc(sit.city) + "</button>"
-      + (p.mode === "travel"
-          ? "<button data-gymhere='1'>There is one here</button>"
-          : (gymHere() ? "<button data-gymhere='0'>Back to the room</button>" : ""))
-      + "</p>";
-  }
-
   h += drawers([
-    due ? "" : fold("progress", "How it is going", waistMeta(ws, tr), prog, false)
+    fold("themoves", lifting ? "The moves" : "When you do lift",
+      lifting ? "Session " + key + " · " + list.length : "Session " + p.key,
+      moves, false),
+    due ? fold("tape", "Tape day", "Sunday",
+      "<p class='fine' style='margin:2px 0 8px'>Navel, before you eat, same tape as last week.</p>"
+      + wh, true) : "",
+    due ? "" : fold("progress", "How it is going", waistMeta(ws, tr), prog, false),
+    sit.home ? "" : "<button class='drow' data-near='gym'>Find a gym in " + esc(sit.city)
+      + "<i>" + svg("arrow", 16) + "</i></button>",
+    (!sit.home && p.mode === "travel")
+      ? "<button class='drow' data-gymhere='1'>There is one here<i>" + svg("arrow", 16) + "</i></button>"
+      : (!sit.home && gymHere())
+      ? "<button class='drow' data-gymhere='0'>Back to the room<i>" + svg("arrow", 16) + "</i></button>" : ""
   ]);
   return h;
 }

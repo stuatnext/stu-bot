@@ -227,9 +227,9 @@ function viewFood(){
   h += "</div></div>";
 
   var mleft = typeof runCount === "function" ? runCount("food") : 0;
-  if (mleft) h += "<div class='actionbar'><button data-run='food'>"
-    + (mleft === plan.length ? "Start the day\u2019s food" : "Log the next one")
-    + "</button></div>";
+  h += gameBar("food",
+    mleft ? (mleft === plan.length ? "Start the day\u2019s food" : "Log the next one") : "",
+    mleft ? "data-run='food'" : "");
 
   /* Everything else the tab knows - what he has already eaten, the menu, the
      reason any of it is measured in protein - waits in the drawer list. */
