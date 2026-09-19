@@ -73,6 +73,21 @@
 }
 :root[data-night] #screen,:root[data-night] #nav{position:relative; z-index:1}
 
+/* ======================================================= the top of a phone
+   The app is a fixed full-bleed column under a translucent status bar, so
+   at the very top of the screen its own clock was rendering underneath
+   iOS's - "11:07" printed through the carrier, the wifi and the battery -
+   and the scene's frame ran off the top edge. The ground still bleeds to
+   the corners; the CONTENT starts below the notch. */
+#screen{padding-top:calc(6px + env(safe-area-inset-top))}
+/* Today's clock sits inside the scene rather than in the page, so it needs
+   the inset itself. */
+body[data-tab="today"] #screen .sc-hud{top:calc(10px + env(safe-area-inset-top))}
+body[data-tab="today"] #screen .sc-stats{top:calc(10px + env(safe-area-inset-top))}
+/* and the bar at the foot fills the home-indicator strip rather than
+   leaving a band of table under it */
+#nav{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+
 /* ============================================================== the HUD
    The top strip is a fascia, not a row of text: a raised bar with a lit top
    edge and a hard shadow beneath, the way the top of a cabinet reads. */
@@ -406,30 +421,197 @@ body[data-tab] #screen .tk-start{margin-top:12px}
 
 /* ------------------------------------------------------- shorter phones
    The plate and the panel give up padding before the object does. */
-@media (max-height:760px){
-  #screen .stage{padding:36px 13px 13px}
-  #screen .stage-l{font-size:14.5px}
-  #screen .gm-plate{top:-12px; padding:6px 16px 5px}
-  #screen .gm-plate b{font-size:15px}
-  #screen .gm-bar{margin-top:11px}
-  #screen .actionbar button{min-height:56px; font-size:17px}
-  #screen .rm{margin-bottom:9px; padding:9px 12px 10px}
-  #screen .stage.food .plate{width:clamp(130px, min(52vw, 19vh), 248px)}
-  #screen .stage.gym .rig{width:clamp(132px, min(54vw, 20vh), 240px)}
-  #screen .stage.skin .rig{width:clamp(130px, min(52vw, 20vh), 232px)}
-  #screen .stage.water .bt{width:clamp(104px, min(42vw, 17vh), 190px)}
-}
-@media (max-height:620px){
-  #screen .stage{padding:32px 11px 10px}
-  #screen .stage-l{font-size:13.5px}
-  #screen .gm-plate b{font-size:14px}
-  #screen .gm-plate span{font-size:8px}
-  #screen .gm-bar{gap:6px; margin-top:9px}
-  #screen .gm-w,#screen .gm-s,#screen .gm-n{padding:5px 10px 4px !important; font-size:12px}
-  #screen .actionbar button{min-height:52px; font-size:16px}
-  #screen .rm{margin-bottom:7px; padding:8px 11px 9px}
-  #screen .stage.food .plate{width:clamp(102px, min(44vw, 14vh), 248px)}
-  #screen .stage.gym .rig{width:clamp(104px, min(44vw, 15vh), 240px)}
-  #screen .stage.skin .rig{width:clamp(108px, min(46vw, 16vh), 232px)}
-  #screen .stage.water .bt{width:clamp(86px, min(36vw, 14vh), 190px)}
+/* --------------------------------------------------- how much room there is
+   These used to be @media (max-height:...), which measures the VIEWPORT. A
+   6.1-inch iPhone reports 852 points and hands the app about 680 of them
+   once the notch, the home indicator and the tab bar have taken their cut -
+   so the trims never fired on the one phone that needed them, and a start
+   screen that fit in every test did not fit in his hand.
+
+   app.js measures the scroller itself and sets data-room on the root:
+   tall over 700 points, short over 560, tight under it. A genuinely short
+   viewport produces a short scroller, so this covers that case too. */
+:root[data-room="short"],:root[data-room="tight"]{}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage{padding:36px 13px 13px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage-l{font-size:14.5px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .gm-plate{top:-12px; padding:6px 16px 5px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .gm-plate b{font-size:15px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .gm-bar{margin-top:11px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .actionbar button{min-height:56px; font-size:17px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .rm{margin-bottom:9px; padding:9px 12px 10px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage.food .plate{width:clamp(130px, min(52vw, 19vh), 248px)}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage.gym .rig{width:clamp(132px, min(54vw, 20vh), 240px)}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage.skin .rig{width:clamp(130px, min(52vw, 20vh), 232px)}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage.water .bt{width:clamp(104px, min(42vw, 17vh), 190px)}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage.water .gl{width:22px; height:26px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage.water .glass{gap:5px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage.food .an{height:44px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage.gym .rig-c b,
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage.skin .rig-c b{font-size:40px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .stage .fine{display:none}
+
+:root[data-room="tight"] #screen .stage{padding:32px 11px 10px}
+:root[data-room="tight"] #screen .stage-l{font-size:13.5px; max-width:30ch;
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden}
+:root[data-room="tight"] #screen .gm-plate b{font-size:14px}
+:root[data-room="tight"] #screen .gm-plate span{font-size:8px}
+:root[data-room="tight"] #screen .gm-bar{gap:6px; margin-top:9px}
+:root[data-room="tight"] #screen .gm-w,
+:root[data-room="tight"] #screen .gm-s,
+:root[data-room="tight"] #screen .gm-n{padding:5px 10px 4px !important; font-size:12px}
+:root[data-room="tight"] #screen .actionbar button{min-height:52px; font-size:16px}
+:root[data-room="tight"] #screen .rm{margin-bottom:7px; padding:8px 11px 9px}
+:root[data-room="tight"] #screen .rm-win{width:66px; height:46px}
+:root[data-room="tight"] #screen .rm-n{margin-top:3px; font-size:15px}
+:root[data-room="tight"] #screen .stage.food .plate{width:clamp(102px, min(44vw, 14vh), 248px)}
+:root[data-room="tight"] #screen .stage.gym .rig{width:clamp(104px, min(44vw, 15vh), 240px)}
+:root[data-room="tight"] #screen .stage.skin .rig{width:clamp(108px, min(46vw, 16vh), 232px)}
+:root[data-room="tight"] #screen .stage.water .bt{width:clamp(86px, min(36vw, 14vh), 190px)}
+:root[data-room="tight"] #screen .stage.water .gl{width:19px; height:22px}
+:root[data-room="tight"] #screen .stage.food .an{height:40px}
+:root[data-room="tight"] #screen .stage.food .an .av{display:none}
+:root[data-room="tight"] #screen .stage.food .an-r{width:24px; height:24px}
+:root[data-room="tight"] #screen .stage.gym .rig-c b,
+:root[data-room="tight"] #screen .stage.skin .rig-c b{font-size:32px}
+:root[data-room="tight"] #screen .stage.food .pc b{font-size:26px}
+:root[data-room="tight"] #screen .stage-l{-webkit-line-clamp:2}
+:root[data-room="tight"] #screen .stage.food .anch{margin-top:2px}
+:root[data-room="tight"] #screen .stage{gap:5px}
+
+/* ==========================================================================
+   v66 - advancing it. "The design is getting better but I think you need to
+   advance it now. Less basic."
+
+   Three things were still basic, and none of them were the colour:
+
+   1. ONE TYPEFACE, EVERYWHERE. Every word in the app was Nunito - a rounded,
+      friendly, utterly generic UI face. A game has a voice: a display face
+      for the things that are shouted (the game's name, the number in the
+      dial, the step you are on) and a plain one for the things that are
+      said. Bricolage Grotesque has been in this repo since v12, self-hosted,
+      used on seven small labels and nowhere that matters.
+
+   2. FLAT MATERIAL. A panel with a linear gradient on it is a rectangle with
+      a linear gradient on it. Real game panels have a surface: a weave, an
+      inner keyline, light falling across them from a direction.
+
+   3. NOTHING MOVED. Everything appeared at once, fully formed. A game tells
+      you where to look by the order things arrive in.
+   ========================================================================== */
+
+/* ------------------------------------------------------------- the voice
+   Display: the game's name, every numeral you are meant to read across the
+   room, the step you are on. Everything else stays Nunito. */
+#screen .gm-plate b,
+#screen .stage .rig-c b,#screen .stage .pc b,#screen .stage .bt-n,
+#screen .stage.work .cd-n,#screen .stage-n,
+#screen .rm-n,#screen .rm-t,
+body[data-tab] #screen .b-pl b,
+#task .tk-body h2,#task .tk-c,
+#screen .gm-gt,#screen .sc-t{
+  font-family:"Bricolage Grotesque","Nunito",sans-serif;
+  font-variation-settings:"wdth" 100;
+  font-weight:800; letter-spacing:-.02em}
+/* the dial numerals want to be narrower and tighter than the titles - a
+   scoreboard sets its figures, it does not letterspace them */
+#screen .stage .rig-c b,#screen .stage .pc b,#screen .stage .bt-n,
+#screen .stage.work .cd-n,#screen .stage-n{
+  font-variation-settings:"wdth" 92; letter-spacing:-.045em;
+  font-variant-numeric:tabular-nums}
+#screen .gm-plate b{font-size:17px; letter-spacing:-.015em}
+#task .tk-body h2{font-size:31px; line-height:1.03; letter-spacing:-.035em}
+#screen .rm-n{letter-spacing:.01em}
+body[data-tab] #screen .b-pl b{letter-spacing:-.03em}
+
+/* ---------------------------------------------------------- the material
+   A surface, not a fill: light from the top-left, a fine weave, and an
+   inner keyline a pixel inside the border. The keyline is the detail that
+   separates a crafted panel from a div with a border-radius. */
+#screen .stage::before{
+  content:""; position:absolute; inset:3px; border-radius:20px;
+  pointer-events:none; z-index:0;
+  border:1px solid rgba(140,160,255,.13);
+  background:
+    radial-gradient(90% 60% at 18% 0%, rgba(160,180,255,.10), transparent 62%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,.015) 0 1px, transparent 1px 6px)}
+/* The keyline pseudo is positioned, so in-flow children would paint under
+   it - they are lifted above. The plate is the exception: it hangs off the
+   panel's top edge and has to stay absolute, or it loses its containing
+   block and slides half its own width to the right. */
+#screen .stage > *{position:relative; z-index:1}
+#screen .stage > .gm-plate{position:absolute; z-index:3}
+#screen .rm::before{
+  content:""; position:absolute; inset:3px; border-radius:16px;
+  pointer-events:none;
+  border:1px solid rgba(140,160,255,.12);
+  background:repeating-linear-gradient(115deg, rgba(255,255,255,.014) 0 1px, transparent 1px 6px)}
+#screen .rm{position:relative}
+#screen .rm > *{position:relative; z-index:1}
+
+/* the plate gets a real emboss: a highlight along the top of the letters
+   and a cut shadow under them, the way a stamped badge reads */
+#screen .gm-plate{
+  background:
+    linear-gradient(rgba(255,255,255,.34), rgba(255,255,255,0) 46%),
+    linear-gradient(color-mix(in srgb, var(--gm) 86%, #FFF), var(--gm) 58%,
+      color-mix(in srgb, var(--gm) 82%, #000))}
+#screen .gm-plate b{text-shadow:0 1px 0 rgba(255,255,255,.55), 0 -1px 0 rgba(0,0,0,.12)}
+
+/* ------------------------------------------------------------- the deck
+   Keys, not labels: the live one is lit and raised, the rest are flush. */
+#nav button{border-radius:15px; transition:color .16s var(--tap)}
+#nav button[aria-current="true"]{color:#08131E}
+#nav button[aria-current="true"]::before{
+  inset:2px 4px !important; border-radius:13px !important; border:0 !important;
+  background:linear-gradient(color-mix(in srgb, var(--navLit,#FFD84D) 76%, #FFF),
+    var(--navLit,#FFD84D)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),
+    0 3px 0 color-mix(in srgb, var(--navLit,#FFD84D) 40%, #000),
+    0 6px 16px -6px color-mix(in srgb, var(--navLit,#FFD84D) 70%, transparent)}
+body[data-tab="today"]  #nav{--navLit:#8FD4FF}
+body[data-tab="gym"]    #nav{--navLit:#FFC61F}
+body[data-tab="food"]   #nav{--navLit:#3FE0A0}
+body[data-tab="basics"] #nav{--navLit:#4FB8FF}
+body[data-tab="skin"]   #nav{--navLit:#FF8FB3}
+body[data-tab="work"]   #nav{--navLit:#CE82FF}
+body[data-tab="cards"]  #nav{--navLit:#FFD84D}
+
+/* ------------------------------------------------------------- the scene
+   Depth: the far ridge sits back behind a haze, the ground is lit from the
+   horizon, and he casts a shadow on the path so he is standing on it rather
+   than pasted over it. */
+#screen .sc-far{filter:saturate(.7) brightness(.78)}
+#screen .sc-gr{box-shadow:inset 0 14px 26px -14px rgba(0,0,0,.8)}
+#screen .sc-me{filter:drop-shadow(0 3px 5px rgba(0,0,0,.75))}
+#screen .sc-me::after{content:""; position:absolute; left:50%; bottom:-4px;
+  width:22px; height:6px; margin-left:-11px; border-radius:50%;
+  background:radial-gradient(closest-side, rgba(0,0,0,.55), transparent)}
+#screen .sc-p{box-shadow:0 4px 0 rgba(0,0,0,.5), 0 8px 16px -8px rgba(0,0,0,.8)}
+#screen .sc-p.up{box-shadow:0 4px 0 rgba(0,0,0,.5),
+  0 0 0 3px rgba(255,216,77,.28), 0 10px 20px -8px rgba(0,0,0,.85)}
+#screen .sc-news{border-radius:14px; border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 8px 20px -14px #000, inset 0 1px 0 rgba(255,255,255,.12)}
+
+/* ------------------------------------------------------------ the arrival
+   The order things land in is how a screen tells you where to look: the
+   panel, then its name, then the dial's light, then the prize, then the
+   key. Sixty frames, once, on entering a tab - not a loop. */
+@keyframes arrRise{from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none}}
+@keyframes arrDrop{from{opacity:0; transform:translate(-50%,-16px) scale(.9)}
+  to{opacity:1; transform:translate(-50%,0) scale(1)}}
+@keyframes arrPop{from{opacity:0; transform:scale(.8)} to{opacity:1; transform:none}}
+@keyframes arrLight{from{opacity:0} to{opacity:1}}
+#screen .stage{animation:arrRise .34s var(--pop) both}
+#screen .gm-plate{animation:arrDrop .38s var(--pop) both .1s}
+#screen .stage .rig svg .rg.on,#screen .stage .plate .fill{animation:arrLight .5s ease-out both .24s}
+#screen .gm-bar span{animation:arrPop .3s var(--pop) both}
+#screen .gm-bar span:nth-child(2){animation-delay:.05s}
+#screen .gm-bar span:nth-child(3){animation-delay:.1s}
+#screen .actionbar button{animation:arrRise .32s var(--pop) both .16s}
+#task .tk-body{animation:arrRise .26s var(--pop) both}
+#task .tk-acts{animation:arrRise .3s var(--pop) both .06s}
+@media (prefers-reduced-motion:reduce){
+  #screen .stage,#screen .gm-plate,#screen .gm-bar span,#screen .actionbar button,
+  #screen .stage .rig svg .rg.on,#screen .stage .plate .fill,
+  #task .tk-body,#task .tk-acts{animation:none}
 }

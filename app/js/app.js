@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v65";
+var BUILD = "v66";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -145,6 +145,26 @@ var TAB_NAMES = { gym:"Gym", food:"Food", basics:"Water", skin:"Skin", work:"Wor
                   cards:"Cards", vault:"The pot", you:"You" };
 var tab = "today";
 
+/* ------------------------------------------------------------- the room
+   How much screen there actually is, after the notch, the home indicator
+   and the tab bar have taken their cut. A 6.1-inch iPhone reports 852
+   points tall and gives the app about 680 of them, so every height-based
+   breakpoint in the stylesheets was measuring a screen he does not have -
+   which is why a start screen that fit in the test fit did not fit in his
+   hand. Measured, not assumed, and re-measured when the window changes. */
+function fitRoom(){
+  var sc = document.getElementById("screen");
+  if (!sc) return;
+  /* clientHeight includes the scroller's own padding, and the notch is
+     carried as padding - so the top inset has to come back off or a phone
+     with a 59-point notch measures as if it had none. */
+  var pad = parseFloat(getComputedStyle(sc).paddingTop) || 0;
+  var h = sc.clientHeight - pad;
+  if (!(h > 0)) return;
+  document.documentElement.setAttribute("data-room",
+    h < 560 ? "tight" : h < 700 ? "short" : "tall");
+}
+
 function render(opts){
   opts = opts || {};
   var el = document.getElementById("screen");
@@ -174,6 +194,7 @@ function render(opts){
   paintHud(!!opts.animate);
   coachSync();
   scr.scrollTop = keep === null ? 0 : keep;
+  fitRoom();
   levelSync();
 }
 function go(next){
@@ -404,6 +425,11 @@ if (S.pushOn && "serviceWorker" in navigator && "PushManager" in window){
     }
   })();
 }
+
+/* The room is measured after every paint, and again when the window changes
+   shape - rotating, or iOS's toolbar collapsing under a scroll. */
+window.addEventListener("resize", fitRoom);
+if (window.visualViewport) window.visualViewport.addEventListener("resize", fitRoom);
 
 /* The sun moves whether he does or not - but repaint only the sky, never the
    screen: a full rebuild every minute silently eats anything half-typed. */
