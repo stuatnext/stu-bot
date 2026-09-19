@@ -65,7 +65,7 @@ function viewGym(){
      numeral: one segment per move, filling as they land. It was a big number
      over a paragraph, which is a poster about training. */
   h += "<div class='stage gym" + (pct === 100 ? " done" : "") + "'>";
-  h += "<div class='stage-h'>" + esc(kicker) + "</div>";
+  h += gameTop("gym", kicker);
   var segs = (p.mode === "rest") ? 0 : Math.max(1, list.length);
   if (segs){
     /* Three moves at five degrees apart is a hairline: the ring read as one

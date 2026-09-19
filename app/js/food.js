@@ -204,6 +204,8 @@ function viewFood(){
      of chips; a strip of chips is a toolbar, not a table. */
   var R = 82, C = 2 * Math.PI * R, dash = (C * Math.min(1, got / target)).toFixed(1);
   h += "<div class='stage food" + (left === 0 ? " done" : "") + "'>";
+  h += gameTop("food", plan.filter(function(a){ return anchorDone(t, a.slot); }).length
+    + " of " + plan.length + " logged");
   h += "<div class='plate'>"
     + "<svg viewBox='0 0 200 200' aria-label='Protein today'>"
     + "<circle class='rim' cx='100' cy='100' r='" + R + "'/>"

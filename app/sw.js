@@ -11,7 +11,7 @@
      files: freshness wins.
    - VERSION changes with every release, and the build number is painted on
      the title card and the You screen so what the phone runs is visible. */
-var VERSION = "daylight-v64";
+var VERSION = "daylight-v65";
 /* Written by the app on every save; read here when a push lands, because a
    service worker cannot see localStorage. Never versioned, never deleted. */
 var STATE_CACHE = "daylight-state";
@@ -19,12 +19,12 @@ var SHELL = [
   "./", "./index.html",
   "./css/tokens.css", "./css/shell.css",
   "./css/cards.css", "./css/body.css", "./css/you.css", "./css/overlays.css",
-  "./css/calm.css", "./css/poster.css", "./css/board.css",
+  "./css/calm.css", "./css/poster.css", "./css/board.css", "./css/arcade.css",
   "./js/data.js", "./js/state.js", "./js/audio.js", "./js/sky.js",
   "./js/world.js", "./js/fx.js", "./js/art.js", "./js/cardui.js", "./js/scene.js", "./js/board.js",
   "./js/collection.js", "./js/quest.js", "./js/gym.js", "./js/food.js",
   "./js/week.js", "./js/dispatch.js",
-  "./js/basics.js", "./js/care.js", "./js/skin.js", "./js/people.js",
+  "./js/basics.js", "./js/care.js", "./js/skin.js", "./js/games.js", "./js/people.js",
   "./js/jokers.js", "./js/run.js", "./js/task.js", "./js/opening.js",
   "./js/work.js", "./js/vault.js", "./js/you.js",
   "./js/coach.js", "./js/app.js",

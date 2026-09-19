@@ -1,0 +1,435 @@
+/* ==========================================================================
+   arcade.css - v65. The look.
+
+   "Design is still awful and doesn't look like a game."
+
+   He is right, and he has been right about it for a while. Every round so
+   far changed what was ON the screen - the structure, the order, what each
+   tab is for - and none of them changed what the screen is MADE of. The
+   materials never moved: hairline strokes, 9-point grey monospace, a 1px
+   ring on near-black, one flat rectangle of gold. That is the vocabulary of
+   a dashboard. You can arrange a dashboard into a perfect start screen and
+   it will still look like a dashboard.
+
+   So this file is only about materials. Nothing here knows what a pillar or
+   a routine is; it is loaded last and it repaints the furniture.
+
+   Five things separate a game screen from an app screen:
+
+     1. SATURATION. The dark look was navy-grey at about four per cent
+        chroma - a spreadsheet with the lights off. The table is now a deep
+        indigo that is unmistakably a colour, lit from above.
+
+     2. MASS. Nothing in a game is a 1px outline. Panels have a face, a
+        bright top bevel and a dark bottom edge; they sit ON the table and
+        cast a shadow. The rings went from 13px hairlines to fat, glowing
+        segments in a sunk track, like the dial on a machine.
+
+     3. A FRAME. Each mini game is now a named panel with a title plate -
+        THE SESSION, EIGHT GLASSES - rather than a heading floating over a
+        void. The plate is the thing that makes it a game rather than a
+        screen about a subject.
+
+     4. REWARD MADE OF SOMETHING. The prize was an outlined pill of grey
+        text. Prizes are coins now: filled, bevelled, gold, with the number
+        at a size you can read across a room.
+
+     5. NO VOID. A game screen is never sixty per cent empty. The table has
+        a vignette and a weave; the panel fills the space the object used to
+        float in.
+   ========================================================================== */
+
+/* -------------------------------------------------------------- the table
+   A colour, lit from above, with a weave in it. The old ground was #0B0F1C
+   flat - and a flat near-black is the single most dashboard thing a screen
+   can do, because light is what tells you a thing is a thing. */
+:root[data-night]{
+  --bg:#0B0E24;
+  --card:#1B2250; --card2:#222A5E; --sunk:#141939;
+  --edge:#33407F; --edge2:#4553A0;
+  --ink:#FFFAF0; --ink2:#C2C9EE; --ink3:#8A93C4;
+
+  --tableTop:#1A2153; --tableBot:#070917;
+  --bevel:#5566C4;             /* the lit top edge of everything raised */
+  --deep:#05071A;              /* the shadow everything casts */
+  --plate:#FFD84D; --plateEdge:#B8860B;
+  --coin:#FFC800; --coinEdge:#9E7011; --coinInk:#3A2A00;
+}
+:root[data-night] body{
+  background:
+    radial-gradient(130% 78% at 50% -12%, rgba(104,124,255,.30), transparent 62%),
+    radial-gradient(90% 46% at 50% 108%, rgba(58,32,120,.44), transparent 70%),
+    linear-gradient(var(--tableTop), var(--tableBot) 62%, var(--tableBot));
+  background-attachment:fixed;
+}
+/* the weave: a diagonal thread, almost invisible, that stops the ground
+   reading as a void the way a flat fill does */
+:root[data-night] body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  opacity:.5;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.022) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,.05) 0 1px, transparent 1px 7px);
+}
+:root[data-night] #screen,:root[data-night] #nav{position:relative; z-index:1}
+
+/* ============================================================== the HUD
+   The top strip is a fascia, not a row of text: a raised bar with a lit top
+   edge and a hard shadow beneath, the way the top of a cabinet reads. */
+/* A floating fascia rather than a full-bleed band: bleeding it to the edges
+   meant a negative margin inside a padded scroller, which is fourteen points
+   of horizontal scroll on every tab. It sits in the page like everything
+   else and is raised instead. */
+#screen .rm{
+  margin:2px 0 12px; padding:11px 13px 12px; max-width:none;
+  background:linear-gradient(var(--card2), var(--card));
+  border:2px solid var(--edge); border-bottom-width:4px; border-radius:20px;
+  box-shadow:inset 0 1px 0 var(--bevel), 0 8px 20px -14px #000}
+#screen .rm-win{border-width:3px; border-color:var(--edge2);
+  box-shadow:inset 0 0 0 2px var(--deep), inset 0 -8px 16px -8px #000,
+    0 4px 0 var(--deep)}
+#screen .rm-t{color:var(--ink); text-shadow:0 2px 0 rgba(0,0,0,.45)}
+#screen .rm-p{color:var(--ink3)}
+#screen .rm-n{margin-top:4px; font-size:18px; color:var(--ink);
+  text-transform:uppercase; letter-spacing:.04em; text-shadow:0 2px 0 rgba(0,0,0,.4)}
+
+/* the counters, as coins on a rail rather than text in a bubble */
+#screen .sc-stats{gap:1px; padding:3px 5px; border-radius:999px;
+  background:linear-gradient(var(--sunk), #0E1230) !important;
+  border:2px solid var(--deep) !important;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.65), 0 1px 0 var(--bevel)}
+#screen .sc-lv{background:linear-gradient(#7C8CF0,#4657C4) !important;
+  color:#FFF !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.45), 0 1px 2px #000}
+#screen .rm .sc-s{font-size:12px; font-weight:900; text-shadow:0 1px 2px rgba(0,0,0,.8)}
+#screen .sc-s.gold{color:#FFD84D}
+#screen .sc-s.jade{color:#5BE8B0}
+
+/* ========================================================== the game panel
+   Each mini game is a panel on the table: a face, a bright bevel along the
+   top, a dark edge under it, and a shadow. The object used to float in the
+   middle of nothing - now it is mounted in something. */
+#screen .stage{
+  position:relative; margin:4px 0 0; padding:40px 14px 16px;
+  border-radius:24px;
+  background:
+    radial-gradient(120% 72% at 50% 0%, rgba(120,140,255,.14), transparent 60%),
+    linear-gradient(var(--card2), var(--card) 58%, #171D46);
+  border:2px solid var(--edge);
+  box-shadow:inset 0 2px 0 var(--bevel), inset 0 -3px 0 var(--deep),
+    0 12px 26px -14px #000, 0 3px 0 var(--deep)}
+
+/* the title plate: the thing that makes it a game rather than a screen
+   about a subject. Stamped into the panel's top edge, like a name badge. */
+#screen .gm-plate{--gm:#FFC61F; position:absolute; left:50%; top:-13px;
+  transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:1px;
+  padding:7px 20px 6px; border-radius:13px; white-space:nowrap; max-width:92%;
+  background:linear-gradient(color-mix(in srgb, var(--gm) 82%, #FFF), var(--gm));
+  border:2px solid color-mix(in srgb, var(--gm) 55%, #000);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.65), 0 3px 0 var(--deep),
+    0 8px 20px -8px color-mix(in srgb, var(--gm) 70%, transparent)}
+#screen .gm-plate b{font-family:"Nunito",sans-serif; font-size:16px; font-weight:900;
+  letter-spacing:-.01em; line-height:1;
+  color:color-mix(in srgb, var(--gm) 22%, #000);
+  text-shadow:0 1px 0 rgba(255,255,255,.4)}
+#screen .gm-plate span{font-family:"JetBrains Mono",monospace; font-size:8.5px;
+  font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:color-mix(in srgb, var(--gm) 34%, #000);
+  overflow:hidden; text-overflow:ellipsis; max-width:100%}
+#screen .stage.done .gm-plate{background:linear-gradient(#7BE8A0,#3FBF72);
+  border-color:#2A8A52; box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 3px 0 var(--deep),
+    0 8px 18px -8px rgba(80,230,140,.5)}
+#screen .stage.done .gm-plate b{color:#06331A}
+#screen .stage.done .gm-plate span{color:#1C6B3C}
+
+/* the object's own line, given some weight */
+#screen .stage-l{font-size:16px; font-weight:800; color:var(--ink);
+  max-width:28ch; text-shadow:0 1px 2px rgba(0,0,0,.5)}
+#screen .stage-h{font-size:9.5px; color:var(--ink3)}
+#screen .stage .fine{color:var(--ink3); font-size:12px}
+
+/* Every object now sits inside a panel with a plate on its top edge, so it
+   has less room than it had floating on the page - and a dial is round, so
+   its height is its width. They take the smaller of a share of the width
+   and a share of the height, at every size rather than only on short
+   phones, because the panel costs the same everywhere. */
+#screen .stage.food .plate{width:clamp(150px, min(52vw, 21vh), 216px)}
+#screen .stage.gym .rig{width:clamp(148px, min(52vw, 22vh), 212px)}
+#screen .stage.skin .rig{width:clamp(146px, min(50vw, 22vh), 208px)}
+#screen .stage.water .bt{width:clamp(112px, min(42vw, 19vh), 172px)}
+
+/* =================================================================== dials
+   A ring is a dial on a machine: a sunk track with a fat, lit needle in it.
+   Thirteen points of flat grey stroke was a progress bar bent into a circle. */
+/* An empty segment has to be VISIBLE - it is the thing you are about to
+   fill. Drawn near-black on a dark panel it vanished, and the dial read as
+   a hole rather than as three slots waiting. So the track is clearly
+   lighter than the panel, and the live segment is lit on top of it. */
+#screen .stage .rig,#screen .stage .plate{filter:drop-shadow(0 8px 16px rgba(0,0,0,.6))}
+#screen .stage.gym .rg,#screen .stage.skin .rg{stroke-width:20; stroke:#3E4A95}
+#screen .stage.gym .rg.on{stroke:#FFC61F; filter:drop-shadow(0 0 9px rgba(255,190,40,.95))}
+#screen .stage.skin .rg.on{stroke:#3FE0BE; filter:drop-shadow(0 0 9px rgba(70,225,190,.95))}
+#screen .stage.gym.done .rg.on,#screen .stage.skin.done .rg.on{stroke:#5BE88E;
+  filter:drop-shadow(0 0 11px rgba(90,230,140,1))}
+#screen .stage.gym .rig.rest::after{border-width:20px; border-color:#3E4A95}
+/* the well inside the dial, so the number sits in something rather than in
+   the middle of the ring's own hole */
+#screen .stage.gym .rig::before,#screen .stage.skin .rig::before{
+  content:""; position:absolute; inset:21%; border-radius:50%;
+  background:radial-gradient(circle at 50% 28%, #2E3A82, #121738 76%);
+  box-shadow:inset 0 4px 12px rgba(0,0,0,.75), 0 0 0 3px rgba(9,12,32,.9),
+    inset 0 -2px 0 rgba(130,150,255,.22)}
+#screen .stage .rig-c,#screen .stage .pc{z-index:1}
+/* Skin's count was baseline-aligned inside a full-height box, which pins it
+   to the top of the dial - fine against a hairline ring, a collision against
+   a fat one. It sits in the well now, like every other dial's number. */
+#screen .stage.skin .rig-c{align-items:center}
+#screen .stage.skin .rig-c b{line-height:.9}
+#screen .stage.skin .rig-c span{align-self:center; margin-top:15px}
+#screen .stage .rig-c b,#screen .stage .pc b{color:#FFFAF0;
+  text-shadow:0 3px 0 rgba(0,0,0,.5), 0 0 18px rgba(150,170,255,.35)}
+/* The hard three-point drop under a 44-point numeral is depth; under the
+   14-point unit beside it, it is a line through the word. */
+#screen .stage .rig-c b small,#screen .stage .pc b small{
+  text-shadow:0 1px 2px rgba(0,0,0,.65)}
+#screen .stage.food .rim{stroke:#3E4A95; stroke-width:18}
+/* the inner rim was a second hairline circle drawn for depth. With a real
+   well behind the number it has nothing to do, and it crossed "129g" like a
+   line through a word. */
+#screen .stage.food .rimx{stroke:transparent}
+#screen .stage.food .fill{stroke:#3FE0A0; stroke-width:18;
+  filter:drop-shadow(0 0 9px rgba(70,225,160,.9))}
+#screen .stage.food .plate::before{content:""; position:absolute; inset:16%;
+  border-radius:50%; background:radial-gradient(circle at 50% 28%, #2E3A82, #121738 76%);
+  box-shadow:inset 0 4px 12px rgba(0,0,0,.75), 0 0 0 3px rgba(9,12,32,.9),
+    inset 0 -2px 0 rgba(130,150,255,.22)}
+
+/* the bottle, as a bottle rather than a diagram */
+#screen .stage.water .bt{filter:drop-shadow(0 8px 16px rgba(0,0,0,.6))}
+#screen .stage.water .glass-body{fill:rgba(140,170,255,.10);
+  stroke:rgba(150,180,255,.5); stroke-width:3}
+#screen .stage.water .cap{fill:#5BA8F6}
+#screen .stage.water .bt-n{text-shadow:0 3px 0 rgba(0,0,0,.45)}
+#screen .stage.water .gl{border:2px solid var(--edge); background:var(--sunk);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+#screen .stage.water .gl.on{background:linear-gradient(#5BC8FF,#1C8FE0);
+  border-color:#0E6C9E; box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+
+/* the countdown on Work, as a scoreboard numeral */
+#screen .stage.work .cd-n{color:#D7A6FF;
+  text-shadow:0 4px 0 rgba(0,0,0,.45), 0 0 26px rgba(190,130,255,.45)}
+#screen .stage.work .cd-t{font-size:24px; color:var(--ink)}
+
+/* The three places at the plate, as chunky keys - laid flat at every size.
+   Stacked, each one was a card a third the height of the object above it,
+   and three cards plus a plate plus a sentence plus the coins plus the
+   button does not fit on any phone. Flat, the tick and the name read on one
+   line and the whole row is the height of one of them. */
+#screen .stage.food .anch{gap:8px; margin-top:6px}
+#screen .stage.food .an{flex-direction:row; align-items:center; justify-content:center;
+  gap:7px; padding:0 8px; height:48px; min-height:0;
+  border:2px solid var(--edge); border-radius:15px;
+  background:linear-gradient(var(--card2), var(--sunk));
+  box-shadow:inset 0 1px 0 var(--bevel), 0 3px 0 var(--deep)}
+/* The hour, not the name. Three columns across a 375-point phone leaves
+   about fifty points for a label, and "After the shift" wraps to four lines
+   in fifty points - which is how a row of three ticks became a third of the
+   screen. "13:00" never wraps, and the name is on the plate and in the run. */
+#screen .stage.food .an .av{display:none}
+#screen .stage.food .an .ak{display:block; font-family:"JetBrains Mono",monospace;
+  font-size:12.5px; font-weight:700; letter-spacing:.02em; color:var(--ink2)}
+#screen .stage.food .an.on .ak{color:#8FF0B4}
+#screen .stage.food .an.next .ak{color:#9FD4FF}
+#screen .stage.food .an-r{width:26px; height:26px; flex:none}
+#screen .stage.food .an.on{border-color:#2F8A55;
+  background:linear-gradient(#2A6B48, #1C4A32)}
+#screen .stage.food .an.next{border-color:#3E8FD8;
+  background:linear-gradient(#24487E, #182F58)}
+#screen .stage.food .an:active{transform:translateY(2px); box-shadow:0 1px 0 var(--deep)}
+
+/* ============================================================== the prizes
+   Coins, not outlined text. This is the single loudest signal on a game
+   screen and it was 10-point grey type in a hairline capsule. */
+#screen .gm-bar{gap:8px; margin-top:16px; font-size:11px}
+#screen .gm-bar span{padding:0; border:0; background:none}
+#screen .gm-bar svg{width:14px; height:14px; flex:none}
+#screen .gm-w{display:inline-flex !important; align-items:center; gap:5px;
+  padding:7px 14px 6px !important; border-radius:999px;
+  color:var(--coinInk) !important; font-size:13.5px; font-weight:900;
+  letter-spacing:.02em;
+  background:linear-gradient(#FFDE6A, var(--coin)) !important;
+  border:2px solid var(--coinEdge) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 3px 0 rgba(0,0,0,.45)}
+#screen .gm-bar.on .gm-w{color:#06331A !important;
+  background:linear-gradient(#8FF0B4,#46C97D) !important;
+  border-color:#2A8A52 !important}
+#screen .gm-s{display:inline-flex !important; align-items:center; gap:4px;
+  padding:7px 13px 6px !important; border-radius:999px; color:#FFB84D !important;
+  font-size:13.5px; font-weight:900; letter-spacing:.02em;
+  background:linear-gradient(#3A2A55,#241A3C) !important;
+  border:2px solid #56407A !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 2px 0 rgba(0,0,0,.45)}
+#screen .gm-n{display:inline-flex !important; align-items:center;
+  padding:7px 12px 6px !important; border-radius:999px; color:var(--ink2) !important;
+  font-weight:900; letter-spacing:.06em;
+  background:var(--sunk) !important; border:2px solid var(--edge) !important;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.5)}
+#screen .gm-sweep{border:2px solid var(--coinEdge); border-bottom-width:4px;
+  color:#3A2A00; font-weight:900; text-align:center; letter-spacing:.01em;
+  background:linear-gradient(#FFE27A, var(--coin));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 18px -8px rgba(255,190,40,.6)}
+
+/* =============================================================== the button
+   It had a 3px bottom edge, which is a web button that presses. A game
+   button is a physical key: taller, a lit face, a thick base, and a shine
+   across the top of it. */
+#screen .actionbar{--gm:#FFC61F}
+#screen .actionbar button{min-height:62px; border-radius:19px;
+  font-size:18px; letter-spacing:.01em; text-transform:none;
+  color:color-mix(in srgb, var(--gm) 20%, #000);
+  background:linear-gradient(color-mix(in srgb, var(--gm) 72%, #FFF) 0%,
+    var(--gm) 48%, color-mix(in srgb, var(--gm) 78%, #000) 100%);
+  border:2px solid color-mix(in srgb, var(--gm) 52%, #000);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.7),
+    0 6px 0 color-mix(in srgb, var(--gm) 38%, #000),
+    0 14px 26px -12px color-mix(in srgb, var(--gm) 62%, transparent);
+  text-shadow:0 1px 0 rgba(255,255,255,.35); position:relative; overflow:hidden}
+#screen .actionbar button::after{content:""; position:absolute; inset:2px 2px auto;
+  height:42%; border-radius:16px 16px 40% 40%;
+  background:linear-gradient(rgba(255,255,255,.45), rgba(255,255,255,0));
+  pointer-events:none}
+#screen .actionbar button:active{transform:translateY(4px);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.7),
+    0 2px 0 color-mix(in srgb, var(--gm) 38%, #000)}
+#screen .actionbar button em{background:rgba(0,0,0,.2); color:#3A2A00;
+  padding:4px 9px; border-radius:999px; font-weight:900}
+#screen .actionbar::before{display:none}
+#screen .tk-start{min-height:62px; border-radius:19px; font-size:18px}
+
+/* ================================================================ the doors
+   A door is a drawer front, not a rule with a word on it. */
+#screen .drawers{border:2px solid var(--edge); border-bottom-width:4px; border-radius:20px;
+  background:linear-gradient(var(--card), var(--sunk));
+  box-shadow:inset 0 1px 0 var(--bevel), 0 8px 20px -14px #000}
+#screen .drawers .fold + .fold,#screen .drawers .fold.open + .fold,
+#screen .drawers .drow + .fold,#screen .drawers .fold + .drow{border-top:2px solid var(--deep)}
+#screen .drawers .fold .fh b,#screen .drawers .drow{font-size:15.5px; color:var(--ink)}
+#screen .drawers .fold .fh em{color:var(--ink3)}
+#screen .drawers .fold .fb{background:var(--sunk)}
+#screen .fold .fh,#screen .fold .fb{border-color:var(--edge)}
+
+/* the five, on Cards: tiles with a face, not bordered boxes */
+#screen .gm-g{border:2px solid var(--edge); border-bottom-width:4px; border-radius:15px;
+  background:linear-gradient(var(--card2), var(--card));
+  box-shadow:inset 0 1px 0 var(--bevel)}
+#screen .gm-g.on{border-color:#2F8A55;
+  background:linear-gradient(#2C6E4B,#1D4B33) !important}
+#screen .gm-g.on .gm-gs{color:#8FF0B4}
+#screen .gm-gt{font-size:13.5px}
+#screen .gm-gs{font-size:10.5px; font-weight:900}
+
+/* ================================================================ the deck
+   The nav is the cabinet's front panel: raised, with the live key lit. */
+#nav{background:linear-gradient(#222A5E, #151A3E);
+  border-top:3px solid var(--deep);
+  box-shadow:inset 0 2px 0 var(--bevel), 0 -10px 22px -16px #000}
+#nav button[aria-current="true"]{color:#FFD84D}
+#nav button[aria-current="true"]::before{background:rgba(255,200,40,.14) !important;
+  border-color:rgba(255,200,40,.45) !important}
+
+/* ============================================================== the runner
+   One step, one key. The overlay keeps the table under it so a run does not
+   feel like leaving the game. */
+#task{background:
+  radial-gradient(130% 70% at 50% -10%, rgba(104,124,255,.28), transparent 62%),
+  linear-gradient(var(--tableTop), var(--tableBot) 64%)}
+#task .tk-pips i{height:7px; border-radius:4px; background:var(--sunk);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.6)}
+#task .tk-pips i[data-s="did"]{background:linear-gradient(#8FF0B4,#46C97D);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+#task .tk-pips i[data-s="now"]{background:linear-gradient(#FFDE6A,#FFC61F);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 0 10px rgba(255,200,40,.7)}
+#task .tk-kk{font-size:11px; letter-spacing:.16em}
+#task .tk-body h2{text-shadow:0 3px 0 rgba(0,0,0,.4)}
+#task .tk-go{min-height:64px; border-radius:19px; font-size:18px;
+  border:2px solid color-mix(in srgb, var(--pil) 58%, #000) !important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.5),
+    0 6px 0 color-mix(in srgb, var(--pil) 34%, #000) !important;
+  position:relative; overflow:hidden}
+#task .tk-go::after{content:""; position:absolute; inset:2px 2px auto; height:42%;
+  border-radius:16px 16px 40% 40%;
+  background:linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,0))}
+#task .tk-go:active{transform:translateY(4px);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.5), 0 2px 0 color-mix(in srgb, var(--pil) 34%, #000) !important}
+#task .tk-skip{border:2px solid var(--edge); border-radius:16px; background:var(--sunk);
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.45)}
+
+/* ================================================================== Today
+   The scene stays what it is - it is already a place rather than a panel -
+   but its card and its stations get the same materials as everything else. */
+/* The scene is a window onto the day, so it is framed like one. It is NOT
+   capped: its contents are placed absolutely inside it, so a max-height
+   crops the sky off the top instead of shrinking it, and leaves the space
+   it gave up empty underneath. It fills, and the frame does the work. */
+#screen .sc{border-radius:20px; border:2px solid var(--edge);
+  box-shadow:inset 0 2px 0 rgba(120,140,255,.18), 0 12px 26px -16px #000}
+#screen .sc-p{box-shadow:0 3px 0 rgba(0,0,0,.5)}
+/* Today's card is scoped to the tab in board.css, so this has to be too or
+   it loses on specificity and the one panel on Today stays flat. */
+body[data-tab] #screen .b-pl{margin-top:12px; border-radius:20px;
+  border:2px solid var(--edge); border-bottom-width:4px;
+  padding:14px 16px 16px;
+  background:linear-gradient(var(--card2), var(--card));
+  box-shadow:inset 0 1px 0 var(--bevel), 0 10px 24px -16px #000}
+body[data-tab] #screen .b-pl b{color:var(--ink); font-size:26px;
+  text-shadow:0 2px 0 rgba(0,0,0,.4)}
+body[data-tab] #screen .tk-start{margin-top:12px}
+
+/* ------------------------------------------------------------- daylight
+   Pinned light in You: the same materials, warmed, so the light look is the
+   same game in a different room rather than a different app. */
+:root:not([data-night]) #screen .stage{
+  background:linear-gradient(#FFFFFF, #F4F1E6);
+  border-color:#DDD6C2;
+  box-shadow:inset 0 2px 0 #FFF, inset 0 -3px 0 #D8D0BA,
+    0 10px 22px -16px rgba(80,60,20,.5), 0 3px 0 #D8D0BA}
+:root:not([data-night]) #screen .gm-plate{background:linear-gradient(#FFD84D,#EEAF12)}
+:root:not([data-night]) #screen .stage-l{color:#3B3A36; text-shadow:none}
+:root:not([data-night]) #screen .stage .rig-c b,
+:root:not([data-night]) #screen .stage .pc b{color:#3B3A36; text-shadow:none}
+:root:not([data-night]) #screen .stage.gym .rg,
+:root:not([data-night]) #screen .stage.skin .rg{stroke:#E5E2D9}
+:root:not([data-night]) #screen .stage.gym .rig::before,
+:root:not([data-night]) #screen .stage.skin .rig::before,
+:root:not([data-night]) #screen .stage.food .plate::before{background:#FFFDF6;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.08)}
+
+/* ------------------------------------------------------- shorter phones
+   The plate and the panel give up padding before the object does. */
+@media (max-height:760px){
+  #screen .stage{padding:36px 13px 13px}
+  #screen .stage-l{font-size:14.5px}
+  #screen .gm-plate{top:-12px; padding:6px 16px 5px}
+  #screen .gm-plate b{font-size:15px}
+  #screen .gm-bar{margin-top:11px}
+  #screen .actionbar button{min-height:56px; font-size:17px}
+  #screen .rm{margin-bottom:9px; padding:9px 12px 10px}
+  #screen .stage.food .plate{width:clamp(130px, min(52vw, 19vh), 248px)}
+  #screen .stage.gym .rig{width:clamp(132px, min(54vw, 20vh), 240px)}
+  #screen .stage.skin .rig{width:clamp(130px, min(52vw, 20vh), 232px)}
+  #screen .stage.water .bt{width:clamp(104px, min(42vw, 17vh), 190px)}
+}
+@media (max-height:620px){
+  #screen .stage{padding:32px 11px 10px}
+  #screen .stage-l{font-size:13.5px}
+  #screen .gm-plate b{font-size:14px}
+  #screen .gm-plate span{font-size:8px}
+  #screen .gm-bar{gap:6px; margin-top:9px}
+  #screen .gm-w,#screen .gm-s,#screen .gm-n{padding:5px 10px 4px !important; font-size:12px}
+  #screen .actionbar button{min-height:52px; font-size:16px}
+  #screen .rm{margin-bottom:7px; padding:8px 11px 9px}
+  #screen .stage.food .plate{width:clamp(102px, min(44vw, 14vh), 248px)}
+  #screen .stage.gym .rig{width:clamp(104px, min(44vw, 15vh), 240px)}
+  #screen .stage.skin .rig{width:clamp(108px, min(46vw, 16vh), 232px)}
+  #screen .stage.water .bt{width:clamp(86px, min(36vw, 14vh), 190px)}
+}

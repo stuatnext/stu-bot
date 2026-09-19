@@ -131,7 +131,8 @@ function viewBasics(){
      stands at the height of the screen, it is the tap target, and everything
      that was in a drawer is drawn underneath it where he can see it. */
   var level = Math.min(1, gl / WATER_GLASSES), top = 172 - level * 140;
-  h += "<div class='stage water" + (gl >= WATER_GLASSES ? " full" : "") + "'>";
+  h += "<div class='stage water" + (gl >= WATER_GLASSES ? " full done" : "") + "'>";
+  h += gameTop("water", litres + "L of " + full + "L");
   h += "<button class='bt' data-water='" + Math.min(WATER_GLASSES, gl + 1) + "'"
     + " aria-label='Add a glass'" + (gl >= WATER_GLASSES ? " disabled" : "") + ">"
     + "<svg viewBox='0 0 100 200' aria-hidden='true'>"

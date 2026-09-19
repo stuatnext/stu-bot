@@ -42,7 +42,7 @@ function viewSkin(){
      The same ring the Gym uses, because it is the same shape of thing: a
      short fixed order you either start or do not. */
   h += "<div class='stage skin" + (done === n ? " done" : "") + "'>";
-  h += "<div class='stage-h'>" + esc(skinName()) + " routine</div>";
+  h += gameTop("skin", skinName() + " routine");
   /* With two steps a five-degree gap is a hairline and the ring reads as one
      unbroken track - a routine you have not started yet looks like a thing
      with no parts. The fewer the steps, the wider the gap between them. */

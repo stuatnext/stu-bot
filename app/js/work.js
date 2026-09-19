@@ -45,7 +45,8 @@ function viewWork(){
      date is the object: the number at the size of the thing it stands for,
      the day it lands on a torn calendar leaf beside it. It was a small panel
      next to a small panel. */
-  h += "<div class='stage work'>";
+  h += "<div class='stage work" + (gameClear("work", t) ? " done" : "") + "'>";
+  h += gameTop("work", doneN + " of " + WORKITEMS.length + " done");
   if (next){
     var n = daysTo(next[2]), nd = new Date(next[2] + "T00:00:00");
     h += "<div class='cd'>"

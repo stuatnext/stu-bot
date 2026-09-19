@@ -35,13 +35,18 @@
       HTML. The tabs' own buttons do the writing, as they always have.
    ======================================================================== */
 
-/* id, tab, name, what it asks, spares */
+/* id, tab, name, what it asks, spares, its colour.
+
+   The colour matters more than it looks like it should. Five games that are
+   all gold are five screens of the same screen; five games with their own
+   suit are five places. The plate, the button and the dial all take it, so
+   he knows which game he is in before he has read a word. */
 var GAMES = [
-  ["gym",   "gym",    "The Session",   "Move through the session",        3],
-  ["food",  "food",   "Three Plates",  "Log all three meals",             3],
-  ["water", "basics", "Eight Glasses", "Eight glasses before lights-out", 3],
-  ["skin",  "skin",   "The Routine",   "Every routine the day asks for",  3],
-  ["work",  "work",   "One Sitting",   "Move one thing off the list",     3]
+  ["gym",   "gym",    "The Session",   "Move through the session",        3, "#FFC61F"],
+  ["food",  "food",   "Three Plates",  "Log all three meals",             3, "#3FE0A0"],
+  ["water", "basics", "Eight Glasses", "Eight glasses before lights-out", 3, "#4FB8FF"],
+  ["skin",  "skin",   "The Routine",   "Every routine the day asks for",  3, "#FF8FB3"],
+  ["work",  "work",   "One Sitting",   "Move one thing off the list",     3, "#CE82FF"]
 ];
 /* All five in a day. The sweep is the thing to chase - the parts are small
    on purpose, the way a hand is worth more than its cards. */
@@ -53,6 +58,7 @@ function gameRow(id){
 }
 function gameName(id){ var r = gameRow(id); return r ? r[2] : ""; }
 function gamePrize(id){ var r = gameRow(id); return r ? r[4] : 0; }
+function gameHue(id){ var r = gameRow(id); return (r && r[5]) || "#FFC61F"; }
 
 /* ------------------------------------------------------------ the win
    One question per game, asked of the record. */
@@ -138,16 +144,30 @@ function gameBar(id, label, attr){
   var k = today(), won = gameClear(id, k), row = gameRow(id);
   if (!row) return "";
   var st = gameStreak(id), got = gamesClearedOn(k), swept = gameSwept(k);
+  /* Coins, with the thing they are made of drawn on them. A prize that is
+     typed rather than minted reads as a label, and a label is not a prize. */
   var h = "<div class='gm-bar" + (won ? " on" : "") + "'>";
-  h += "<span class='gm-w'>" + (won ? "Won · +" + row[4] + " spares"
-                                    : "+" + row[4] + " spares") + "</span>";
-  if (st) h += "<span class='gm-s'>" + num(st) + (st === 1 ? " day" : " days") + "</span>";
+  h += "<span class='gm-w'>" + svg(won ? "tick" : "spare", 14)
+    + (won ? "Won" : "+" + row[4]) + "</span>";
+  if (st) h += "<span class='gm-s'>" + svg("flame", 13) + num(st) + "</span>";
   h += "<span class='gm-n'>" + got + "/" + GAMES.length + " today</span>";
   h += "</div>";
   if (swept) h += "<div class='gm-sweep'>All five, in one day. +" + SWEEP + " spares.</div>";
   if (label && attr)
-    h += "<div class='actionbar'><button " + attr + ">" + esc(label) + "</button></div>";
+    h += "<div class='actionbar' style='--gm:" + row[5] + "'><button " + attr + ">"
+      + esc(label) + "</button></div>";
   return h;
+}
+
+/* --------------------------------------------------------- the title plate
+   The name of the game, stamped into the top edge of its panel. Until v65
+   each tab had a nine-point grey kicker floating over a void - which names
+   a subject, not a game. A game has a title. */
+function gameTop(id, sub){
+  var row = gameRow(id);
+  if (!row) return "";
+  return "<div class='gm-plate' style='--gm:" + row[5] + "'><b>" + esc(row[2]) + "</b>"
+    + (sub ? "<span>" + esc(sub) + "</span>" : "") + "</div>";
 }
 
 /* The one line under the object, before he has started: what this game is.
