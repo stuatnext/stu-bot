@@ -705,7 +705,8 @@ function briefFor(k){
     if (typeof gymWords === "function") gym = gymWords(k, key);
     if (!gym){
       var n = stageLifts(key).length;
-      gym = "Session " + key + ", " + n + (n === 1 ? " move" : " moves");
+      gym = (typeof sessionName === "function" ? sessionName(key) : "Session " + key)
+          + ", " + n + (n === 1 ? " move" : " moves");
     }
   }
   var card = null;

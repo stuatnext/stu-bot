@@ -17,38 +17,44 @@ function viewGym(){
   /* The tab opens on the answer to "what do I train today", in the hero's
      own voice: the session and how long it takes, or the honest word for a
      day the programme does not want a session on. */
+  /* The day has a NAME now, and the name is the first thing on the screen.
+     "Session A" told him nothing and made Tuesday indistinguishable from
+     Friday; "Leg Day" is a thing you can look forward to or dread, which is
+     the same thing as caring about it. */
   var kicker, big, unit, line, pct = null, cta = null;
+  var dayName2 = planName(p);
   if (p.mode === "rest"){
-    kicker = "Today \u00b7 rest";
+    kicker = "Rest \u00b7 " + esc(sessionName(p.key)) + " next";
     big = "Rest"; unit = "";
-    line = "Session " + (p.last || "A") + " was yesterday, and the day after is when it is built. "
-         + "A walk makes Trained.";
+    line = esc(sessionName(p.last || "A")) + " was yesterday, and the day after is when it "
+         + "is built. A walk makes Trained.";
     cta = trained ? null : { attr: "data-walk='1'", label: walked ? "Walked \u00b7 " + walked + " min" : "Walked \u2014 mark Trained" };
   } else if (p.mode === "walk"){
-    kicker = "This week \u00b7 lifting done";
+    kicker = "The week is in";
     big = p.week; unit = "/ 3 this week";
     pct = Math.min(100, Math.round(100 * p.week / 3));
-    line = "Legs, a push and a pull all covered since Monday. A walk makes Trained; "
-         + "a fourth session is allowed, not asked.";
-    cta = trained ? null : { attr: "data-walk='1'", label: walked ? "Walked \u00b7 " + walked + " min" : "Walked \u2014 mark Trained" };
+    line = "Push, pull and legs all covered since Monday. A walk makes Trained \u2014 "
+         + "or take Arms & Abs, which is allowed and never asked.";
+    cta = trained ? { attr: "data-startsession='D'", label: "Arms & Abs \u2014 the bonus" }
+                  : { attr: "data-walk='1'", label: walked ? "Walked \u00b7 " + walked + " min" : "Walked \u2014 mark Trained" };
   } else if (p.mode === "travel"){
-    kicker = "Travel session \u00b7 " + esc(sit.city);
+    kicker = esc(sessionWhat(travelTheme())) + " \u00b7 " + esc(sit.city);
     big = doneN; unit = "/ " + list.length;
     pct = Math.round(100 * doneN / Math.max(1, list.length));
     line = doneN === list.length ? "Every move logged. That is the session."
          : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
          : "~" + mins + " min \u00b7 a room and your own weight";
     cta = { attr: "data-startsession='T'",
-            label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the travel session" };
+            label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start " + dayName2 };
   } else {
-    kicker = "Session " + key + " \u00b7 " + esc(st[1]);
+    kicker = esc(sessionWhat(key));
     big = doneN; unit = "/ " + list.length;
     pct = Math.round(100 * doneN / Math.max(1, list.length));
     line = doneN === list.length ? "Every move logged. That is the session."
          : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
          : "~" + mins + " min \u00b7 " + trainWhen();
     cta = { attr: "data-startsession='" + key + "'",
-            label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start the session" };
+            label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start " + dayName2 };
   }
   /* Trained already marked and the session not started is a real state - a
      walk earns it, and so does a session logged on the floor without the
@@ -65,7 +71,9 @@ function viewGym(){
      numeral: one segment per move, filling as they land. It was a big number
      over a paragraph, which is a poster about training. */
   h += "<div class='stage gym" + (pct === 100 ? " done" : "") + "'>";
-  h += gameTop("gym", kicker);
+  /* the plate carries the DAY, not the tab: PUSH DAY, LEG DAY, REST DAY */
+  h += "<div class='gm-plate' style='--gm:" + gameHue("gym") + "'><b>"
+    + esc(dayName2) + "</b><span>" + kicker + "</span></div>";
   var segs = (p.mode === "rest") ? 0 : Math.max(1, list.length);
   if (segs){
     /* Three moves at five degrees apart is a hairline: the ring read as one
@@ -101,6 +109,25 @@ function viewGym(){
      ring, what the game asks, what it pays, the run behind it, and one
      button. The moves are inside the session, which is where he reads them
      anyway - on the floor, one at a time. */
+  /* --------------------------------------------------------- the week
+     Three named days, and which of them are in. This is what a split gives
+     you that a rotation of letters could not: a week with a shape, on the
+     screen, so Monday knows what Friday is for. The one he is standing on
+     is lit; the ones behind him are struck. */
+  var wkSplit = weekSplit(), live = p.mode === "travel" ? travelTheme() : p.key;
+  h += "<div class='wksp'>";
+  wkSplit.forEach(function(d){
+    var now = d.key === live && !d.done && lifting;
+    h += "<button class='wk-d" + (d.done ? " on" : "") + (now ? " now" : "")
+      + "' data-startsession='" + d.key + "'>"
+      + "<span class='wk-k'>" + esc(d.short) + "</span>"
+      + "<span class='wk-n'>" + (d.done ? (d.room ? "in a room" : "done")
+          : now ? "today" : "to come") + "</span>"
+      + "<i>" + (d.done ? svg("tick", 13) : now ? svg("run", 13) : "") + "</i>"
+      + "</button>";
+  });
+  h += "</div>";
+
   h += gameBar("gym", cta ? cta.label : "", cta ? cta.attr : "");
 
   /* The claim. Half a session logged and nothing marked is the one state
@@ -121,7 +148,7 @@ function viewGym(){
     var names = stageLifts(p.key).map(function(x){ return x[0].toLowerCase(); }).join(", ");
     moves = "<p class='fine' style='margin:2px 0 10px'>" + esc(names) + ".</p>"
       + "<div class='btns'><button class='btn quiet' data-startsession='" + p.key + "'>"
-      + "Lift anyway — Session " + p.key + "</button></div>";
+      + "Lift anyway — " + esc(sessionName(p.key)) + "</button></div>";
   } else {
     /* An index. Two columns of type: the number and the move. What it weighs
        sits at the end of the line only when there is a weight. Everything
@@ -187,7 +214,7 @@ function viewGym(){
   var prog = wh + gymProgressHTML(true);
   h += drawers([
     fold("themoves", lifting ? "The moves" : "When you do lift",
-      lifting ? "Session " + key + " · " + list.length : "Session " + p.key,
+      lifting ? sessionName(key) + " · " + list.length : sessionName(p.key),
       moves, false),
     due ? fold("tape", "Tape day", "Sunday",
       "<p class='fine' style='margin:2px 0 8px'>Navel, before you eat, same tape as last week.</p>"
@@ -240,12 +267,45 @@ function stageLifts(sKey){
   return s ? s[1].slice(0, stage()[2]) : [];
 }
 function sessionFor(key){
-  if (key === "T") return TRAVEL;
+  /* A hotel room is still a day of the split: the travel list is the one
+     that matches whatever pattern is next, so a week away walks Push, Pull,
+     Legs the way a week at home does. Derived from the record, so it needs
+     no state of its own. */
+  if (key === "T"){
+    var th = travelTheme();
+    return ["T", TRAVEL_BY[th] || TRAVEL_BY.A,
+      "Travel " + sessionName(th), sessionWhat(th), "ROOM"];
+  }
   return SESSIONS.filter(function(s){ return s[0] === key; })[0];
 }
-/* TRAVEL is deliberately not in SESSIONS: nextSessionKey looks the last letter
-   up in that array, so a fortnight of hotel rooms leaves A - B - C exactly
-   where he left it. */
+/* Which of the split a room session is standing in for. */
+function travelTheme(){ return nextSessionKey(); }
+
+/* ------------------------------------------------------------- the names
+   "A proper routine for each day. Like leg day, arms, abs." A day with a
+   name is a different thing from a letter: you can look forward to Leg Day.
+   These read the table rather than hardcoding, so adding a day is a data
+   change. */
+function sessionName(key){
+  var s = SESSIONS.filter(function(x){ return x[0] === key; })[0];
+  return s && s[2] ? s[2] : "Session " + key;
+}
+function sessionWhat(key){
+  var s = SESSIONS.filter(function(x){ return x[0] === key; })[0];
+  return s && s[3] ? s[3] : "";
+}
+function sessionShort(key){
+  if (key === "T") return "ROOM";
+  var s = SESSIONS.filter(function(x){ return x[0] === key; })[0];
+  return s && s[4] ? s[4] : key;
+}
+/* The day's name, whatever kind of day it is. */
+function planName(p){
+  if (p.mode === "rest")   return "Rest Day";
+  if (p.mode === "walk")   return "Week Is In";
+  if (p.mode === "travel") return sessionName(travelTheme());
+  return sessionName(p.key);
+}
 
 /* ==================================================================== the plan
    "When I go to the gym app, I want to know exactly what to train." Before
@@ -304,24 +364,26 @@ function trainWhen(){
 /* The one instruction, for the Today card, the pillar row and the brief. */
 function gymAsk(){
   var p = gymPlan(), n = stageLifts(p.key).length, mins = sessionMinutes(p.key);
-  var cta = { tab: "gym", label: p.mode === "travel" ? "Open the travel session" : "Open Session " + p.key };
+  var nm = planName(p);
+  var cta = { tab: "gym", label: "Open " + nm };
   if (p.mode === "done"){
     var got = stageLifts(p.key).filter(function(ex, i){ return loggedToday(pickFor(p.key, i)); }).length;
-    return { ask: "Session " + p.key + " is logged.", sub: got + " of " + n + " moves in. Mark Trained on the Gym tab.",
-             row: "Session " + p.key + " \u00b7 " + got + " of " + n + " logged", cta: cta };
+    return { ask: nm + " is logged.", sub: got + " of " + n + " moves in. Mark Trained on the Gym tab.",
+             row: nm + " \u00b7 " + got + " of " + n + " logged", cta: cta };
   }
   if (p.mode === "walk")
-    return { ask: "Three in. Walk today.", sub: "Legs, a push and a pull all covered since Monday.",
-             row: "Three sessions in this week \u2014 a walk is Trained" };
+    return { ask: "The week is in. Walk today.", sub: "Push, pull and legs all covered since Monday.",
+             row: "Push, pull and legs all in \u2014 a walk is Trained" };
   if (p.mode === "rest")
-    return { ask: "Rest day. Walk it.", sub: "Session " + p.last + " was yesterday. Session " + p.key + " tomorrow.",
+    return { ask: "Rest day. Walk it.", sub: sessionName(p.last || "A") + " was yesterday. " + sessionName(p.key) + " tomorrow.",
              row: "Rest day \u2014 a walk is Trained" };
   if (p.mode === "travel")
-    return { ask: "Travel session, " + mins + " min.", sub: p.sit.city + " \u00b7 the room is the gym. " + n + " moves, no kit.",
-             row: "Travel session \u00b7 " + n + " moves \u00b7 ~" + mins + " min", cta: cta };
-  return { ask: "Train. Session " + p.key + ", " + mins + " min.",
+    return { ask: nm + " in a room. " + mins + " min.",
+             sub: p.sit.city + " \u00b7 " + sessionWhat(travelTheme()) + ". " + n + " moves, no kit.",
+             row: nm + " \u00b7 a room \u00b7 " + n + " moves", cta: cta };
+  return { ask: nm + ". " + mins + " min.",
            sub: n + " moves \u00b7 " + trainWhen(),
-           row: "Session " + p.key + " \u00b7 " + n + " moves \u00b7 ~" + mins + " min", cta: cta };
+           row: nm + " \u00b7 " + n + " moves \u00b7 ~" + mins + " min", cta: cta };
 }
 /* The same plan in the brief's voice, for today or tomorrow. */
 function gymWords(k, key){
@@ -331,7 +393,7 @@ function gymWords(k, key){
     if (p.mode === "rest") return "Rest day \u2014 a walk is Trained";
     if (p.mode === "walk") return "Lifting done for the week \u2014 walk";
     if (p.mode === "travel") return "Travel session, " + n + " moves, ~" + sessionMinutes("T") + " min";
-    return "Session " + p.key + ", " + n + " moves, ~" + sessionMinutes(p.key) + " min";
+    return planName(p) + ", " + n + " moves, ~" + sessionMinutes(p.key) + " min";
   }
   if (liftsOn(t)) return "Rest day \u2014 a walk is Trained";
   if (sessionsThisWeek() >= 3 && typeof weekKey === "function" && weekKeyOf(k) === weekKey())
@@ -339,7 +401,8 @@ function gymWords(k, key){
   var sit = situation();
   var kk = (!sit.home && !gymHere()) ? "T" : (key || nextSessionKey());
   var nn = stageLifts(kk).length;
-  return (kk === "T" ? "Travel session, " : "Session " + kk + ", ") + nn + " moves, ~" + sessionMinutes(kk) + " min";
+  return (kk === "T" ? sessionName(travelTheme()) + " in a room, " : sessionName(kk) + ", ")
+    + nn + " moves, ~" + sessionMinutes(kk) + " min";
 }
 /* A walk is Trained and always has been; before v39 there was nowhere to say
    so, so a rest day looked like a day the app had nothing for. */
@@ -419,18 +482,54 @@ function tellBelly(){
   tell("Where the belly comes in",
     "<ol class='how'>" + BELLY.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>");
 }
-/* A to B to C and round again, from whatever was logged last. */
+/* Push to Pull to Legs and round again, from whatever was logged last.
+   Arms & Abs is the bonus day: it never advances the rotation, because
+   doing an extra arms session on a Friday should not mean Monday skips
+   legs. A hotel room DOES advance it - a room session is a day of the
+   split now, so a fortnight away comes home in the right place. */
 function nextSessionKey(){
-  var ks = liftDays();
+  var ks = liftDays(), tAfter = 0;
   for (var i = ks.length - 1; i >= 0; i--){
     /* a finisher-only or walk-only day is a visit, not a session: it must not
        advance the rotation */
     if (!Object.keys(S.lifts[ks[i]].ex || {}).length) continue;
     var s = S.lifts[ks[i]].s;
-    var at = SESSIONS.map(function(x){ return x[0]; }).indexOf(s);
-    if (at >= 0) return SESSIONS[(at + 1) % SESSIONS.length][0];
+    if (s === "D") continue;                  /* the bonus is outside the cycle */
+    var at = SPLIT.indexOf(s);
+    if (at >= 0) return SPLIT[(at + 1 + tAfter) % SPLIT.length];
+    if (s === "T") tAfter++;                  /* a room still used a slot */
   }
-  return "A";
+  return SPLIT[tAfter % SPLIT.length];
+}
+
+/* ------------------------------------------------------------- the week
+   Three named days, and which of them are in. This is the thing a split
+   gives you that a rotation of letters never could: a week you can see the
+   shape of. */
+function weekSplit(){
+  var done = {}, wk = (typeof weekKey === "function") ? weekKey() : null;
+  liftDays().forEach(function(k){
+    if (!Object.keys(S.lifts[k].ex || {}).length) return;
+    if (wk && typeof weekKeyOf === "function" && weekKeyOf(k) !== wk) return;
+    var s = S.lifts[k].s;
+    if (s === "T") s = "T";
+    done[s] = k;
+  });
+  /* a room session counts towards whichever day of the split it was: the
+     record stores T, so the days it covered are worked out by walking the
+     week forward from the first thing in it */
+  var out = SPLIT.map(function(key){
+    return { key: key, name: sessionName(key), short: sessionShort(key),
+             done: !!done[key] };
+  });
+  var rooms = Object.keys(S.lifts || {}).filter(function(k){
+    return (!wk || weekKeyOf(k) === wk) && S.lifts[k].s === "T"
+      && Object.keys(S.lifts[k].ex || {}).length;
+  }).length;
+  for (var i = 0; i < out.length && rooms > 0; i++){
+    if (!out[i].done){ out[i].done = true; out[i].room = true; rooms--; }
+  }
+  return out;
 }
 function todaySession(){
   var e = (S.lifts || {})[today()];
@@ -1090,7 +1189,7 @@ function paintSession(){
   var list = sessionList(), n = list.length;
   var h = "<div class='ss'>";
   h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
-    + "<span class='ssk'>" + (SESSION.key === "T" ? "Travel session" : "Session " + SESSION.key) + "</span>"
+    + "<span class='ssk'>" + esc(sessionFor(SESSION.key)[2] || sessionName(SESSION.key)) + "</span>"
     + "<span class='ssp'>" + (SESSION.warm ? Math.min(SESSION.i + 1, n) + " of " + n : "warm-up") + "</span></div>";
 
   if (!SESSION.warm){
@@ -1168,7 +1267,8 @@ function paintFinisher(el){
   var min = finMinutes(), on = lastFinOn() || "Bike";
   var h = "<div class='ss'>";
   h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
-    + "<span class='ssk'>Session " + SESSION.key + "</span><span class='ssp'>last thing</span></div>";
+    + "<span class='ssk'>" + esc(sessionFor(SESSION.key)[2] || sessionName(SESSION.key))
+    + "</span><span class='ssp'>last thing</span></div>";
   h += "<div class='sshero'><div class='ssk2'>Easy minutes</div><h2>Finisher</h2>"
     + "<p>" + min + " easy minutes on the bike, incline treadmill or rower. Talking pace \u2014 a "
     + "sentence, not a song. Phone out, podcast on. It never gets harder: the lifts get heavier, this "
@@ -1189,7 +1289,7 @@ function paintFinisher(el){
 function paintSummary(el){
   var list = sessionList(), h = "<div class='ss'>";
   h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
-    + "<span class='ssk'>" + (SESSION.key === "T" ? "Travel session" : "Session " + SESSION.key)
+    + "<span class='ssk'>" + esc(sessionFor(SESSION.key)[2] || sessionName(SESSION.key))
     + "</span><span class='ssp'>done</span></div>";
   h += "<div class='sshero'><div class='ssk2'>That is the session</div><h2>Turned up. Lifted. Logged.</h2></div>";
   h += "<div class='recs'>";

@@ -615,3 +615,40 @@ body[data-tab="cards"]  #nav{--navLit:#FFD84D}
   #screen .stage .rig svg .rg.on,#screen .stage .plate .fill,
   #task .tk-body,#task .tk-acts{animation:none}
 }
+
+/* ==================================================== the week's split
+   v67. Three named days across the top of the gym panel - Push, Pull,
+   Legs - with the one he is standing on lit and the ones behind him
+   struck. A rotation of letters could not show him this; a split can, and
+   a week you can see the shape of is a week you can finish. */
+#screen .wksp{display:flex; gap:7px; margin:14px 0 0}
+#screen .wk-d{flex:1 1 0; min-width:0; display:flex; flex-direction:column;
+  align-items:center; gap:2px; padding:8px 4px 7px; cursor:pointer; font:inherit;
+  border:2px solid var(--edge); border-bottom-width:4px; border-radius:14px;
+  background:linear-gradient(var(--card2), var(--sunk));
+  box-shadow:inset 0 1px 0 var(--bevel)}
+#screen .wk-d:active{transform:translateY(2px); box-shadow:none}
+#screen .wk-k{font-family:"Bricolage Grotesque","Nunito",sans-serif; font-size:14px;
+  font-weight:800; letter-spacing:.01em; color:var(--ink2)}
+#screen .wk-n{font-size:11.5px; font-weight:700; color:var(--ink3);
+  max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+#screen .wk-d i{display:flex; height:13px; color:var(--ink3)}
+#screen .wk-d.on{border-color:#2F8A55; background:linear-gradient(#2C6E4B,#1D4B33)}
+#screen .wk-d.on .wk-k{color:#FFFAF0}
+#screen .wk-d.on .wk-n{color:#8FF0B4}
+#screen .wk-d.on .wk-n{color:#FFFAF0}
+#screen .wk-d.on i{color:#8FF0B4}
+#screen .wk-d.now{border-color:color-mix(in srgb, #FFC61F 60%, #000);
+  background:linear-gradient(#5A4A16, #3A2E0C);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 0 0 2px rgba(255,198,31,.25)}
+#screen .wk-d.now .wk-k{color:#FFFAF0}
+#screen .wk-d.now .wk-n,#screen .wk-d.now i{color:#FFD84D}
+#screen .wk-d.now .wk-n{color:#FFFAF0}
+/* on a short screen the three days keep their names and lose their state
+   line - the tick already says which are in */
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .wksp{margin-top:10px; gap:6px}
+:is(:root[data-room="short"],:root[data-room="tight"]) #screen .wk-d{padding:7px 4px 6px}
+:root[data-room="tight"] #screen .wksp{margin-top:8px; gap:5px}
+:root[data-room="tight"] #screen .wk-d{padding:6px 3px 5px}
+:root[data-room="tight"] #screen .wk-n{display:none}
+:root[data-room="tight"] #screen .wk-k{font-size:13px}

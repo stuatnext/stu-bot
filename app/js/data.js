@@ -898,82 +898,179 @@ var RANKS = [
    compounds, ninety seconds on the rows and single-leg work, a minute on core.
    An alternative inherits its slot's rest - swapping a goblet squat for the
    leg press does not change what the set costs you. */
+/* [ key, moves, name, what it trains, the short word for a plate ]
+
+   v67: a named split, because he asked for one - "a proper routine for each
+   day. Like leg day, arms, abs, etc."
+
+   Before this it was three full-body sessions called A, B and C. That is
+   defensible programming for three days a week and it is a terrible thing to
+   open on a phone: "Session A" tells you nothing, gives you nothing to look
+   forward to, and makes Tuesday indistinguishable from Friday. A split has
+   names, and a name is the difference between a list and a day.
+
+   Push, Pull, Legs is the split that names itself and it fits three sessions
+   a week exactly - each pattern gets hit once, nothing is trained two days
+   running, and the week closes. Arms & Abs is the fourth: never asked for,
+   always there, for a week where he wants one more.
+
+   The keys are still A, B, C so that every session he has already logged
+   still finds its place in the rotation, and every exercise keeps its own
+   weight history, which is stored by the movement's name rather than by the
+   day it sits in. Moving the bench press from the old Session A to Push Day
+   does not lose a kilogram of it. */
 var SESSIONS = [
   ["A", [
-    ["Goblet squat",         3,  8, 10, "One dumbbell at the chest",
-      ["Leg press", "Hack squat", "Smith machine squat"], 120],
     ["Dumbbell bench press", 3,  8, 10, "The chest exercise",
       ["Chest press machine", "Smith bench press", "Incline chest press machine"], 120],
-    ["One-arm dumbbell row", 3, 10, 10, "Each side. Upper back, posture",
-      ["Chest-supported row machine", "Seated cable row", "T-bar row"], 90],
-    ["Romanian deadlift",    3, 10, 10, "Dumbbells, hinge at the hip",
-      ["Seated leg curl", "Lying leg curl", "Cable pull-through", "Back extension"], 120],
+    ["Dumbbell shoulder press", 3, 8, 10, "Shoulders. Width, which makes the waist read smaller",
+      ["Shoulder press machine", "Smith overhead press", "Landmine press"], 120],
+    ["Incline dumbbell press", 3, 10, 10, "Upper chest, the part that reads flat",
+      ["Incline chest press machine", "Smith incline press", "Low-to-high cable fly"], 90],
+    ["Cable triceps pushdown", 3, 12, 12, "Elbows pinned to your sides",
+      ["Overhead cable extension", "Dumbbell skull crusher", "Dip machine"], 60],
     ["Pallof press",         3, 12, 12, "Each side. Resist the twist",
       ["Torso rotation machine", "Cable half-kneeling chop", "Ab wheel"], 60],
     ["Farmer's carry",       3, 40, 40, "Metres. Heavy, do not lean",
       ["Trap bar carry", "Suitcase carry, one side", "Sled push"], 90]
-  ]],
+  ], "Push Day", "Chest, shoulders and triceps", "PUSH"],
   ["B", [
-    ["Dumbbell deadlift",    3,  6,  8, "Flat back, drive the floor away",
-      ["Trap bar deadlift", "Rack pull", "Back extension", "45-degree hyperextension"], 150],
     ["Lat pulldown",         3,  8, 10, "Width. Makes the waist look smaller",
       ["Assisted pull-up machine", "Neutral-grip pulldown", "Straight-arm pulldown"], 90],
-    ["Incline dumbbell press", 3, 10, 10, "Upper chest, the part that reads flat",
-      ["Incline chest press machine", "Smith incline press", "Low-to-high cable fly"], 120],
-    ["Reverse lunge",        3,  8,  8, "Each leg. Step back, not forward",
-      ["Single-leg press", "Step-up", "Smith split squat", "Walking lunge"], 90],
-    ["Side plank",           3, 30, 30, "Seconds each side",
-      ["Suitcase carry", "Pallof hold", "Cable side bend, light"], 60],
-    ["Dead bug",             3, 10, 10, "Each side. Lower back stays flat",
-      ["Bird dog", "Lying leg raise", "Dead bug with band"], 60]
-  ]],
-  ["C", [
-    ["Leg press",            3, 10, 10, "Or a squat if someone has shown you",
-      ["Hack squat", "Smith machine squat", "Goblet squat", "Belt squat"], 120],
+    ["One-arm dumbbell row", 3, 10, 10, "Each side. Upper back, posture",
+      ["Chest-supported row machine", "Seated cable row", "T-bar row"], 90],
     ["Seated cable row",     3, 10, 10, "Squeeze the shoulder blades",
       ["Chest-supported row machine", "T-bar row", "Wide-grip cable row"], 90],
-    ["Dumbbell shoulder press", 3, 8, 10, "Shoulders. Width again",
-      ["Shoulder press machine", "Smith overhead press", "Landmine press"], 120],
+    ["Dumbbell curl",        3, 10, 12, "No swinging. The elbow does the work",
+      ["Cable curl", "Hammer curl", "Preacher curl machine"], 60],
+    ["Face pull",            3, 15, 15, "The posture fix. Pull to the forehead",
+      ["Reverse pec deck", "Rear delt fly", "Band pull-apart"], 60],
+    ["Dead bug",             3, 10, 10, "Each side. Lower back stays flat",
+      ["Bird dog", "Lying leg raise", "Dead bug with band"], 60]
+  ], "Pull Day", "Back, rear delts and biceps", "PULL"],
+  ["C", [
+    ["Goblet squat",         3,  8, 10, "One dumbbell at the chest",
+      ["Leg press", "Hack squat", "Smith machine squat"], 120],
+    ["Romanian deadlift",    3, 10, 10, "Dumbbells, hinge at the hip",
+      ["Seated leg curl", "Lying leg curl", "Cable pull-through", "Back extension"], 120],
+    ["Leg press",            3, 10, 12, "Or a squat if someone has shown you",
+      ["Hack squat", "Smith machine squat", "Belt squat"], 120],
     ["Hip thrust",           3, 12, 12, "Glutes. The other half of the posture fix",
       ["Glute drive machine", "Smith hip thrust", "Cable kickback", "Back extension"], 90],
-    ["Cable woodchop",       3, 12, 12, "Each side. Controlled, do not swing",
-      ["Torso rotation machine", "Pallof press", "Landmine rotation"], 60],
+    ["Reverse lunge",        3,  8,  8, "Each leg. Step back, not forward",
+      ["Single-leg press", "Step-up", "Smith split squat", "Walking lunge"], 90],
     ["Hanging knee raise",   3, 10, 10, "Or lying leg raises",
       ["Captain's chair knee raise", "Lying leg raise", "Bird dog"], 60]
-  ]]
+  ], "Leg Day", "Quads, hamstrings and glutes", "LEGS"],
+  /* The fourth. It sits in SESSIONS so the rotation knows its name, but
+     gymPlan never proposes it in the normal three - it is offered only once
+     the week's lifting is already done. Allowed, never asked. */
+  ["D", [
+    ["Dumbbell curl",        3, 10, 12, "No swinging. The elbow does the work",
+      ["Cable curl", "Hammer curl", "Preacher curl machine"], 60],
+    ["Cable triceps pushdown", 3, 12, 12, "Elbows pinned to your sides",
+      ["Overhead cable extension", "Dumbbell skull crusher", "Dip machine"], 60],
+    ["Hanging knee raise",   3, 10, 12, "Or lying leg raises",
+      ["Captain's chair knee raise", "Lying leg raise", "Ab wheel"], 60],
+    ["Cable woodchop",       3, 12, 12, "Each side. Controlled, do not swing",
+      ["Torso rotation machine", "Pallof press", "Landmine rotation"], 60],
+    ["Side plank",           3, 30, 30, "Seconds each side",
+      ["Suitcase carry", "Pallof hold", "Cable side bend, light"], 60],
+    ["Farmer's carry",       3, 40, 40, "Metres. Heavy, do not lean",
+      ["Trap bar carry", "Suitcase carry, one side", "Sled push"], 90]
+  ], "Arms & Abs", "The extra one, when the week is already in", "ARMS"]
 ];
+/* The three the week asks for. D is the bonus and is not one of them. */
+var SPLIT = ["A", "B", "C"];
 
 /* [ what to order, grams of protein, where it fits ] */
 /* ------------------------------------------------------- the travel session
    docs/train.html has promised this since the beginning: twenty minutes, a
    hotel room, no equipment, "so the run does not break, and so you come home
-   having not lost the thread". Session T is that list, in the app.
+   having not lost the thread".
 
-   It sits OUTSIDE the SESSIONS array on purpose: nextSessionKey() rotates
-   A - B - C by looking the last letter up in SESSIONS, so a fortnight of hotel
-   rooms must not scramble the programme. Side plank and Dead bug keep the
-   same names as Session B, so their history is one history. */
-var TRAVEL = ["T", [
-  ["Push-up",                    4,  8, 15, "Stop two short of failure",
-    ["Incline push-up, hands on the desk", "Dumbbell bench press"], 75],
-  ["Split squat",                3, 12, 12, "Each leg. Back knee towards the floor",
-    ["Reverse lunge", "Step-up", "Goblet squat"], 75],
-  ["Single-leg Romanian deadlift", 3, 10, 10, "Each side. Bodyweight is enough",
-    ["Romanian deadlift", "Glute bridge"], 75],
-  ["Backpack row",               3, 12, 12, "A loaded bag, or the edge of a table",
-    ["Table-edge row", "One-arm dumbbell row"], 75],
-  ["Side plank",                 3, 40, 40, "Seconds each side",
-    ["Suitcase carry", "Pallof hold"], 60],
-  ["Dead bug",                   3, 12, 12, "Each side. Lower back stays flat",
-    ["Bird dog", "Lying leg raise"], 60]
-]];
+   v67: it follows the split. There used to be ONE travel session - a
+   full-body list he got in every hotel room, whatever day of the week it
+   was - so a fortnight away meant a fortnight of the same six movements and
+   a rotation that had not moved an inch. Now a room on push day is a push
+   session, and a hotel week walks through Push, Pull and Legs exactly as a
+   week at home would.
+
+   Movements keep the names their gym counterparts use wherever the pattern
+   is the same, so the history is one history. */
+var TRAVEL_BY = {
+  A: [
+    ["Push-up",                  4,  8, 15, "Stop two short of failure",
+      ["Incline push-up, hands on the desk", "Dumbbell bench press"], 75],
+    ["Pike push-up",             3,  6, 12, "Hips high. This is the shoulder one",
+      ["Wall handstand hold", "Dumbbell shoulder press"], 75],
+    ["Chair dip",                3,  8, 15, "Edge of the desk, elbows back not out",
+      ["Bench dip", "Cable triceps pushdown"], 60],
+    ["Decline push-up, feet on the bed", 3, 6, 12, "Upper chest, harder angle",
+      ["Push-up", "Incline dumbbell press"], 75],
+    ["Pallof hold",              3, 30, 30, "Seconds each side. A towel on a door handle",
+      ["Pallof press", "Side plank"], 60],
+    ["Plank shoulder tap",       3, 16, 16, "Taps. Hips do not rock",
+      ["Plank", "Dead bug"], 60]
+  ],
+  B: [
+    ["Backpack row",             4, 12, 12, "A loaded bag, or the edge of a table",
+      ["Table-edge row", "One-arm dumbbell row"], 75],
+    ["Table-edge row",           3,  8, 12, "Under a solid table, chest to the edge",
+      ["Backpack row", "Lat pulldown"], 75],
+    ["Towel curl",               3, 12, 15, "Pull against your own other arm",
+      ["Backpack curl", "Dumbbell curl"], 60],
+    ["Superman",                 3, 12, 12, "Lift the chest, not the chin",
+      ["Back extension", "Face pull"], 60],
+    ["Reverse snow angel",       3, 12, 12, "Face down. The posture one",
+      ["Face pull", "Band pull-apart"], 60],
+    ["Dead bug",                 3, 12, 12, "Each side. Lower back stays flat",
+      ["Bird dog", "Lying leg raise"], 60]
+  ],
+  C: [
+    ["Split squat",              3, 12, 12, "Each leg. Back knee towards the floor",
+      ["Reverse lunge", "Step-up", "Goblet squat"], 75],
+    ["Single-leg Romanian deadlift", 3, 10, 10, "Each side. Bodyweight is enough",
+      ["Romanian deadlift", "Glute bridge"], 75],
+    ["Wall sit",                 3, 45, 45, "Seconds. Thighs parallel, back flat",
+      ["Bodyweight squat", "Leg press"], 75],
+    ["Glute bridge",             3, 15, 15, "Squeeze at the top, two seconds",
+      ["Hip thrust", "Single-leg glute bridge"], 60],
+    ["Calf raise",               3, 20, 20, "On a step if there is one",
+      ["Single-leg calf raise"], 45],
+    ["Lying leg raise",          3, 12, 12, "Lower back pressed to the floor",
+      ["Hanging knee raise", "Dead bug"], 60]
+  ],
+  D: [
+    ["Towel curl",               3, 12, 15, "Pull against your own other arm",
+      ["Backpack curl", "Dumbbell curl"], 60],
+    ["Chair dip",                3,  8, 15, "Edge of the desk, elbows back not out",
+      ["Bench dip", "Cable triceps pushdown"], 60],
+    ["Lying leg raise",          3, 12, 12, "Lower back pressed to the floor",
+      ["Hanging knee raise", "Dead bug"], 60],
+    ["Plank shoulder tap",       3, 16, 16, "Taps. Hips do not rock",
+      ["Plank", "Dead bug"], 60],
+    ["Side plank",               3, 40, 40, "Seconds each side",
+      ["Suitcase carry", "Pallof hold"], 60],
+    ["Dead bug",                 3, 12, 12, "Each side. Lower back stays flat",
+      ["Bird dog", "Lying leg raise"], 60]
+  ]
+};
+
 /* Movements with no weight to pick. The dial says "body" rather than a
    number, and the progression is reps, not kilos. */
 var BODYWEIGHT = {
   "Push-up": 1, "Incline push-up, hands on the desk": 1, "Split squat": 1,
   "Single-leg Romanian deadlift": 1, "Glute bridge": 1, "Table-edge row": 1,
   "Backpack row": 1, "Side plank": 1, "Dead bug": 1, "Bird dog": 1,
-  "Lying leg raise": 1, "Bodyweight squat": 1, "Plank": 1
+  "Lying leg raise": 1, "Bodyweight squat": 1, "Plank": 1,
+  /* the room sessions the split added */
+  "Pike push-up": 1, "Wall handstand hold": 1, "Chair dip": 1, "Bench dip": 1,
+  "Decline push-up, feet on the bed": 1, "Pallof hold": 1,
+  "Plank shoulder tap": 1, "Towel curl": 1, "Backpack curl": 1,
+  "Superman": 1, "Back extension": 1, "Reverse snow angel": 1,
+  "Band pull-apart": 1, "Wall sit": 1, "Single-leg glute bridge": 1,
+  "Calf raise": 1, "Single-leg calf raise": 1, "Step-up": 1, "Ab wheel": 1
 };
 
 var ORDERS = [
