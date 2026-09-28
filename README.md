@@ -86,6 +86,44 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v73: a machine you have never touched
+
+> *"There's lots of other weight machines but I just feel way too unconfident to touch them"*,
+> sent from the gym floor, on the leg press.
+
+What makes a machine frightening isn't the weight. It's not knowing how it works in front of
+people who seem to. The app made that worse: *How to do it* on a machine showed the **dumbbell
+move's** instructions, because 37 alternatives had none of their own. So a nervous person sitting
+at a chest press read how to lie on a bench.
+
+- **Every alternative has its own instructions** (`HOW_MORE` in `data.js`). A machine's first line
+  is always how to set it up, because that's the part nobody shows you.
+- **First time? Set it up.** If you've never logged a set on a machine, the session button reads
+  *First time? Set it up* instead of *How to do it*. The sheet it opens has three parts:
+  - the three things every machine has: a seat, a pin and a picture
+  - this machine's own set-up
+  - "one set at a light plate is the whole job", and what to say to the staff
+- **The first set on a new machine gets said out loud**: a gold "First time on the seated leg
+  curl. That is 2 machines." It appears once per machine and is derived from the record.
+- **The words sheet has a new section**, *A machine you have never touched*. It ends with the
+  machines you've used so far and the rule: one new one a visit, never more.
+- **A swapped move now says what it stands in for.** The orange line reads "Instead of the
+  Romanian deadlift" instead of the slot's own "Dumbbells, hinge at the hip" over a seated leg
+  curl. Proper names keep their capitals in sentences (Smith, Romanian, Pallof, T-bar).
+
+Verified with a Playwright walk at 390x844 (17 checks):
+- It starts from his morning: the leg press logged, the count reading one machine.
+- The Romanian deadlift keeps *How to do it*.
+- The seated leg curl says *First time? Set it up* on one line, with "Instead of the Romanian
+  deadlift" above.
+- The sheet has the title, the three things, its own set-up and the count.
+- The first set gives exactly one gold cheer ("2 machines"), then *How to do it* returns and
+  shows the machine's own instructions.
+- The words sheet has the section and the count.
+- No tap target is under 44pt.
+
+The v68 to v72 walks, the v70 tick checks and 2,160 renders pass.
+
 #### v72: everything is taken
 
 > *"Every bench is taken. Every weight machine is also taken. Got nervous so just grabbed the
