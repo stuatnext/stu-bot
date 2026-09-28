@@ -641,3 +641,43 @@ button.rec{font:inherit; width:100%; text-align:left; color:inherit; cursor:poin
 button.rec:active{transform:scale(.985)}
 .rec.skip{border-style:dashed}
 .rec.skip .rt{color:var(--ink3)}
+
+/* ==================================================================== v69
+   The nerves. Plan B sits on the move itself, before it is needed: the
+   machine is taken, and the answer is already on the screen. */
+.sshero .ssplanb{display:flex; align-items:center; gap:10px; width:100%; margin-top:10px;
+  min-height:44px; padding:9px 12px; border-radius:14px; cursor:pointer; text-align:left;
+  font:inherit; font-size:13.5px; line-height:1.35; color:#fff;
+  background:rgba(255,255,255,.06); border:1.5px dashed rgba(255,255,255,.32)}
+.sshero .ssplanb span{flex:1; min-width:0}
+.sshero .ssplanb b{color:#FFD35C; font-weight:800}
+.sshero .ssplanb i{flex:none; font-style:normal; font-weight:800; font-size:12.5px;
+  padding:6px 10px; border-radius:10px; background:rgba(255,255,255,.16)}
+.sshero .ssplanb:active{transform:scale(.99)}
+
+/* How busy was it: three taps, and after a handful the app knows his gym. */
+.busyq{display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin:12px 0 4px}
+.busyq span{flex:1 1 100%; font-size:13px; color:var(--ink2); font-weight:700}
+.busyq .bq{flex:1; min-height:44px; border-radius:14px; font:inherit; font-weight:800; font-size:13.5px;
+  cursor:pointer; background:var(--card); color:var(--ink2); border:1.5px solid var(--edge); border-bottom-width:3px}
+.busyq .bq.on{background:var(--blueSoft); color:var(--ink); border-color:var(--navOn)}
+
+/* The sheet: the words for the moments, in the order they happen. */
+#modal .nv-h{margin:14px 0 6px; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink3)}
+#modal .nv{list-style:none; margin:0; padding:0; display:grid; gap:8px}
+#modal .nv li{padding:10px 12px; border-radius:12px; background:var(--sunk)}
+#modal .nv li b{display:block; font-size:15px; color:var(--ink)}
+#modal .nv li span{display:block; margin-top:3px; font-size:13.5px; line-height:1.4; color:var(--ink2)}
+#modal .nvr, #modal .nvbag{margin:4px 0 0 18px; padding:0}
+#modal .nvr li, #modal .nvbag li{margin:6px 0; font-size:14px; line-height:1.45}
+/* The way out, in the small print's own line: a 44-point target that does
+   not make the line any taller, so the start button stays on the screen. */
+.stage .fine .lowlink{display:inline-block; padding:13px 6px; margin:-13px -6px; cursor:pointer;
+  font:inherit; font-weight:800; color:inherit; background:none; border:0;
+  text-decoration:underline; text-decoration-thickness:1.5px; text-underline-offset:3px}
+/* A sentence in capitals is hard to read, and hardest when he is anxious:
+   the option's label keeps the look, the explanation under it does not. */
+#modal .opts button span{text-transform:none; letter-spacing:0}
+/* On the floor, the quiet row is the one a nervous thumb reaches for:
+   "Skip this one" and "What to say" get the full 44 points. */
+.ss .btns.tight button.btn{min-height:44px}

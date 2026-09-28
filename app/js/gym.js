@@ -52,7 +52,7 @@ function viewGym(){
     pct = Math.round(100 * doneN / Math.max(1, list.length));
     line = doneN === list.length ? "Every move logged. That is the session."
          : doneN ? "moves logged \u2014 " + (list.length - doneN) + " to go"
-         : "~" + mins + " min \u00b7 " + trainWhen();
+         : "~" + mins + " min \u00b7 " + gymWhen();
     cta = { attr: "data-startsession='" + key + "'",
             label: resume ? "Resume today\u2019s session" : doneN ? "Continue the session" : "Start " + dayName2 };
   }
@@ -95,9 +95,20 @@ function viewGym(){
     h += "<div class='rig rest'><div class='rig-c'><b>" + big + "</b></div></div>";
   }
   h += "<div class='stage-l'>" + esc(line) + "</div>";
-  h += "<div class='fine'>" + (doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged"
-        : "Turning up is the thing being trained.")
-        + (waistFoot() ? "  \u00b7  " + waistFoot() : "") + "</div>";
+  /* On a day with a session still to do, the small print is the way out
+     that keeps the day: a nervous thumb that sees only "Start Push Day"
+     closes the app. It takes the fine line's place rather than adding a
+     row, because on his phone there is no room under the button. */
+  var qh = busyHint();
+  if (lifting && !day(t).p.train && !doneN){
+    h += "<div class='fine'>" + (qh ? esc(qh.charAt(0).toUpperCase() + qh.slice(1)) + "  \u00b7  " : "")
+      + "<button class='lowlink' data-lowday='1'>Not up to it today?</button></div>";
+  } else {
+    h += "<div class='fine'>" + (doneS ? num(doneS) + (doneS === 1 ? " session" : " sessions") + " logged"
+          : "Turning up is the thing being trained. One move counts.")
+          + (qh ? "  \u00b7  " + qh : "")
+          + (waistFoot() ? "  \u00b7  " + waistFoot() : "") + "</div>";
+  }
   h += "</div>";
   /* The one action sits under the object, the way it does on every other
      tab. At the foot of the page it was a sticky bar floating over the move
@@ -212,6 +223,7 @@ function viewGym(){
     + "<div class='btns'><button class='btn' data-waist='1'>Measure</button></div></div>";
 
   var prog = wh + gymProgressHTML(true);
+  var cueTxt = cueSay();
   h += drawers([
     fold("themoves", lifting ? "The moves" : "When you do lift",
       lifting ? sessionName(key) + " · " + list.length : sessionName(p.key),
@@ -220,6 +232,10 @@ function viewGym(){
       "<p class='fine' style='margin:2px 0 8px'>Navel, before you eat, same tape as last week.</p>"
       + wh, true) : "",
     due ? "" : fold("progress", "How it is going", waistMeta(ws, tr), prog, false),
+    "<button class='drow' data-nerves='1'>Nervous about the gym?<i>" + svg("arrow", 16) + "</i></button>",
+    "<button class='drow' data-cue='1'>" + (cueTxt
+        ? "You go " + esc(cueTxt.charAt(0).toLowerCase() + cueTxt.slice(1))
+        : "Pick your moment to go") + "<i>" + svg("arrow", 16) + "</i></button>",
     sit.home ? "" : "<button class='drow' data-near='gym'>Find a gym in " + esc(sit.city)
       + "<i>" + svg("arrow", 16) + "</i></button>",
     (!sit.home && p.mode === "travel")
@@ -273,13 +289,17 @@ function sessionFor(key){
      no state of its own. */
   if (key === "T"){
     var th = travelTheme();
+    var home = typeof situation === "function" && situation().home;
     return ["T", TRAVEL_BY[th] || TRAVEL_BY.A,
-      "Travel " + sessionName(th), sessionWhat(th), "ROOM"];
+      home ? sessionName(th) + " at home" : "Travel " + sessionName(th), sessionWhat(th), "ROOM"];
   }
   return SESSIONS.filter(function(s){ return s[0] === key; })[0];
 }
-/* Which of the split a room session is standing in for. */
-function travelTheme(){ return nextSessionKey(); }
+/* Which of the split a room session is standing in for. Worked out from
+   the days BEFORE today: the room session's own first set is a session in
+   the record, and counting it moved the theme on mid-workout - log one
+   push-up and the list became tomorrow's. */
+function travelTheme(){ return nextSessionKey(today()); }
 
 /* ------------------------------------------------------------- the names
    "A proper routine for each day. Like leg day, arms, abs." A day with a
@@ -353,6 +373,13 @@ function gymPlan(){
   if (!sit.home && !gymHere()) return { mode: "travel", key: "T", sit: sit };
   return { mode: "session", key: nextSessionKey(), sit: sit };
 }
+/* His moment, if he has named one, in front of the shift's. */
+function gymWhen(){
+  var c = cueSay();
+  if (!c) return trainWhen();
+  var sh = shape(), lc = c.charAt(0).toLowerCase() + c.slice(1);
+  return (!sh.noShift && sh.now < sh.start) ? lc + ", before Malta at " + sh.startT : lc;
+}
 /* When today's training fits, in his own shift's words. */
 function trainWhen(){
   var sh = shape();
@@ -381,8 +408,9 @@ function gymAsk(){
     return { ask: nm + " in a room. " + mins + " min.",
              sub: p.sit.city + " \u00b7 " + sessionWhat(travelTheme()) + ". " + n + " moves, no kit.",
              row: nm + " \u00b7 a room \u00b7 " + n + " moves", cta: cta };
+  var c0 = cueSay();
   return { ask: nm + ". " + mins + " min.",
-           sub: n + " moves \u00b7 " + trainWhen(),
+           sub: c0 ? c0 + " \u00b7 " + n + " moves" : n + " moves \u00b7 " + trainWhen(),
            row: nm + " \u00b7 " + n + " moves \u00b7 ~" + mins + " min", cta: cta };
 }
 /* The same plan in the brief's voice, for today or tomorrow. */
@@ -487,9 +515,10 @@ function tellBelly(){
    doing an extra arms session on a Friday should not mean Monday skips
    legs. A hotel room DOES advance it - a room session is a day of the
    split now, so a fortnight away comes home in the right place. */
-function nextSessionKey(){
+function nextSessionKey(before){
   var ks = liftDays(), tAfter = 0;
   for (var i = ks.length - 1; i >= 0; i--){
+    if (before && ks[i] >= before) continue;  /* what was next before that day */
     /* a finisher-only or walk-only day is a visit, not a session: it must not
        advance the rotation */
     if (!Object.keys(S.lifts[ks[i]].ex || {}).length) continue;
@@ -1152,14 +1181,16 @@ function askHow(sKey, idx){
    S.sess so a reload lands him back where he was. */
 var SESSION = null;
 
-function startSession(key){
+function startSession(key, short){
   var t = today();
   if (S.sess && S.sess.day === t && S.sess.key === key){
     SESSION = S.sess;
+    if (short) SESSION.short = short;
   } else {
     SESSION = S.sess = { day: t, key: key, i: 0, set: 0, warm: 0, started: Date.now(), extra: {} };
-    save();
+    if (short) SESSION.short = short;
   }
+  save();
   var el = document.getElementById("session");
   el.className = "on";
   document.body.style.overflow = "hidden";
@@ -1181,11 +1212,142 @@ function closeSession(){
   restPaint();
   render({ keepScroll: true });
 }
-function sessionList(){ return stageLifts(SESSION.key); }
+function sessionList(){
+  var l = stageLifts(SESSION.key);
+  return SESSION.short ? l.slice(0, SESSION.short) : l;
+}
 function sessionSetsFor(name, ex){
   var extra = (SESSION.extra || {})[name] || 0;
   return stage()[3] + extra;
 }
+/* ================================================================ the nerves
+   "Someone that gets nervous and socially awkward at the gym." The moment a
+   nervous person walks out is small and specific: the machine is taken and
+   everyone can see you standing there not knowing what to do. So every move
+   carries its plan B on the screen before it is needed, and the words for
+   the awkward moments are one tap from anywhere in the session. */
+function planB(sKey, i){
+  var ex = sessionFor(sKey)[1][i];
+  if (!ex) return null;
+  var cur = pickFor(sKey, i);
+  var alts = swapNames(ex).filter(function(n){ return n !== cur; });
+  return alts[0] || null;
+}
+function planBHTML(sKey, i){
+  var alt = planB(sKey, i);
+  if (!alt) return "";
+  return "<button class='ssplanb' data-splanb='" + i + "'><span><b>Taken?</b> "
+    + esc(alt) + " does the same job.</span><i>Switch</i></button>";
+}
+function tellNerves(){
+  var h = "<p class='fine' style='margin:0 0 10px'>The hard part is not the lifting. It is an unfamiliar "
+    + "room, rules nobody tells you, and feeling watched. So here are the words, and the rules.</p>";
+  NERVES.forEach(function(sec){
+    h += "<h4 class='nv-h'>" + esc(sec[0]) + "</h4><ul class='nv'>";
+    sec[1].forEach(function(r){
+      h += "<li><b>" + esc(r[0]) + "</b><span>" + esc(r[1]) + "</span></li>";
+    });
+    h += "</ul>";
+  });
+  h += "<h4 class='nv-h'>The rules nobody writes down</h4><ol class='nvr'>"
+    + GYM_RULES.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>";
+  h += "<h4 class='nv-h'>In the bag, the night before</h4><ul class='nvbag'>"
+    + GYM_BAG.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>";
+  h += "<p class='fine' style='margin:12px 0 0'>And the ten-minute rule: if you get there and want to "
+    + "leave, do ten minutes and go. It still counts.</p>";
+  tell("The gym, without the nerves", h);
+}
+
+/* The short version: the first two moves, which are always the big ones.
+   On a day the whole session feels like too much, two moves done is a day,
+   and it counts exactly as the full thing does. */
+var SHORT_MOVES = 2;
+function shortMinutes(key){
+  var list = stageLifts(key).slice(0, SHORT_MOVES), sets = stage()[3], m = 4;
+  list.forEach(function(ex){ m += sets * 0.75 + (sets - 1) * restOf(ex) / 60; });
+  return Math.max(8, Math.round(m / 2) * 2);
+}
+/* "Not up to the gym today?" Three ways to still have the day, and none of
+   them is a lesser version of turning up - they ARE turning up. */
+function askLowDay(){
+  var p = gymPlan(), key = p.key === "T" ? "T" : p.key;
+  var nm = key === "T" ? sessionName(travelTheme()) : sessionName(key);
+  ask({
+    title: "Not up to the gym today?",
+    say: "That happens, and it is not the end of anything. Any of these is the day &mdash; "
+       + "turning up is the thing being trained.",
+    options: [
+      { id: "short", label: "The short version",
+        note: "The first two moves of " + nm + ", about " + shortMinutes(key) + " minutes, then go." },
+      { id: "home", label: "Do it at home",
+        note: nm + " with your own weight, wherever you are. Nobody watching." },
+      { id: "walk", label: "A walk instead", note: "Twenty minutes counts." }
+    ],
+    cancel: "I\u2019ll go after all"
+  }).then(function(v){
+    if (!v || v === "__no") return;
+    if (v === "short"){ sfx("tap"); startSession(key, SHORT_MOVES); return; }
+    if (v === "home"){ sfx("tap"); startSession("T"); return; }
+    if (v === "walk"){ askWalk(); return; }
+  });
+}
+
+/* ------------------------------------------------------------ the moment
+   "After my first coffee, I go." Deciding the moment in advance is the
+   best-studied trick there is for actually going, because when the moment
+   comes there is nothing left to decide. Stored in his words; said back to
+   him in the app's. */
+function cueSay(){
+  var c = String(S.cue || "").trim();
+  if (!c) return "";
+  return c.replace(/\bmy\b/gi, "your").replace(/\bI\b/g, "you").replace(/\bI'm\b/g, "you're");
+}
+function askCue(){
+  ask({
+    title: "When do you go?",
+    say: "Pick the moment, not the mood. When it comes, the decision is already made &mdash; "
+       + "naming it in advance is the best-studied trick there is for actually going.",
+    field: { label: "Or in your own words", value: S.cue && CUES.indexOf(S.cue) < 0 ? S.cue : "",
+             placeholder: "After I drop the kids off" },
+    options: CUES.map(function(c){ return { id: c, label: c, pri: S.cue === c }; })
+      .concat(S.cue ? [{ id: "__clear", label: "No set moment", note: "take the cue away" }] : []),
+    confirm: "Use my words", cancel: "Close"
+  }).then(function(v){
+    if (v === null || v === "__no") return;
+    if (v === "__clear"){ S.cue = ""; save(); sfx("untick"); render({ keepScroll: true }); return; }
+    var c = String(v).trim().slice(0, 60);
+    if (!c) return;
+    S.cue = c.charAt(0).toUpperCase() + c.slice(1);
+    save(); sfx("done"); buzz(10);
+    toast(cueSay() + ". That is when you go.");
+    render({ keepScroll: true });
+  });
+}
+
+/* ---------------------------------------------------------- the quiet hours
+   One tap after a session - quiet, fine, packed - and after a handful of
+   visits the app can tell him when HIS gym is empty. No borrowed statistics
+   about gyms in general: his visits, his hours, derived from the record. */
+function busyHint(){
+  var rows = Object.keys(S.busy || {}).map(function(k){ return S.busy[k]; })
+    .filter(function(r){ return r && r.h != null && r.b != null; });
+  if (rows.length < 4) return "";
+  var bands = {};
+  rows.forEach(function(r){
+    var b = Math.floor(r.h / 2) * 2;
+    bands[b] = bands[b] || { n: 0, sum: 0 };
+    bands[b].n++; bands[b].sum += r.b;
+  });
+  var best = null, all = rows.reduce(function(a, r){ return a + r.b; }, 0) / rows.length;
+  Object.keys(bands).forEach(function(b){
+    var x = bands[b];
+    if (x.n < 2) return;
+    var m = x.sum / x.n;
+    if (m < all && (!best || m < best.m)) best = { h: Number(b), m: m };
+  });
+  return best ? "quietest around " + hhmm(best.h * 60) : "";
+}
+
 /* How much of this session is actually on the record, and where the first
    gap is. The summary used to say "Turned up. Lifted. Logged." over three
    rows reading "skipped". */
@@ -1220,7 +1382,8 @@ function paintSession(){
   if (!el || !SESSION) return;
   var list = sessionList(), n = list.length;
   var h = "<div class='ss'>";
-  h += sstop(SESSION.warm ? Math.min(SESSION.i + 1, n) + " of " + n : "warm-up");
+  h += sstop((SESSION.short ? "short \u00b7 " : "")
+    + (SESSION.warm ? Math.min(SESSION.i + 1, n) + " of " + n : "warm-up"));
 
   if (!SESSION.warm){
     h += "<div class='sshero'><div class='ssk2'>Before anything</div><h2>Warm up</h2>"
@@ -1240,7 +1403,7 @@ function paintSession(){
 
   if (SESSION.i >= n){
     var finDone = (S.lifts || {})[SESSION.day] && S.lifts[SESSION.day].fin;
-    if (finMinutes() > 0 && !SESSION.fin && !finDone && SESSION.key !== "T"){ paintFinisher(el); return; }
+    if (finMinutes() > 0 && !SESSION.fin && !finDone && SESSION.key !== "T" && !SESSION.short){ paintFinisher(el); return; }
     paintSummary(el); return;
   }
 
@@ -1255,6 +1418,7 @@ function paintSession(){
 
   h += "<div class='sshero'><div class='ssk2'>" + esc(ex[4]) + "</div><h2>" + esc(name) + "</h2>"
     + "<p class='sstarget'>" + esc(t.say) + "</p>"
+    + planBHTML(SESSION.key, SESSION.i)
     + "<div class='ssacts'><button class='btn quiet' data-how='" + SESSION.key + ":" + SESSION.i + "'>How to do it</button>"
     + "<button class='btn quiet' data-sswap='" + SESSION.i + "'>Swap the machine</button></div></div>";
 
@@ -1284,7 +1448,8 @@ function paintSession(){
     h += "<div class='btns'><button class='btn pri big' data-snext='1'>"
       + (SESSION.i + 1 < n ? "Next movement" : "Finish the session") + "</button></div>";
   }
-  h += "<div class='btns tight'><button class='btn quiet' data-sskip='1'>Skip this one</button></div>";
+  h += "<div class='btns tight'><button class='btn quiet' data-sskip='1'>Skip this one</button>"
+    + "<button class='btn quiet' data-nerves='1'>What to say</button></div>";
   h += "</div>";
   el.innerHTML = h;
 }
@@ -1317,7 +1482,11 @@ function paintFinisher(el){
 function paintSummary(el){
   var list = sessionList(), got = sessionDone(), h = "<div class='ss'>";
   h += sstop(got ? "done" : "nothing logged");
-  h += "<div class='sshero'>" + (got
+  h += "<div class='sshero'>" + (got && SESSION.short
+    ? "<div class='ssk2'>The short version</div><h2>Turned up. That counts.</h2>"
+      + "<p>Two moves on a day that did not want any is worth more than a perfect session "
+      + "you talked yourself out of.</p>"
+    : got
     ? "<div class='ssk2'>That is the session</div><h2>Turned up. Lifted. Logged.</h2>"
     : "<div class='ssk2'>Nothing on the record</div><h2>Nothing logged yet.</h2>"
       + "<p>Every move was skipped. Tap one below to go back to it, or leave and "
@@ -1336,6 +1505,12 @@ function paintSummary(el){
   }
   h += "</div>";
   if (got){
+    /* one tap, and after a handful of these the app knows when his gym is empty */
+    var bz = (S.busy || {})[SESSION.day];
+    h += "<div class='busyq'><span>How busy was it?</span>"
+      + ["Quiet", "Fine", "Packed"].map(function(w, bi){
+          return "<button class='bq" + (bz && bz.b === bi ? " on" : "") + "' data-sbusy='" + bi + "'>" + w + "</button>";
+        }).join("") + "</div>";
     h += "<div class='btns'><button class='btn pri big' data-sfinish='1'>Finish &mdash; mark Trained</button></div>";
     if (got < list.length){
       h += "<div class='btns tight'><button class='btn quiet' data-sgo='" + firstUnlogged() + "'>"
@@ -1400,6 +1575,25 @@ function sessionTap(ds, b){
   if (ds.sfinskip){
     SESSION.fin = "skip"; restStop(true); save(); sfx("untick");
     toast("Skipped. The lifts were the session.");
+    paintSession(); return true;
+  }
+  /* Plan B: the machine is taken, so switch to the one that does the same
+     job, without a sheet, without standing there deciding. */
+  if (ds.splanb !== undefined){
+    var pi = Number(ds.splanb), alt = planB(SESSION.key, pi);
+    if (!alt) return true;
+    S.liftPick = S.liftPick || {};
+    S.liftPick[slotId(SESSION.key, pi)] = alt;
+    SESSION.w = null; SESSION.r = null;
+    save(); sfx("tap"); buzz(10);
+    toast(alt + ". It keeps its own weights.");
+    paintSession(); return true;
+  }
+  if (ds.sbusy !== undefined){
+    S.busy = S.busy || {};
+    var sh0 = new Date(SESSION.started || Date.now());
+    S.busy[SESSION.day] = { h: sh0.getHours(), b: Number(ds.sbusy) };
+    save(); sfx("tap"); buzz(8);
     paintSession(); return true;
   }
   /* Back one step: to the move before this one, to the warm-up from the

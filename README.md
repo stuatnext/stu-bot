@@ -86,6 +86,59 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v69: for someone who gets nervous at the gym
+
+> *"Just make it a really useful app for someone that struggles to keep up with a good routine,
+> someone that gets nervous and socially awkward at the gym, etc."*
+
+The app had a great deal for keeping score and almost nothing for the moment a nervous
+person turns round and goes home. `docs/train.html` has always had a section on exactly this
+— the unfamiliar room, the unwritten rules, the feeling of being watched, the ten-minute rule —
+but none of it was in the app, and on an ordinary session day the Gym tab offered one button
+and no way to do less.
+
+**Plan B on every move.** The moment that makes a nervous person leave is small and specific:
+the machine is taken and everyone can see you standing there. So each move in the guided
+session now carries its answer before it is needed — *"Taken? Chest press machine does the
+same job."* — and one tap switches to it. Each machine keeps its own weights.
+
+**The words.** *"Nervous about the gym?"* on the Gym tab, and *"What to say"* on every step of
+the session, open one sheet: what to say when someone is on the machine you want, what to say
+when someone asks you, how to ask the staff, the six rules nobody writes down, and what goes in
+the bag the night before. It matches the paper plan, including the line that the feeling of
+being watched only runs one way and fades at about the fourth visit.
+
+**A way out that keeps the day.** On a day with a session still to do, the small print above
+the start button reads *"Not up to it today?"*. It offers three things, all of which count
+as Trained:
+
+- **The short version**: the first two moves, which are always the big ones, at full sets, and
+  then go. The summary says *"Turned up. That counts."*
+- **At home**: the same day of the split with your own weight, wherever you are. The room
+  sessions were only ever offered abroad; now they are there on a day the gym is too much.
+- **A walk.**
+
+The same three are the third answer on the Today runner's Train step — *Did it*, *Not now*,
+*Something smaller* — because "Not now" on training used to be the whole day's training gone.
+
+**The moment you go.** *"When do you go?"* — after the first coffee, before the laptop opens,
+or in his own words. Deciding the moment in advance is the best-studied trick there is for
+actually going, because when it comes there is nothing left to decide. Once named, it leads
+the Gym tab's line, Today's card and the morning brief: *"After your first coffee, before Malta
+wakes at 16:00."*
+
+**His gym's quiet hours, learned.** One optional tap on the summary — *Quiet*, *Fine*,
+*Packed* — and after a handful of visits the start screen says when his gym is emptiest, from
+his own visits rather than borrowed statistics about gyms in general.
+
+**A bug on the way.** The room session worked out which day of the split it stood for from
+the record — and its own first set is in the record, so logging one push-up moved it on to the
+next day and the list changed mid-workout. It now reads the days *before* today. This was
+already hitting travel days; the at-home option would have hit it every time.
+
+Also: explanations under sheet options are no longer set in capitals (a sentence in capitals is
+hard to read, and hardest when anxious), and the session's quiet buttons are 44 points tall.
+
 #### v68: the way back
 
 He skipped every move in a guided session and sent a screenshot: three rows

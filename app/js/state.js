@@ -22,7 +22,8 @@ function load(){
             season:1, vault:{}, setsEver:0, liftPick:{}, work:{},
             quests:{}, lived:{}, chips:{}, chipRewards:{}, lastBackup:0,
             monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1, showDone:{}, notes:{},
-            where:{}, walks:{}, levelSeen:0, gymHere:null, care:{},
+            where:{}, walks:{}, levelSeen:0, gymHere:null,
+            cue:"", busy:{}, care:{},
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
@@ -689,7 +690,9 @@ function briefFor(k){
     ? "Two things make a Sunday. Train early, call home. Tape at the navel first, before you eat."
     : wkend
     ? "Two things make a " + DAY_NAMES[dow] + ". Train early, call home."
-    : "Train before Malta wakes at " + start + (sit.home ? "." : ", which is " + start + " where you are.");
+    : (typeof cueSay === "function" && cueSay()
+        ? cueSay() + ", before Malta wakes at " + start + "."
+        : "Train before Malta wakes at " + start + (sit.home ? "." : ", which is " + start + " where you are."));
   /* the gym only knows sessions once gym.js is loaded; the brief degrades */
   var gym = null;
   if (typeof stageLifts === "function" && typeof nextSessionKey === "function"){
