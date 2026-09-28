@@ -322,7 +322,7 @@ function holidayOn(k){
   if (r && r.k === "holiday") return true;
   if (r && r.m) return false;                 /* his own word beats the plan */
   /* v78: a planned holiday is time off whether or not the phone has
-     landed yet - the first morning in Cannes is a holiday morning */
+     landed yet - the first morning away is already a holiday morning */
   var t = typeof tripOn === "function" ? tripOn(k) : null;
   return !!(t && t.k === "holiday");
 }
