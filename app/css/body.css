@@ -697,3 +697,12 @@ button.sspill{font-family:"Nunito",sans-serif; cursor:pointer}
 /* The rest clock is the one live thing on the floor, and at night its blue
    ink on the dark wash measured 2.97:1 (10:1 now); by day 4.44, now 5.3. */
 :root[data-night] .ssrest.going{color:#A9DDFF}
+
+/* v72 - everything is taken. One quiet line in the hero, under plan B: the
+   day turns into dumbbells and a bit of floor, and back again. */
+.sshero .ssfloor{display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%;
+  min-height:44px; margin-top:8px; padding:6px 2px; background:none; border:0; cursor:pointer;
+  font:inherit; font-size:13.5px; color:rgba(255,255,255,.86); text-align:left}
+.sshero .ssfloor b{font-weight:800; color:#fff; text-decoration:underline; text-decoration-thickness:1.5px;
+  text-underline-offset:3px; flex:none}
+.sshero .ssfloor.on{color:#BFF0CF}
