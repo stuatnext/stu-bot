@@ -49,6 +49,10 @@ var ICONS = {
   dumb:  "<path d='M6 7.6v6.8M16 7.6v6.8' stroke='currentColor' stroke-width='2.2' stroke-linecap='round'/><path d='M3.2 9.4v3.2M18.8 9.4v3.2' stroke='currentColor' stroke-width='2.2' stroke-linecap='round'/><path d='M6 11h10' stroke='currentColor' stroke-width='2.2'/>",
   plate: "<path d='M5.5 3v6.6a2.3 2.3 0 0 0 4.6 0V3M7.8 9.6v9.6' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><path d='M15.4 3c-1.3 1.4-1.8 3.2-1.8 5s.7 2.7 1.8 3v8.2' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
   case:  "<rect x='2.8' y='6.6' width='16.4' height='11.4' rx='2.2' stroke='currentColor' stroke-width='1.9'/><path d='M8.2 6.6V4.9a1.5 1.5 0 0 1 1.5-1.5h2.6a1.5 1.5 0 0 1 1.5 1.5v1.7' stroke='currentColor' stroke-width='1.9'/>",
+  heart: "<path d='M11 18.4s-6.6-4-6.6-8.7A3.6 3.6 0 0 1 11 7.5a3.6 3.6 0 0 1 6.6 2.2c0 4.7-6.6 8.7-6.6 8.7z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/>",
+  people: "<circle cx='8.2' cy='8' r='3' stroke='currentColor' stroke-width='1.9'/><circle cx='15.3' cy='8.9' r='2.4' stroke='currentColor' stroke-width='1.9'/><path d='M2.9 18.2c.7-3 2.7-4.6 5.3-4.6s4.6 1.6 5.3 4.6M13.8 13.7c2.6-.3 4.7 1.3 5.3 4.5' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
+  star: "<path d='M11 3.4l2.3 4.8 5.2.7-3.8 3.6.9 5.2L11 15.3l-4.6 2.4.9-5.2-3.8-3.6 5.2-.7z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/>",
+  bulb: "<path d='M8.2 15.6h5.6M8.9 18.6h4.2M11 3.4a5.5 5.5 0 0 0-3.2 10c.5.4.8.9.8 1.6h4.8c0-.7.3-1.2.8-1.6A5.5 5.5 0 0 0 11 3.4z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/>",
   cards: "<rect x='2.9' y='4.6' width='11' height='14.2' rx='1.9' stroke='currentColor' stroke-width='1.9'/><path d='M7.7 3.1h8.4a1.9 1.9 0 0 1 1.9 1.9v10.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>"
 };
 function svg(name, size){

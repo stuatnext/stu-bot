@@ -24,6 +24,7 @@ function load(){
             monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1, showDone:{}, notes:{},
             where:{}, walks:{}, levelSeen:0, gymHere:null,
             cue:"", busy:{}, care:{},
+            life:[], focus:[], goals:{},
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
@@ -1458,6 +1459,7 @@ function xp(){
   n += keptCount() * 5;
   n += comebackDays() * 15;          /* the first day back counts twice */
   n += steadyXP();                   /* v39: the day itself, the week, the month, the chips */
+  if (typeof lifeMainXP === "function") n += lifeMainXP();   /* v77: the steps in the rest of life */
   XPC = n;
   return n;
 }

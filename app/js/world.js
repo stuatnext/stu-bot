@@ -167,7 +167,16 @@ function winList(k){
   /* The day's card, which is open as long as the day is. Something he put in
      his own hand outranks one the app drew for him. */
   var hd = (typeof handDo === "function" && S.onboarded) ? handDo() : [];
-  if (hd.length){
+  /* v77: a focus skill's small step for the week takes the slot first -
+     he chose the focus, and it is the thing that moves his life, not just
+     his day. Done, and the slot goes back to his own hand or the card. */
+  var ls = (typeof lifeStep === "function" && S.onboarded) ? lifeStep(k) : null;
+  if (ls){
+    var sk = skillDef(ls.skill);
+    out.push({ id: "life", kind: "life", label: sk[1], short: "Level up",
+      col: sk[3], chip: 0, rank: 2, done: 0, open: wake, shut: bed + 15,
+      life: ls, why: ls.act[3] + "." });
+  } else if (hd.length){
     out.push({ id: "todo", kind: "todo", label: hd[0][1], short: "To do",
       col: "#CE82FF", chip: 0, rank: 2, done: 0, open: wake, shut: bed + 15,
       todo: hd[0], why: hd[0][2] });

@@ -386,6 +386,7 @@ function scPin(w){
     : w.key === "family" ? "phone" : "clock";
   if (w.kind === "care" || w.kind === "skinset") return "drop";
   if (w.kind === "pack") return "pack";
+  if (w.kind === "life") return w.life ? skillDef(w.life.skill)[2] : "star";
   return "cards";
 }
 /* v75: him, as a character rather than a stick. Chunky and outlined like a
@@ -558,11 +559,16 @@ function bPlayHTML(sel, k, fwd, quiet){
      its own told him nothing. So it says what the thing is, which set it
      is from, and what it asks of him - or what he did, once he has. */
   var cd = sel.kind === "card" ? sel.card.card : null;
+  var lf = sel.kind === "life" ? sel.life : null;
   var ask = isUp ? pr.ask
+          : lf ? lf.act[1] + "."
           : cd ? cd[0]
           : sel.kind === "todo" ? sel.todo[1] + "."
           : sel.label + ".";
-  var say = cd ? (cd[3] || "")
+  var lfl = lf ? skillLv(lf.skill) : null;
+  var say = lf ? lf.act[3] + ". This week's step for " + sel.label + " \u00b7 level " + lfl.level
+               + ", " + (lfl.to - lfl.xp) + " XP to the next."
+          : cd ? (cd[3] || "")
           : sel.done ? (sel.kind === "pillar" ? doneLine(sel.key) : "Done today.")
           : isUp ? (bSecond(pr.ask, pr.sub) || sel.why)
           : sel.kind === "care" ? careSay(sel.key, k)
@@ -575,7 +581,7 @@ function bPlayHTML(sel, k, fwd, quiet){
 
   var h = "<div class='b-pl " + sel.state + (cd ? " is-card" : "") + "' style='--pil:" + sel.col + "'>";
   h += icon;
-  h += "<span class='b-pl-h'><span class='b-pl-n'>" + esc(cd ? "Card \u00b7 " + setNm : sel.label) + "</span>"
+  h += "<span class='b-pl-h'><span class='b-pl-n'>" + esc(cd ? "Card \u00b7 " + setNm : lf ? "Level up \u00b7 " + sel.label : sel.label) + "</span>"
     + (sel.chip ? "<em class='b-pl-p'>+" + sel.chip + "</em>" : "")
     + "<em class='b-pl-c'>" + esc(state) + "</em></span>";
   h += "<b>" + esc(ask) + "</b>";
@@ -603,6 +609,9 @@ function bPlayHTML(sel, k, fwd, quiet){
       h += "<button class='b-go' data-questdone='1'>Did it</button>";
       if (!sel.card.swaps) h += "<button class='b-do' data-questswap='1'>Swap it</button>";
     }
+  } else if (sel.kind === "life"){
+    h += "<button class='b-go' data-lifedo='1'>Did it</button>"
+      + "<button class='b-do' data-life='" + esc(lf.skill) + "'>Something else</button>";
   } else if (sel.kind === "todo"){
     h += "<button class='b-go' data-doit='" + esc(sel.todo[0]) + "'>Did it</button>";
   } else if (sel.kind === "pack"){

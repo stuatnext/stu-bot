@@ -86,6 +86,49 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v77: a level for every part of life
+
+> *"I like the idea of levelling up. The thing is that I feel like I'm at level zero with a lot of
+> these things ... things that aren't going to happen at once ... but I do want them to be gradually
+> moving in the right direction."*
+
+Every part of his life now has its own level, the way a game gives a character skills. There are
+nine (`app/js/life.js`, new), each starting where his record says it is, and each climbing from
+small things done.
+
+- **Five read from what the app already records**, so they did not start at zero:
+  - *Gym routine* (sessions, weeks of three)
+  - *Gym know-how* (machines tried, moves logged, stages unlocked)
+  - *Diet* (days logged, protein met)
+  - *Skin* (routine days)
+  - *Family* (calls home)
+- **Four are new and are levelled by small steps**, logged in one tap. The small ones sit at the
+  bottom, where a message counts, and the rare big ones are worth a lot:
+  - *Tim & me* (date nights, evenings off together)
+  - *Friends & community* (meeting people, groups, volunteering)
+  - *Name & network* (posts, coffees, events, introductions)
+  - *The business* (conversations, proposals, wins)
+- **Levels** need 25·n·(n+1) XP: 50 for the first, then 150, 300, 500 and so on. The first comes
+  from one or two things done, and each one after asks a little more. Levels never go down. Steps
+  also count for half towards the main level.
+- **Focus: up to three at a time.** Each focus skill gets one small step a week on Today, as a
+  **Level up** station on the road that takes the card's slot. It is done through the run. The
+  rest keep their levels and wait their turn.
+- **The character sheet** is on You: every skill with its level badge, a bar to the next level and
+  a star to focus. Tapping a skill logs a step, or takes the last one off.
+- A skill levelling up gets the full-screen celebration.
+
+Nothing specific (who, which client, which goal) is in the code. His own goal lines per skill live
+only on his phone (`S.goals`).
+
+Verified with a Playwright walk (15 checks):
+- record skills start from the record, and step skills start at zero
+- the sheet shows nine skills, focus is set, and a fourth is refused kindly
+- a date night reaches level 1, the main level gets half, and taking it off undoes it
+- Today shows the week's step, and the run logs it and moves on to the next focus
+
+The v68 to v76 walks and 2,160 renders pass.
+
 #### v76: every room in the same world
 
 > *"Yeah, do the same treatment for all of them."*
