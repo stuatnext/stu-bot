@@ -756,7 +756,9 @@ function askSwap(sKey, i){
     options: swapNames(ex).map(function(n){
       var last = lastLift(n);
       return { id: n, label: n + (n === cur ? "  (using)" : ""),
-               note: last ? "last " + last.w + "kg" : (n === ex[0] ? "the default" : "not tried yet") };
+               note: last ? "last " + last.w + "kg" : (n === ex[0] ? "the default" : "not tried yet"),
+               /* the machine's shape beside its name, to match against the room */
+               icon: typeof machineArt === "function" ? machineArt(n, true) : "" };
     }),
     cancel: "Keep " + cur
   }).then(function(v){
@@ -1204,7 +1206,7 @@ function gymProgressHTML(bare){
 /* ------------------------------------------------------------- how-to */
 function askHow(sKey, idx){
   var ex = sessionFor(sKey)[1][idx], name = pickFor(sKey, idx);
-  if (firstTimeOn(name)){ tellMachine(name, ex); return; }
+  if (isMachine(name)){ tellMachine(name, ex, firstTimeOn(name)); return; }
   var steps = howFor(name, ex);
   tell(name, "<ol class='how'>" + steps.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>"
     + "<p class='fine'>" + esc(ex[4]) + " &middot; " + restClock(restOf(ex)) + " between sets.</p>");
@@ -1318,19 +1320,25 @@ function machineThreeHTML(){
     return "<li><b>" + esc(x[0]) + "</b> " + esc(x[1]) + "</li>";
   }).join("") + "</ol>";
 }
-/* The first time on a machine: how every machine works, then this one. */
-function tellMachine(name, ex){
-  var h = "<p class='fine' style='margin:0 0 8px'>Every machine works the same way, and nobody is "
-    + "watching you set it up \u2014 they are counting their own reps.</p>";
-  h += "<h4 class='nv-h'>The three things every machine has</h4>" + machineThreeHTML();
-  h += "<h4 class='nv-h'>This one</h4><ol class='how'>"
+/* A machine's sheet: the drawing with its numbered dots, how to spot it,
+   the set-up that matches the numbers, then the move itself. The first
+   time on one it also says how small today's job is. */
+function tellMachine(name, ex, first){
+  var h = "";
+  if (first) h += "<p class='fine' style='margin:0 0 8px'>Nobody is watching you set it up \u2014 "
+    + "they are counting their own reps. Every machine is a seat, a pin and a picture on the side.</p>";
+  h += machineCardHTML(name);
+  h += "<h4 class='nv-h'>Then the move</h4><ol class='how'>"
     + howFor(name, ex).map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>";
-  h += "<p class='fine' style='margin:10px 0 0'>Today the whole job is one set at a light plate. "
-    + "That is the machine done; the weight comes later. Or ask the staff: "
-    + "\u201cCould you show me how to set this up?\u201d</p>";
-  h += "<p class='fine' style='margin:8px 0 0'>" + esc(machinesLine()) + "</p>";
-  tell("First time on the " + lowerName(name), h);
+  if (first){
+    h += "<p class='fine' style='margin:10px 0 0'>Today the whole job is one set at a light plate. "
+      + "That is the machine done; the weight comes later. Or ask the staff: "
+      + "\u201cCould you show me how to set this up?\u201d</p>";
+    h += "<p class='fine' style='margin:8px 0 0'>" + esc(machinesLine()) + "</p>";
+  }
+  tell(first ? "First time on the " + lowerName(name) : name, h);
 }
+function isMachine(name){ return !!(MACHINES[name] || (typeof MACHINE_KIND !== "undefined" && MACHINE_KIND[name])); }
 /* Said once, the first time a set lands on a machine he had never used. */
 function machineCheer(name, wasFirst){
   if (!wasFirst) return;

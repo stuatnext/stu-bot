@@ -102,8 +102,10 @@ function ask(opts){
     if (opts.options && opts.options.length){
       h += "<div class='opts'>";
       opts.options.forEach(function(o){
-        h += "<button class='btn" + (o.pri ? " pri" : "") + "' data-mk='" + esc(o.id) + "'>"
-          + esc(o.label) + (o.note ? "<span style='display:block;font-weight:500;font-size:12.5px;opacity:.72;margin-top:2px'>" + esc(o.note) + "</span>" : "")
+        /* o.icon is trusted markup the app draws itself (a machine's shape) */
+        var lab = esc(o.label) + (o.note ? "<span style='display:block;font-weight:500;font-size:12.5px;opacity:.72;margin-top:2px'>" + esc(o.note) + "</span>" : "");
+        h += "<button class='btn" + (o.pri ? " pri" : "") + (o.icon ? " hasic" : "") + "' data-mk='" + esc(o.id) + "'>"
+          + (o.icon ? "<i class='oic'>" + o.icon + "</i><span class='olab'>" + lab + "</span>" : lab)
           + "</button>";
       });
       h += "</div>";

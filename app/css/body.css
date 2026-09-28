@@ -706,3 +706,44 @@ button.sspill{font-family:"Nunito",sans-serif; cursor:pointer}
 .sshero .ssfloor b{font-weight:800; color:#fff; text-decoration:underline; text-decoration-thickness:1.5px;
   text-underline-offset:3px; flex:none}
 .sshero .ssfloor.on{color:#BFF0CF}
+
+/* v74 - what a machine looks like. One visual language for every drawing:
+   frame lines in the quiet ink, padded parts filled, the orange things you
+   touch, a person in blue, numbered dots that match the list under it. */
+.mach{margin:4px 0 6px; border-radius:16px; background:var(--sunk); padding:6px 4px 2px}
+.mach-svg{display:block; width:100%; height:auto; max-height:240px}
+.mach-svg .mf, .mach-svg .mfr{fill:none; stroke:var(--ink3); stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round}
+.mach-svg .mfr{stroke-width:2.5}
+.mach-svg .mfl{stroke:var(--edge); stroke-width:2; stroke-linecap:round}
+.mach-svg .mpl{stroke:var(--ink3); stroke-width:1.6; stroke-linecap:round; opacity:.7}
+.mach-svg .mp{fill:var(--card); stroke:var(--ink2); stroke-width:2.2; stroke-linejoin:round}
+.mach-svg .mbar{stroke:var(--ink2); stroke-width:6; stroke-linecap:round; fill:none}
+.mach-svg .mcab{stroke:var(--ink3); stroke-width:1.8; stroke-dasharray:1 3.5; stroke-linecap:round; fill:none}
+.mach-svg .me{fill:none; stroke:var(--blue); stroke-width:8.5; stroke-linecap:round; stroke-linejoin:round; opacity:.85}
+.mach-svg .mh{fill:var(--blue); opacity:.85}
+/* the orange you touch: a deeper orange with white numbers by day (4.8:1,
+   and 4:1 against the panel), the bright one with dark numbers at night */
+.mach-svg{--mo:#B35F00; --mon:#fff}
+:root[data-night] .mach-svg{--mo:var(--flame); --mon:#2A1600}
+.mach-svg .mk{fill:var(--mo); stroke:none}
+.mach-svg .mk2{stroke:var(--mo); stroke-width:3; stroke-linecap:round; fill:none}
+.mach-svg .ml{stroke:var(--mo); stroke-width:1.5; stroke-dasharray:3 3; fill:none}
+.mach-svg .mc{fill:var(--mo)}
+.mach-svg .mct{fill:var(--mon); font:800 10.5px "Nunito",sans-serif; text-anchor:middle}
+.mach-svg.thumb .me{stroke-width:10}
+#modal .mspot{margin:0 0 4px; font-size:14px; line-height:1.45; color:var(--ink2)}
+#modal .mset{margin:4px 0 0 20px; padding:0}
+#modal .mset li{margin:6px 0; font-size:14px; line-height:1.45}
+#modal .mset li::marker{color:var(--flameEdge); font-weight:800}
+#modal .mvid{display:flex; align-items:center; justify-content:center; gap:6px; min-height:44px; margin:12px 0 2px;
+  border-radius:14px; border:1.5px solid var(--edge); border-bottom-width:3px; background:var(--card);
+  color:var(--ink); font-weight:800; font-size:14px; text-decoration:none}
+#modal .mvid i{font-style:normal; opacity:.7}
+/* thumbnails in the swap sheet, so a machine can be matched to the room */
+#modal .opts button.hasic{display:flex; align-items:center; gap:10px; text-align:left}
+#modal .opts button.hasic .oic{flex:none; width:66px; height:44px; border-radius:10px; background:var(--sunk);
+  display:flex; align-items:center; justify-content:center}
+#modal .opts button.hasic .oic svg{width:64px; height:43px}
+#modal .opts button.hasic .olab{flex:1; min-width:0}
+/* one sheet, one case: when the options carry drawings, the plain ones match */
+#modal .opts:has(.hasic) button{text-transform:none; letter-spacing:0}

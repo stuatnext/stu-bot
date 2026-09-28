@@ -86,6 +86,52 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v74: what a machine looks like
+
+> *"Help me with indicators of what a machine looks like and how to set it up"*
+
+Words were not enough. On a gym floor you can't match "seated leg curl" to the shapes in front of
+you, and "line your knee up with the pivot" means nothing until you've seen where the pivot is.
+
+- **A drawing for every machine** (`app/js/machines.js`, new, 38 machines in 16 drawings with
+  variants). Each one shows the machine side-on, a person in it at the start of the move, and a
+  numbered dot on each thing you adjust:
+  - the back pad
+  - the pivot
+  - the ankle pad
+  - the thigh pad
+  - the pin
+
+  The sheet's *Set it up* list uses the same numbers. Everything is hand-drawn SVG in one visual
+  language that follows the theme: frame lines, padded parts, the orange things you touch, and a
+  person in blue.
+- **How to spot it**: one line per machine for finding it across the room. For example, "on the
+  curl the roller goes behind your legs, on the extension in front of them". The four machines
+  without a drawing (torso rotation, T-bar, belt squat, sled) have this line too.
+- **Cable stations** are one machine set up many ways. Each cable move says where the pulley
+  goes, what clips on, and which way to stand, and its drawing shows the pulley at that height.
+- **Watch someone set one up** opens a YouTube search for that machine, because brands differ.
+- **In the app:**
+  - *How to do it* on any machine now opens this sheet, followed by the move itself.
+  - The first time on a machine it is *First time? Set it up*, with v73's one-light-set rule and
+    count.
+  - The swap list shows each machine's shape beside its name, to match against the room.
+- **Contrast**:
+  - By day, deeper orange dots with white numbers: 4.6:1 for the numbers, 3.9:1 for the dots
+    against the panel, 3.3:1 for the frame.
+  - At night, bright orange with dark numbers.
+
+Verified with Playwright at 390x844 (10 checks):
+- For all 38 machines, the dots are numbered in order and match the set-up list line for line,
+  every drawing stays inside its frame, and every machine has a spot line.
+- The swap sheet shows drawings beside machines and none beside dumbbells, with 44pt options.
+- Choosing the seated leg curl from the sheet gives 5 dots, 5 lines, the video link and the
+  first-time title.
+- The cable set-up names the height, the attachment and the stance.
+- The light theme contrast passes.
+
+The v68 to v73 walks, the v70 tick checks and 2,160 renders pass.
+
 #### v73: a machine you have never touched
 
 > *"There's lots of other weight machines but I just feel way too unconfident to touch them"*,
