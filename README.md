@@ -86,6 +86,27 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v76: every room in the same world
+
+> *"Yeah, do the same treatment for all of them."*
+
+The rooms (Gym, Food, Water, Skin, Work, Cards, You and the pot) opened on a small window of sky beside
+the clock, which was a picture of the world rather than a place in it. Each room is now a small
+scene of the same world as Today:
+- the same sky at the same hour, with stars at night and the sun on its arc
+- the same ground and road
+- him standing at the one object the room is about: a dumbbell rack, a hawker stall, a rain tree
+  with a water bottle, a mirror, a desk and laptop, a card chest, a trophy or a stack of coins
+
+The props are drawn in the same sticker style as he is. The clock and the room's name sit over the
+scene, and the counters use the same level ring as Today.
+
+Fixed on the way: the rest day's word on Gym sat in a box with no height, so the plate above it and
+the line below it ran over it. The rest ring is square now, like the ring it replaces.
+
+Verified at 375x667, 390x844 and 430x932, at dawn, midday, golden hour and night: nothing overlaps
+and there is no sideways scroll. The v68 to v75 walks and 2,160 renders pass.
+
 #### v75: Today, designed as a game
 
 > *"Rain tree... not sure what that is. Also please enhance the design into a genuinely good
