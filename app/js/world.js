@@ -164,6 +164,18 @@ function winList(k){
     });
   }
 
+  /* v81: the kit. A routine he has nothing to do with is held back, and
+     this one step stands in for all of it until he has - asked first, then
+     shopped for. It does not shut; a Watsons is open late. */
+  if (typeof kitWanted === "function" && S.onboarded){
+    var kw = kitWanted();
+    if (kw.length){
+      out.push({ id: "kit", kind: "kit", label: kitLabel(kw), short: "Kit",
+        col: "#FF8FB3", chip: 0, rank: 2, done: 0, open: wake, shut: bed + 15,
+        kit: kw, why: kitWhy(kw) });
+    }
+  }
+
   /* The day's card, which is open as long as the day is. Something he put in
      his own hand outranks one the app drew for him. */
   var hd = (typeof handDo === "function" && S.onboarded) ? handDo() : [];

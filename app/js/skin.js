@@ -37,11 +37,15 @@ function skinName(){ return careWindow() === "night" ? "Evening" : "Daytime"; }
 function viewSkin(){
   var t = today(), set = skinSet(), done = skinDone(), n = set.length;
   var h = "";
+  /* v81: steps held for the kit are not in the set; with none left in
+     this half of the day, the room says so instead of "Done". */
+  var want = typeof kitWanted === "function" ? kitWanted("skin") : [];
+  var held = !n && want.length;
 
   /* ------------------------------------------------------------ the room
      The same ring the Gym uses, because it is the same shape of thing: a
      short fixed order you either start or do not. */
-  h += "<div class='stage skin" + (done === n ? " done" : "") + "'>";
+  h += "<div class='stage skin" + (done === n && !held ? " done" : "") + "'>";
   h += gameTop("skin", skinName() + " routine");
   /* With two steps a five-degree gap is a hairline and the ring reads as one
      unbroken track - a routine you have not started yet looks like a thing
@@ -56,8 +60,11 @@ function viewSkin(){
       + " stroke-dasharray='" + segLen + " " + CC.toFixed(1) + "'"
       + " transform='rotate(" + (-90 + si * stepA + gapA / 2).toFixed(1) + " 100 100)'/>";
   }
-  h += "</svg><div class='rig-c'><b>" + done + "</b><span>/ " + n + "</span></div></div>";
-  h += "<div class='stage-l'>" + esc(done === n
+  /* held for the kit: the bag, not a nought out of nought */
+  h += "</svg><div class='rig-c'>" + (held ? "<i class='rig-bag'>" + svg("bag", 50) + "</i>"
+      : "<b>" + done + "</b><span>/ " + n + "</span>") + "</div></div>";
+  h += "<div class='stage-l'>" + esc(held ? "Get the kit first. The routine starts the day you have it."
+      : done === n
       ? (careWindow() === "night" ? "Done. Phone on the side." : "Done. Out you go.")
       : set.filter(function(r){ return !careOn(t, r[0]); })
            .map(function(r){ return r[1]; }).join(" · ")) + "</div>";
@@ -66,6 +73,10 @@ function viewSkin(){
   h += gameBar("skin",
     done >= n ? "" : done ? "Carry on" : "Start the " + skinName().toLowerCase() + " routine",
     done >= n ? "" : "data-run='skin'");
+  /* The kit, right under the game while any of it is missing - it is the
+     level he is on. Once it is all there it goes behind a door with the
+     record, where Ran out lives. */
+  if (want.length) h += kitPanelHTML("skin");
 
   /* Behind the one door: every routine in the app with how long it has been
      kept. This is the only page where a skincare streak is the subject
@@ -74,15 +85,20 @@ function viewSkin(){
   var kept = "<div class='runs'>";
   ROUTINES.forEach(function(r){
     var on = careOn(t, r[0]), due = careDue(r[0], t), run = careRun(r[0]);
+    var need = typeof kitBlocks === "function" && kitBlocks(r[0]) ? kitFor(r[0]) : null;
     kept += "<div class='rr" + (on ? " on" : "") + (due ? "" : " off") + "'>"
       + "<span class='rr-t'>" + esc(r[1]) + "</span>"
-      + "<span class='rr-s'>" + esc(!due ? "not needed here" : on ? "done today"
+      + "<span class='rr-s'>" + esc(need ? "needs " + need.name.toLowerCase()
+          : !due ? "not needed here" : on ? "done today"
           : r[3] === "night" ? "tonight" : "in the day") + "</span>"
       + "<span class='rr-n'>" + (run ? run + (run === 1 ? " day" : " days") : "—") + "</span>"
       + "</div>";
   });
   kept += "</div><p class='fine'>None of these touch the streak. They are kept "
     + "because they are kept.</p>";
-  h += drawers([ fold("keptroutines", "Kept", ROUTINES.length + " routines", kept, false) ]);
+  var doors = [ fold("keptroutines", "Kept", ROUTINES.length + " routines", kept, false) ];
+  if (!want.length && typeof kitPanelHTML === "function")
+    doors.push(fold("skinkit", "Kit", "all there", kitPanelHTML("skin", 1), false));
+  h += drawers(doors);
   return h;
 }

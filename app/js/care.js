@@ -82,10 +82,14 @@ function bedOnTime(){
    care[iso] = { sun:1, skin:1, bed:1 }. Absent means not done; there is no
    "missed" to store, because nothing is owed. */
 function careOn(k, key){ return !!((S.care || {})[k] || {})[key]; }
-/* Whether a routine applies at all on a given day - only sunscreen can ever
-   answer no, and it answers it from the map. */
+/* Whether a routine applies at all on a given day. Sunscreen answers it
+   from the map. v81: and a routine whose kit he has not got is not due
+   from today on - a step he cannot do is not owed. The past is left as it
+   was, so a run already kept is not rewritten by a bottle running out. */
 function careDue(key, k){
-  if (key === "sun") return sunNeeded(k || today());
+  k = k || today();
+  if (typeof kitBlocks === "function" && k >= today() && kitBlocks(key)) return false;
+  if (key === "sun") return sunNeeded(k);
   return true;
 }
 /* Due today is not the same as worth asking for now. The day window runs

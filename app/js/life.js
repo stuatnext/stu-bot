@@ -107,12 +107,15 @@ function recordXP(key){
       if (i > 0) n += i * 40;
     }
   } else if (key === "diet"){
+    if (typeof kitXP === "function") n += kitXP("food");
     Object.keys(S.food || {}).forEach(function(k){
       if (!foodOn(k).length) return;
       n += 8;
       if (proteinOn(k) >= proteinTarget()) n += 25;
     });
   } else if (key === "skin"){
+    /* v81: getting the kit is the first level */
+    if (typeof kitXP === "function") n += kitXP("skin");
     Object.keys(S.care || {}).forEach(function(k){
       var steps = Object.keys(S.care[k] || {}).filter(function(s){ return S.care[k][s]; }).length;
       if (steps) n += 12;

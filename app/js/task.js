@@ -57,6 +57,7 @@ function runStepsFor(kind, all){
                : w.kind === "card" ? "The card"
                : w.kind === "life" ? "Level up \u00b7 " + w.label
                : w.kind === "date" ? "Tim & me"
+               : w.kind === "kit" ? "Level zero \u00b7 the kit"
                : w.kind === "pillar" ? w.label
                : w.label;
       out.push({
@@ -70,6 +71,8 @@ function runStepsFor(kind, all){
         shut: w.state === "shut",
         /* the Train step can be done smaller, not just done or skipped */
         small: w.kind === "pillar" && w.key === "train",
+        /* the kit is gone through, not done in one tap */
+        go: w.kind === "kit" ? "Go through it" : "",
         op: w.kind === "todo" ? "t:" + w.todo[0] : w.id,
         done: !!w.done,
         /* which skill and step, so a level-up step can be taken back */
@@ -292,7 +295,7 @@ function paintRun(){
     if (step.shut) h += "<p class='tk-shut'>That window has shut. It still counts if you do it.</p>";
     h += "</div>";
     h += "<div class='tk-acts'>"
-      + "<button class='tk-go' data-runop='" + esc(step.op) + "'>Did it</button>"
+      + "<button class='tk-go' data-runop='" + esc(step.op) + "'>" + esc(step.go || "Did it") + "</button>"
       /* "Not now" on training was the whole day's training gone. The third
          answer keeps it: the short version, at home, or a walk. */
       + (step.small && typeof askLowDay === "function"
@@ -396,6 +399,8 @@ function runOp(op){
   var settled = function(ok){ if (ok) mark(); runNext(); };
 
   if (op === "card"){ if (typeof questDone === "function") questDone(); return after(); }
+  /* the kit: one sheet per thing; ticked only when nothing is left to get */
+  if (op === "kit") return askKit().then(function(){ settled(!kitWanted().length); });
   if (op === "life"){ if (typeof lifeDoStep === "function") lifeDoStep(); return after(); }
   if (op === "date"){ if (typeof logLife === "function" && !dateNightDone(today())) logLife("us", "date"); return after(); }
   if (kind === "t"){ if (typeof doItUI === "function") doItUI(val); return after(); }

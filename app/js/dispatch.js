@@ -65,6 +65,12 @@ var DISPATCHES = [
     function(c){ return "Date night tonight. The laptop shuts at " + hhmm(nightMin()) + "."; }],
   ["t-last", 90, function(c){ var t = tripOn(c.k); return !!(t && t.b === c.k && t.a !== c.k); },
     function(c){ return "Last day in " + tripOn(c.k).c + ". Tomorrow the road moves on."; }],
+  /* v81: the kit, said as an errand rather than a failing */
+  ["k-shop", 88, function(c){ return c.k === today() && typeof kitNeed === "function" && kitNeed().length > 0; },
+    function(c){ var n = kitNeed(), nm = kitNames(n);
+      return "Passing a " + kitShopOne(n) + "? "
+        + nm.charAt(0).toUpperCase() + nm.slice(1) + ". The steps that need "
+        + (n.length === 1 ? "it start" : "them start") + " the day you have " + (n.length === 1 ? "it." : "them."); }],
   ["t-soon", 89, function(c){
       var n = tripsAhead(c.k).filter(function(t){ return t.a > c.k; })[0];
       if (!n) return false; var d = daysBetween(c.k, n.a); return d >= 1 && d <= 10; },
