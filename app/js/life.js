@@ -223,10 +223,12 @@ function lifeDoStep(btn){
   if (!s){ sfx("no"); return; }
   logLife(s.skill, s.act[0], btn);
 }
-function undoLife(skill){
+/* `id`, when given, takes back that step and only that step - the runner's
+   undo on a date night must not take off a coffee he logged after it. */
+function undoLife(skill, id){
   var L = lifeEntries();
   for (var i = L.length - 1; i >= 0; i--){
-    if (L[i][1] === skill){
+    if (L[i][1] === skill && (!id || L[i][2] === id)){
       var a = actDef(L[i][1], L[i][2]);
       L.splice(i, 1); S.life = L; save(); sfx("untick");
       toast("Taken off: " + (a ? a[1].toLowerCase() : "the last one") + ".");

@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v79";
+var BUILD = "v80";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -227,7 +227,11 @@ document.addEventListener("click", function(ev){
   }
   if (ds.run){ startRun(ds.run, ds.runat || ""); return; }
   if (ds.runop){ runOp(ds.runop); return; }
-  if (ds.runskip){ sfx("tap"); runNext(); return; }
+  if (ds.runskip || ds.runfwd){ runFwd(); return; }
+  if (ds.runback){ runBack(); return; }
+  if (ds.runjump){ runJump(Number(ds.runjump)); return; }
+  if (ds.runundo){ runUndo(); return; }
+  if (ds.runleft){ runLeft(); return; }
   if (ds.runsmall){ closeRun(); askLowDay(); return; }
   if (ds.runclose){ closeRun(); return; }
   if (ds.work){ askWorking(); return; }
@@ -370,9 +374,16 @@ document.addEventListener("click", function(ev){
 
 /* Back closes whatever is on top before it leaves the app. */
 window.addEventListener("keydown", function(ev){
+  /* the run walks with the arrow keys too, when nothing sits over it */
+  if (typeof RUN !== "undefined" && RUN && !MODAL
+      && (ev.key === "ArrowLeft" || ev.key === "ArrowRight")){
+    if (ev.key === "ArrowLeft") runBack(); else runFwd();
+    return;
+  }
   if (ev.key !== "Escape") return;
   if (typeof OPENING !== "undefined" && OPENING) closeOpening();
   else if (MODAL) MODAL.close(null);
+  else if (typeof RUN !== "undefined" && RUN) closeRun();
   else if (typeof SESSION !== "undefined" && SESSION) closeSession();
   else if (document.getElementById("sheet").className) closeSheet();
   else if (document.getElementById("chip").className) closeChip();

@@ -143,6 +143,17 @@ function questDone(btn){
   if (btn) burst(btn, "#FFC800");
   render({ keepScroll: true, animate: true });
 }
+/* v80: the runner's undo. The card stays pinned and the swap stays spent;
+   only the done comes off, and the card is un-lived if today lived it. */
+function questUndo(){
+  var t = today(), q = (S.quests || {})[t];
+  if (!q || !q.done) return false;
+  q.done = 0;
+  if (q.card && S.lived && S.lived[q.card] === t) delete S.lived[q.card];
+  save(); sfx("untick");
+  render({ keepScroll: true });
+  return true;
+}
 /* One swap a day. A quest you can reroll forever is a quest you never do. */
 function questSwap(){
   var t = today(), q = questFor(t);

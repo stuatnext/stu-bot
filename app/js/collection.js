@@ -303,6 +303,12 @@ function doItUI(id, btn){
   toast("Done. +10 spares, +20 XP.", true);
   render({ keepScroll: true, animate: true });
 }
+function undoDoUI(id){
+  if (!undoDo(id)){ sfx("no"); return; }
+  sfx("untick");
+  toast("Back in your hand.");
+  render({ keepScroll: true });
+}
 function keepUI(id, btn){
   if (!keepIn(id)){ sfx("no"); return; }
   sfx("done"); buzz(12);

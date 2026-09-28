@@ -86,6 +86,37 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v80: the run goes both ways
+
+> *"I can't go back and forward here."* (over step 6 of 6 of Start the day)
+
+The run only went one way. Did it and Not now both moved forward, and anything behind him was gone,
+including a tap he did not mean. Now every step in a run (Today, Work, Food, Skin) has:
+- **Back and forward, under the thumb.** `‹ Back` and `Not now ›` sit side by side on every step.
+  On a step that is already done, the forward button says `Next ›`. Back works from the end screen
+  too.
+- **Pips you can tap.** Tap one to go straight to that step. Green means done, gold is where you
+  are, grey means walked past.
+- **Swipe and keys.** A swipe left or right does the same as the buttons. So do the arrow keys, and
+  Escape leaves the run.
+- **A done step stays in the run.** It shows a *Done* stamp and an **Undo**. Undo uses the same
+  function that the tab's own button uses to take a tap back:
+  - Train, Family and Stop untick
+  - a routine, a work item, or a meal (only that slot's meal, not the snack logged after it)
+  - the day's card (the swap stays spent)
+  - a level-up step, or a date night (only that entry, not a later step)
+  - a Do from his hand, which goes back into the hand
+- **The end knows what is left.** "The 3 left ›" goes back to the first one still open.
+
+Whether a step is done is read from the record every time, never stored. A step whose window has
+moved on (a routine after the switch to night) is stepped over, not shown blank.
+
+Verified:
+- 29 checks in a new walk, covering forward and back, pips, arrow keys, swipe (and a short drag
+  that is not a swipe), the end screen, Escape, and 44-point targets at 375×667
+- an Undo for each kind of step
+- the existing suites and the 2,160-render sweep, all clean
+
 #### v79: his road, built in
 
 > *"Why do you need it private? I don't. It can be public."*
