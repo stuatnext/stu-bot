@@ -44,6 +44,8 @@ function viewYou(){
      crest is the number and this is the meaning of it. */
   /* v77: every part of his life, with a level of its own */
   if (typeof lifeSheetHTML === "function") h += lifeSheetHTML();
+  /* v78: what is coming, and what to sort before it */
+  if (typeof roadAheadHTML === "function") h += roadAheadHTML();
 
   h += soFarHTML();
 

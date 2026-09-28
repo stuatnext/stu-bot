@@ -54,6 +54,7 @@ function runStepsFor(kind){
                : w.kind === "todo" ? "From your own hand"
                : w.kind === "card" ? "The card"
                : w.kind === "life" ? "Level up \u00b7 " + w.label
+               : w.kind === "date" ? "Tim & me"
                : w.kind === "pillar" ? w.label
                : w.label;
       out.push({
@@ -223,6 +224,7 @@ function runOp(op){
 
   if (op === "card"){ if (typeof questDone === "function") questDone(); return after(); }
   if (op === "life"){ if (typeof lifeDoStep === "function") lifeDoStep(); return after(); }
+  if (op === "date"){ if (typeof logLife === "function" && !dateNightDone(today())) logLife("us", "date"); return after(); }
   if (kind === "t"){ if (typeof doItUI === "function") doItUI(val); return after(); }
   if (kind === "p"){
     if (val === "family" && typeof askPeople === "function"

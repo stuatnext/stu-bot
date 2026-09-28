@@ -55,6 +55,25 @@ function dispatchCtx(k){
    cheerleading, nothing that would embarrass him if Tim read it over his
    shoulder. */
 var DISPATCHES = [
+  /* --- the road ahead (v78): trips and date nights ----------------------- */
+  ["t-first", 97, function(c){ var t = tripOn(c.k); return !!(t && t.a === c.k); },
+    function(c){ var t = tripOn(c.k);
+      return t.k === "holiday" ? "First day in " + t.c + ". Two things make a holiday: move, and call home."
+           : t.k === "family" ? t.c + ", with family. The routine comes too, just smaller."
+           : "First day in " + t.c + ". The routine is smaller on a trip, not gone."; }],
+  ["d-night", 96, function(c){ return dateNightOn(c.k) && !dateNightDone(c.k); },
+    function(c){ return "Date night tonight. The laptop shuts at " + hhmm(nightMin()) + "."; }],
+  ["t-last", 90, function(c){ var t = tripOn(c.k); return !!(t && t.b === c.k && t.a !== c.k); },
+    function(c){ return "Last day in " + tripOn(c.k).c + ". Tomorrow the road moves on."; }],
+  ["t-soon", 89, function(c){
+      var n = tripsAhead(c.k).filter(function(t){ return t.a > c.k; })[0];
+      if (!n) return false; var d = daysBetween(c.k, n.a); return d >= 1 && d <= 10; },
+    function(c){
+      var n = tripsAhead(c.k).filter(function(t){ return t.a > c.k; })[0], d = daysBetween(c.k, n.a);
+      var od = todosAll().filter(function(t){ return !t.done; })[0];
+      return (d === 1 ? n.c + " tomorrow." : n.c + " in " + d + " days.")
+        + (od ? " Still to sort: " + od.l.charAt(0).toLowerCase() + od.l.slice(1).replace(/\.$/, "") + "." : ""); }],
+
   /* --- the week, which is now the thing being kept ----------------------- */
   ["w-kept-run", 95, function(c){ return c.w.kept && c.run >= 2; },
     function(c){ return "The week is kept, and that is " + num(c.run + 1) + " in a row."; }],
