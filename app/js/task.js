@@ -53,12 +53,14 @@ function runStepsFor(kind){
       var kick = w.kind === "care" ? (careWindow() === "night" ? "Tonight\u2019s routine" : "The routine")
                : w.kind === "todo" ? "From your own hand"
                : w.kind === "card" ? "The card"
+               : w.kind === "life" ? "Level up \u00b7 " + w.label
                : w.kind === "pillar" ? w.label
                : w.label;
       out.push({
         id: w.id, kicker: kick, col: w.col,
         title: w.kind === "pillar" && w.key === nextUp() ? priority({ noPacks: 1 }).ask
              : w.kind === "card" ? w.card.card[0] + "."
+             : w.kind === "life" ? w.life.act[1] + "."
              : w.kind === "todo" ? w.todo[1] + "."
              : w.label + ".",
         say: w.kind === "care" ? careSay(w.key, k) : w.why,
@@ -220,6 +222,7 @@ function runOp(op){
   var settled = function(ok){ if (ok) mark(); runNext(); };
 
   if (op === "card"){ if (typeof questDone === "function") questDone(); return after(); }
+  if (op === "life"){ if (typeof lifeDoStep === "function") lifeDoStep(); return after(); }
   if (kind === "t"){ if (typeof doItUI === "function") doItUI(val); return after(); }
   if (kind === "p"){
     if (val === "family" && typeof askPeople === "function"

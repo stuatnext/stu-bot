@@ -11,7 +11,7 @@
      files: freshness wins.
    - VERSION changes with every release, and the build number is painted on
      the title card and the You screen so what the phone runs is visible. */
-var VERSION = "daylight-v76";
+var VERSION = "daylight-v77";
 /* Written by the app on every save; read here when a push lands, because a
    service worker cannot see localStorage. Never versioned, never deleted. */
 var STATE_CACHE = "daylight-state";
@@ -22,7 +22,7 @@ var SHELL = [
   "./css/calm.css", "./css/poster.css", "./css/board.css", "./css/arcade.css", "./css/game.css",
   "./js/data.js", "./js/state.js", "./js/audio.js", "./js/sky.js",
   "./js/world.js", "./js/fx.js", "./js/art.js", "./js/cardui.js", "./js/scene.js", "./js/board.js",
-  "./js/collection.js", "./js/quest.js", "./js/gym.js", "./js/machines.js", "./js/food.js",
+  "./js/collection.js", "./js/quest.js", "./js/gym.js", "./js/machines.js", "./js/life.js", "./js/food.js",
   "./js/week.js", "./js/dispatch.js",
   "./js/basics.js", "./js/care.js", "./js/skin.js", "./js/games.js", "./js/people.js",
   "./js/jokers.js", "./js/run.js", "./js/task.js", "./js/opening.js",

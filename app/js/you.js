@@ -42,6 +42,9 @@ function viewYou(){
 
   /* The whole book, in five sentences. It sits under the crest because the
      crest is the number and this is the meaning of it. */
+  /* v77: every part of his life, with a level of its own */
+  if (typeof lifeSheetHTML === "function") h += lifeSheetHTML();
+
   h += soFarHTML();
 
   /* who is at the other end of the third pillar, and what o'clock it is
