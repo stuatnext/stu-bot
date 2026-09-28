@@ -369,7 +369,7 @@ button.vc:active{transform:scale(.96)}
 .ssrest > i{display:none}
 .ssrest > span{position:relative; z-index:1}
 .ssrest.going{min-height:54px; display:flex; align-items:center; justify-content:center; border-radius:17px;
-  background:var(--blueSoft); color:#0B72BD; border:2px solid var(--blue); font-size:17px}
+  background:var(--blueSoft); color:#0A66A8; border:2px solid var(--blue); font-size:17px}
 .ssrest.going > i{display:block; position:absolute; left:0; top:0; bottom:0;
   width:calc(var(--rest, 1) * 100%); background:rgba(28,176,246,.28);
   transition:width 1s linear}
@@ -681,3 +681,19 @@ button.rec:active{transform:scale(.985)}
 /* On the floor, the quiet row is the one a nervous thumb reaches for:
    "Skip this one" and "What to say" get the full 44 points. */
 .ss .btns.tight button.btn{min-height:44px}
+
+/* v71 - every tap can be taken back. The way back is a word, not a glyph:
+   a chevron in a circle beside the close button read as decoration. */
+.sstop .ssback{height:44px; padding:0 16px 0 12px; border-radius:22px; display:inline-flex; align-items:center;
+  gap:6px; font:inherit; font-weight:800; font-size:14.5px; cursor:pointer; flex:none;
+  background:var(--card); color:var(--ink); border:1.5px solid var(--edge); border-bottom-width:3px}
+.sstop .ssback i{font-style:normal; font-size:24px; line-height:1; margin-top:-3px}
+.sstop .ssback:active, .sspill:active{transform:translateY(1px)}
+/* a done set is a button: the same pill, now something a thumb can press */
+button.sspill{font-family:"Nunito",sans-serif; cursor:pointer}
+.sspill.on.fix{background:var(--flameSoft); color:var(--flameEdge); border-color:var(--flame);
+  box-shadow:0 0 0 2px var(--flameSoft)}
+.sshint{margin:-6px 0 4px; font-size:12.5px; font-weight:700; color:var(--ink3)}
+/* The rest clock is the one live thing on the floor, and at night its blue
+   ink on the dark wash measured 2.97:1 (10:1 now); by day 4.44, now 5.3. */
+:root[data-night] .ssrest.going{color:#A9DDFF}

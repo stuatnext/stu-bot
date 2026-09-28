@@ -938,8 +938,11 @@ function askLift(sKey, idx){
     + (ex[2] === ex[3] ? ex[2] : ex[2] + "-" + ex[3])
     + "<br><b>" + esc(t.say) + "</b></p>"
     + "<div id='lfBody' class='lf'></div>"
-    + "<div class='btns'><button class='btn pri' data-lf='ok:0:0'>Log it</button>"
-    + "<button class='btn quiet' data-lf='no:0:0'>Not this one</button></div></div>";
+    + "<div class='btns'><button class='btn pri' data-lf='ok:0:0'>" + (had ? "Save" : "Log it") + "</button>"
+    + "<button class='btn quiet' data-lf='no:0:0'>" + (had ? "Leave it" : "Not this one") + "</button></div>"
+    + (had ? "<div class='btns tight'><button class='btn quiet' data-lf='clear:0:0'>Take today’s "
+      + esc(name.toLowerCase()) + " off</button></div>" : "")
+    + "</div>";
   el.className = "on";
   document.body.style.overflow = "hidden";
   paintLift();
@@ -960,6 +963,16 @@ function askLift(sKey, idx){
     ev.stopPropagation();
     var p = b.dataset.lf.split(":"), kind = p[0], dir = Number(p[1]), at = Number(p[2]);
     if (kind === "no"){ sfx("tap"); close(); return; }
+    if (kind === "clear"){
+      var kc = today();
+      if (S.lifts && S.lifts[kc] && S.lifts[kc].ex) S.lifts[kc].ex[LIFT.name] = { w: LIFT.w, r: [] };
+      forgetEmpty(kc, LIFT.name);
+      save(); buzz(10); sfx("untick");
+      toast("Taken off today’s record.");
+      close();
+      render({ keepScroll: true });
+      return;
+    }
     if (kind === "ok"){
       var reps = LIFT.r.filter(function(n){ return n > 0; });
       if (!reps.length){ sfx("no"); toast("At least one set with reps in it."); return; }
@@ -1368,9 +1381,21 @@ function firstUnlogged(){
    trained. */
 function sstop(right){
   return "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
-    + (SESSION.warm ? "<button class='ssx ssb' data-sback='1' aria-label='Back'>&lsaquo;</button>" : "")
+    /* Labelled, because a bare chevron beside the close button is a thing
+       you have to already know is there. He went looking for a way back on
+       the v67 screen and there was none; a word cannot be missed. */
+    + (SESSION.warm ? "<button class='ssback' data-sback='1'><i>&lsaquo;</i>Back</button>" : "")
     + "<span class='ssk'>" + esc(sessionFor(SESSION.key)[2] || sessionName(SESSION.key)) + "</span>"
     + "<span class='ssp'>" + right + "</span></div>";
+}
+/* A move with no sets left is not a move he did, and a day with no moves
+   and no finisher is not a session: take them out of the record rather
+   than leave an empty entry that counts. */
+function forgetEmpty(k, name){
+  var d = (S.lifts || {})[k];
+  if (!d || !d.ex) return;
+  if (name && d.ex[name] && !(d.ex[name].r || []).length) delete d.ex[name];
+  if (!Object.keys(d.ex).length && !d.fin) delete S.lifts[k];
 }
 function sessionLogged(name){
   var e = (S.lifts || {})[SESSION.day];
@@ -1409,8 +1434,15 @@ function paintSession(){
 
   var ex = list[SESSION.i], name = pickFor(SESSION.key, SESSION.i);
   var t = nextTarget(ex, name), had = sessionLogged(name);
-  var sets = sessionSetsFor(name, ex), setNo = (had ? had.r.length : 0);
+  var sets = Math.max(sessionSetsFor(name, ex), had ? had.r.length : 0);
+  var setNo = (had ? had.r.length : 0);
   var doneAll = setNo >= sets;
+  /* Fixing a set that is already on the record: its own numbers in the
+     dials, and the buttons say save or take it off. Forgotten the moment
+     the move changes under it - a swap, back, skip. */
+  var ed = SESSION.edit && SESSION.edit.name === name && had && had.r[SESSION.edit.k] != null
+         ? SESSION.edit.k : null;
+  if (ed === null) SESSION.edit = null;
   var w = SESSION.w != null && SESSION.wFor === name ? SESSION.w : (had ? had.w : (t.w || 0));
   var reps = SESSION.r != null && SESSION.rFor === name ? SESSION.r
            : (had && had.r.length ? had.r[had.r.length - 1] : (t.reps || ex[2]));
@@ -1422,14 +1454,40 @@ function paintSession(){
     + "<div class='ssacts'><button class='btn quiet' data-how='" + SESSION.key + ":" + SESSION.i + "'>How to do it</button>"
     + "<button class='btn quiet' data-sswap='" + SESSION.i + "'>Swap the machine</button></div></div>";
 
-  /* the sets so far, as pills */
+  /* the sets so far, as pills. A logged one is a button: a thumb that hit
+     Set done too early, or a 10 that was an 8, is fixed where it was made. */
+  var extra = (SESSION.extra || {})[name] || 0;
   h += "<div class='sssets'>";
   for (var k = 0; k < sets; k++){
     var got = had && had.r[k] != null ? had.r[k] : null;
-    h += "<span class='sspill" + (got != null ? " on" : k === setNo ? " now" : "") + "'>"
-      + (got != null ? got : (k + 1)) + "</span>";
+    h += got != null
+      ? "<button class='sspill on" + (k === ed ? " fix" : "") + "' data-sedit='" + k + "' aria-label='Change set "
+        + (k + 1) + "'>" + got + "</button>"
+      : "<span class='sspill" + (k === setNo && ed === null ? " now" : "") + "'>" + (k + 1) + "</span>";
   }
-  h += "<button class='sspill add' data-saddset='1' aria-label='Add a set'>+</button></div>";
+  h += "<button class='sspill add' data-saddset='1' aria-label='Add a set'>+</button>";
+  /* an added set that has not been done can be taken away again */
+  if (extra > 0 && setNo < sets && ed === null)
+    h += "<button class='sspill add' data-sdelset='1' aria-label='Remove the added set'>&minus;</button>";
+  h += "</div>";
+  if (setNo && ed === null)
+    h += "<p class='sshint'>Tap a done set to change it or take it off.</p>";
+
+  if (ed !== null){
+    var secs = BODYWEIGHT[name] && ex[2] >= 25;
+    h += "<label class='sslab'>Changing set " + (ed + 1) + " &middot; logged as "
+      + (had.w ? esc(had.w) + "kg &times; " + had.r[ed] : had.r[ed] + (secs ? " seconds" : " reps")) + "</label>";
+    h += "<div class='lf'>"
+      + (BODYWEIGHT[name] ? "" : liftRow("Load", w, "kg", "sw", 0))
+      + liftRow(BODYWEIGHT[name] && ex[2] >= 25 ? "Seconds" : "Reps", reps, "", "sr", 0)
+      + "</div>";
+    h += "<div class='btns'><button class='btn pri big' data-sfixok='1'>Save set " + (ed + 1) + "</button></div>";
+    h += "<div class='btns tight'><button class='btn quiet' data-sfixdel='1'>Take set " + (ed + 1) + " off</button>"
+      + "<button class='btn quiet' data-sfixno='1'>Leave it</button></div>";
+    h += "</div>";
+    el.innerHTML = h;
+    return;
+  }
 
   if (!doneAll){
     h += "<label class='sslab'>Set " + (setNo + 1) + " &middot; " + (t.w ? "" : "pick a weight, ") + "how many did you do</label>";
@@ -1550,6 +1608,38 @@ function sessionTap(ds, b){
     SESSION.extra = SESSION.extra || {}; SESSION.extra[name] = (SESSION.extra[name] || 0) + 1;
     save(); sfx("tap"); paintSession(); return true;
   }
+  if (ds.sdelset){
+    SESSION.extra = SESSION.extra || {};
+    SESSION.extra[name] = Math.max(0, (SESSION.extra[name] || 0) - 1);
+    save(); sfx("untick"); paintSession(); return true;
+  }
+  /* A done set, tapped: its own numbers go back in the dials. */
+  if (ds.sedit !== undefined){
+    var hadE = sessionLogged(name), ke = Number(ds.sedit);
+    if (!hadE || hadE.r[ke] == null) return true;
+    restStop(true);
+    SESSION.edit = { name: name, k: ke };
+    SESSION.w = hadE.w; SESSION.r = hadE.r[ke]; SESSION.wFor = name; SESSION.rFor = name;
+    save(); sfx("tap"); buzz(8);
+    paintSession(); return true;
+  }
+  if (ds.sfixok || ds.sfixdel || ds.sfixno){
+    var hadF = sessionLogged(name), ed = SESSION.edit;
+    if (hadF && ed && ed.name === name && hadF.r[ed.k] != null){
+      if (ds.sfixok){
+        hadF.w = SESSION.w; hadF.r[ed.k] = Number(SESSION.r) || 0;
+        toast("Set " + (ed.k + 1) + " changed.");
+        sfx("tick"); buzz(10);
+      } else if (ds.sfixdel){
+        hadF.r.splice(ed.k, 1);
+        forgetEmpty(SESSION.day, name);
+        toast("Set " + (ed.k + 1) + " is off the record.");
+        sfx("untick"); buzz(10);
+      } else sfx("tap");
+    }
+    SESSION.edit = null; SESSION.w = null; SESSION.r = null;
+    save(); paintSession(); return true;
+  }
   if (ds.ssetdone){
     var k = SESSION.day;
     S.lifts = S.lifts || {};
@@ -1600,6 +1690,7 @@ function sessionTap(ds, b){
      first, and out of the summary or the finisher onto the last move. */
   if (ds.sback){
     restStop(true);
+    SESSION.edit = null;
     var nb = sessionList().length;
     if (SESSION.i >= nb){ SESSION.i = Math.max(0, nb - 1); SESSION.fin = null; }
     else if (SESSION.i > 0) SESSION.i--;
@@ -1611,6 +1702,7 @@ function sessionTap(ds, b){
   /* Straight to a named move, from a row on the summary. */
   if (ds.sgo !== undefined){
     restStop(true);
+    SESSION.edit = null;
     SESSION.i = Math.max(0, Math.min(sessionList().length - 1, Number(ds.sgo) || 0));
     SESSION.warm = 1; SESSION.fin = null; SESSION.w = null; SESSION.r = null;
     save(); sfx("tap"); buzz(8);
@@ -1624,6 +1716,7 @@ function sessionTap(ds, b){
   }
   if (ds.snext || ds.sskip){
     restStop(true);
+    SESSION.edit = null;
     SESSION.i++; SESSION.w = null; SESSION.r = null;
     save(); sfx(ds.snext ? "done" : "untick");
     paintSession(); return true;
