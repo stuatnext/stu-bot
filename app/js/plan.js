@@ -164,6 +164,53 @@ function askPastePlan(){
   });
 }
 
+/* ------------------------------------------------------------- his plan
+   "Why do you need it private? I don't. It can be public."
+   So it is built in: the road as he described it on 28 September 2026,
+   loaded into the phone once, the first time this version opens. After
+   that it is his to change - a trip he removes stays removed, because the
+   seed never runs twice. The paste code is still there for the next one. */
+var MY_PLAN = {
+  /* trips: [ first day, last day, place, kind, note, time zone ] */
+  t: [
+    ["2026-10-10", "2026-10-16", "Cannes", "holiday", "With Tim", "Europe/Paris"],
+    ["2026-10-17", "2026-10-19", "Sheffield", "family", "The weekend with family", "Europe/London"],
+    ["2026-10-20", "2026-10-23", "New York", "work", "NEXT Predict", "America/New_York"],
+    ["2026-10-23", "2026-10-24", "Doha", "travel", "On the way home", "Asia/Qatar"]
+  ],
+  /* to give dates to: [ id, what, when, kind, place ] */
+  p: [
+    ["nov-leave", "Some leave in November", "November", "holiday", ""],
+    ["croatia", "Croatia", "Early December", "holiday", "Croatia"],
+    ["christmas", "Christmas in Sheffield", "December", "family", "Sheffield"],
+    ["ny-apr", "New York event", "April 2027", "work", "New York"],
+    ["malta-may", "Malta event", "May 2027", "work", "Valletta"]
+  ],
+  /* to sort: [ id, what, by ] */
+  d: [
+    ["cannes-off", "Book the Cannes days off", "2026-10-05"],
+    ["cannes-plan", "Plan Cannes with Tim", "2026-10-08"],
+    ["sg-hours", "Ask to work Singapore hours on Mondays and Fridays", "2026-10-30"],
+    ["nov-book", "Book the November leave", "2026-11-06"]
+  ],
+  /* focus, and his own line for each skill */
+  f: ["us", "friends", "biz"],
+  g: {
+    us: "Date nights every Monday and Friday, from November",
+    friends: "Friends and community in Singapore, and some volunteering",
+    biz: "At least one more client, or a few freelance projects, before 2027",
+    name: "Known in Singapore: events, posts, introductions"
+  },
+  /* date nights: weekdays (0 = Sunday), from, at */
+  n: {"w": [1, 5], "from": "2026-11-02", "t": "19:30"}
+};
+function seedPlan(){
+  if (S.planSeeded) return;
+  mergePlan(MY_PLAN);
+  S.planSeeded = 1;
+  save();
+}
+
 /* ------------------------------------------------------------ editing */
 function askTrip(i){
   var t = tripsAll()[i]; if (!t) return;

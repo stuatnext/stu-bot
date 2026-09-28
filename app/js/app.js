@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v78";
+var BUILD = "v79";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -408,6 +408,8 @@ function graduate(){
 backfillChips();
 noteWhere();
 paintSky();
+/* v79: his road, built in, loaded once */
+if (typeof seedPlan === "function" && S.onboarded) seedPlan();
 render({ first: true });
 paintHud();
 openGate();
