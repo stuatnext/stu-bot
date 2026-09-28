@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v69";
+var BUILD = "v70";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -92,7 +92,7 @@ document.addEventListener("visibilitychange", function(){
   if (typeof awayMin === "function" && awayMin() >= 55){
     arrive(true);
     render({ animate: true });
-  }
+  } else minuteTick();      /* a short absence: the clock and the card still moved */
   /* back in the foreground, possibly in another country: record the day's
      city if this is the first look at it */
   var before = today() + "|" + JSON.stringify(whereOn(today()));
@@ -435,28 +435,19 @@ if (S.pushOn && "serviceWorker" in navigator && "PushManager" in window){
 window.addEventListener("resize", fitRoom);
 if (window.visualViewport) window.visualViewport.addEventListener("resize", fitRoom);
 
-/* The sun moves whether he does or not - but repaint only the sky, never the
-   screen: a full rebuild every minute silently eats anything half-typed. */
-setInterval(function(){
+/* The sun moves whether he does or not - but repaint only what is made of
+   time, never the screen: a full rebuild every minute silently eats anything
+   half-typed. Every room's clock moves; Today moves its card and him on the
+   path, and is drawn again only when a station opens or shuts. */
+function minuteTick(){
   paintSky();
-  if (tab !== "today" || ST || MODAL) return;
-  /* The world moves on its own, so the parts of the board that are made of
-     time are repainted every minute: the hour, the day strip with now
-     crossing it, and the windows with what is left of them. None of the
-     three holds anything typed. The panel and the news are left alone - the
-     panel can hold a half-made decision, and news that reshuffles under him
-     is worse than news that waits. */
-  var sk = document.querySelector("#screen .b-hr");
-  if (sk) sk.outerHTML = bHourHTML();
-  var wins = typeof winList === "function" ? winList() : null;
-  var tl = document.querySelector("#screen .w-tl");
-  if (tl && wins) tl.outerHTML = wDayHTML(wins);
-  var ws = document.querySelector("#screen .w-wins");
-  if (ws && wins){
-    var sel = boardPick(wins);
-    ws.outerHTML = wWindowsHTML(wins, sel);
-  }
-}, 60000);
+  if (ST || MODAL) return;
+  var t = hhmm(nowMin()), cl = document.querySelectorAll("#screen .sc-t, #screen .rm-t");
+  for (var i = 0; i < cl.length; i++) if (cl[i].textContent !== t) cl[i].textContent = t;
+  if (tab === "today" && typeof boardTick === "function" && boardTick())
+    render({ keepScroll: true });
+}
+setInterval(minuteTick, 60000);
 
 /* Hold the title card for a beat, then hand over. */
 window.addEventListener("load", function(){

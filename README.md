@@ -86,6 +86,51 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v70: fixes
+
+> *"Fix fix fix"*
+
+No new features. Three things that were wrong, fixed.
+
+- **Today's clock stopped when you opened the app.** The minute tick in `app.js` was still
+  aiming at parts of the dashboard Today used to be (`.b-hr`, `.w-tl`, `.w-wins`), found none of
+  them, and did nothing. So the clock, the "6h 40m left" on the card and the figure on the path
+  all read whatever they read when the app was opened, however long it stayed open. The tick now
+  moves every room's clock. On Today it also moves the card's minutes and the figure. It
+  redraws the board when a station opens or shuts, or the day turns over. Coming back after less
+  than an hour runs the tick at once rather than waiting for the next minute.
+- **The walk replayed on every tap.** The figure walks from where he last closed the app to
+  now, which is the point. But every redraw of Today replayed it, so marking something done
+  restarted nine hours of walking. It now plays once per arrival.
+- **The paper plan described a programme that no longer exists.** `docs/train.html` still had
+  three full-body Sessions A, B and C on Monday, Wednesday and Friday. It had a travel session
+  "outside the rotation" and a session zero of squat, bench and row. Since v67 the app has run
+  Push, Pull and Legs, plus Arms & Abs as the bonus, and room sessions that follow the split.
+  The tables were rebuilt from `SESSIONS` and `TRAVEL_BY`, and the stage table matches.
+  The page points at what v68 and v69 added:
+  - plan B on every move
+  - the words for the awkward moments
+  - *Not up to it today?*
+  - *When do you go?*
+  - the quiet-hours question
+- **The stage unlocks said the wrong thing.** Reaching Three moves announced "Legs, a push and
+  a pull" and Four moves "A hinge goes in". Both are true of the old full-body sessions and
+  false of a split. They now name what actually joins each day.
+
+Removed as dead: `planLine`, `tipFor` and the `TIPS` table they read. Nothing had called them
+since the dashboard went.
+
+Verified with Playwright at 390x844:
+- The clock, card minutes and figure move on the tick.
+- The board redraws when a station opens. At +250 minutes, family opened.
+- A redraw does not replay the walk.
+- Every other tab's clock keeps time.
+- A short return from the background brings the clock current.
+- The same 61-second wait on the v69 build still showed 09:20 at 09:27.
+- The v68 and v69 walks pass.
+- 2,160 renders across zones, hours and dates show no problems.
+- The paper plan has no horizontal overflow at 390 points, light or dark.
+
 #### v69: for someone who gets nervous at the gym
 
 > *"Just make it a really useful app for someone that struggles to keep up with a good routine,
