@@ -86,6 +86,32 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v79: his road, built in
+
+> *"Why do you need it private? I don't. It can be public."*
+
+So there is no code to paste. His plan as he described it on 28 September 2026 is built into
+`plan.js` (`MY_PLAN`):
+- **Trips:** Cannes with Tim, the Sheffield weekend, New York for NEXT Predict, and Doha on the way
+  home.
+- **To give dates to:** November leave, Croatia, Christmas in Sheffield, and the April and May
+  events.
+- **To sort:** the Cannes days off, planning Cannes, asking for Singapore hours on Mondays and
+  Fridays, and booking the November leave.
+- **Focus:** Tim & me, friends & community, and the business, with his own line for each.
+- **Date nights:** Monday and Friday from 2 November.
+
+It loads into the phone once, the first time this version opens on an onboarded save
+(`S.planSeeded`). After that it is his to change: a trip he removes stays removed. The paste code
+stays for the next plan.
+
+Verified:
+- first open loads the whole road, the focus and the date nights
+- Today already carries the first focus step, and the road ahead counts down to Cannes
+- a removed trip stays removed after reopening
+- a fresh, un-onboarded install gets nothing
+- the v68 to v78 walks and 2,160 renders pass
+
 #### v78: the road ahead
 
 > *"Gosh, chaos, uncertainty. And this is where things need to start getting a little bit more
