@@ -323,7 +323,10 @@ function scWorldHTML(wins, sel){
   var placed = wins.map(function(w){
     return { w: w, x: sinceWake(w.open) / 1440 * 100 };
   }).sort(function(a, b){ return a.x - b.x; });
-  var MIN = 18.5;
+  /* a crowded day - a date night and a level-up step on top of the usual
+     five - tightens the spacing rather than piling stations on each other */
+  var MIN = Math.min(18.5, 80 / Math.max(1, placed.length - 1));
+  var crowd = placed.length >= 6;
   placed.forEach(function(q, i){
     q.x = Math.max(7, Math.min(93, q.x));
     if (i && q.x - placed[i - 1].x < MIN) q.x = placed[i - 1].x + MIN;
@@ -338,12 +341,12 @@ function scWorldHTML(wins, sel){
      one he is standing at bounces and, if it is open, flies a NOW flag. */
   placed.forEach(function(q){
     var w = q.w, picked = sel && w.id === sel.id;
-    h += "<button class='sc-p " + w.state + (picked ? " up" : "")
+    h += "<button class='sc-p " + w.state + (picked ? " up" : "") + (crowd ? " tight" : "")
       + "' data-pick='" + esc(w.id) + "' style='left:" + q.x.toFixed(1)
       + "%; bottom:" + (roadY(q.x) - 24 * ROAD_S).toFixed(0) + "px; --pil:" + w.col + "'>"
       + (picked && w.state === "open" ? "<span class='sc-flag'>Now</span>" : "")
       + "<span class='sc-pk'>" + svg(scPin(w), 20) + "</span>"
-      + "<span class='sc-pn'>" + esc(w.short || w.label)
+      + "<span class='sc-pn'>" + esc(crowd && w.kind === "life" ? "Step" : crowd && w.kind === "date" ? "Date" : (w.short || w.label))
       + (w.state === "soon" ? "<small>" + esc(hhmm(w.open)) + "</small>" : "") + "</span>"
       + "</button>";
   });
@@ -387,6 +390,7 @@ function scPin(w){
   if (w.kind === "care" || w.kind === "skinset") return "drop";
   if (w.kind === "pack") return "pack";
   if (w.kind === "life") return w.life ? skillDef(w.life.skill)[2] : "star";
+  if (w.kind === "date") return "heart";
   return "cards";
 }
 /* v75: him, as a character rather than a stick. Chunky and outlined like a
@@ -609,6 +613,8 @@ function bPlayHTML(sel, k, fwd, quiet){
       h += "<button class='b-go' data-questdone='1'>Did it</button>";
       if (!sel.card.swaps) h += "<button class='b-do' data-questswap='1'>Swap it</button>";
     }
+  } else if (sel.kind === "date"){
+    if (!sel.done) h += "<button class='b-go' data-datedone='1'>We did it</button>";
   } else if (sel.kind === "life"){
     h += "<button class='b-go' data-lifedo='1'>Did it</button>"
       + "<button class='b-do' data-life='" + esc(lf.skill) + "'>Something else</button>";

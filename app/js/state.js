@@ -24,7 +24,7 @@ function load(){
             monthSeen:{}, pushOn:0, look:"sky", badge:1, autoZone:1, showDone:{}, notes:{},
             where:{}, walks:{}, levelSeen:0, gymHere:null,
             cue:"", busy:{}, care:{},
-            life:[], focus:[], goals:{},
+            life:[], focus:[], goals:{}, trips:[], plans:[], todos:[], nights:null,
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
@@ -202,6 +202,10 @@ function noteWhere(){
   var made = z
     ? { c: zoneCity(z), z: z, k: guessKind(z, k) }
     : { c: String(S.camp || "Singapore").replace(" / UK", ""), z: "", k: campKind(S.camp) };
+  /* v78: landed somewhere a planned trip covers - the plan knows the place
+     and whether it is time off, which a time zone cannot */
+  var tr = typeof tripOn === "function" ? tripOn(k) : null;
+  if (tr && z && z !== "Asia/Singapore"){ made.c = tr.c; made.k = tr.k; made.f = 1; }
   /* a stay he has already corrected keeps its correction */
   var y = whereOn(shift(-1));
   if (y && y.z === made.z && y.f){ made.k = y.k; made.f = 1; }
@@ -280,11 +284,16 @@ function kindWord(kind){
 function situation(k){
   k = k || today();
   var rec = whereOn(k);
+  var trip = typeof tripOn === "function" ? tripOn(k) : null;
   if (!rec && k === today()){
     var z = S.autoZone === 0 ? "" : deviceZone();
     rec = z ? { c: zoneCity(z), z: z, k: guessKind(z, k) }
             : { c: String(S.camp || "Singapore").replace(" / UK", ""), z: "", k: campKind(S.camp) };
+    /* v78: away on a planned trip, the plan names the place and the kind */
+    if (trip && z && z !== "Asia/Singapore") rec = { c: trip.c, z: z, k: trip.k, f: 1 };
   }
+  /* a day ahead is where the plan says, or home */
+  if (!rec && trip && k > today()) rec = { c: trip.c, z: trip.z || "", k: trip.k, f: 1 };
   if (!rec) rec = { c: "Singapore", z: "Asia/Singapore", k: "home" };
   var city = rec.c, pin = pinToday();
   /* Sheffield and London are one time zone; only a pin can tell them apart */
@@ -308,7 +317,15 @@ function flipWhere(){
   save();
   return to;
 }
-function holidayOn(k){ var r = whereOn(k); return !!(r && r.k === "holiday"); }
+function holidayOn(k){
+  var r = whereOn(k);
+  if (r && r.k === "holiday") return true;
+  if (r && r.m) return false;                 /* his own word beats the plan */
+  /* v78: a planned holiday is time off whether or not the phone has
+     landed yet - the first morning away is already a holiday morning */
+  var t = typeof tripOn === "function" ? tripOn(k) : null;
+  return !!(t && t.k === "holiday");
+}
 /* A day whose city is not the one before it: he was in the air. It carries
    the run the way a freeze does, and costs him nothing - a routine that
    survives travel is the whole point. */

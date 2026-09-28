@@ -167,6 +167,14 @@ function winList(k){
   /* The day's card, which is open as long as the day is. Something he put in
      his own hand outranks one the app drew for him. */
   var hd = (typeof handDo === "function" && S.onboarded) ? handDo() : [];
+  /* v78: a date night is an evening station of its own on the days he
+     picked - done, it is a Tim & me step */
+  if (typeof dateNightOn === "function" && S.onboarded && dateNightOn(k)){
+    var nm = nightMin();
+    out.push({ id: "date", kind: "date", label: "Date night", short: "Date night",
+      col: "#FF5A7A", chip: 0, rank: 1, done: dateNightDone(k) ? 1 : 0,
+      open: nm, shut: Math.max(nm + 150, bed), why: "Yours and Tim's. Laptop shut, phones away." });
+  }
   /* v77: a focus skill's small step for the week takes the slot first -
      he chose the focus, and it is the thing that moves his life, not just
      his day. Done, and the slot goes back to his own hand or the card. */

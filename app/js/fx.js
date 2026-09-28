@@ -97,7 +97,7 @@ function ask(opts){
     if (opts.field){
       var f = opts.field;
       if (f.label) h += "<label for='mkField'>" + esc(f.label) + "</label>";
-      h += "<input id='mkField' type='" + (f.type === "number" ? "text" : "text") + "'"
+      h += "<input id='mkField' type='" + (f.type === "date" ? "date" : "text") + "'"
         + (f.type === "number" ? " inputmode='decimal'" : "")
         + " value='" + esc(f.value == null ? "" : f.value) + "'"
         + " placeholder='" + esc(f.placeholder || "") + "'"

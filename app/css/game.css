@@ -299,3 +299,57 @@ body:not([data-tab="today"]) #screen{padding-top:0 !important}
   font-weight:700; color:var(--ink)}
 #screen .lf-sub.due{color:color-mix(in srgb, var(--sk) 80%, #FFF); font-weight:700}
 #screen .lf-sub.due.done{color:#5BE8A0}
+
+/* ============================================================ the road
+   v78. What is coming, in order, with a colour per kind of trip, what still
+   needs dates, what to sort before it, and the date nights. */
+#screen .ra{padding:16px 14px 12px}
+#screen .ra-next{margin:8px 0 10px; padding:12px 14px; border-radius:16px; display:flex; flex-direction:column; gap:2px;
+  background:linear-gradient(135deg, color-mix(in srgb, var(--tk) 26%, transparent), transparent 80%);
+  box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--tk) 50%, transparent)}
+#screen .ra-next b{font-family:"Nunito",sans-serif; font-size:22px; font-weight:900; color:var(--ink); letter-spacing:-.02em}
+#screen .ra-next span{font-size:13.5px; font-weight:700; color:var(--ink2)}
+#screen .ra-list{list-style:none; margin:0; padding:0 0 0 14px; position:relative}
+#screen .ra-list::before{content:""; position:absolute; left:4px; top:10px; bottom:10px; width:2px; border-radius:2px;
+  background:linear-gradient(var(--edge), transparent)}
+#screen .ra-list li{position:relative}
+#screen .ra-trip{width:100%; min-height:52px; display:flex; align-items:center; gap:10px; padding:8px 10px; margin:4px 0;
+  border:0; border-radius:14px; background:rgba(255,255,255,.04); font:inherit; color:inherit; text-align:left; cursor:pointer}
+#screen .ra-trip::before{content:""; position:absolute; left:-14px; width:10px; height:10px; border-radius:50%;
+  background:var(--tk); box-shadow:0 0 0 3px var(--card, #141A2B)}
+#screen .ra-trip.on{box-shadow:inset 0 0 0 1.5px var(--tk)}
+#screen .ra-d{flex:none; width:72px; font-family:"JetBrains Mono",monospace; font-size:10.5px; font-weight:700;
+  letter-spacing:.04em; color:var(--ink3)}
+#screen .ra-c{flex:1; min-width:0; font-family:"Nunito",sans-serif; font-size:15px; font-weight:800; color:var(--ink)}
+#screen .ra-c small{display:block; font-size:12px; font-weight:600; color:var(--ink3)}
+#screen .ra-trip em{flex:none; font-style:normal; font-size:11px; font-weight:900; padding:3px 8px; border-radius:999px;
+  color:#101828; background:var(--tk)}
+#screen .ra-plan{display:flex; align-items:center; gap:10px; padding:8px 10px; margin:4px 0; border-radius:14px;
+  background:rgba(255,255,255,.03); box-shadow:inset 3px 0 0 var(--tk)}
+#screen .ra-plan span{flex:1; min-width:0}
+#screen .ra-plan b{display:block; font-size:14.5px; color:var(--ink)}
+#screen .ra-plan small{font-size:12px; color:var(--ink3)}
+#screen .ra-btn{flex:none; min-height:44px; padding:0 14px; border-radius:12px; border:1.5px solid var(--edge);
+  background:var(--card); color:var(--ink); font:inherit; font-weight:800; font-size:13px; cursor:pointer}
+#screen .ra-todo{width:100%; min-height:48px; display:flex; align-items:center; gap:11px; padding:6px 4px; border:0;
+  background:none; font:inherit; color:var(--ink); text-align:left; cursor:pointer}
+#screen .ra-todo i{flex:none; width:26px; height:26px; border-radius:8px; border:2px solid var(--edge2, #2F3850);
+  display:grid; place-items:center; color:#06251A}
+#screen .ra-todo.done i{background:#3FD9A0; border-color:#3FD9A0}
+#screen .ra-todo span{font-size:14px; font-weight:700; line-height:1.35}
+#screen .ra-todo.done span{color:var(--ink3); text-decoration:line-through}
+#screen .ra-todo small{display:block; font-size:12px; font-weight:600; color:var(--ink3)}
+#screen .ra-todo small.late{color:#FF8A7A}
+#screen .ra-nights{width:100%; min-height:52px; display:flex; align-items:center; gap:11px; margin-top:10px; padding:8px 12px;
+  border:0; border-radius:14px; background:rgba(255,90,122,.1); box-shadow:inset 0 0 0 1.5px rgba(255,90,122,.4);
+  font:inherit; color:var(--ink); text-align:left; cursor:pointer}
+#screen .ra-nights i{flex:none; width:32px; height:32px; border-radius:10px; display:grid; place-items:center;
+  background:#FF5A7A; color:#FFFFFF}
+#screen .ra-nights span{flex:1}
+#screen .ra-nights b{display:block; font-size:14.5px}
+#screen .ra-nights small{font-size:12px; color:var(--ink3)}
+#screen .ra-acts{margin-top:10px}
+/* six stations on one road: a little smaller, so they sit side by side */
+body[data-tab="today"] #screen .sc-p.tight .sc-pk{width:42px; height:42px}
+body[data-tab="today"] #screen .sc-p.tight .sc-pk svg{width:19px; height:19px}
+body[data-tab="today"] #screen .sc-p.tight .sc-pn{font-size:10px; padding:3px 7px}

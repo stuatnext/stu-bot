@@ -181,12 +181,24 @@ function lifeStep(k){
   var f = focusList().filter(function(key){ return skillDef(key)[4] === "steps"; });
   for (var i = 0; i < f.length; i++){
     if (lifeThisWeek(f[i], k).length) continue;
+    /* a date night still to come this week IS the week's step for Tim & me */
+    if (f[i] === "us" && typeof dateNightOn === "function" && nightLeftThisWeek(k)) continue;
     var small = (SKILL_ACTS[f[i]] || []).filter(function(a){ return !SKILL_BIG[a[0]]; });
     if (!small.length) continue;
     var a = small[hashOf(weekKeyOf(k) + f[i]) % small.length];
     return { skill: f[i], act: a };
   }
   return null;
+}
+
+function nightLeftThisWeek(k){
+  var d = new Date(k + "T12:00:00"), wk = weekKeyOf(k);
+  for (var i = 0; i < 7; i++){
+    var x = iso(new Date(d.getFullYear(), d.getMonth(), d.getDate() + i));
+    if (weekKeyOf(x) !== wk) break;
+    if (dateNightOn(x)) return true;
+  }
+  return false;
 }
 
 /* ------------------------------------------------------------- the log */

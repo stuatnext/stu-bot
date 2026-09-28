@@ -86,6 +86,58 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v78: the road ahead
+
+> *"Gosh, chaos, uncertainty. And this is where things need to start getting a little bit more
+> certain, a little bit more predictable, a little bit more consistent ... That's exactly why this
+> app exists."*
+
+The app now knows what is coming (`app/js/plan.js`, new), not only where the phone is today.
+
+- **Trips** have dates, a place and a kind: holiday, family, work or travel.
+  - A planned holiday is time off even before the phone lands. Stopped is carried, not owed, so
+    two things make the day.
+  - Away on a trip, the plan names the place and the kind, which a time zone cannot. Days ahead
+    are described from the plan.
+  - Travel days still carry the run.
+- **Plans with no dates yet** (a month, a season) wait under *To give dates to*. Once dated, they
+  become trips. Dates use the phone's own date picker.
+- **To sort**: things to do before the road gets busy, each with an optional "by" date, ticked
+  when done.
+- **Date nights** fall on the weekdays he picks, from the day he picks:
+  - an evening station on Today's road, with the heart, done through the run
+  - each one done is a *Tim & me* step (v77)
+  - a date night still to come that week stands in for that skill's weekly step
+- **The road ahead** is on You, under the levels:
+  - the next trip as a countdown
+  - the trips in order, with a colour for each kind
+  - plans to date and things to sort
+  - date nights
+  - *Add a trip* and *Paste a plan*
+- **He mentions it.** The character says so on the first day of a trip, on the last day, when a
+  trip is ten days out or less (with the first thing still to sort), and on a date night.
+- **Crowded days**: with six stations on the road, the spacing tightens and the labels shorten, so
+  nothing overlaps on the smallest phone.
+
+**None of his actual plans are in the code.** They arrive on the phone by a paste code
+(`DAYLIGHT1:` plus base64url JSON), which is checked, trimmed and merged. Nothing in a code can run,
+nothing already there is removed, and pasting the same code twice adds nothing. They can also be
+added in the app, and they never leave the phone.
+
+Verified with a Playwright walk (17 checks):
+- a pasted plan merges trips, plans, things to sort, date nights, focus and goals; a second paste
+  adds nothing; a broken code is refused
+- the panel counts down to the first trip
+- a planned holiday carries Stopped, and the days ahead know the place
+- date nights appear from their start day, on the road, and the run logs them as a Tim & me step
+- the bubble names the trip and the first thing to sort
+- on holiday abroad the place and kind come from the plan
+- a plan gets dates through the date picker and becomes a trip
+- a thing to sort is ticked
+
+Also checked: six stations on a 375pt road with no overlaps, and the date night standing in for
+the weekly step. The v68 to v77 walks and 2,160 renders pass.
+
 #### v77: a level for every part of life
 
 > *"I like the idea of levelling up. The thing is that I feel like I'm at level zero with a lot of
