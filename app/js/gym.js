@@ -718,12 +718,34 @@ function nextTarget(ex, name){
 function slotId(sKey, i){ return sKey + ":" + i; }
 function pickFor(sKey, i){
   var ex = sessionFor(sKey)[1][i];
+  /* Everything taken: today's session is dumbbells and floor, and a floor
+     version already logged today stays the name for that slot all day, so
+     the tab counts what he actually did after the session is closed. */
+  var fl = FLOOR[ex[0]];
+  if (fl && floorOn(sKey)) return fl;
   var chosen = (S.liftPick || {})[slotId(sKey, i)];
-  if (!chosen) return ex[0];
-  if (chosen === ex[0] || (ex[5] || []).indexOf(chosen) >= 0) return chosen;
-  return ex[0];                       /* a variant I later renamed or removed */
+  var pick = chosen && (chosen === ex[0] || (ex[5] || []).indexOf(chosen) >= 0 || chosen === fl)
+           ? chosen : ex[0];          /* else a variant I later renamed or removed */
+  if (fl && pick !== fl && !loggedToday(pick) && loggedToday(fl)) return fl;
+  return pick;
 }
-function swapNames(ex){ return [ex[0]].concat(ex[5] || []); }
+function swapNames(ex){
+  var fl = FLOOR[ex[0]];
+  return [ex[0]].concat(ex[5] || [], fl && (ex[5] || []).indexOf(fl) < 0 ? [fl] : []);
+}
+/* Today's guided session has been switched to dumbbells and floor. */
+function floorOn(sKey){
+  return !!(SESSION && SESSION.floor && SESSION.key === sKey && SESSION.day === today());
+}
+/* The switch, as a line in the session: in the hero under plan B on every
+   move, and on the warm-up, because the moment he sees the room is before
+   the first set. A room session is already floor, so it never shows there. */
+function floorHTML(){
+  if (!SESSION || SESSION.key === "T") return "";
+  return SESSION.floor
+    ? "<button class='ssfloor on' data-sfloor='0'><span>Dumbbells and floor today.</span><b>Back to the machines</b></button>"
+    : "<button class='ssfloor' data-sfloor='1'><span>Everything taken?</span><b>Dumbbells and floor instead</b></button>";
+}
 
 function askSwap(sKey, i){
   var ex = sessionFor(sKey)[1][i], cur = pickFor(sKey, i);
@@ -1414,7 +1436,7 @@ function paintSession(){
     h += "<div class='sshero'><div class='ssk2'>Before anything</div><h2>Warm up</h2>"
       + "<p>Walked here? You are already warm &mdash; go straight to the two light sets. Otherwise five "
       + "minutes easy on a bike or rower, then two light sets of the first movement to find the weight. "
-      + "Not to failure. Not even close.</p></div>";
+      + "Not to failure. Not even close.</p>" + floorHTML() + "</div>";
     h += "<div class='ssbig'>" + (restLeft() > 0
       ? "<div id='ssRest' class='ssrest going' style='--rest:"
         + (restLeft() / Math.max(1, restTotal())).toFixed(3) + "'><i></i><span>Warm-up \u00b7 "
@@ -1448,11 +1470,17 @@ function paintSession(){
            : (had && had.r.length ? had.r[had.r.length - 1] : (t.reps || ex[2]));
   SESSION.w = w; SESSION.wFor = name; SESSION.r = reps; SESSION.rFor = name;
 
-  h += "<div class='sshero'><div class='ssk2'>" + esc(ex[4]) + "</div><h2>" + esc(name) + "</h2>"
+  /* the slot's own line is about the machine; on a floor day say what it stands in for */
+  var kick = SESSION.floor && name !== ex[0] && FLOOR[ex[0]] === name
+           ? "Instead of the " + ex[0].toLowerCase() : ex[4];
+  h += "<div class='sshero'><div class='ssk2'>" + esc(kick) + "</div><h2>" + esc(name) + "</h2>"
     + "<p class='sstarget'>" + esc(t.say) + "</p>"
-    + planBHTML(SESSION.key, SESSION.i)
+    + (SESSION.floor ? "" : planBHTML(SESSION.key, SESSION.i))
+    + floorHTML()
     + "<div class='ssacts'><button class='btn quiet' data-how='" + SESSION.key + ":" + SESSION.i + "'>How to do it</button>"
-    + "<button class='btn quiet' data-sswap='" + SESSION.i + "'>Swap the machine</button></div></div>";
+    /* on a dumbbells-and-floor day there is no machine to swap */
+    + (SESSION.floor ? "" : "<button class='btn quiet' data-sswap='" + SESSION.i + "'>Swap the machine</button>")
+    + "</div></div>";
 
   /* the sets so far, as pills. A logged one is a button: a thumb that hit
      Set done too early, or a 10 that was an 8, is fixed where it was made. */
@@ -1677,6 +1705,15 @@ function sessionTap(ds, b){
     SESSION.w = null; SESSION.r = null;
     save(); sfx("tap"); buzz(10);
     toast(alt + ". It keeps its own weights.");
+    paintSession(); return true;
+  }
+  if (ds.sfloor !== undefined){
+    SESSION.floor = ds.sfloor === "1";
+    SESSION.w = null; SESSION.r = null; SESSION.edit = null;
+    restStop(true);
+    save(); sfx("tap"); buzz(10);
+    toast(SESSION.floor ? "Dumbbells and a bit of floor. Nothing today needs a bench or a machine."
+                        : "Back to the machines.");
     paintSession(); return true;
   }
   if (ds.sbusy !== undefined){

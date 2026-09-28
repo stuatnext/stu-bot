@@ -959,6 +959,36 @@ var SESSIONS = [
 /* The three the week asks for. D is the bonus and is not one of them. */
 var SPLIT = ["A", "B", "C"];
 
+/* ------------------------------------------------------ everything is taken
+   His words, from the floor: "Every bench is taken. Every weight machine is
+   also taken. Got nervous so just grabbed the most familiar weight machine."
+
+   Plan B offers the next machine, which is no help when every machine has
+   someone on it. So every move that needs a bench, a cable or a machine has
+   a version that needs a pair of dumbbells and a bit of floor, and one tap
+   turns the whole day into those. The same job, the same sets and reps, and
+   nothing he has to ask anyone for. Moves that are not listed already need
+   nothing more than that (goblet squat, Romanian deadlift, the carry, the
+   curl, the dead bug, the lunge, the side plank).
+
+   Each floor version keeps its own weight history, like any other swap.
+   [ the slot's own move ] -> the dumbbells-and-floor version */
+var FLOOR = {
+  "Dumbbell bench press":    "Dumbbell floor press",
+  "Dumbbell shoulder press": "Standing dumbbell press",
+  "Incline dumbbell press":  "Push-up",
+  "Cable triceps pushdown":  "Overhead dumbbell extension",
+  "Pallof press":            "Dead bug",
+  "Lat pulldown":            "Dumbbell pullover on the floor",
+  "One-arm dumbbell row":    "Split-stance dumbbell row",
+  "Seated cable row":        "Bent-over dumbbell row",
+  "Face pull":               "Bent-over rear delt fly",
+  "Leg press":               "Dumbbell split squat",
+  "Hip thrust":              "Glute bridge",
+  "Hanging knee raise":      "Lying leg raise",
+  "Cable woodchop":          "Dumbbell woodchop"
+};
+
 /* [ what to order, grams of protein, where it fits ] */
 /* ------------------------------------------------------- the travel session
    docs/train.html has promised this since the beginning: twenty minutes, a
@@ -1046,7 +1076,9 @@ var BODYWEIGHT = {
   "Plank shoulder tap": 1, "Towel curl": 1, "Backpack curl": 1,
   "Superman": 1, "Back extension": 1, "Reverse snow angel": 1,
   "Band pull-apart": 1, "Wall sit": 1, "Single-leg glute bridge": 1,
-  "Calf raise": 1, "Single-leg calf raise": 1, "Step-up": 1, "Ab wheel": 1
+  "Calf raise": 1, "Single-leg calf raise": 1, "Step-up": 1, "Ab wheel": 1,
+  /* hanging from a bar is your own weight too */
+  "Hanging knee raise": 1, "Captain's chair knee raise": 1, "Dead bug with band": 1
 };
 
 var ORDERS = [
@@ -1162,6 +1194,9 @@ var NERVES = [
   ["If someone asks you", [
     ["\u201cAre you using this?\u201d", "\u201cTwo more sets, then it\u2019s yours.\u201d Or \u201cAll yours.\u201d That is the whole conversation."],
     ["\u201cCan I work in?\u201d", "\u201cSure.\u201d Swap on and off between sets, and wipe it when you leave."]
+  ]],
+  ["If everything is taken", [
+    ["Nothing to say.", "Tap \u201cEverything taken?\u201d on the move. Every move becomes dumbbells and a bit of floor, so you never have to ask anyone for anything."]
   ]],
   ["Asking the staff", [
     ["\u201cCould you show me how to set this up?\u201d", "It is their job, and they are asked it every hour. Nobody thinks less of you for it."]
@@ -1434,7 +1469,32 @@ var START = {
   "Farmer's carry": 20,
   "Trap bar carry": 30,
   "Suitcase carry": 20,
-  "Suitcase carry, one side": 20
+  "Suitcase carry, one side": 20,
+
+  /* the v67 moves, which arrived without a number to start on */
+  "Cable triceps pushdown": 15,
+  "Overhead cable extension": 10,
+  "Dumbbell skull crusher": 6,
+  "Dip machine": 20,
+  "Dumbbell curl": 6,
+  "Cable curl": 10,
+  "Hammer curl": 6,
+  "Preacher curl machine": 15,
+  "Face pull": 10,
+  "Reverse pec deck": 15,
+  "Rear delt fly": 4,
+  "Sled push": 20,
+
+  /* dumbbells and floor, for the day everything is taken */
+  "Dumbbell floor press": 12,
+  "Standing dumbbell press": 8,
+  "Overhead dumbbell extension": 8,
+  "Dumbbell pullover on the floor": 10,
+  "Split-stance dumbbell row": 14,
+  "Bent-over dumbbell row": 10,
+  "Bent-over rear delt fly": 4,
+  "Dumbbell split squat": 8,
+  "Dumbbell woodchop": 6
 };
 
 
@@ -1543,6 +1603,140 @@ var INSPIRE = [
    one is always the thing that goes wrong. An alternative without its own
    entry inherits the slot's, then the generic one. */
 var HOW = {
+  /* the v67 moves, which arrived without their own words */
+  "Cable triceps pushdown": [
+    "Rope or bar on the high pulley. Stand close, a slight lean forward",
+    "Elbows pinned to your sides and they stay there",
+    "Push down until the arms are straight, squeeze, let it back up to chest height",
+    "Wrong: the elbows drifting forward so the shoulders help. Only the forearms move"
+  ],
+  "Dumbbell curl": [
+    "Stand tall, a dumbbell in each hand, palms facing forward",
+    "Elbows at your sides; curl the weights up towards your shoulders",
+    "Squeeze at the top, then lower all the way down slowly",
+    "Wrong: swinging your back to lift it. If you sway, go a dumbbell lighter"
+  ],
+  "Face pull": [
+    "Rope on a cable at head height. Step back until the arms are straight",
+    "Pull the rope towards your forehead, hands finishing either side of your ears",
+    "Squeeze the shoulder blades together, pause, let it back slowly",
+    "Wrong: pulling to your chest. It goes to your face, elbows high"
+  ],
+  "Pike push-up": [
+    "Push-up position, then walk your feet in so your hips go high, an upside-down V",
+    "Bend the elbows and lower the top of your head towards the floor between your hands",
+    "Press back up into the V",
+    "Wrong: dropping the hips into a normal push-up. Hips stay high; this is the shoulder one"
+  ],
+  "Chair dip": [
+    "Hands on the edge of a solid chair or desk behind you, fingers forward",
+    "Feet out in front, knees bent to make it easier, straighter to make it harder",
+    "Bend the elbows straight back until the upper arms are level, then push up",
+    "Wrong: elbows flaring out sideways. Point them behind you"
+  ],
+  "Decline push-up, feet on the bed": [
+    "Feet on the edge of the bed, hands on the floor under your shoulders",
+    "Body one straight line from heels to head",
+    "Lower your chest towards the floor, then press away",
+    "Wrong: hips sagging. If they drop, do normal push-ups instead"
+  ],
+  "Pallof hold": [
+    "Loop a towel round a door handle and hold both ends at your chest, side-on to the door",
+    "Step away until it pulls, feet hip-width, knees soft",
+    "Push your hands straight out in front and hold. Do not let it turn you",
+    "Wrong: twisting towards the door. The job is to stay square"
+  ],
+  "Plank shoulder tap": [
+    "High plank: hands under the shoulders, feet a little wider than hips",
+    "Lift one hand and tap the opposite shoulder, then the other side",
+    "Slow taps. The hips stay still the whole time",
+    "Wrong: rocking side to side. Widen the feet until you can keep still"
+  ],
+  "Towel curl": [
+    "Stand on the middle of a towel, or hold one end in each hand, one hand working",
+    "Curl the working hand up while the other hand pulls against it",
+    "Make the other arm fight you all the way up and all the way down",
+    "Wrong: letting it be easy. The harder the other hand resists, the better it works"
+  ],
+  "Superman": [
+    "Lie face down, arms stretched out in front, legs long",
+    "Lift your chest, arms and legs a few centimetres off the floor",
+    "Hold for two seconds, lower slowly",
+    "Wrong: throwing the head back. Look at the floor just ahead of your hands"
+  ],
+  "Reverse snow angel": [
+    "Lie face down, arms by your sides, palms down, forehead just off the floor",
+    "Lift the arms a little and sweep them round in an arc until they are overhead",
+    "Sweep them back to your sides without letting them touch the floor",
+    "Wrong: rushing it. Slow and small beats fast and big"
+  ],
+  "Wall sit": [
+    "Back flat against a wall, feet a stride out in front",
+    "Slide down until your thighs are level with the floor, knees over ankles",
+    "Hold it. Breathe",
+    "Wrong: hands on your thighs. Let the legs do all of it"
+  ],
+  "Calf raise": [
+    "Balls of your feet on a step, heels hanging off, a hand on the wall",
+    "Rise up as high as you can onto your toes",
+    "Pause at the top, lower slowly until the heels drop below the step",
+    "Wrong: bouncing. Up, pause, all the way down"
+  ],
+  /* dumbbells and floor - the day every bench and machine is taken */
+  "Dumbbell floor press": [
+    "Lie on the floor, knees bent, a dumbbell in each hand over your chest",
+    "Lower until your upper arms touch the floor, elbows about 45 degrees out",
+    "Pause a beat on the floor, then press straight up",
+    "Wrong: bouncing the elbows off the floor. Touch, pause, press"
+  ],
+  "Standing dumbbell press": [
+    "Stand tall, feet hip-width, dumbbells at your shoulders, palms forward",
+    "Squeeze your glutes and brace your stomach",
+    "Press straight up until the arms are long, then lower to the shoulders",
+    "Wrong: leaning back to finish the rep. If you lean, the weight is too heavy"
+  ],
+  "Overhead dumbbell extension": [
+    "Stand or kneel, one dumbbell held in both hands above your head",
+    "Elbows point forward; lower the weight behind your head",
+    "Straighten the arms back up. Only the forearms move",
+    "Wrong: elbows flaring out wide. Keep them close to your ears"
+  ],
+  "Dumbbell pullover on the floor": [
+    "Lie on the floor, knees bent, one dumbbell in both hands above your chest",
+    "Soft bend in the elbows; lower it slowly back behind your head",
+    "Stop just before it touches the floor, then pull it back over your chest",
+    "Wrong: bending the elbows to make it easy. The back does this, not the arms"
+  ],
+  "Split-stance dumbbell row": [
+    "Step one foot forward and rest that hand on your front knee",
+    "Flat back, the dumbbell hanging from the other hand",
+    "Pull it to your hip, elbow close to your side, then lower it all the way",
+    "Wrong: twisting the chest open to lift it. Shoulders stay square to the floor"
+  ],
+  "Bent-over dumbbell row": [
+    "A dumbbell in each hand, soft knees, fold forward from the hips",
+    "Back flat, arms hanging straight down",
+    "Pull both to your ribs, squeeze the shoulder blades, lower slowly",
+    "Wrong: standing up a little on every rep. Stay folded; go lighter if you cannot"
+  ],
+  "Bent-over rear delt fly": [
+    "Light dumbbells, fold forward with a flat back, arms hanging down",
+    "Soft bend in the elbows, palms facing each other",
+    "Lift the arms out to the sides to shoulder height, then lower slowly",
+    "Wrong: swinging. If it needs momentum, the dumbbells are too heavy"
+  ],
+  "Dumbbell split squat": [
+    "Dumbbells at your sides, one foot a long stride in front of the other",
+    "Back heel up, chest tall",
+    "Drop the back knee straight down towards the floor, push up through the front heel",
+    "Wrong: the front knee caving in. Keep it over your middle toes"
+  ],
+  "Dumbbell woodchop": [
+    "One dumbbell in both hands by one hip, feet wider than your shoulders",
+    "Lift it diagonally across your body to above the other shoulder",
+    "Turn from the middle and pivot the back foot; control it back down",
+    "Wrong: throwing it. The same speed up and down"
+  ],
   /* the travel session - a hotel room, no kit */
   "Push-up": [
     "Hands under the shoulders, feet together, body one straight line",

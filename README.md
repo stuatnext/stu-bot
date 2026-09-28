@@ -86,6 +86,52 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v72: everything is taken
+
+> *"Every bench is taken. Every weight machine is also taken. Got nervous so just grabbed the
+> most familiar weight machine which is the leg press"*, sent from the gym floor.
+
+v69's plan B offers the next machine, which is no help when every machine has someone on it.
+So now every move that needs a bench, a cable or a machine has a version that needs only a pair
+of dumbbells and a bit of floor (`FLOOR` in `data.js`). One tap turns the whole day into those
+versions. It keeps the same sets and reps and doesn't need anything from anyone.
+
+- **"Everything taken? Dumbbells and floor instead"** appears on the warm-up, which is when he
+  first sees the room, and under the move on every step. Once switched, it reads "Dumbbells and
+  floor today · Back to the machines". Plan B and *Swap the machine* are hidden, because there is
+  no machine to swap. The orange line above the move says what it stands in for, for example
+  "Instead of the leg press".
+- **It lasts for today's session only.** The next Pull Day opens on the machines again. A floor
+  version already logged today keeps its name for that slot all day, so the Gym tab counts it
+  after the session is closed. Each floor version keeps its own weight history.
+- **The floor versions for each day:**
+  - Push: floor press, standing press, push-up, overhead extension, dead bug, carry
+  - Pull: floor pullover, split-stance row, bent-over row, curl, rear delt fly, dead bug
+  - Legs: goblet squat, Romanian deadlift, split squat, glute bridge, lunge, leg raise
+- **What to say**: the sheet has a new section, *If everything is taken*. The answer is
+  "Nothing to say" and to tap the switch.
+
+Fixed on the way. v67 added the triceps pushdown, the dumbbell curl and the face pull, plus
+ten room-session moves, without instructions, so *How to do it* showed generic text. The three
+gym moves also had no starting weight, so they opened blank. All of them now have their own
+instructions. Every move and alternative now opens on a starting weight, or is marked as your
+own weight (the hanging knee raise is).
+
+Verified with a Playwright walk at 390x844 (20 checks):
+- every day's floor version has unique names, its own instructions, a starting weight, and no
+  machine
+- the switch shows on the warm-up and on moves
+- moves 1 to 3 of Pull Day become the floor versions
+- sets are logged under the floor name
+- *How to do it* shows the floor move's own instructions
+- "Back to the machines" works, and the logged floor move keeps its name
+- the tab counts the floor move after closing
+- the words sheet covers it
+- the switch is a 44pt target
+- the next Pull Day opens on the machines, and the floor move remembers its weight
+
+The v68, v69 and v71 walks, the v70 tick checks and 2,160 renders pass.
+
 #### v71: every tap can be taken back
 
 > *"Can't see a way to go back or reverse things"* - sent with a screenshot of Pull Day, move 2
