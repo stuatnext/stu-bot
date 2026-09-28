@@ -1,0 +1,197 @@
+/* ==================================================================== game
+   v75. "Please enhance the design into a genuinely good designed game."
+
+   Today was a scene with its game crammed into a strip along the bottom:
+   half a screen of empty sky, pins at two heights on the skyline, a black
+   band for ground, a stick for a man, a grey bar in the sky that read like
+   an error, and nothing that said what the day wanted. A home screen in a
+   game does three things, and this now does all three:
+
+     1. A place with somewhere to go - a road through the day on real
+        ground, the stations as chunky medallions standing on it, the one to
+        go to bouncing under a NOW flag, and him walking it.
+     2. The goal and the progress, always in view - today's three as coins
+        under the clock, the level as a ring that fills towards the next.
+     3. One quest, with its picture - the card below says what the thing is
+        and what it asks.
+
+   Loaded last; everything is scoped to Today so no other room changes.
+   ======================================================================== */
+
+/* ------------------------------------------------------------ the ground
+   Grass by day, going warm at golden hour and blue-dark at night, instead
+   of a black band. The skyline stands on it. */
+body[data-tab="today"] #screen .sc{--gA:#43A96E; --gB:#23744A; --rd:#F4E4BF; --rdE:#C9B083;
+  --rdL:rgba(255,255,255,.75); --walk:#FFD84D}
+body[data-tab="today"] #screen .sc[data-sky="dawn"]{--gA:#5E7458; --gB:#34463A; --rd:#E9D2B4; --rdE:#A98C74}
+body[data-tab="today"] #screen .sc[data-sky="gold"]{--gA:#7C9A48; --gB:#46622F; --rd:#F6DDAA; --rdE:#C29A5E}
+body[data-tab="today"] #screen .sc[data-sky="dusk"]{--gA:#3F5063; --gB:#253140; --rd:#C9BBAA; --rdE:#8B7C73;
+  --rdL:rgba(255,255,255,.45)}
+body[data-tab="today"] #screen .sc[data-sky="night"],
+body[data-tab="today"] #screen .sc[data-sky="deepnight"]{--gA:#1A2A40; --gB:#0D1727; --rd:#34435F; --rdE:#1F2A40;
+  --rdL:rgba(255,255,255,.28)}
+body[data-tab="today"] #screen .sc-gr{height:var(--gh, 214px) !important;
+  background:linear-gradient(var(--gA), var(--gB)) !important;
+  box-shadow:inset 0 10px 18px -12px rgba(0,0,0,.45) !important}
+/* a lip of lighter grass where the ground meets the sky */
+body[data-tab="today"] #screen .sc-gr::before{content:""; position:absolute; left:0; right:0; top:0; height:6px;
+  background:linear-gradient(rgba(255,255,255,.22), rgba(255,255,255,0))}
+body[data-tab="today"] #screen .sc-far{bottom:calc(var(--gh, 214px) - 6px) !important; height:clamp(70px,15vh,120px) !important}
+body[data-tab="today"] #screen .sc-path{display:none}
+
+/* ------------------------------------------------------------- the road */
+body[data-tab="today"] #screen .sc-road{position:absolute; left:0; right:0; bottom:0; height:var(--gh, 214px);
+  pointer-events:none; z-index:1}
+body[data-tab="today"] #screen .sc-road svg{width:100%; height:100%; display:block; overflow:visible}
+body[data-tab="today"] #screen .sc-road path{fill:none; stroke-linecap:round; stroke-linejoin:round}
+body[data-tab="today"] #screen .sc-road .r0{stroke:var(--rdE); stroke-width:38px}
+body[data-tab="today"] #screen .sc-road .r1{stroke:var(--rd); stroke-width:31px}
+body[data-tab="today"] #screen .sc-road .r2{stroke:var(--rdL); stroke-width:2.5px; stroke-dasharray:8 10}
+/* where he has already been today: a trail of gold steps behind him */
+body[data-tab="today"] #screen .sc-road .rw{stroke:var(--walk); stroke-width:6px; stroke-dasharray:0 11;
+  opacity:.95}
+
+/* --------------------------------------------------------- the stations
+   Medallions standing on the road: coloured when open, gold with a tick
+   when done, pale with the hour when still to come, grey when shut. */
+body[data-tab="today"] #screen .sc-p{gap:5px; box-shadow:none !important; z-index:3}
+body[data-tab="today"] #screen .sc-p::before{display:none !important}
+body[data-tab="today"] #screen .sc-pk{position:relative; width:48px; height:48px; border-radius:50%;
+  background:linear-gradient(color-mix(in srgb, var(--pil) 62%, #FFF), var(--pil) 62%);
+  border:3px solid #FFFFFF; color:#FFFFFF;
+  box-shadow:0 4px 0 color-mix(in srgb, var(--pil) 45%, #000), 0 8px 14px -6px rgba(0,0,0,.6) !important;
+  transform:none !important}
+body[data-tab="today"] #screen .sc-pk svg{width:22px; height:22px; filter:drop-shadow(0 1px 0 rgba(0,0,0,.25))}
+body[data-tab="today"] #screen .sc-pn small{display:block; font-size:9.5px; font-weight:700; opacity:.78; text-align:center;
+  margin-top:-1px}
+body[data-tab="today"] #screen .sc-pn{padding:3px 9px; border-radius:11px; background:rgba(8,12,28,.8); line-height:1.15;
+  text-align:center;
+  color:#FFFFFF !important; font-size:11px; font-weight:800; text-shadow:none; letter-spacing:0;
+  box-shadow:0 2px 0 rgba(0,0,0,.35)}
+body[data-tab="today"] #screen .sc-p.open, body[data-tab="today"] #screen .sc-p.soon,
+body[data-tab="today"] #screen .sc-p.shut, body[data-tab="today"] #screen .sc-p.done{opacity:1}
+body[data-tab="today"] #screen .sc-p.done .sc-pk{background:linear-gradient(#FFE88A, #F2B41C 62%);
+  color:#6A4700; box-shadow:0 4px 0 #A8740A, 0 8px 14px -6px rgba(0,0,0,.6) !important}
+body[data-tab="today"] #screen .sc-p.done .sc-pk::after{content:""; position:absolute; right:-6px; top:-6px;
+  width:19px; height:19px; border-radius:50%; background:#2FCB8B; border:2.5px solid #FFFFFF;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.4l2.6 2.6L12 5.4' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size:13px; background-position:center; background-repeat:no-repeat}
+body[data-tab="today"] #screen .sc-p.soon .sc-pk{background:linear-gradient(#F4F7FC, #CBD4E4 62%);
+  color:#4B5A7A; box-shadow:0 4px 0 #8E9AB2, 0 8px 14px -6px rgba(0,0,0,.5) !important}
+body[data-tab="today"] #screen .sc-p.shut .sc-pk{background:linear-gradient(#9AA3B5, #6E7890 62%);
+  color:#DDE2EC; border-color:#C4CBD8; box-shadow:0 4px 0 #4B5366 !important}
+body[data-tab="today"] #screen .sc-p.shut .sc-pn{opacity:.8}
+/* the one he is standing at: bigger, bouncing, a halo */
+body[data-tab="today"] #screen .sc-p.up{z-index:5; transform:translateX(-50%) scale(1.14)}
+body[data-tab="today"] #screen .sc-p.up .sc-pk{animation:gmBob 1.4s ease-in-out infinite;
+  box-shadow:0 4px 0 color-mix(in srgb, var(--pil) 45%, #000), 0 0 0 6px rgba(255,255,255,.3),
+    0 10px 18px -6px rgba(0,0,0,.65) !important}
+body[data-tab="today"] #screen .sc-p.up.done .sc-pk{box-shadow:0 4px 0 #A8740A, 0 0 0 6px rgba(255,232,138,.35),
+    0 10px 18px -6px rgba(0,0,0,.65) !important}
+body[data-tab="today"] #screen .sc-p:active .sc-pk{transform:translateY(3px) !important}
+body[data-tab="today"] #screen .sc-flag{position:absolute; bottom:calc(100% + 4px); left:50%;
+  transform:translateX(-50%); padding:3px 9px 4px; border-radius:9px; background:#FFD84D; color:#3A2800;
+  font-family:"Nunito",sans-serif; font-size:10.5px; font-weight:900; letter-spacing:.06em;
+  text-transform:uppercase; white-space:nowrap; box-shadow:0 3px 0 #B98A0E;
+  animation:gmBob 1.4s ease-in-out infinite}
+body[data-tab="today"] #screen .sc-flag::after{content:""; position:absolute; left:50%; top:100%;
+  margin-left:-5px; border:5px solid transparent; border-top-color:#FFD84D}
+@keyframes gmBob{0%,100%{translate:0 0} 50%{translate:0 -4px}}
+
+/* ----------------------------------------------------------------- him */
+body[data-tab="today"] #screen .sc-me{width:32px !important; height:46px !important; margin-left:-16px !important;
+  z-index:6; transition:none !important; filter:drop-shadow(0 2px 0 rgba(0,0,0,.25))}
+body[data-tab="today"] #screen .sc-me svg{filter:none !important; animation:gmIdle 2.6s ease-in-out infinite}
+body[data-tab="today"] #screen .sc-me::after{bottom:-3px !important; width:26px !important; height:7px !important;
+  margin-left:-13px !important; background:radial-gradient(closest-side, rgba(0,0,0,.45), transparent) !important}
+body[data-tab="today"] #screen .sc-me .lg rect{fill:#26345A; stroke:#0B1020; stroke-width:1.4}
+body[data-tab="today"] #screen .sc-me .lg{transform-box:fill-box; transform-origin:50% 8%}
+body[data-tab="today"] #screen .sc-me .tee{fill:#1CB0F6; stroke:#0B1020; stroke-width:1.6}
+body[data-tab="today"] #screen .sc-me .arm{fill:none; stroke:#F2C6A0; stroke-width:3.4; stroke-linecap:round}
+body[data-tab="today"] #screen .sc-me .skin{fill:#F2C6A0; stroke:#0B1020; stroke-width:1.5}
+body[data-tab="today"] #screen .sc-me .hair{fill:#3B2A20; stroke:#0B1020; stroke-width:1.2; stroke-linejoin:round}
+body[data-tab="today"] #screen .sc-me .eye{fill:#0B1020}
+body[data-tab="today"] #screen .sc-me .smile{fill:none; stroke:#0B1020; stroke-width:1.3; stroke-linecap:round}
+body[data-tab="today"] #screen .sc-me.walk svg{animation:gmStep .36s ease-in-out infinite alternate}
+body[data-tab="today"] #screen .sc-me.walk .l1{animation:gmLegA .36s ease-in-out infinite alternate}
+body[data-tab="today"] #screen .sc-me.walk .l2{animation:gmLegB .36s ease-in-out infinite alternate}
+@keyframes gmIdle{0%,100%{transform:translateY(0)} 50%{transform:translateY(-1.5px)}}
+@keyframes gmStep{from{transform:translateY(0)} to{transform:translateY(-2px)}}
+@keyframes gmLegA{from{transform:rotate(22deg)} to{transform:rotate(-22deg)}}
+@keyframes gmLegB{from{transform:rotate(-22deg)} to{transform:rotate(22deg)}}
+
+/* ------------------------------------------------------------- the news
+   Said by him: a white speech bubble above the ground, its tail towards
+   where he stands. */
+body[data-tab="today"] #screen .sc-news{right:auto !important; top:auto !important; bottom:calc(var(--gh, 214px) + 12px) !important;
+  --bw:min(280px, 76vw); left:clamp(calc(var(--bw) / 2 + 12px), var(--x, 50vw), calc(100vw - var(--bw) / 2 - 12px)) !important;
+  transform:translateX(-50%); width:var(--bw); padding:9px 13px !important; border-radius:16px !important;
+  background:#FFFFFF !important; color:#1B2340 !important; border:0 !important; backdrop-filter:none !important;
+  font-size:13px !important; font-weight:700 !important; line-height:1.35 !important;
+  box-shadow:0 4px 0 rgba(0,0,0,.28), 0 10px 22px -12px rgba(0,0,0,.6) !important; z-index:5;
+  animation:gmPop .45s cubic-bezier(.2,1.4,.4,1) both .35s}
+body[data-tab="today"] #screen .sc-news.quiet{color:#3A4466 !important; font-weight:700 !important}
+body[data-tab="today"] #screen .sc-news::after{content:""; position:absolute; top:100%;
+  left:clamp(22px, calc(50% + var(--x, 50vw) - clamp(calc(var(--bw) / 2 + 12px), var(--x, 50vw), calc(100vw - var(--bw) / 2 - 12px))), calc(100% - 22px));
+  margin-left:-8px; border:8px solid transparent; border-top-color:#FFFFFF;
+  border-bottom:0}
+body[data-tab="today"] #screen .sc-news em{background:#EEF1F8 !important; color:#3A4466 !important;
+  border-radius:999px; padding:2px 8px}
+@keyframes gmPop{from{opacity:0; transform:translateX(-50%) scale(.85) translateY(8px)} to{opacity:1; transform:translateX(-50%)}}
+
+/* -------------------------------------------------------------- the HUD */
+body[data-tab="today"] #screen .sc-goal{position:absolute; left:14px; top:calc(52px + env(safe-area-inset-top));
+  z-index:4; display:flex; align-items:center; gap:5px; padding:4px 11px 4px 5px; border-radius:999px;
+  background:rgba(8,12,28,.42); backdrop-filter:blur(4px); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+body[data-tab="today"] #screen .sc-goal .gc{width:24px; height:24px; border-radius:50%; display:grid; place-items:center;
+  color:rgba(255,255,255,.75); border:2px solid rgba(255,255,255,.5); font-style:normal}
+body[data-tab="today"] #screen .sc-goal .gc svg{width:12px; height:12px}
+body[data-tab="today"] #screen .sc-goal .gc.on{background:var(--pil); border-color:#FFFFFF; color:#FFFFFF;
+  box-shadow:0 2px 0 rgba(0,0,0,.35)}
+body[data-tab="today"] #screen .sc-goal .gc.rest{border-style:dashed; opacity:.55}
+body[data-tab="today"] #screen .sc-goal span{margin-left:3px; font-family:"Nunito",sans-serif; font-size:12.5px;
+  font-weight:800; color:#FFFFFF; text-shadow:0 1px 2px rgba(0,0,0,.4)}
+/* the level: a ring that fills towards the next one */
+body[data-tab="today"] #screen .sc-stats .sc-lv{width:30px !important; height:30px !important; margin:0 3px 0 0 !important;
+  padding:0; display:grid; place-items:center;
+  background:conic-gradient(#FFD84D calc(var(--xp, 0) * 360deg), rgba(255,255,255,.16) 0) !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.6) !important}
+body[data-tab="today"] #screen .sc-stats .sc-lv b{width:23px; height:23px; border-radius:50%; display:grid; place-items:center;
+  background:linear-gradient(#7C8CF0, #4657C4); color:#FFFFFF; font-size:12px; font-weight:900;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+body[data-tab="today"] #screen .sc-stats{padding:3px 8px 3px 3px !important}
+#screen .rm .sc-lv b{font-weight:900}
+
+/* ------------------------------------------------------------ the quest
+   The card under the scene: a medallion with the thing's picture, then the
+   words. For a collected card it says what the thing is and what it asks. */
+body[data-tab="today"] #screen .b-pl{position:relative; padding-left:80px !important; min-height:92px}
+body[data-tab="today"] #screen .b-pl-ic{position:absolute; left:16px; top:16px; width:50px; height:50px;
+  border-radius:16px; display:grid; place-items:center; font-style:normal; color:#FFFFFF;
+  background:linear-gradient(color-mix(in srgb, var(--pil) 62%, #FFF), var(--pil) 62%);
+  box-shadow:0 3px 0 color-mix(in srgb, var(--pil) 45%, #000), inset 0 1px 0 rgba(255,255,255,.5)}
+body[data-tab="today"] #screen .b-pl-ic svg{width:24px; height:24px}
+body[data-tab="today"] #screen .b-pl-ic.art{font-size:30px; line-height:1;
+  background:linear-gradient(#FFF6DA, #FFE0A0); box-shadow:0 3px 0 #C99A3C, inset 0 1px 0 #FFF}
+body[data-tab="today"] #screen .b-pl.done .b-pl-ic:not(.art){background:linear-gradient(#FFE88A, #F2B41C 62%);
+  color:#6A4700; box-shadow:0 3px 0 #A8740A}
+body[data-tab="today"] #screen .b-pl.done .b-pl-ic::after{content:""; position:absolute; right:-6px; top:-6px;
+  width:19px; height:19px; border-radius:50%; background:#2FCB8B; border:2.5px solid var(--card, #141A2B);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.4l2.6 2.6L12 5.4' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size:13px; background-position:center; background-repeat:no-repeat}
+body[data-tab="today"] #screen .b-pl-q{display:block; margin-top:9px; padding:8px 11px; border-radius:12px;
+  background:rgba(255,255,255,.06); font-size:13px; font-weight:600; line-height:1.4; color:var(--ink2)}
+body[data-tab="today"] #screen .b-pl-q em{display:block; margin-bottom:2px; font-style:normal;
+  font-family:"JetBrains Mono",monospace; font-size:9px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:#FFD84D}
+body[data-tab="today"] #screen .b-pl.won{padding-left:18px !important}
+
+/* ------------------------------------------------------------- the deck
+   The active tab on Today was light blue text on a light blue key - the
+   word Today could not be read. Dark ink, like every other tab. */
+body[data-tab="today"] #nav button[aria-current="true"]{color:#08131E !important}
+
+@media (prefers-reduced-motion: reduce){
+  body[data-tab="today"] #screen .sc-p.up .sc-pk, body[data-tab="today"] #screen .sc-flag,
+  body[data-tab="today"] #screen .sc-me svg, body[data-tab="today"] #screen .sc-news{animation:none !important}
+}

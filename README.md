@@ -86,6 +86,56 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v75: Today, designed as a game
+
+> *"Rain tree... not sure what that is. Also please enhance the design into a genuinely good
+> designed game"*, with a screenshot of Today at 12:21.
+
+The screenshot showed the problem.
+- **Empty sky, cramped game.** Over half the screen was sky. The game was crammed into a strip at
+  the bottom: pins at two heights on the skyline, a black band for ground, and a stick figure.
+- **Glitches.** A mustard square sat behind the selected pin. A grey bar in the sky read like an
+  error. The active Today tab was light blue text on a light blue key, so it couldn't be read.
+- **No goal, no meaning.** Nothing said what the day wanted. The card panel said "Rain tree." and
+  "Done today." with nothing about what a rain tree is.
+
+A game's home screen does three things, and Today now does all three. The new styles are in
+`css/game.css`, loaded last and scoped to Today.
+
+1. **A place with somewhere to go.**
+   - Real ground that follows the hour: grass by day, warm at golden hour, blue-dark at night.
+   - A winding road across it, with gold steps behind him where he has already been.
+   - The stations stand on the road as chunky medallions: coloured when open, gold with a tick
+     when done, pale with their hour when still to come, grey when shut.
+   - The one he's standing at bounces under a **NOW** flag.
+   - He is a character now, walking along the curve of the road when the app opens, with a small
+     bob while he waits. If his minute would put him on top of a station, he stands a step
+     before it.
+2. **The goal and the progress in view.**
+   - Under the clock, today's three pillars show as coins, lit when done, with "1 of 3 today" or
+     "Day complete".
+   - The level is a ring that fills towards the next one.
+3. **One quest, with its picture.**
+   - The panel has a medallion with the station's icon, or the card's own picture.
+   - A card says its set ("Card · Everyday"), what the thing is ("The wide flat canopies. Folds
+     its leaves at night.") and what it asks, or "You did it" once done.
+
+Also:
+- The news is now **said by him**: a white speech bubble above the ground, its tail towards where
+  he stands, kept on screen.
+- The first-session line was rewritten in plain words.
+- The active Today tab is readable again: dark ink, as on every other tab.
+- On shorter phones the ground and road shrink together.
+
+Verified with Playwright:
+- Today at 08:50, 12:21, 16:40 and 22:30, at 375x667, 390x844 and 430x932. Nothing overlaps
+  and there is no sideways scroll.
+- The card panel, open and done, explains the Rain tree.
+- He walks the road to now and stops.
+- The room headers on other tabs are unchanged.
+- The v68 to v74 walks, the v70 tick checks (now checking he's drawn where the minute puts him)
+  and 2,160 renders pass.
+
 #### v74: what a machine looks like
 
 > *"Help me with indicators of what a machine looks like and how to set it up"*
