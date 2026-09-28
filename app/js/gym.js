@@ -963,7 +963,7 @@ function askLift(sKey, idx){
     + "<div class='btns'><button class='btn pri' data-lf='ok:0:0'>" + (had ? "Save" : "Log it") + "</button>"
     + "<button class='btn quiet' data-lf='no:0:0'>" + (had ? "Leave it" : "Not this one") + "</button></div>"
     + (had ? "<div class='btns tight'><button class='btn quiet' data-lf='clear:0:0'>Take today’s "
-      + esc(name.toLowerCase()) + " off</button></div>" : "")
+      + esc(lowerName(name)) + " off</button></div>" : "")
     + "</div>";
   el.className = "on";
   document.body.style.overflow = "hidden";
@@ -998,12 +998,13 @@ function askLift(sKey, idx){
     if (kind === "ok"){
       var reps = LIFT.r.filter(function(n){ return n > 0; });
       if (!reps.length){ sfx("no"); toast("At least one set with reps in it."); return; }
-      var k = today();
+      var k = today(), wasFirst = firstTimeOn(LIFT.name), nm = LIFT.name;
       S.lifts = S.lifts || {};
       S.lifts[k] = S.lifts[k] || { s: sKey, ex: {} };
       S.lifts[k].s = sKey;
       S.lifts[k].ex[LIFT.name] = { w: LIFT.w, r: reps };
       save(); buzz(14); sfx("tick");
+      machineCheer(nm, wasFirst);
       close();
       render({ keepScroll: true });
       return;
@@ -1203,6 +1204,7 @@ function gymProgressHTML(bare){
 /* ------------------------------------------------------------- how-to */
 function askHow(sKey, idx){
   var ex = sessionFor(sKey)[1][idx], name = pickFor(sKey, idx);
+  if (firstTimeOn(name)){ tellMachine(name, ex); return; }
   var steps = howFor(name, ex);
   tell(name, "<ol class='how'>" + steps.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>"
     + "<p class='fine'>" + esc(ex[4]) + " &middot; " + restClock(restOf(ex)) + " between sets.</p>");
@@ -1274,6 +1276,71 @@ function planBHTML(sKey, i){
   return "<button class='ssplanb' data-splanb='" + i + "'><span><b>Taken?</b> "
     + esc(alt) + " does the same job.</span><i>Switch</i></button>";
 }
+/* ============================================================== machines
+   "There's lots of other weight machines but I just feel way too
+   unconfident to touch them." What makes a machine frightening is not the
+   weight, it is not knowing how it works in front of people who seem to.
+   Every machine is the same three things, and the first time on one is
+   worth saying out loud. */
+var MACHINE_THREE = [
+  ["A seat or pad that moves.", "A knob or lever, usually a bright colour: pull it, slide, let go. Line the handles up with the joint that moves \u2014 your chest for a press, your knee level with the dot on the side for legs."],
+  ["A pin in the weight stack.", "Pull it out and push it into a light plate near the top. Nobody can see the number from where they are, and lighter is never wrong on a first go."],
+  ["A picture on the side.", "The movement, and the muscles it works. Everyone reads it, including the people who look like they know."]
+];
+/* every machine he has ever logged a set on, in the order he first did */
+function machinesUsed(){
+  var seen = {}, out = [];
+  liftDays().forEach(function(k){
+    Object.keys((S.lifts[k] || {}).ex || {}).forEach(function(n){
+      var e = S.lifts[k].ex[n];
+      if (MACHINES[n] && !seen[n] && e && e.r && e.r.length){ seen[n] = 1; out.push(n); }
+    });
+  });
+  return out;
+}
+/* A move's name inside a sentence: lower case, except the words that are
+   names - Smith, Romanian, Pallof, the T in T-bar, the captain's chair. */
+function lowerName(n){
+  return String(n).toLowerCase()
+    .replace(/\bsmith\b/g, "Smith").replace(/\bromanian\b/g, "Romanian")
+    .replace(/\bpallof\b/g, "Pallof").replace(/\bt-bar\b/g, "T-bar");
+}
+function firstTimeOn(name){ return !!MACHINES[name] && !liftHistory(name, 1).length; }
+function machinesLine(){
+  var u = machinesUsed();
+  if (!u.length) return "No machines yet. One is enough to start.";
+  return "You have used " + (u.length === 1 ? "one machine" : u.length + " machines") + ": "
+    + u.map(lowerName).join(", ")
+    + ". One new one a visit, never more \u2014 and the floor stops being unfamiliar.";
+}
+function machineThreeHTML(){
+  return "<ol class='nvr'>" + MACHINE_THREE.map(function(x){
+    return "<li><b>" + esc(x[0]) + "</b> " + esc(x[1]) + "</li>";
+  }).join("") + "</ol>";
+}
+/* The first time on a machine: how every machine works, then this one. */
+function tellMachine(name, ex){
+  var h = "<p class='fine' style='margin:0 0 8px'>Every machine works the same way, and nobody is "
+    + "watching you set it up \u2014 they are counting their own reps.</p>";
+  h += "<h4 class='nv-h'>The three things every machine has</h4>" + machineThreeHTML();
+  h += "<h4 class='nv-h'>This one</h4><ol class='how'>"
+    + howFor(name, ex).map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>";
+  h += "<p class='fine' style='margin:10px 0 0'>Today the whole job is one set at a light plate. "
+    + "That is the machine done; the weight comes later. Or ask the staff: "
+    + "\u201cCould you show me how to set this up?\u201d</p>";
+  h += "<p class='fine' style='margin:8px 0 0'>" + esc(machinesLine()) + "</p>";
+  tell("First time on the " + lowerName(name), h);
+}
+/* Said once, the first time a set lands on a machine he had never used. */
+function machineCheer(name, wasFirst){
+  if (!wasFirst) return;
+  var n = machinesUsed().length;
+  setTimeout(function(){
+    toast("First time on the " + lowerName(name) + ". That is "
+      + (n === 1 ? "your first machine." : n + " machines."), true);
+  }, 350);
+}
+
 function tellNerves(){
   var h = "<p class='fine' style='margin:0 0 10px'>The hard part is not the lifting. It is an unfamiliar "
     + "room, rules nobody tells you, and feeling watched. So here are the words, and the rules.</p>";
@@ -1284,6 +1351,8 @@ function tellNerves(){
     });
     h += "</ul>";
   });
+  h += "<h4 class='nv-h'>A machine you have never touched</h4>" + machineThreeHTML()
+    + "<p class='fine' style='margin:6px 0 0'>" + esc(machinesLine()) + "</p>";
   h += "<h4 class='nv-h'>The rules nobody writes down</h4><ol class='nvr'>"
     + GYM_RULES.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>";
   h += "<h4 class='nv-h'>In the bag, the night before</h4><ul class='nvbag'>"
@@ -1470,14 +1539,16 @@ function paintSession(){
            : (had && had.r.length ? had.r[had.r.length - 1] : (t.reps || ex[2]));
   SESSION.w = w; SESSION.wFor = name; SESSION.r = reps; SESSION.rFor = name;
 
-  /* the slot's own line is about the machine; on a floor day say what it stands in for */
-  var kick = SESSION.floor && name !== ex[0] && FLOOR[ex[0]] === name
-           ? "Instead of the " + ex[0].toLowerCase() : ex[4];
+  /* The slot's own line is about its own move - "Dumbbells, hinge at the
+     hip" read over a seated leg curl. A swap, or a floor day, says what it
+     stands in for instead. */
+  var kick = name !== ex[0] ? "Instead of the " + lowerName(ex[0]) : ex[4];
   h += "<div class='sshero'><div class='ssk2'>" + esc(kick) + "</div><h2>" + esc(name) + "</h2>"
     + "<p class='sstarget'>" + esc(t.say) + "</p>"
     + (SESSION.floor ? "" : planBHTML(SESSION.key, SESSION.i))
     + floorHTML()
-    + "<div class='ssacts'><button class='btn quiet' data-how='" + SESSION.key + ":" + SESSION.i + "'>How to do it</button>"
+    + "<div class='ssacts'><button class='btn quiet' data-how='" + SESSION.key + ":" + SESSION.i + "'>"
+    + (firstTimeOn(name) ? "First time? Set it up" : "How to do it") + "</button>"
     /* on a dumbbells-and-floor day there is no machine to swap */
     + (SESSION.floor ? "" : "<button class='btn quiet' data-sswap='" + SESSION.i + "'>Swap the machine</button>")
     + "</div></div>";
@@ -1669,7 +1740,7 @@ function sessionTap(ds, b){
     save(); paintSession(); return true;
   }
   if (ds.ssetdone){
-    var k = SESSION.day;
+    var k = SESSION.day, wasFirst = firstTimeOn(name);
     S.lifts = S.lifts || {};
     S.lifts[k] = S.lifts[k] || { s: SESSION.key, ex: {} };
     S.lifts[k].s = SESSION.key;
@@ -1678,6 +1749,7 @@ function sessionTap(ds, b){
     S.lifts[k].ex[name] = e;
     save(); buzz(14); sfx("tick");
     if (b) burst(b, "#8FE3B4");
+    machineCheer(name, wasFirst);
     var setsNow = sessionSetsFor(name, ex);
     if (e.r.length < setsNow) restStart(restOf(ex));
     paintSession(); return true;
