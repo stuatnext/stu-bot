@@ -630,3 +630,14 @@ button.vc:not(.on) .vv{color:var(--goldEdge, #C98A08); font-family:"Nunito",sans
   cursor:pointer}
 .donerow:active{opacity:.6}
 .wk.done .wi{opacity:.55}
+
+/* ==================================================================== v68
+   The way back. The guided session only ever went forwards: skip every move
+   and the summary was a dead end whose one button said he had trained. */
+.sstop .ssx{width:44px; height:44px}       /* the thumb target, for both of them */
+.ssb{font-size:26px; padding-bottom:3px}
+button.rec{font:inherit; width:100%; text-align:left; color:inherit; cursor:pointer;
+  transition:transform .08s var(--tap)}
+button.rec:active{transform:scale(.985)}
+.rec.skip{border-style:dashed}
+.rec.skip .rt{color:var(--ink3)}

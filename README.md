@@ -86,6 +86,41 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v68: the way back
+
+He skipped every move in a guided session and sent a screenshot: three rows
+reading **skipped**, a headline reading **"Turned up. Lifted. Logged."**, and
+one green button offering to mark him Trained. *"There's no way to reset."*
+
+He was right, and it was worse than it looked. The session only ever went
+forwards — `Set done` or `Skip this one`, no way back — so once the index ran
+past the last move you landed on the summary. Closing it left `S.sess` behind
+with the index still at the end, so the next tap on the tab resumed it and put
+you straight back on that summary. For the rest of the day the guided session
+was bricked, and the only exit that cleared it was the button that claimed he
+had trained.
+
+Four small things:
+
+- **A back arrow** beside the close button on every step. From a move it goes
+  to the one before, from the first move to the warm-up, and from the summary
+  or the finisher onto the last move.
+- **The summary tells the truth.** With nothing on the record it reads
+  "Nothing logged yet." over "Every move was skipped", the status says
+  *nothing logged* rather than *done*, and the green button becomes **Back to
+  the first move**. Marking Trained is not offered for a session he did not
+  do; the fine print points at the tab, because a walk still counts.
+- **Every row is a way in.** The summary's move rows are buttons now — tap a
+  skipped one and the session opens on it. With some logged and some skipped
+  the primary stays *Finish — mark Trained*, with *Go back to the skipped
+  ones* underneath.
+- **Closing never leaves a dead session.** If nothing was logged and no
+  finisher was done, the stored session is forgotten on the way out, so the
+  next start begins at the warm-up. A session with even one set in it still
+  resumes exactly where he left it.
+
+The round session buttons went from 42px to 44 while I was in there.
+
 #### v62: five rooms, not five headers
 
 *"You've just added a moon. That's a shit design change."* Correct. v61 pasted

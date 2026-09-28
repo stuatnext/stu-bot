@@ -1166,6 +1166,14 @@ function startSession(key){
   paintSession();
 }
 function closeSession(){
+  /* A session with nothing on the record is not progress to come back to. If
+     it is left behind, the next tap on the tab resumes it - which, once every
+     move has been skipped past, means landing straight back on the summary
+     with no way to the moves. Forget it instead and start clean. */
+  if (SESSION && !sessionDone()){
+    var fe = (S.lifts || {})[SESSION.day];
+    if (!(fe && fe.fin)){ S.sess = null; save(); }
+  }
   var el = document.getElementById("session");
   if (el){ el.className = ""; el.innerHTML = ""; }
   document.body.style.overflow = "";
@@ -1178,6 +1186,30 @@ function sessionSetsFor(name, ex){
   var extra = (SESSION.extra || {})[name] || 0;
   return stage()[3] + extra;
 }
+/* How much of this session is actually on the record, and where the first
+   gap is. The summary used to say "Turned up. Lifted. Logged." over three
+   rows reading "skipped". */
+function sessionDone(){
+  if (!SESSION) return 0;
+  var n = 0;
+  sessionList().forEach(function(ex, i){ if (sessionLogged(pickFor(SESSION.key, i))) n++; });
+  return n;
+}
+function firstUnlogged(){
+  var list = sessionList();
+  for (var i = 0; i < list.length; i++) if (!sessionLogged(pickFor(SESSION.key, i))) return i;
+  return 0;
+}
+/* The bar across the top of every step. The back arrow is the thing that was
+   missing: the session only ever went forwards, so skipping every move left
+   him on a summary with one button on it, and that button said he had
+   trained. */
+function sstop(right){
+  return "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
+    + (SESSION.warm ? "<button class='ssx ssb' data-sback='1' aria-label='Back'>&lsaquo;</button>" : "")
+    + "<span class='ssk'>" + esc(sessionFor(SESSION.key)[2] || sessionName(SESSION.key)) + "</span>"
+    + "<span class='ssp'>" + right + "</span></div>";
+}
 function sessionLogged(name){
   var e = (S.lifts || {})[SESSION.day];
   return e && e.ex && e.ex[name] ? e.ex[name] : null;
@@ -1188,9 +1220,7 @@ function paintSession(){
   if (!el || !SESSION) return;
   var list = sessionList(), n = list.length;
   var h = "<div class='ss'>";
-  h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
-    + "<span class='ssk'>" + esc(sessionFor(SESSION.key)[2] || sessionName(SESSION.key)) + "</span>"
-    + "<span class='ssp'>" + (SESSION.warm ? Math.min(SESSION.i + 1, n) + " of " + n : "warm-up") + "</span></div>";
+  h += sstop(SESSION.warm ? Math.min(SESSION.i + 1, n) + " of " + n : "warm-up");
 
   if (!SESSION.warm){
     h += "<div class='sshero'><div class='ssk2'>Before anything</div><h2>Warm up</h2>"
@@ -1266,9 +1296,7 @@ function paintSession(){
 function paintFinisher(el){
   var min = finMinutes(), on = lastFinOn() || "Bike";
   var h = "<div class='ss'>";
-  h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
-    + "<span class='ssk'>" + esc(sessionFor(SESSION.key)[2] || sessionName(SESSION.key))
-    + "</span><span class='ssp'>last thing</span></div>";
+  h += sstop("last thing");
   h += "<div class='sshero'><div class='ssk2'>Easy minutes</div><h2>Finisher</h2>"
     + "<p>" + min + " easy minutes on the bike, incline treadmill or rower. Talking pace \u2014 a "
     + "sentence, not a song. Phone out, podcast on. It never gets harder: the lifts get heavier, this "
@@ -1287,16 +1315,19 @@ function paintFinisher(el){
 }
 
 function paintSummary(el){
-  var list = sessionList(), h = "<div class='ss'>";
-  h += "<div class='sstop'><button class='ssx' data-sclose='1' aria-label='Leave'>&times;</button>"
-    + "<span class='ssk'>" + esc(sessionFor(SESSION.key)[2] || sessionName(SESSION.key))
-    + "</span><span class='ssp'>done</span></div>";
-  h += "<div class='sshero'><div class='ssk2'>That is the session</div><h2>Turned up. Lifted. Logged.</h2></div>";
+  var list = sessionList(), got = sessionDone(), h = "<div class='ss'>";
+  h += sstop(got ? "done" : "nothing logged");
+  h += "<div class='sshero'>" + (got
+    ? "<div class='ssk2'>That is the session</div><h2>Turned up. Lifted. Logged.</h2>"
+    : "<div class='ssk2'>Nothing on the record</div><h2>Nothing logged yet.</h2>"
+      + "<p>Every move was skipped. Tap one below to go back to it, or leave and "
+      + "the session starts clean the next time you open it.</p>") + "</div>";
   h += "<div class='recs'>";
   list.forEach(function(ex, i){
     var name = pickFor(SESSION.key, i), had = sessionLogged(name);
-    h += "<div class='rec'><span class='rd'>" + (i + 1) + "</span><span class='rt'>" + esc(name) + "</span>"
-      + "<b class='rv'>" + (had ? kgOr(had.w) + " \u00b7 " + had.r.join(",") : "skipped") + "</b></div>";
+    h += "<button class='rec" + (had ? "" : " skip") + "' data-sgo='" + i + "'>"
+      + "<span class='rd'>" + (i + 1) + "</span><span class='rt'>" + esc(name) + "</span>"
+      + "<b class='rv'>" + (had ? kgOr(had.w) + " \u00b7 " + had.r.join(",") : "skipped") + "</b></button>";
   });
   if (finMinutes() > 0 && SESSION.key !== "T"){
     var fe = (S.lifts || {})[SESSION.day], fin = fe && fe.fin ? fe.fin : null;
@@ -1304,8 +1335,21 @@ function paintSummary(el){
       + "<b class='rv'>" + (fin ? esc(finLabel(fin.on)) + " \u00b7 " + fin.min + " min" : "skipped") + "</b></div>";
   }
   h += "</div>";
-  h += "<div class='btns'><button class='btn pri big' data-sfinish='1'>Finish &mdash; mark Trained</button></div>";
-  h += "<p class='fine' style='text-align:center'>Next time the app already knows what to suggest.</p>";
+  if (got){
+    h += "<div class='btns'><button class='btn pri big' data-sfinish='1'>Finish &mdash; mark Trained</button></div>";
+    if (got < list.length){
+      h += "<div class='btns tight'><button class='btn quiet' data-sgo='" + firstUnlogged() + "'>"
+        + "Go back to the skipped ones</button></div>";
+    }
+    h += "<p class='fine' style='text-align:center'>Next time the app already knows what to suggest.</p>";
+  } else {
+    /* Nothing was lifted, so nothing here claims he lifted. The way out is a
+       way back in, and leaving costs him nothing. */
+    h += "<div class='btns'><button class='btn pri big' data-sgo='0'>Back to the first move</button></div>";
+    h += "<div class='btns tight'><button class='btn quiet' data-sdrop='1'>Leave it &mdash; not today</button></div>";
+    h += "<p class='fine' style='text-align:center'>A walk counts too. Mark Trained from the tab if that "
+      + "is what happened.</p>";
+  }
   h += "</div>";
   el.innerHTML = h;
 }
@@ -1357,6 +1401,32 @@ function sessionTap(ds, b){
     SESSION.fin = "skip"; restStop(true); save(); sfx("untick");
     toast("Skipped. The lifts were the session.");
     paintSession(); return true;
+  }
+  /* Back one step: to the move before this one, to the warm-up from the
+     first, and out of the summary or the finisher onto the last move. */
+  if (ds.sback){
+    restStop(true);
+    var nb = sessionList().length;
+    if (SESSION.i >= nb){ SESSION.i = Math.max(0, nb - 1); SESSION.fin = null; }
+    else if (SESSION.i > 0) SESSION.i--;
+    else SESSION.warm = 0;
+    SESSION.w = null; SESSION.r = null;
+    save(); sfx("tap"); buzz(8);
+    paintSession(); return true;
+  }
+  /* Straight to a named move, from a row on the summary. */
+  if (ds.sgo !== undefined){
+    restStop(true);
+    SESSION.i = Math.max(0, Math.min(sessionList().length - 1, Number(ds.sgo) || 0));
+    SESSION.warm = 1; SESSION.fin = null; SESSION.w = null; SESSION.r = null;
+    save(); sfx("tap"); buzz(8);
+    paintSession(); return true;
+  }
+  /* Out, with the day's session forgotten rather than left finished-but-empty. */
+  if (ds.sdrop){
+    S.sess = null; save(); sfx("untick");
+    toast("Left it. Nothing logged, nothing lost.");
+    closeSession(); return true;
   }
   if (ds.snext || ds.sskip){
     restStop(true);
