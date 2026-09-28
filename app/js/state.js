@@ -559,13 +559,6 @@ function nextUp(){
   if (open.indexOf("family") >= 0 && wake) return "family";
   return open[0];
 }
-function tipFor(key, day){
-  var pool = TIPS[key] || [];
-  if (!pool.length) return "";
-  var k = (day || today()) + key, h = 0;
-  for (var j = 0; j < k.length; j++) h = (h * 33 + k.charCodeAt(j)) >>> 0;
-  return pool[h % pool.length];
-}
 
 /* ------------------------------------------------------- the one instruction
    His words: "when I go to the today page, I want to know what my top
@@ -658,15 +651,6 @@ function priority(opts){
   return { ask: over ? "Stop. Malta finished at " + sh.endT + "." : "Stop when Malta does.",
            sub: (stake || stopLine()) + back,
            cta: (over || sh.noShift) ? { act: "tick:stop", label: "I finished on time" } : null };
-}
-/* What the row the hour points at says inside the row itself. */
-function planLine(key){
-  if (key === "train"){
-    var ga = typeof gymAsk === "function" ? gymAsk() : null;
-    return ga && ga.row ? ga.row : tipFor("train");
-  }
-  if (key === "family") return typeof peopleLine === "function" ? peopleLine() : familyLine();
-  return stopLine();
 }
 
 /* ------------------------------------------------------------ the brief

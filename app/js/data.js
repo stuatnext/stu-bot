@@ -554,30 +554,6 @@ var CHIP_HINT = [
   "Something you would call ridiculous"
 ];
 
-/* ----------------------------------------------------------------- the tips
-   What the app says when it points at the next thing. Picked by day hash so
-   it does not repeat itself two mornings running. */
-var TIPS = {
-  train: [
-    "The hours before Malta wakes are the only ones nobody can take.",
-    "A long walk counts. It has always counted.",
-    "Gym, run or walk - decided the night before is twice as likely.",
-    "Twenty minutes is a tick. Perfect is not the standard."
-  ],
-  family: [
-    "A call, not a text. Ten minutes is a real ten minutes.",
-    "A call, not a text. The accent comes back in minutes.",
-    "Wednesday is Mum's day. Walk while you talk.",
-    "Five minutes counts if it is a real five minutes."
-  ],
-  stop: [
-    "Malta is done. Shut the laptop and take the point.",
-    "The shift ends when it ends. That is the whole skill.",
-    "Nothing after 23:00 is work; it is worry with a keyboard.",
-    "Stopping on time tonight is tomorrow's energy."
-  ]
-};
-
 /* ----------------------------------------------------- the card challenges
    His call: a card should ask something of you, or it is wallpaper. Every
    card carries a doable line - the specific ones here, the rest built from
@@ -1151,10 +1127,10 @@ var NEAR = {
    [ sessions needed, name, exercises shown, sets each, what this stage is for, finisher minutes ] */
 var STAGES = [
   [0,  "Session zero",     3, 2, "Find the room. Two easy sets of three things, then leave.", 0],
-  [1,  "Three moves",      3, 3, "Legs, a push and a pull. The whole body in twenty-five minutes.", 0],
+  [1,  "Three moves",      3, 3, "Three proper sets of the day\u2019s first three moves. About twenty-five minutes.", 0],
   [2,  "The bike",         3, 3, "Eight easy minutes after the lifts. Talking pace. With the walk in, this is the belly work.", 8],
-  [3,  "Four moves",       4, 3, "A hinge goes in. This is where the posture work starts.", 8],
-  [6,  "Five moves",       5, 3, "The waist work joins it - bracing, not crunches.", 10],
+  [3,  "Four moves",       4, 3, "One more on every day: the pushdown on Push, the curl on Pull, the hip thrust on Legs.", 8],
+  [6,  "Five moves",       5, 3, "A fifth on every day: the Pallof press, the face pull, the lunge.", 10],
   [11, "The full session", 6, 3, "All six. From here nothing is added; the weight goes up instead.", 10]
 ];
 

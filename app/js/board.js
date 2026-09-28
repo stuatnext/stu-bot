@@ -37,6 +37,9 @@
 var B_PICK = "";        /* which window is in the panel, "" = let the day decide */
 var NEWS = null;        /* the news, captured once per arrival */
 var AWAY = 0;           /* how long he was gone, read before the arrival is stamped */
+var WALKED = false;     /* the walk from where he was has played for this arrival */
+var B_SIG = "";         /* the day and every station's state, as last drawn */
+var B_CARD = "";        /* the card, as last drawn */
 
 /* ------------------------------------------------------------- the arrival
    The news has to be read BEFORE the open is stamped, or looking at it is
@@ -45,6 +48,7 @@ var AWAY = 0;           /* how long he was gone, read before the arrival is stam
 function arrive(force){
   if (NEWS !== null && !force) return NEWS;
   AWAY = awayMin();
+  WALKED = false;
   NEWS = worldNews();
   markSeen();
   return NEWS;
@@ -84,6 +88,8 @@ function viewBoard(){
   TODAY_MORE = "";
   arrive();
   var wins = sceneWins(winList(k)), sel = boardPick(wins);
+  B_SIG = boardSig(wins, k);
+  B_CARD = scCardHTML(sel, k);
   /* One button that walks the day, because he should not have to choose
      which station to stand at before he can start. */
   /* ONE action on this screen. The card used to carry its own button and the
@@ -98,7 +104,7 @@ function viewBoard(){
       + (at && sel.state === "open" ? "Start here" : "Start the day")
       + "<em>" + left + " left</em></button>"
     : "";
-  return "<div class='b-t'>" + scWorldHTML(wins, sel) + scCardHTML(sel, k)
+  return "<div class='b-t'>" + scWorldHTML(wins, sel) + B_CARD
     + start + TODAY_MORE + "</div>";
 }
 
@@ -202,9 +208,11 @@ function scWorldHTML(wins, sel){
   var s = shape(), sit = situation(), ph = skyPhase();
   var night = ph === "night" || ph === "deepnight";
   var nowPos = sinceWake(nowMin()) / 1440 * 100;
-  /* where he was standing when he last closed it, so the walk back is real */
+  /* where he was standing when he last closed it, so the walk back is real -
+     once per arrival. Every tap on Today redraws it, and replaying nine
+     hours of walking because he marked something done is a stutter. */
   var wasPos = nowPos;
-  if (AWAY > 2) wasPos = sinceWake(((nowMin() - AWAY) % 1440 + 1440) % 1440) / 1440 * 100;
+  if (AWAY > 2 && !WALKED) wasPos = sinceWake(((nowMin() - AWAY) % 1440 + 1440) % 1440) / 1440 * 100;
   if (wasPos > nowPos) wasPos = 1.5;            /* he slept through the fold */
   nowPos = Math.max(1.5, Math.min(98.5, nowPos));
   wasPos = Math.max(1.5, Math.min(98.5, wasPos));
@@ -402,11 +410,7 @@ function bPlayHTML(sel, k, fwd, quiet){
           : isUp ? (bSecond(pr.ask, pr.sub) || sel.why)
           : sel.kind === "care" ? careSay(sel.key, k)
           : sel.why;
-  var left = winLeft(sel);
-  var state = sel.state === "done" ? "done"
-            : sel.state === "open" ? dur(left) + " left"
-            : sel.state === "soon" ? "opens " + hhmm(sel.open)
-            : "shut " + dur(left) + " ago";
+  var state = bStateWord(sel);
 
   var h = "<div class='b-pl " + sel.state + "' style='--pil:" + sel.col + "'>";
   h += "<span class='b-pl-h'><span class='b-pl-n'>" + esc(sel.label) + "</span>"
@@ -442,6 +446,44 @@ function bPlayHTML(sel, k, fwd, quiet){
   h += "</span>";
   return h + fwd + "</div>";
 }
+function bStateWord(sel){
+  var left = winLeft(sel);
+  return sel.state === "done" ? "done"
+       : sel.state === "open" ? dur(left) + " left"
+       : sel.state === "soon" ? "opens " + hhmm(sel.open)
+       : "shut " + dur(left) + " ago";
+}
+
+/* -------------------------------------------------------------- the minute
+   The board is made of time, so the minute has to move it: the clock, the
+   minutes left on the card, and him on the path. Before v70 the tick in
+   app.js still reached for the parts of the old board, found none of them,
+   and left the clock reading whatever time he opened it at.
+
+   When a station opens or shuts, or the day turns over, the whole board is
+   drawn again - it holds nothing typed. Otherwise only the card is swapped,
+   and only when its words changed, so the clouds do not jump every minute.
+   Returns true when the caller should redraw the board. */
+function boardSig(wins, k){
+  return k + "|" + wins.map(function(w){
+    return w.id + ":" + w.state + (w.done ? "+" : "");
+  }).join(",");
+}
+function boardTick(){
+  var k = today(), wins = sceneWins(winList(k));
+  if (boardSig(wins, k) !== B_SIG) return true;
+  var card = document.querySelector("#screen .b-pl");
+  var html = scCardHTML(boardPick(wins), k);
+  if (card && html !== B_CARD){ card.outerHTML = html; B_CARD = html; }
+  var me = document.querySelector("#screen .sc-me");
+  if (me){
+    var x = Math.max(1.5, Math.min(98.5, sinceWake(nowMin()) / 1440 * 100)).toFixed(2);
+    me.dataset.to = x;
+    me.style.left = x + "%";
+  }
+  return false;
+}
+
 /* priority() writes the headline and the line under it, and on some days
    they are the same sentence twice. On a card that is the whole panel, the
    echo is dropped and the station's own line stands in. */
@@ -462,6 +504,7 @@ function scSettle(){
   var me = document.querySelector("#screen .sc-me");
   if (!me || me.dataset.to == null) return;
   var to = me.dataset.to;
+  WALKED = true;
   if (reduced()){ me.style.left = to + "%"; return; }
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){ me.style.left = to + "%"; });
