@@ -86,6 +86,48 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v81: kit first
+
+> *"It's asking me to moisturise in the shower, but if I don't have moisturiser, I can't complete it...
+> I need to buy things. I need to make sure I have things to actually complete the levels... And I
+> don't know what moisturiser I should buy."*
+
+At level zero, the first level is getting the kit, not doing the routine. New `kit.js`:
+- **A step you have nothing for is held back.** If the kit a routine needs is missing, `careDue` says
+  that routine isn't due, from today on. This is the same way sunscreen isn't due in a Sheffield
+  January: it drops off Today, the run and the Skin ring, and nothing is owed. Past days are left
+  alone, so a bottle running out never rewrites a run you already kept.
+- **One step replaces the held ones: the kit.** It shows on Today and in the run:
+  - It starts as "Check your kit", and "Go through it" asks one thing at a time: *I have one* or
+    *Need to buy it*.
+  - After that it's the errand: "Get the kit — moisturiser and breakfast protein. A big FairPrice
+    has all of it."
+  - The character's speech bubble says it too: "Passing a FairPrice? …"
+- **One named pick for each thing.** Each comes with its size and price, why that one, the other
+  pick and when to choose it, how to use it, where it's sold (from where you are), and how long it
+  lasts. Prices were checked at FairPrice online in September 2026.
+  - **Moisturiser:** Neutrogena Hydro Boost Water Gel. If your skin feels tight or flaky, CeraVe PM
+    Facial Moisturising Lotion instead. The same one does morning and night, so the night step is
+    now *Night moisturiser*: one bottle to buy, not two.
+  - **Sunscreen:** Bioré UV Aqua Rich Watery Essence SPF50+. If it stings your eyes, La Roche-Posay
+    Anthelios UVMune 400 instead.
+  - **Face wash:** CeraVe Foaming Cleanser. For dry skin, the Hydrating one.
+  - **Breakfast protein:** a week of Greek yoghurt, or whey and a shaker. Until you have it in, the
+    food tab stops suggesting the shake or the yoghurt, and breakfast stays breakfast.
+- **Getting it is a level.** Marking something as got brings back the step it was holding and pays
+  +30 XP to that skill (Skin or Diet). XP counts only what you said you got, so it never pays twice.
+- **Where it lives.** The Skin tab shows the kit under the game while anything is missing, and the
+  ring shows a bag instead of 0 of 0. Once it's all there, it moves behind a *Kit* door with a
+  *Ran out* button. On the food tab it's an *In the kitchen* door.
+- **Nobody asks what the record already shows.** If you've ticked the moisturiser in the last 30
+  days, you have one.
+
+Verified:
+- 30 checks in a new walk: held steps, the station, the Skin panel, the sheets from the run, the
+  summary, the errand and the bubble, unlocking and XP, Ran out, inference from the record, runs not
+  rewritten, the breakfast pick, and fit at 375 wide
+- the existing suites and the 2,160-render sweep (with the kit missing), all clean
+
 #### v80: the run goes both ways
 
 > *"I can't go back and forward here."* (over step 6 of 6 of Start the day)

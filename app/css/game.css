@@ -397,3 +397,57 @@ body[data-tab="today"] #screen .sc-p.tight .sc-pn{font-size:10px; padding:3px 7p
 #task .tk-ch{display:inline-block; font-size:25px; font-weight:800; line-height:0; vertical-align:-2px}
 #task .tk-bk .tk-ch{margin-right:7px}
 #task .tk-fw .tk-ch{margin-left:7px}
+
+/* ================================================================ the kit
+   v81. "If I don't have moisturiser, I can't complete it... I don't know
+   what moisturiser I should buy." What is still to get is a card with one
+   named pick, the other one and when, how to use it, and where it is sold;
+   what he has is one line with Ran out. */
+#screen .kit{padding:16px 14px 12px}
+#screen .kit.bare{padding:2px 0 6px}
+#screen .kit-hd{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
+#screen .kit-hd b{font-family:"Nunito",sans-serif; font-size:18px; font-weight:900; color:var(--ink)}
+#screen .kit-hd span{font-family:"JetBrains Mono",monospace; font-size:10px; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink3)}
+#screen .kit-lead{margin:6px 0 2px; font-size:13px; line-height:1.45; color:var(--ink2)}
+#screen .kit-i{margin-top:10px; padding:12px; border-radius:18px; background:rgba(255,255,255,.035);
+  box-shadow:inset 0 0 0 1.5px var(--edge)}
+#screen .kit-i.need{background:color-mix(in srgb, var(--kt) 9%, transparent);
+  box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--kt) 55%, transparent)}
+#screen .kit-top{display:flex; align-items:center; gap:10px; margin-bottom:9px}
+#screen .kit-top b{font-family:"Nunito",sans-serif; font-size:16.5px; font-weight:900; color:var(--ink)}
+#screen .kit-st{margin-left:auto; font-style:normal; font-family:"Nunito",sans-serif; font-size:11.5px; font-weight:900;
+  padding:3px 10px; border-radius:999px; color:#2A0714; background:var(--kt);
+  box-shadow:0 2px 0 color-mix(in srgb, var(--kt) 45%, #000)}
+#screen .kit-i.ask .kit-st{background:none; color:var(--kt); box-shadow:inset 0 0 0 1.5px var(--kt)}
+.kit-c{display:flex; flex-direction:column; gap:8px}
+#modal .kit-c{margin:8px 0 4px}
+.kit-pick{display:flex; flex-direction:column; gap:3px; padding:11px 13px; border-radius:14px; background:var(--sunk);
+  box-shadow:inset 3px 0 0 var(--kt)}
+.kit-pick em,.kit-c p em{font-style:normal; font-family:"JetBrains Mono",monospace; font-size:9.5px; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase}
+.kit-pick em{color:var(--kt)}
+.kit-pick b{font-family:"Nunito",sans-serif; font-size:16px; font-weight:900; line-height:1.25; color:var(--ink)}
+.kit-pick span{font-size:12.5px; font-weight:700; color:var(--ink2)}
+.kit-c p{margin:0; font-size:13.5px; line-height:1.45; color:var(--ink2)}
+.kit-c p em{margin-right:8px; color:var(--ink3)}
+.kit-c .kit-where{display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--ink3)}
+.kit-c .kit-where svg{flex:none}
+#screen .kit-acts{display:flex; gap:8px; margin-top:12px}
+#screen .kit-b{flex:1 1 0; min-width:0; min-height:48px; border-radius:14px; cursor:pointer; font:inherit;
+  font-family:"Nunito",sans-serif; font-size:14.5px; font-weight:900; color:var(--ink);
+  border:1.5px solid var(--edge); background:rgba(255,255,255,.04)}
+#screen .kit-b.pri{border-color:transparent; color:#2A0714;
+  background:linear-gradient(color-mix(in srgb, var(--kt) 62%, #FFF), var(--kt));
+  box-shadow:0 3px 0 color-mix(in srgb, var(--kt) 42%, #000), inset 0 1px 0 rgba(255,255,255,.5)}
+#screen .kit-b.pri:active{transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--kt) 42%, #000)}
+#screen .kit-i.have{display:flex; align-items:center; gap:11px; padding:7px 7px 7px 12px}
+#screen .kit-ok{flex:none; width:28px; height:28px; border-radius:9px; display:grid; place-items:center;
+  background:#3FD9A0; color:#06251A}
+#screen .kit-n{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px}
+#screen .kit-n b{font-size:14.5px; font-weight:800; color:var(--ink)}
+#screen .kit-n small{font-size:12px; color:var(--ink3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+#screen .kit-b.quiet{flex:none; min-height:44px; padding:0 13px; font-size:13px; color:var(--ink2); background:none}
+#screen .kit-sum{margin:12px 2px 0; font-size:12.5px; font-weight:700; color:var(--ink2)}
+#screen .stage .rig-c .rig-bag{display:grid; place-items:center; color:#FF8FB3;
+  filter:drop-shadow(0 3px 0 rgba(0,0,0,.35))}

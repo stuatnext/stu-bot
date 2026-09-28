@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v80";
+var BUILD = "v81";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -232,6 +232,8 @@ document.addEventListener("click", function(ev){
   if (ds.runjump){ runJump(Number(ds.runjump)); return; }
   if (ds.runundo){ runUndo(); return; }
   if (ds.runleft){ runLeft(); return; }
+  if (ds.kit){ setKit(ds.kit, ds.kitto === "have" ? "have" : "need"); return; }
+  if (ds.kitask){ askKit(); return; }
   if (ds.runsmall){ closeRun(); askLowDay(); return; }
   if (ds.runclose){ closeRun(); return; }
   if (ds.work){ askWorking(); return; }

@@ -1284,10 +1284,12 @@ var VITALS = [
 
    [ key, label, the line it says, window, whether it can be "not needed" ] */
 var ROUTINES = [
-  ["skin",    "Moisturiser",  "In the shower, on skin that is still wet.",   "day",   0],
+  ["skin",    "Moisturiser",  "Before you towel off, on skin that is still wet.", "day", 0],
   ["sun",     "Sunscreen",    "Face, neck, the backs of your hands.",        "day",   1],
   ["cleanse", "Wash it off",  "The day, the sunscreen, the flight. Warm water, not hot.", "night", 0],
-  ["night",   "Night cream",  "Heavier than the morning one. Neck as well.", "night", 0],
+  /* v81: the same moisturiser as the morning - at level zero, one bottle
+     to buy, not two */
+  ["night",   "Night moisturiser", "The same one as the morning, a little more. Neck as well.", "night", 0],
   ["bed",     "Wind down",    "Phone on the side, water poured, kit out.",   "night", 0]
 ];
 /* Inside this band of latitude the sun is worth covering all year; outside

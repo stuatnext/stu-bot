@@ -50,9 +50,14 @@ function suggestOrder(slot){
      empty morning the app proposed the biggest thing on the list and printed
      "129g to go - a chicken rice does it", which was arithmetic nonsense. */
   var aim = Math.min(left, MEAL_CAP);
-  var all = ordersNow();
+  /* v81: never the shake or the yoghurt he has not got in - and a
+     breakfast with only the eggs left is still a breakfast, not a chicken
+     rice at nine in the morning */
+  var every = ordersNow();
+  var all = every.filter(function(o){ return typeof kitOrderOk !== "function" || kitOrderOk(o); });
   var own = all.filter(function(o){ return o[2] === slot; });
-  var pool = own.length >= 2 ? own : all.filter(function(o){ return o[2] === "any" || o[2] === slot; });
+  var own0 = every.filter(function(o){ return o[2] === slot; });
+  var pool = own0.length >= 2 && own.length ? own : all.filter(function(o){ return o[2] === "any" || o[2] === slot; });
   if (!pool.length) pool = all;
   var best = pool[0], gap = Math.abs(pool[0][1] - aim);
   pool.forEach(function(o){
@@ -262,6 +267,10 @@ function viewFood(){
     log ? fold("eaten", "What you have eaten", num(got) + "g today", log, false) : "",
     fold("orders", "What to order",
       (sit.home ? "" : esc(sit.city) + " \u00b7 ") + ordersNow().length + " " + ordersWord(), ordl, false),
+    /* v81: breakfast protein is bought, not ordered - what to get, at home */
+    sit.home && typeof kitPanelHTML === "function"
+      ? fold("foodkit", "In the kitchen", kitWanted("food").length ? "breakfast to buy" : "stocked",
+             kitPanelHTML("food", 1), false) : "",
     sit.home ? "" : "<button class='drow' data-near='" + (sit.kind === "family" ? "shop" : "eat")
       + "'>Find protein near you<i>" + svg("arrow", 16) + "</i></button>",
     "<button class='drow' data-go='../docs/train.html'>Why protein and not calories<i>"

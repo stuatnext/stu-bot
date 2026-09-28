@@ -391,6 +391,7 @@ function scPin(w){
   if (w.kind === "pack") return "pack";
   if (w.kind === "life") return w.life ? skillDef(w.life.skill)[2] : "star";
   if (w.kind === "date") return "heart";
+  if (w.kind === "kit") return "bag";
   return "cards";
 }
 /* v75: him, as a character rather than a stick. Chunky and outlined like a
@@ -615,6 +616,9 @@ function bPlayHTML(sel, k, fwd, quiet){
     }
   } else if (sel.kind === "date"){
     if (!sel.done) h += "<button class='b-go' data-datedone='1'>We did it</button>";
+  } else if (sel.kind === "kit"){
+    h += "<button class='b-go' data-kitask='1'>" + (sel.label === "Check your kit" ? "Go through it" : "Got something") + "</button>"
+      + "<button class='b-do' data-tab='" + kitTab(sel.kit) + "'>The picks</button>";
   } else if (sel.kind === "life"){
     h += "<button class='b-go' data-lifedo='1'>Did it</button>"
       + "<button class='b-do' data-life='" + esc(lf.skill) + "'>Something else</button>";
