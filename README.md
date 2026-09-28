@@ -86,6 +86,91 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v82: the day in order, and a week that goes somewhere
+
+> *"Right now things aren't in order from when I wake up to when I start work... I'd first come round,
+> maybe gym, go for a coffee, do some extra curricular work, life admin, learn something... I like to
+> try new places for coffee but hate going during lunchtime... community, volunteering... Strait Up
+> Growth... Mandarin... But other times I just want to vegetate... very little time or energy after
+> work... I want the routine built chronologically, and each day of the week to help me towards my
+> goals."*
+
+The time he has is the morning: Malta starts at 16:00 (17:00 from late October), and he is up at 08:30.
+So everything that moves his life goes before the shift, and the evening asks for nothing except
+stopping on time. New `dayplan.js`:
+
+**The day, in order.** `dayPlan()` lays out the whole day from waking to bed:
+- come round
+- the gym (on a session day)
+- moisturiser, sunscreen, breakfast
+- coffee somewhere new
+- the day's focus block
+- Mandarin and life admin
+- the family call in the UK's morning
+- the pre-shift meal, Malta, and stopping on time
+- the night routine and bed
+
+Where it shows up:
+- **Start the day** walks the steps in that order, with the time on each step.
+- **The road** draws its stations at those times.
+- **The Start button** begins at the step that's due now: coming round at 08:30, not a breakfast five
+  hours cold.
+- **The new *Day* button** beside Start opens the whole day as a list. The current step is lit, Malta
+  and bed are shown as markers, and tapping a row starts the run there.
+
+**Coffee somewhere new.** Coffee goes before 11:45, or after 14:00 if the lunch crowd has already
+started. Each week has one pick, and every place you log goes into a coffee passport. On a rest day the
+walk goes to the coffee, so one trip also counts as Trained.
+
+**The week.** Each day has one focus:
+
+| Day | Focus | Extras |
+|---|---|---|
+| Mon | Strait Up Growth | |
+| Tue | Mandarin | coffee, life admin |
+| Wed | Community | |
+| Thu | Strait Up Growth | coffee |
+| Fri | Name & network | life admin |
+| Sat | Community | coffee |
+| Sun | Vegetate | |
+
+- Any day can be changed on the You tab under *Your week*, including its coffee and admin.
+- Away from home the day is the trip, so there's no focus.
+
+**Quest lines from level zero.** Each focus has a step-by-step line, and each step pays XP to its skill:
+- **Strait Up Growth** starts with one sentence (the offer), then the list of ten people, the first
+  messages, a case study (never anything from NEXT), LinkedIn, follow-ups, a real conversation and a
+  proposal.
+- **Community** starts with picking where to volunteer (Willing Hearts, Food from the Heart,
+  giving.sg), then a first shift and a group that meets when he's free.
+- **Mandarin** starts with the words he already has, then ordering kopi, finding a class, and a first
+  lesson.
+- **Name & network** starts with one post, then asking someone for coffee and booking an event.
+- Once a line runs out, it switches to steps that keep it going.
+- Mandarin is also now a skill on the character sheet, and fifteen minutes of it goes on the other
+  weekdays.
+
+**Life admin** takes the first unfinished item from his "to sort" list, such as booking the Cannes days
+off.
+
+**Vegetate.** One tap in *Your day* turns off the focus, coffee, Mandarin, admin and kit errands. The
+three still count and nothing else is asked. Sunday does this by default.
+
+**Also fixed:** the morning routine's window opens half an hour before waking, and the road had been
+showing it as "soon" for the rest of the day. It now opens when he's up.
+
+Verified:
+- **New walk (34 checks):** the order of the plan and the run; coffee outside the lunch crowd; where
+  Start begins; the day list and starting from a row; the focus step paying XP and moving the line,
+  with undo; the coffee passport; admin ticking the to-do; vegetate on and off; the week panel and
+  editing it; Mandarin on the sheet; "Carry on" in the afternoon; a day away; fit at 375 wide.
+- **Earlier walks, rebuilt:** the test scratchpad was lost when the container was recycled, so these
+  were rebuilt and moved to v82. They pass.
+- **New sweep:** every tab across three saves, six dates (including New York and winter hours), eight
+  times of day and three phone sizes: 432 loads and 3,888 renders, with 0 problems. It checks for
+  errors, sideways scroll, Start below the fold, stations off screen or piled up, the day list opening,
+  and the run staying in order.
+
 #### v81: kit first
 
 > *"It's asking me to moisturise in the shower, but if I don't have moisturiser, I can't complete it...

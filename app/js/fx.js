@@ -53,6 +53,10 @@ var ICONS = {
   people: "<circle cx='8.2' cy='8' r='3' stroke='currentColor' stroke-width='1.9'/><circle cx='15.3' cy='8.9' r='2.4' stroke='currentColor' stroke-width='1.9'/><path d='M2.9 18.2c.7-3 2.7-4.6 5.3-4.6s4.6 1.6 5.3 4.6M13.8 13.7c2.6-.3 4.7 1.3 5.3 4.5' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
   star: "<path d='M11 3.4l2.3 4.8 5.2.7-3.8 3.6.9 5.2L11 15.3l-4.6 2.4.9-5.2-3.8-3.6 5.2-.7z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/>",
   bulb: "<path d='M8.2 15.6h5.6M8.9 18.6h4.2M11 3.4a5.5 5.5 0 0 0-3.2 10c.5.4.8.9.8 1.6h4.8c0-.7.3-1.2.8-1.6A5.5 5.5 0 0 0 11 3.4z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/>",
+  rise:  "<path d='M3 16.5h16M6.2 16.5a4.8 4.8 0 0 1 9.6 0' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><path d='M11 4.2v3.4M4.6 8.6l2 1.8M17.4 8.6l-2 1.8' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
+  cup:   "<path d='M4.4 8.4h11v5.2a4.6 4.6 0 0 1-4.6 4.6h-1.8a4.6 4.6 0 0 1-4.6-4.6z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M15.4 9.8h1.4a2.4 2.4 0 0 1 0 4.8h-1.6M8 3.6c-.6.9.6 1.5 0 2.4M11.2 3.6c-.6.9.6 1.5 0 2.4' stroke='currentColor' stroke-width='1.7' stroke-linecap='round'/>",
+  zh:    "<text x='11' y='16.4' text-anchor='middle' fill='currentColor' style='font:900 14px \"Noto Sans SC\",\"PingFang SC\",sans-serif'>\u4e2d</text>",
+  list:  "<path d='M8.4 6.2h9.8M8.4 11h9.8M8.4 15.8h9.8' stroke='currentColor' stroke-width='2' stroke-linecap='round'/><circle cx='4.4' cy='6.2' r='1.3' fill='currentColor'/><circle cx='4.4' cy='11' r='1.3' fill='currentColor'/><circle cx='4.4' cy='15.8' r='1.3' fill='currentColor'/>",
   bag:   "<path d='M4.6 7.6h12.8l-1.1 11.2H5.7z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M8.1 9.8V6.4a2.9 2.9 0 0 1 5.8 0v3.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
   cards: "<rect x='2.9' y='4.6' width='11' height='14.2' rx='1.9' stroke='currentColor' stroke-width='1.9'/><path d='M7.7 3.1h8.4a1.9 1.9 0 0 1 1.9 1.9v10.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>"
 };

@@ -31,7 +31,9 @@ var SKILLS = [
   ["us",      "Tim & me",             "heart",  "#FF5A7A", "steps",  "Date nights, and evenings that are yours.", ""],
   ["friends", "Friends & community",  "people", "#5AC8F5", "steps",  "People in Singapore, and giving time.", ""],
   ["name",    "Name & network",       "star",   "#CE82FF", "steps",  "Being known, and knowing people.",      ""],
-  ["biz",     "The business",         "case",   "#FFD84D", "steps",  "Your own business, growing.",           ""]
+  ["biz",     "The business",         "case",   "#FFD84D", "steps",  "Your own business, growing.",           ""],
+  /* v82: he asked for it by name - "learning Mandarin would be good" */
+  ["zh",      "Mandarin",             "zh",     "#FF7A66", "steps",  "Words you say out loud, to people who answer.", ""]
 ];
 
 /* The small steps that level the four new skills. Deliberately small at
@@ -50,6 +52,8 @@ var SKILL_ACTS = {
     ["yes",       "Said yes to an invite",             25, "Especially when you did not feel like it"],
     ["group",     "Went to a group, class or club",    40, "A run club, a class, a meetup"],
     ["volunteer", "Volunteered",                       50, "Time given, here"],
+    ["find",      "Found where to go",                 10, "One place picked, not ten bookmarked"],
+    ["signup",    "Signed up for something",           20, "A shift, a class, a group"],
     ["host",      "Hosted something",                  60, "Dinner, drinks, a walk you organised"]
   ],
   name: [
@@ -57,7 +61,8 @@ var SKILL_ACTS = {
     ["coffee", "Coffee with someone in the industry",    40, "Here, or on a trip"],
     ["event",  "Went to an event and spoke to three people", 45, "Three is the whole job"],
     ["intro",  "Asked for, or made, an introduction",    25, "The quickest way in"],
-    ["stage",  "Spoke, was quoted, or sat on a panel",   90, "Your name in the room"]
+    ["stage",  "Spoke, was quoted, or sat on a panel",   90, "Your name in the room"],
+    ["plan",   "Put an event in the calendar",           15, "Booked, not bookmarked"]
   ],
   biz: [
     ["lead",   "Talked to a possible client",           45, "A real conversation, not a like"],
@@ -65,6 +70,12 @@ var SKILL_ACTS = {
     ["prop",   "Sent a proposal",                       70, "Price and scope, in writing"],
     ["win",    "Won a client or a project",            300, "The big one"],
     ["build",  "Worked on the business itself",         20, "The offer, the site, a case study, the price"]
+  ],
+  zh: [
+    ["study",  "Fifteen minutes of Mandarin",          10, "Out loud, not just read"],
+    ["book",   "Booked a class or a tutor",            20, "The first one is the hard one"],
+    ["use",    "Used it with a person",                30, "Ordered, asked, thanked"],
+    ["lesson", "A lesson or a class",                  40, "A teacher, even online"]
   ]
 };
 /* the ones too big to be a week's small step */
@@ -234,7 +245,7 @@ function undoLife(skill, id){
     if (L[i][1] === skill && (!id || L[i][2] === id)){
       var a = actDef(L[i][1], L[i][2]);
       L.splice(i, 1); S.life = L; save(); sfx("untick");
-      toast("Taken off: " + (a ? a[1].toLowerCase() : "the last one") + ".");
+      toast("Taken off: " + (a ? a[1].charAt(0).toLowerCase() + a[1].slice(1) : "the last one") + ".");
       render({ keepScroll: true });
       return;
     }

@@ -65,6 +65,14 @@ var DISPATCHES = [
     function(c){ return "Date night tonight. The laptop shuts at " + hhmm(nightMin()) + "."; }],
   ["t-last", 90, function(c){ var t = tripOn(c.k); return !!(t && t.b === c.k && t.a !== c.k); },
     function(c){ return "Last day in " + tripOn(c.k).c + ". Tomorrow the road moves on."; }],
+  /* v82: what the day is for, and when */
+  ["d-focus", 86, function(c){ return c.k === today() && typeof dayFocus === "function" && !!dayFocus(c.k) && !focusDoneOn(c.k); },
+    function(c){
+      var f = dayFocus(c.k), st = focusToday(c.k), b = dayPlan(c.k).filter(function(x){ return x.id === "focus"; })[0];
+      return DAY_LONG[dowOf(c.k)] + " is for " + FOCI[f][0] + ": " + st.t.charAt(0).toLowerCase() + st.t.slice(1)
+        + (b ? ", at " + hhmm(b.at) : "") + ". The evening is yours."; }],
+  ["d-veg", 85, function(c){ return c.k === today() && typeof vegOn === "function" && vegOn(c.k); },
+    function(c){ return "Nothing to prove today. The three still count, and that is all."; }],
   /* v81: the kit, said as an errand rather than a failing */
   ["k-shop", 88, function(c){ return c.k === today() && typeof kitNeed === "function" && kitNeed().length > 0; },
     function(c){ var n = kitNeed(), nm = kitNames(n);
