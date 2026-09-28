@@ -63,6 +63,8 @@ function runStepsFor(kind){
              : w.label + ".",
         say: w.kind === "care" ? careSay(w.key, k) : w.why,
         shut: w.state === "shut",
+        /* the Train step can be done smaller, not just done or skipped */
+        small: w.kind === "pillar" && w.key === "train",
         op: w.kind === "todo" ? "t:" + w.todo[0] : w.id
       });
     });
@@ -173,6 +175,10 @@ function paintRun(){
     h += "<div class='tk-acts'>"
       + "<button class='tk-go' data-runop='" + esc(step.op) + "'>Did it</button>"
       + "<button class='tk-skip' data-runskip='1'>Not now</button>"
+      /* "Not now" on training was the whole day's training gone. The third
+         answer keeps it: the short version, at home, or a walk. */
+      + (step.small && typeof askLowDay === "function"
+          ? "<button class='tk-skip tk-small' data-runsmall='1'>Something smaller</button>" : "")
       + "</div>";
   } else {
     /* the end of the run */

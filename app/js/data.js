@@ -1169,6 +1169,58 @@ var FINISHERS = [
   ["Rower",     "Rower",              "once someone has shown you the stroke - legs, then back, then arms"]
 ];
 
+/* ------------------------------------------------------------ the nerves
+   His words: "someone that gets nervous and socially awkward at the gym."
+   The moments that make a nervous person leave are small and specific - the
+   machine is taken, someone asks you something, you do not know the rules -
+   and every one of them is easier with the words already in your pocket. So
+   these are the words, for the three moments, and the six rules nobody
+   writes down. Read on the floor, one thumb, between sets.
+
+   [ heading, [ [ what to say, what happens / why ], ... ] ] */
+var NERVES = [
+  ["If someone is on it", [
+    ["\u201cMind if I work in?\u201d", "You take turns on it between sets. Nearly everyone says yes, and asking it marks you as someone who knows the room."],
+    ["\u201cHow many sets have you got left?\u201d", "Then do something else and come back. Or skip the question entirely \u2014 the plan B on the screen does the same job."]
+  ]],
+  ["If someone asks you", [
+    ["\u201cAre you using this?\u201d", "\u201cTwo more sets, then it\u2019s yours.\u201d Or \u201cAll yours.\u201d That is the whole conversation."],
+    ["\u201cCan I work in?\u201d", "\u201cSure.\u201d Swap on and off between sets, and wipe it when you leave."]
+  ]],
+  ["Asking the staff", [
+    ["\u201cCould you show me how to set this up?\u201d", "It is their job, and they are asked it every hour. Nobody thinks less of you for it."]
+  ]]
+];
+/* The bag, packed the night before, so there is no "I forgot my towel" to
+   turn round on. Singapore gyms expect the towel. */
+var GYM_BAG = [
+  "Shoes \u2014 flat ones if you have them, trainers if not. It does not matter yet.",
+  "A towel, to put on the bench.",
+  "Water.",
+  "Headphones, if they make it easier. They are allowed the whole time.",
+  "This app, open. You are not meant to remember the moves."
+];
+var GYM_RULES = [
+  "Wipe the seat and the handles when you leave. That is most of gym manners.",
+  "Put the weights back where they came from.",
+  "Between sets, stand up off the machine rather than scrolling on it.",
+  "Headphones in means \u201cnot now\u201d \u2014 for you as well as for them. You can wear them the whole time.",
+  "Nobody is watching you. Everyone is looking at themselves, their phone or the ceiling while they count. The feeling is real, it only runs one way, and it fades at about the fourth visit.",
+  "Regulars notice who keeps coming back, not what they lift."
+];
+
+/* ------------------------------------------------------------ the moment
+   The best-studied trick there is for actually going: decide the moment in
+   advance - "after X, I go" - so there is nothing to decide when it comes.
+   Written in his voice, because it is his plan; the app says it back in
+   the second person. */
+var CUES = [
+  "After my first coffee",
+  "Straight after I wake up",
+  "Before I open the laptop",
+  "After lunch"
+];
+
 /* What he asked, answered in six lines he can read on his phone: how to deal
    with the belly, and why there are no crunches in this programme. */
 var BELLY = [
