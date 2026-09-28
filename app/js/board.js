@@ -119,35 +119,103 @@ function viewBoard(){
 function worldHead(name){
   var sit = situation(), ph = skyPhase();
   var night = ph === "night" || ph === "deepnight";
-  var h = "<div class='rm'>";
-
-  /* A WINDOW, not a banner. v61 pasted a band of sky across the top of five
-     unchanged lists and he called it what it was: a moon. The sky belongs in
-     these rooms the way sky belongs in a room - through a window in the wall,
-     small, with the same hour and the same skyline in it. Everything below it
-     is then indoors, which is the point: five rooms in one place. */
-  h += "<div class='rm-win' data-sky='" + esc(ph) + "'>";
+  /* v76: every room is a small scene of the same world as Today - the same
+     sky at the same hour, the same ground and road, and him standing in the
+     room at its one object: the rack, the stall, the tree, the mirror, the
+     desk. The window before this was a picture of the sky; this is a place
+     he walks into when he changes tab. */
+  var room = typeof tab === "string" ? tab : "";
+  var h = "<div class='rm rs' data-sky='" + esc(ph) + "' data-room='" + esc(room) + "'>";
   if (night){
     h += "<div class='sc-stars'>";
-    for (var i = 0; i < 7; i++){
-      h += "<i style='left:" + ((hashOf("q" + i) % 900) / 10).toFixed(1)
-        + "%;top:" + ((hashOf("z" + i) % 560) / 10).toFixed(1) + "%'></i>";
+    for (var i = 0; i < 12; i++){
+      h += "<i style='left:" + ((hashOf("q" + i) % 960) / 10).toFixed(1)
+        + "%;top:" + ((hashOf("z" + i) % 520) / 10).toFixed(1) + "%'></i>";
     }
     h += "</div>";
   }
   var p = arcPt(shape().now / 1440);
   h += "<span class='sc-sun" + (night ? " moon" : "") + "' style='left:"
-    + (8 + (p[0] - 12) / 100 * 84).toFixed(1) + "%; top:"
-    + (16 + (p[1] / 58) * 44).toFixed(1) + "%'></span>";
+    + (30 + (p[0] - 12) / 100 * 60).toFixed(1) + "%; top:"
+    + (14 + (p[1] / 58) * 30).toFixed(1) + "%'></span>";
   h += scGroundHTML(sit);
-  h += "<i class='rm-bar'></i><i class='rm-bar v'></i></div>";
-
+  h += "<svg class='rs-road' viewBox='0 0 100 40' preserveAspectRatio='none' aria-hidden='true'>"
+    + "<path class='r0' d='M-4 30 C 20 22, 40 34, 60 26 S 90 22, 104 28' vector-effect='non-scaling-stroke'/>"
+    + "<path class='r1' d='M-4 30 C 20 22, 40 34, 60 26 S 90 22, 104 28' vector-effect='non-scaling-stroke'/>"
+    + "<path class='r2' d='M-4 30 C 20 22, 40 34, 60 26 S 90 22, 104 28' vector-effect='non-scaling-stroke'/></svg>";
+  h += "<span class='rs-prop'>" + roomProp(room) + "</span>";
+  h += "<span class='rs-me'>" + scWalker() + "</span>";
   h += "<div class='rm-c'><button class='rm-t' data-tab='today'>"
     + esc(hhmm(nowMin())) + "</button>"
     + "<span class='rm-p'>" + esc(sit.home ? shortToday() : sit.city) + "</span>"
     + (name ? "<span class='rm-n'>" + esc(name) + "</span>" : "") + "</div>";
   h += scStatsHTML();
   return h + "</div>";
+}
+
+/* The one object each room is about, drawn in the same sticker style as
+   him: thick dark outline, flat bright fills. 64 x 56, standing on the
+   ground line at the bottom. */
+function roomProp(room){
+  var o = " stroke='#0B1020' stroke-width='1.8' stroke-linejoin='round'";
+  var a = "<svg viewBox='0 0 64 56' aria-hidden='true'>", z = "</svg>";
+  if (room === "gym") return a
+    + "<path d='M8 54V22M56 54V22M6 30H58M6 44H58'" + o + " fill='none' stroke-linecap='round'/>"
+    + "<rect x='14' y='20' width='6' height='16' rx='2' fill='#3B4468'" + o + "/>"
+    + "<rect x='44' y='20' width='6' height='16' rx='2' fill='#3B4468'" + o + "/>"
+    + "<rect x='20' y='26' width='24' height='4' rx='2' fill='#C9D2E6'" + o + "/>"
+    + "<rect x='17' y='36' width='5' height='12' rx='2' fill='#FF8A3D'" + o + "/>"
+    + "<rect x='42' y='36' width='5' height='12' rx='2' fill='#FF8A3D'" + o + "/>"
+    + "<rect x='22' y='40' width='20' height='3.5' rx='1.7' fill='#C9D2E6'" + o + "/>" + z;
+  if (room === "food") return a
+    + "<path d='M6 20h52l-4-12H10z' fill='#FF5A5F'" + o + "/>"
+    + "<path d='M14 8l-2 12M24 8v12M34 8v12M44 8l2 12' stroke='#FFFFFF' stroke-width='3'/>"
+    + "<path d='M6 20h52l-4-12H10z' fill='none'" + o + "/>"
+    + "<rect x='8' y='20' width='48' height='34' rx='3' fill='#FFE7B8'" + o + "/>"
+    + "<rect x='8' y='32' width='48' height='22' rx='3' fill='#F2B45A'" + o + "/>"
+    + "<path d='M22 30q10 8 20 0z' fill='#FFFFFF'" + o + "/>"
+    + "<path d='M28 26q-2-3 0-6M33 25q-2-3 0-6M38 26q-2-3 0-6' fill='none' stroke='#FFFFFF' stroke-width='1.6' stroke-linecap='round'/>" + z;
+  if (room === "basics") return a
+    + "<rect x='26' y='28' width='7' height='26' rx='2' fill='#8A5A3B'" + o + "/>"
+    + "<path d='M2 28q6-16 30-18 24 2 30 18-8 6-30 6T2 28z' fill='#3FB872'" + o + "/>"
+    + "<path d='M14 22q18-8 36 0' fill='none' stroke='#7CE0A4' stroke-width='2' stroke-linecap='round'/>"
+    + "<rect x='44' y='38' width='10' height='16' rx='3' fill='#6CCBFF'" + o + "/>"
+    + "<rect x='46' y='34' width='6' height='5' rx='1.5' fill='#1E6FB8'" + o + "/>" + z;
+  if (room === "skin") return a
+    + "<path d='M32 46v8M22 54h20' fill='none'" + o + " stroke-linecap='round'/>"
+    + "<ellipse cx='32' cy='26' rx='17' ry='21' fill='#FF8FB3'" + o + "/>"
+    + "<ellipse cx='32' cy='26' rx='12' ry='16' fill='#CDEBFF'" + o + "/>"
+    + "<path d='M26 18q3-4 7-4' fill='none' stroke='#FFFFFF' stroke-width='2.2' stroke-linecap='round'/>"
+    + "<path d='M54 10l1.6 3.4 3.4 1.6-3.4 1.6L54 20l-1.6-3.4L49 15l3.4-1.6z' fill='#FFD84D'" + o + "/>"
+    + "<rect x='50' y='40' width='8' height='14' rx='2.5' fill='#FFFFFF'" + o + "/>" + z;
+  if (room === "work") return a
+    + "<path d='M4 40h56M10 40v14M54 40v14' fill='none'" + o + " stroke-linecap='round'/>"
+    + "<rect x='16' y='14' width='32' height='22' rx='3' fill='#2A3358'" + o + "/>"
+    + "<rect x='19' y='17' width='26' height='16' rx='1.5' fill='#8FD4FF'/>"
+    + "<path d='M22 22h14M22 26h10M22 30h16' stroke='#2A3358' stroke-width='1.6' stroke-linecap='round'/>"
+    + "<path d='M12 36h40l3 4H9z' fill='#C9D2E6'" + o + "/>"
+    + "<rect x='50' y='30' width='7' height='10' rx='2' fill='#FFFFFF'" + o + "/>" + z;
+  if (room === "cards") return a
+    + "<path d='M10 30h44v24H10z' fill='#A8642E'" + o + "/>"
+    + "<path d='M10 30q22-22 44 0z' fill='#C47A3B'" + o + "/>"
+    + "<path d='M10 38h44M32 30v24' stroke='#FFD84D' stroke-width='3'/>"
+    + "<rect x='28' y='34' width='8' height='8' rx='2' fill='#FFD84D'" + o + "/>"
+    + "<rect x='20' y='12' width='12' height='16' rx='2' fill='#CE82FF'" + o + " transform='rotate(-14 26 20)'/>"
+    + "<rect x='32' y='10' width='12' height='16' rx='2' fill='#6CCBFF'" + o + " transform='rotate(12 38 18)'/>" + z;
+  if (room === "vault") return a
+    + "<ellipse cx='32' cy='50' rx='18' ry='5' fill='#E0A21B'" + o + "/>"
+    + "<ellipse cx='32' cy='44' rx='18' ry='5' fill='#FFD84D'" + o + "/>"
+    + "<ellipse cx='32' cy='38' rx='18' ry='5' fill='#FFD84D'" + o + "/>"
+    + "<ellipse cx='32' cy='32' rx='18' ry='5' fill='#FFE88A'" + o + "/>"
+    + "<text x='32' y='35' text-anchor='middle' font-family='Nunito,sans-serif' font-weight='900' font-size='8' fill='#8A5A00'>$</text>"
+    + "<ellipse cx='50' cy='22' rx='7' ry='7' fill='#FFE88A'" + o + "/>" + z;
+  /* you: the trophy */
+  return a
+    + "<rect x='20' y='46' width='24' height='8' rx='2' fill='#8A5A3B'" + o + "/>"
+    + "<rect x='28' y='36' width='8' height='10' fill='#F2B41C'" + o + "/>"
+    + "<path d='M16 8h32v10q0 16-16 18-16-2-16-18z' fill='#FFD84D'" + o + "/>"
+    + "<path d='M16 12H8q0 10 10 12M48 12h8q0 10-10 12' fill='none'" + o + "/>"
+    + "<path d='M32 14l2 4.4 4.8.6-3.5 3.3.9 4.7-4.2-2.3-4.2 2.3.9-4.7-3.5-3.3 4.8-.6z' fill='#FFFFFF'/>" + z;
 }
 
 /* The routines are one station on the path rather than five: they have a tab

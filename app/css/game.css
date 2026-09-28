@@ -195,3 +195,69 @@ body[data-tab="today"] #nav button[aria-current="true"]{color:#08131E !important
   body[data-tab="today"] #screen .sc-p.up .sc-pk, body[data-tab="today"] #screen .sc-flag,
   body[data-tab="today"] #screen .sc-me svg, body[data-tab="today"] #screen .sc-news{animation:none !important}
 }
+
+/* ================================================================ rooms
+   v76. Every room is a small scene of the same world as Today: the same sky
+   at the same hour, the same ground and road, and him standing at the one
+   object the room is about. The clock, the room's name and the counters
+   sit over it the way they do on Today, and the level wears the same ring. */
+body:not([data-tab="today"]) #screen{padding-top:0 !important}
+#screen .rm.rs{display:block !important; position:relative; overflow:hidden; max-width:none !important;
+  margin:0 0 8px !important; padding:0 !important; height:calc(138px + env(safe-area-inset-top));
+  border-radius:0 0 26px 26px; box-shadow:0 5px 0 rgba(0,0,0,.28), 0 14px 26px -16px rgba(0,0,0,.8);
+  --gA:#43A96E; --gB:#23744A; --rd:#F4E4BF; --rdE:#C9B083; --rdL:rgba(255,255,255,.75);
+  background:linear-gradient(#2A78BE,#67B6E4 60%,#B6DCF0)}
+#screen .rm.rs[data-sky="dawn"]     {background:linear-gradient(#3B2B52,#8E5A6B 55%,#C58468); --gA:#5E7458; --gB:#34463A; --rd:#E9D2B4; --rdE:#A98C74}
+#screen .rm.rs[data-sky="morning"]  {background:linear-gradient(#2E6FA8,#69AFD8 58%,#A8D4E8)}
+#screen .rm.rs[data-sky="gold"]     {background:linear-gradient(#2E3E77,#C4713F 62%,#E8A758); --gA:#7C9A48; --gB:#46622F; --rd:#F6DDAA; --rdE:#C29A5E}
+#screen .rm.rs[data-sky="dusk"]     {background:linear-gradient(#211A45,#5A3C78 58%,#A45F76); --gA:#3F5063; --gB:#253140; --rd:#C9BBAA; --rdE:#8B7C73; --rdL:rgba(255,255,255,.45)}
+#screen .rm.rs[data-sky="night"]    {background:linear-gradient(#0B0E1E,#151B36 58%,#1E2547); --gA:#1A2A40; --gB:#0D1727; --rd:#34435F; --rdE:#1F2A40; --rdL:rgba(255,255,255,.28)}
+#screen .rm.rs[data-sky="deepnight"]{background:linear-gradient(#070911,#0D1120 58%,#141A30); --gA:#1A2A40; --gB:#0D1727; --rd:#34435F; --rdE:#1F2A40; --rdL:rgba(255,255,255,.28)}
+#screen .rm.rs .sc-stars{position:absolute; inset:0}
+#screen .rm.rs .sc-stars i{width:2px; height:2px; opacity:.7}
+#screen .rm.rs .sc-sun{position:absolute; width:28px; height:28px; margin:-14px 0 0 -14px; z-index:0}
+#screen .rm.rs .sc-sun.moon{width:22px; height:22px; margin:-11px 0 0 -11px}
+#screen .rm.rs .sc-far{position:absolute; left:0; right:0; bottom:36px !important; height:58px !important; z-index:1}
+#screen .rm.rs .sc-gr{display:block !important; position:absolute; left:0; right:0; bottom:0; height:40px;
+  background:linear-gradient(var(--gA), var(--gB)); z-index:1}
+#screen .rm.rs .rs-road{position:absolute; left:0; right:0; bottom:0; width:100%; height:40px; z-index:2; overflow:visible}
+#screen .rm.rs .rs-road path{fill:none; stroke-linecap:round}
+#screen .rm.rs .rs-road .r0{stroke:var(--rdE); stroke-width:17px}
+#screen .rm.rs .rs-road .r1{stroke:var(--rd); stroke-width:13px}
+#screen .rm.rs .rs-road .r2{stroke:var(--rdL); stroke-width:1.6px; stroke-dasharray:5 7}
+#screen .rm.rs .rs-prop{position:absolute; right:9%; bottom:9px; width:62px; height:54px; z-index:3;
+  filter:drop-shadow(0 3px 0 rgba(0,0,0,.25))}
+#screen .rm.rs .rs-prop svg{width:100%; height:100%; display:block}
+#screen .rm.rs .rs-me{position:absolute; right:calc(9% + 68px); bottom:8px; width:26px; height:37px; z-index:4;
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,.25))}
+#screen .rm.rs .rs-me svg{width:100%; height:100%; display:block; overflow:visible; animation:gmIdle 2.6s ease-in-out infinite}
+#screen .rm.rs .rs-me .lg rect{fill:#26345A; stroke:#0B1020; stroke-width:1.4}
+#screen .rm.rs .rs-me .tee{fill:#1CB0F6; stroke:#0B1020; stroke-width:1.6}
+#screen .rm.rs .rs-me .arm{fill:none; stroke:#F2C6A0; stroke-width:3.4; stroke-linecap:round}
+#screen .rm.rs .rs-me .skin{fill:#F2C6A0; stroke:#0B1020; stroke-width:1.5}
+#screen .rm.rs .rs-me .hair{fill:#3B2A20; stroke:#0B1020; stroke-width:1.2}
+#screen .rm.rs .rs-me .eye{fill:#0B1020}
+#screen .rm.rs .rs-me .smile{fill:none; stroke:#0B1020; stroke-width:1.3; stroke-linecap:round}
+#screen .rm.rs .rm-c{position:absolute; left:16px; top:calc(12px + env(safe-area-inset-top)); z-index:5;
+  display:flex; flex-direction:column; gap:0; padding:0}
+#screen .rm.rs .rm-t{color:#FFFFFF !important; font-size:26px !important; text-shadow:0 2px 0 rgba(0,0,0,.25)}
+#screen .rm.rs .rm-p{color:rgba(255,255,255,.8) !important; text-shadow:0 1px 2px rgba(0,0,0,.4)}
+#screen .rm.rs .rm-n{margin-top:6px !important; padding:3px 11px 4px; align-self:flex-start; border-radius:10px;
+  background:rgba(8,12,28,.55); color:#FFFFFF !important; font-size:15px !important; letter-spacing:.06em !important;
+  text-transform:uppercase; text-shadow:none !important; box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+#screen .rm.rs .sc-stats{position:absolute !important; right:12px; top:calc(12px + env(safe-area-inset-top)); z-index:5;
+  margin:0 !important; padding:3px 8px 3px 3px !important}
+#screen .rm.rs .sc-lv{width:28px !important; height:28px !important; margin:0 3px 0 0 !important; padding:0;
+  display:grid; place-items:center;
+  background:conic-gradient(#FFD84D calc(var(--xp, 0) * 360deg), rgba(255,255,255,.16) 0) !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.6) !important}
+#screen .rm.rs .sc-lv b{width:21px; height:21px; border-radius:50%; display:grid; place-items:center;
+  background:linear-gradient(#7C8CF0, #4657C4); color:#FFFFFF; font-size:11.5px; font-weight:900;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+#screen .rm.rs .sc-s{font-size:12.5px !important; padding:3px 4px !important}
+#screen .rm.rs .sc-s svg{width:12px !important; height:12px !important}
+@media (prefers-reduced-motion: reduce){ #screen .rm.rs .rs-me svg{animation:none} }
+
+/* The rest day's word sat in a box with no height, so the plate above and
+   the line below ran over it. The ring is square, so is its rest. */
+#screen .stage.gym .rig.rest{aspect-ratio:1 / 1}
