@@ -167,7 +167,8 @@ function winList(k){
   /* v81: the kit. A routine he has nothing to do with is held back, and
      this one step stands in for all of it until he has - asked first, then
      shopped for. It does not shut; a Watsons is open late. */
-  if (typeof kitWanted === "function" && S.onboarded){
+  /* v82: not on a vegetating day - nothing else is asked */
+  if (typeof kitWanted === "function" && S.onboarded && !(typeof vegOn === "function" && vegOn(k))){
     var kw = kitWanted();
     if (kw.length){
       out.push({ id: "kit", kind: "kit", label: kitLabel(kw), short: "Kit",
@@ -187,20 +188,41 @@ function winList(k){
       col: "#FF5A7A", chip: 0, rank: 1, done: dateNightDone(k) ? 1 : 0,
       open: nm, shut: Math.max(nm + 150, bed), why: "Yours and Tim's. Laptop shut, phones away." });
   }
+  /* v82: the week. Coffee somewhere new on the days that have it, before
+     the lunch crowd; and the day's focus - the business, community,
+     Mandarin, his name - takes the slot. A vegetating day has neither and
+     nothing in the slot: nothing else is asked. */
+  var dfc = (typeof dayFocus === "function" && S.onboarded) ? dayFocus(k) : "";
+  var veg = (typeof vegOn === "function" && S.onboarded) ? vegOn(k) : false;
+  if (typeof coffeeDay === "function" && S.onboarded && coffeeDay(k)){
+    var cw = coffeeWindow(), cp = coffeePick(k);
+    out.push({ id: "coffee", kind: "coffee", label: "Coffee somewhere new", short: "Coffee",
+      col: "#E0A15A", chip: 0, rank: 2, done: coffeeOn(k) ? 1 : 0, open: cw[0], shut: cw[1],
+      why: coffeeOn(k) ? "Found one. Coffee passport: " + coffeePassport() + "."
+         : cp[0] + ", " + cp[1] + ". Before the lunch crowd at twelve." });
+  }
+  if (dfc){
+    var fst = focusToday(k), fo = FOCI[dfc];
+    out.push({ id: "focus", kind: "focus", label: fo[0], short: fo[1], col: fo[3], chip: 0, rank: 1,
+      done: focusDoneOn(k) ? 1 : 0, open: wake, shut: s.noShift ? bed : s.start,
+      focus: fst, why: fst ? fst.how : "" });
+  }
   /* v77: a focus skill's small step for the week takes the slot first -
      he chose the focus, and it is the thing that moves his life, not just
-     his day. Done, and the slot goes back to his own hand or the card. */
-  var ls = (typeof lifeStep === "function" && S.onboarded) ? lifeStep(k) : null;
+     his day. Done, and the slot goes back to his own hand or the card.
+     v82: only on a day the week has not given a focus to. */
+  var free = !dfc && !veg;
+  var ls = (free && typeof lifeStep === "function" && S.onboarded) ? lifeStep(k) : null;
   if (ls){
     var sk = skillDef(ls.skill);
     out.push({ id: "life", kind: "life", label: sk[1], short: "Level up",
       col: sk[3], chip: 0, rank: 2, done: 0, open: wake, shut: bed + 15,
       life: ls, why: ls.act[3] + "." });
-  } else if (hd.length){
+  } else if (free && hd.length){
     out.push({ id: "todo", kind: "todo", label: hd[0][1], short: "To do",
       col: "#CE82FF", chip: 0, rank: 2, done: 0, open: wake, shut: bed + 15,
       todo: hd[0], why: hd[0][2] });
-  } else if (typeof questFor === "function" && S.onboarded){
+  } else if (free && typeof questFor === "function" && S.onboarded){
     var q = questFor(k);
     if (q) out.push({ id: "card", kind: "card", label: "The card", short: "Card",
       col: "#CE82FF", chip: CHIP.card, rank: 2, done: !!q.done,
@@ -223,6 +245,10 @@ function winList(k){
   out.forEach(function(w){
     w.a = sinceWake(w.open);
     w.b = sinceWake(w.shut);
+    /* v82: a window that opens a little before he wakes - the morning
+       routine opens half an hour early - is open from the moment he is up,
+       not "soon" for the next twenty-three hours */
+    if (w.a >= 1260 && w.b < w.a) w.a = 0;
     if (w.b <= w.a) w.b = 1440;            /* runs to the end of his day */
     w.state = winState(w);
   });

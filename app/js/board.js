@@ -87,7 +87,7 @@ function viewBoard(){
   var k = today();
   TODAY_MORE = "";
   arrive();
-  var wins = sceneWins(winList(k)), sel = boardPick(wins);
+  var wins = sceneWins(planWins(k)), sel = planPick(wins, k);
   B_SIG = boardSig(wins, k);
   B_CARD = scCardHTML(sel, k);
   /* One button that walks the day, because he should not have to choose
@@ -98,12 +98,26 @@ function viewBoard(){
      button starts there. */
   var left = typeof runCount === "function" ? runCount("day") : 0;
   var at = sel && sel.kind !== "pack" ? (sel.kind === "skinset" ? sel.first : sel.id) : "";
+  /* v82: unless he picked a station, the run starts at the block that is
+     now in the day's own order - coming round at nine, not a breakfast
+     five hours cold at two */
+  var label = at && sel.state === "open" ? "Start here" : "Start the day";
+  if (!B_PICK && S.onboarded && typeof dayPlan === "function"){
+    var steps = runStepsFor("day"), pn = planNow(dayPlan(k));
+    if (pn && steps.some(function(s){ return s.id === pn.id; })){
+      at = pn.id;
+      label = steps[0] && steps[0].id === pn.id ? "Start the day" : "Carry on";
+    }
+  }
   var start = left
-    ? "<button class='tk-start' data-run='day'"
+    ? "<div class='tk-row'><button class='tk-start' data-run='day'"
       + (at ? " data-runat='" + esc(at) + "'" : "") + ">"
-      + (at && sel.state === "open" ? "Start here" : "Start the day")
-      + "<em>" + left + " left</em></button>"
-    : "";
+      + label + "<em>" + left + " left</em></button>"
+      + (typeof askDay === "function" && S.onboarded ? "<button class='tk-day' data-dayplan='1' aria-label='Your day, in order'>"
+        + svg("list", 22) + "<span>Day</span></button>" : "")
+      + "</div>"
+    : (typeof askDay === "function" && S.onboarded ? "<div class='tk-row'><button class='tk-start quiet' data-dayplan='1'>Your day"
+        + svg("list", 18) + "</button></div>" : "");
   return "<div class='b-t'>" + scWorldHTML(wins, sel) + B_CARD
     + start + TODAY_MORE + "</div>";
 }
@@ -228,11 +242,12 @@ function sceneWins(wins){
     if (w.kind !== "care"){ out.push(w); return; }
     if (!care){
       care = { id: "skin", kind: "skinset", label: "Skin", short: "Skin", col: "#7FD4C1",
-               open: w.open, shut: w.shut, n: 0, on: 0, first: "" };
+               open: w.open, shut: w.shut, n: 0, on: 0, first: "", at: w.at };
       out.push(care);
     }
     care.n++;
-    if (w.done) care.on++; else if (!care.first) care.first = w.id;
+    if (w.done) care.on++;
+    else if (!care.first){ care.first = w.id; if (w.at != null) care.at = w.at; }
     care.shut = Math.max(care.shut, w.shut);
   });
   if (care){
@@ -241,6 +256,7 @@ function sceneWins(wins){
     care.why = care.done ? "The routine is done."
       : left + (left === 1 ? " step left" : " steps left") + " in the routine.";
     care.a = sinceWake(care.open); care.b = sinceWake(care.shut);
+    if (care.a >= 1260 && care.b < care.a) care.a = 0;   /* v82: opens just before waking */
     if (care.b <= care.a) care.b = 1440;
     care.state = winState(care);
   }
@@ -320,8 +336,10 @@ function scWorldHTML(wins, sel){
   h += scRoadHTML(nowPos);
 
   h += "<div class='sc-pins'>";
+  /* v82: each station stands at the minute the day's plan gives it, so the
+     road reads in the order he lives it */
   var placed = wins.map(function(w){
-    return { w: w, x: sinceWake(w.open) / 1440 * 100 };
+    return { w: w, x: sinceWake(w.at != null ? w.at : w.open) / 1440 * 100 };
   }).sort(function(a, b){ return a.x - b.x; });
   /* a crowded day - a date night and a level-up step on top of the usual
      five - tightens the spacing rather than piling stations on each other */
@@ -347,7 +365,7 @@ function scWorldHTML(wins, sel){
       + (picked && w.state === "open" ? "<span class='sc-flag'>Now</span>" : "")
       + "<span class='sc-pk'>" + svg(scPin(w), 20) + "</span>"
       + "<span class='sc-pn'>" + esc(crowd && w.kind === "life" ? "Step" : crowd && w.kind === "date" ? "Date" : (w.short || w.label))
-      + (w.state === "soon" ? "<small>" + esc(hhmm(w.open)) + "</small>" : "") + "</span>"
+      + (w.state === "soon" ? "<small>" + esc(hhmm(w.at != null ? w.at : w.open)) + "</small>" : "") + "</span>"
       + "</button>";
   });
 
@@ -392,6 +410,9 @@ function scPin(w){
   if (w.kind === "life") return w.life ? skillDef(w.life.skill)[2] : "star";
   if (w.kind === "date") return "heart";
   if (w.kind === "kit") return "bag";
+  if (w.kind === "coffee") return "cup";
+  if (w.kind === "plan") return w.ic || "clock";
+  if (w.kind === "focus") return w.focus && FOCI[w.focus.skill] ? FOCI[w.focus.skill][2] : "star";
   return "cards";
 }
 /* v75: him, as a character rather than a stick. Chunky and outlined like a
@@ -533,6 +554,25 @@ function scCardHTML(sel, k){
   return bPlayHTML(sel, k, fwd, 1);
 }
 
+/* v82: what the card shows when he has not picked - the block that is now
+   in the day's plan. A station if it is one; if it is one of the plan's own
+   steps (coming round, Mandarin, a meal), the card is that step, so the card
+   and Start always say the same thing. */
+function planPick(wins, k){
+  var i;
+  if (B_PICK) for (i = 0; i < wins.length; i++) if (wins[i].id === B_PICK) return wins[i];
+  if (!S.onboarded || typeof dayPlan !== "function") return boardPick(wins);
+  var pn = planNow(dayPlan(k));
+  if (!pn) return boardPick(wins);
+  for (i = 0; i < wins.length; i++){
+    var w = wins[i];
+    if (w.id === pn.id || (w.kind === "skinset" && w.first === pn.id)) return w;
+  }
+  if (pn.station) return boardPick(wins);
+  var a = sinceWake(pn.at);
+  return { id: pn.id, kind: "plan", label: pn.t, why: pn.say, col: pn.col, ic: pn.ic, at: pn.at,
+           chip: 0, state: "open", a: a, b: Math.min(1440, a + Math.max(pn.dur, 30) + 30), done: 0 };
+}
 /* Which station he is standing at. His pick if it is still there, else the
    one closing soonest, else the next one to open, else whatever is left. */
 function boardPick(wins){
@@ -540,7 +580,9 @@ function boardPick(wins){
   for (i = 0; i < wins.length; i++) if (wins[i].id === B_PICK) return wins[i];
   var open = wins.filter(function(w){ return w.state === "open" && !w.done; });
   if (open.length){
+    /* v82: in the day's own order when the plan has a minute for them */
     open.sort(function(a, b){
+      if (a.at != null && b.at != null && a.at !== b.at) return sinceWake(a.at) - sinceWake(b.at);
       if ((a.rank || 0) !== (b.rank || 0)) return (a.rank || 0) - (b.rank || 0);
       return winLeft(a) - winLeft(b);
     });
@@ -565,13 +607,16 @@ function bPlayHTML(sel, k, fwd, quiet){
      is from, and what it asks of him - or what he did, once he has. */
   var cd = sel.kind === "card" ? sel.card.card : null;
   var lf = sel.kind === "life" ? sel.life : null;
+  var fc = sel.kind === "focus" ? sel.focus : null;
   var ask = isUp ? pr.ask
+          : fc ? fc.t + "."
           : lf ? lf.act[1] + "."
           : cd ? cd[0]
           : sel.kind === "todo" ? sel.todo[1] + "."
           : sel.label + ".";
   var lfl = lf ? skillLv(lf.skill) : null;
-  var say = lf ? lf.act[3] + ". This week's step for " + sel.label + " \u00b7 level " + lfl.level
+  var say = fc ? fc.how
+          : lf ? lf.act[3] + ". This week's step for " + sel.label + " \u00b7 level " + lfl.level
                + ", " + (lfl.to - lfl.xp) + " XP to the next."
           : cd ? (cd[3] || "")
           : sel.done ? (sel.kind === "pillar" ? doneLine(sel.key) : "Done today.")
@@ -586,7 +631,8 @@ function bPlayHTML(sel, k, fwd, quiet){
 
   var h = "<div class='b-pl " + sel.state + (cd ? " is-card" : "") + "' style='--pil:" + sel.col + "'>";
   h += icon;
-  h += "<span class='b-pl-h'><span class='b-pl-n'>" + esc(cd ? "Card \u00b7 " + setNm : lf ? "Level up \u00b7 " + sel.label : sel.label) + "</span>"
+  h += "<span class='b-pl-h'><span class='b-pl-n'>" + esc(cd ? "Card \u00b7 " + setNm : lf ? "Level up \u00b7 " + sel.label
+      : fc ? focusWord(fc) : sel.kind === "plan" ? "Your day" : sel.label) + "</span>"
     + (sel.chip ? "<em class='b-pl-p'>+" + sel.chip + "</em>" : "")
     + "<em class='b-pl-c'>" + esc(state) + "</em></span>";
   h += "<b>" + esc(ask) + "</b>";
@@ -631,6 +677,7 @@ function bPlayHTML(sel, k, fwd, quiet){
   return h + fwd + "</div>";
 }
 function bStateWord(sel){
+  if (sel.kind === "plan") return "now \u00b7 " + hhmm(sel.at);
   var left = winLeft(sel);
   return sel.state === "done" ? "done"
        : sel.state === "open" ? dur(left) + " left"
@@ -654,10 +701,10 @@ function boardSig(wins, k){
   }).join(",");
 }
 function boardTick(){
-  var k = today(), wins = sceneWins(winList(k));
+  var k = today(), wins = sceneWins(planWins(k));
   if (boardSig(wins, k) !== B_SIG) return true;
   var card = document.querySelector("#screen .b-pl");
-  var html = scCardHTML(boardPick(wins), k);
+  var html = scCardHTML(planPick(wins, k), k);
   if (card && html !== B_CARD){ card.outerHTML = html; B_CARD = html; }
   var me = document.querySelector("#screen .sc-me");
   if (me){

@@ -44,6 +44,11 @@ var RUN_KINDS = {
 function runStepsFor(kind, all){
   var k = today(), out = [];
   if (kind === "day"){
+    /* v82: the day's plan gives every step its minute, adds the steps only
+       the plan knows (coming round, meals, Mandarin, admin), and the run
+       walks them in that order - "built chronologically" */
+    var plan = (S.onboarded && typeof dayPlan === "function") ? dayPlan(k) : null, at = {};
+    if (plan) plan.forEach(function(b){ at[b.id] = b.at; });
     winList(k).forEach(function(w){
       if (w.kind === "pack") return;
       /* The op is what the station's own button does. A card he put in his
@@ -58,11 +63,16 @@ function runStepsFor(kind, all){
                : w.kind === "life" ? "Level up \u00b7 " + w.label
                : w.kind === "date" ? "Tim & me"
                : w.kind === "kit" ? "Level zero \u00b7 the kit"
+               : w.kind === "focus" ? (w.focus ? focusWord(w.focus) : w.label)
+               : w.kind === "coffee" ? "Coffee somewhere new"
                : w.kind === "pillar" ? w.label
                : w.label;
+      if (at[w.id] != null) kick = hhmm(at[w.id]) + " \u00b7 " + kick;
       out.push({
-        id: w.id, kicker: kick, col: w.col,
+        id: w.id, kicker: kick, col: w.col, at: at[w.id],
         title: w.kind === "pillar" && w.key === nextUp() ? priority({ noPacks: 1 }).ask
+             : w.kind === "focus" && w.focus ? w.focus.t + "."
+             : w.kind === "coffee" ? coffeePick(k)[0] + "."
              : w.kind === "card" ? w.card.card[0] + "."
              : w.kind === "life" ? w.life.act[1] + "."
              : w.kind === "todo" ? w.todo[1] + "."
@@ -72,13 +82,20 @@ function runStepsFor(kind, all){
         /* the Train step can be done smaller, not just done or skipped */
         small: w.kind === "pillar" && w.key === "train",
         /* the kit is gone through, not done in one tap */
-        go: w.kind === "kit" ? "Go through it" : "",
+        go: w.kind === "kit" ? "Go through it" : w.kind === "coffee" ? "I went" : "",
         op: w.kind === "todo" ? "t:" + w.todo[0] : w.id,
         done: !!w.done,
         /* which skill and step, so a level-up step can be taken back */
         skill: w.life ? w.life.skill : "", act: w.life ? w.life.act[0] : ""
       });
     });
+    if (plan){
+      planSteps(k, plan).forEach(function(s){ out.push(s); });
+      out.sort(function(a, b){
+        var x = a.at == null ? 1e9 : sinceWake(a.at), y = b.at == null ? 1e9 : sinceWake(b.at);
+        return x - y;
+      });
+    }
   } else if (kind === "work"){
     WORKAREAS.forEach(function(a){
       WORKITEMS.forEach(function(i){
@@ -109,13 +126,20 @@ function runCount(kind){ return runStepsFor(kind).length; }
 
 /* ------------------------------------------------------------ the run */
 function startRun(kind, from){
-  var steps = runStepsFor(kind);
-  if (!steps.length) return;
+  /* v82: the day's run is the whole day - done steps too, green on the pips
+     behind him - so a done row tapped in "Your day" opens on that step,
+     stamped, with its Undo. The other runs are what is left. */
+  var whole = kind === "day" && S.onboarded;
+  var steps = runStepsFor(kind, whole);
+  var first = -1;
+  steps.forEach(function(s, n){ if (first < 0 && !s.done) first = n; });
+  if (!steps.length || (first < 0 && !from)) return;
   var ids = steps.map(function(s){ return s.id; }), snap = {};
   steps.forEach(function(s){ snap[s.id] = s; });
   /* Starting "here" means starting at the station he was looking at, not at
      the top of a list he has already scrolled past. */
-  var at = from ? ids.indexOf(from) : 0;
+  var at = from ? ids.indexOf(from) : first;
+  if (at < 0) at = first < 0 ? 0 : first;
   /* snap keeps each step as he saw it, so one he has done can still be
      shown when he walks back to it; dir is which way he last moved */
   RUN = { kind: kind, ids: ids, i: at < 0 ? 0 : at, ticked: {}, snap: snap, dir: 1, n: 0 };
@@ -357,6 +381,11 @@ function runCanUndo(s){
   if (s.op === "life") return !!s.skill && lifeEntries().some(function(e){
     return e[0] === k && e[1] === s.skill && e[2] === s.act; });
   if (s.op === "date") return typeof dateNightDone === "function" && dateNightDone(k);
+  if (s.op === "wake" || s.op === "week") return !!dayRec(k)[s.op];
+  if (s.op === "zh") return zhDone(k);
+  if (s.op === "admin") return adminDone(k);
+  if (s.op === "focus") return focusDoneOn(k);
+  if (s.op === "coffee") return coffeeOn(k);
   if (o.kind === "t") return !!(S.doneDo || {})[o.val];
   if (o.kind === "p") return pDone(k, o.val);
   if (o.kind === "c") return careOn(k, o.val);
@@ -372,6 +401,11 @@ function runUndo(){
   if (s.op === "card") questUndo();
   else if (s.op === "life") undoLife(s.skill, s.act);
   else if (s.op === "date") undoLife("us", "date");
+  else if (s.op === "wake" || s.op === "week") planUntick(s.op);
+  else if (s.op === "zh") undoLife("zh", "study");
+  else if (s.op === "admin") undoAdmin();
+  else if (s.op === "focus") undoFocus();
+  else if (s.op === "coffee") undoCoffee();
   else if (o.kind === "t") undoDoUI(o.val);
   else if (o.kind === "p") tapPillar(o.val);
   else if (o.kind === "c") tapCare(o.val);
@@ -399,6 +433,13 @@ function runOp(op){
   var settled = function(ok){ if (ok) mark(); runNext(); };
 
   if (op === "card"){ if (typeof questDone === "function") questDone(); return after(); }
+  /* v82: the plan's own steps */
+  if (op === "wake"){ planTick("wake"); return after(); }
+  if (op === "week"){ planTick("week"); return after(); }
+  if (op === "zh"){ logLife("zh", "study"); return after(); }
+  if (op === "admin"){ doAdmin(); return after(); }
+  if (op === "focus"){ doFocus(); return after(); }
+  if (op === "coffee") return askCoffee().then(function(){ settled(coffeeOn(today())); });
   /* the kit: one sheet per thing; ticked only when nothing is left to get */
   if (op === "kit") return askKit().then(function(){ settled(!kitWanted().length); });
   if (op === "life"){ if (typeof lifeDoStep === "function") lifeDoStep(); return after(); }

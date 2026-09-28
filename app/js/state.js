@@ -25,6 +25,7 @@ function load(){
             where:{}, walks:{}, levelSeen:0, gymHere:null,
             cue:"", busy:{}, care:{},
             life:[], focus:[], goals:{}, trips:[], plans:[], todos:[], nights:null, planSeeded:0, kit:{},
+            coffee:[], lines:{}, week:{}, veg:{}, dayp:{},
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
