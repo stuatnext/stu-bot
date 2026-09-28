@@ -76,7 +76,7 @@ var DISPATCHES = [
   ["g-four", 93, function(c){ return c.wkSess >= 4; },
     function(c){ return num(c.wkSess) + " sessions this week. The plan asks for three."; }],
   ["g-first", 85, function(c){ return c.sess === 1; },
-    function(c){ return "One session in the record. Everything after this is a comparison."; }],
+    function(c){ return "Your first gym session is logged. From now on the app measures each one against the last."; }],
   ["g-ten", 84, function(c){ return c.sess === 10 || c.sess === 25 || c.sess === 50 || c.sess === 100; },
     function(c){ return num(c.sess) + " sessions logged. None of them were the one you felt like doing."; }],
   ["g-waist", 86, function(c){ return c.waist && c.waist.dir === "down"; },

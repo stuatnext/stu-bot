@@ -191,7 +191,10 @@ function scStatsHTML(){
      its pot chip opened the vault and its shards went to the deck, and all
      three of those routes have to survive the bar going. */
   var h = "<div class='sc-stats'>";
-  h += "<button class='sc-lv' data-tab='you' aria-label='Rank'>" + r.level + "</button>";
+  /* the level wears its progress: a ring that fills towards the next one */
+  var xpPct = r.to > r.from ? Math.max(0, Math.min(1, (r.xp - r.from) / (r.to - r.from))) : 1;
+  h += "<button class='sc-lv' data-tab='you' aria-label='Level " + r.level + "' style='--xp:"
+    + xpPct.toFixed(3) + "'><b>" + r.level + "</b></button>";
   if (fullDays() > 0)
     h += "<button class='sc-s" + (run === 0 ? " cold" : "") + "' data-tab='cards'"
       + " aria-label='Streak'>" + svg("flame", 12) + num(run) + "</button>";
@@ -217,7 +220,8 @@ function scWorldHTML(wins, sel){
   nowPos = Math.max(1.5, Math.min(98.5, nowPos));
   wasPos = Math.max(1.5, Math.min(98.5, wasPos));
 
-  var h = "<div class='sc' data-sky='" + esc(ph) + "'>";
+  roadScale();
+  var h = "<div class='sc' data-sky='" + esc(ph) + "' style='--gh:" + ROAD_H + "px'>";
 
   /* the sky: stars and the sun on the arc it has ridden since v4. Drawn as
      elements rather than inside a stretched SVG, because a circle in a
@@ -243,15 +247,15 @@ function scWorldHTML(wins, sel){
   h += "<span class='sc-sun" + (night ? " moon" : "") + "' style='left:" + sunX.toFixed(1)
     + "%; top:" + sunY.toFixed(1) + "%'></span>";
 
-  /* the ground he woke up on */
+  /* the ground he woke up on, and the road across it */
   h += scGroundHTML(sit);
-  h += "<span class='sc-path'></span>";
+  h += scRoadHTML(nowPos);
 
   h += "<div class='sc-pins'>";
   var placed = wins.map(function(w){
     return { w: w, x: sinceWake(w.open) / 1440 * 100 };
   }).sort(function(a, b){ return a.x - b.x; });
-  var MIN = 13.5;
+  var MIN = 18.5;
   placed.forEach(function(q, i){
     q.x = Math.max(7, Math.min(93, q.x));
     if (i && q.x - placed[i - 1].x < MIN) q.x = placed[i - 1].x + MIN;
@@ -259,20 +263,29 @@ function scWorldHTML(wins, sel){
   /* if that pushed the last one off the end, shuffle the whole line back */
   var over = placed.length ? placed[placed.length - 1].x - 93 : 0;
   if (over > 0) placed.forEach(function(q){ q.x = q.x - over; });
-  placed.forEach(function(q){ q.x = Math.max(12, Math.min(88, q.x)); });
-  placed.forEach(function(q, i){
+  placed.forEach(function(q){ q.x = Math.max(10, Math.min(90, q.x)); });
+  B_XS = placed.map(function(q){ return q.x; });
+  /* v75: every station stands ON the road, at the height the road is at
+     that hour - one row of medallions, not two staggered rows of pins. The
+     one he is standing at bounces and, if it is open, flies a NOW flag. */
+  placed.forEach(function(q){
     var w = q.w, picked = sel && w.id === sel.id;
-    h += "<button class='sc-p " + w.state + (picked ? " up" : "") + (i % 2 ? " hi" : "")
+    h += "<button class='sc-p " + w.state + (picked ? " up" : "")
       + "' data-pick='" + esc(w.id) + "' style='left:" + q.x.toFixed(1)
-      + "%; --pil:" + w.col + "'>"
-      + "<span class='sc-pk'>" + svg(scPin(w), 17) + "</span>"
-      + "<span class='sc-pn'>" + esc(w.short || w.label) + "</span>"
+      + "%; bottom:" + (roadY(q.x) - 24 * ROAD_S).toFixed(0) + "px; --pil:" + w.col + "'>"
+      + (picked && w.state === "open" ? "<span class='sc-flag'>Now</span>" : "")
+      + "<span class='sc-pk'>" + svg(scPin(w), 20) + "</span>"
+      + "<span class='sc-pn'>" + esc(w.short || w.label)
+      + (w.state === "soon" ? "<small>" + esc(hhmm(w.open)) + "</small>" : "") + "</span>"
       + "</button>";
   });
 
-  /* him, walking */
-  h += "<span class='sc-me' style='left:" + wasPos.toFixed(2) + "%' data-to='"
-    + nowPos.toFixed(2) + "'>" + scWalker() + "</span>";
+  /* him, walking the road */
+  var mw = meX(wasPos), mn = meX(nowPos);
+  if (mw > mn) mw = mn;
+  h += "<span class='sc-me' style='left:" + mw.toFixed(2) + "%; bottom:"
+    + (roadY(mw) - 3).toFixed(1) + "px' data-to='" + mn.toFixed(2) + "' data-from='"
+    + mw.toFixed(2) + "'>" + scWalker() + "</span>";
   h += "</div>";
 
   /* The clock, and under it the place. The city is not decoration: he is in
@@ -288,8 +301,9 @@ function scWorldHTML(wins, sel){
       + (guessed ? "locate" : "notthere") + "='1'>" + esc(sit.city)
       + (guessed ? " " + svg("pin", 11) : "") + "</button>";
   h += "</div>";
+  h += scGoalHTML(k0());
   h += scStatsHTML();
-  h += scNewsHTML();
+  h += scNewsHTML(meX(nowPos));
   return h + "</div>";
 }
 
@@ -306,12 +320,78 @@ function scPin(w){
   if (w.kind === "pack") return "pack";
   return "cards";
 }
-/* A person, twenty pixels tall. Deliberately the simplest thing that still
-   reads as somebody rather than a dot. */
+/* v75: him, as a character rather than a stick. Chunky and outlined like a
+   sticker, facing the way the day goes, legs that swing while he walks and
+   a small bob while he waits. */
 function scWalker(){
-  return "<svg viewBox='0 0 14 20' aria-hidden='true'>"
-    + "<circle class='hd' cx='7' cy='4' r='3.1'/>"
-    + "<path class='bd' d='M7 7.6v6.2M7 13.8 4 19M7 13.8 10 19M3.6 10.2 10.4 10.2'/></svg>";
+  return "<svg viewBox='0 0 32 46' aria-hidden='true'>"
+    + "<g class='lg l2'><rect x='15.5' y='29' width='6' height='14' rx='3'/></g>"
+    + "<g class='lg l1'><rect x='10.5' y='29' width='6' height='14' rx='3'/></g>"
+    + "<rect class='tee' x='8' y='16' width='16' height='16' rx='6'/>"
+    + "<path class='arm' d='M22.5 20.5q4 3 3 7.5'/>"
+    + "<circle class='skin' cx='16' cy='10.5' r='7.6'/>"
+    + "<path class='hair' d='M8.6 9.4q.6-7 7.6-7.2 6.6.2 7.4 6.2-3.2-1.8-7.4-1.4-4.4.4-7.6 2.4z'/>"
+    + "<circle class='eye' cx='19.2' cy='11' r='1.15'/>"
+    + "<path class='smile' d='M18 14.2q1.6 1 3 .1'/></svg>";
+}
+/* The road across the ground: one gentle curve through the day, the same
+   function placing the stations and him on it, so they stand on the road
+   rather than near it. x is 0-100 across the day, the answer is pixels up
+   from the bottom of the scene. */
+/* On a shorter phone the ground and the road shrink together, so the sky
+   keeps room for the clock and the bubble. 844 points is his phone. */
+var ROAD_S = 1, ROAD_H = 214;
+function roadScale(){
+  ROAD_S = Math.max(.72, Math.min(1, ((typeof window !== "undefined" && window.innerHeight) || 844) / 844));
+  ROAD_H = Math.round(214 * ROAD_S);
+}
+function roadY(x){ return ROAD_S * (100 + 34 * Math.sin(2 * Math.PI * 0.85 * x / 100 + 0.5)); }
+/* Where he is drawn: at this minute on the road, unless that puts him on
+   top of a station - then a step before it, walking up to it, so neither
+   covers the other. */
+var B_XS = [];
+function meX(x){
+  for (var i = 0; i < B_XS.length; i++){
+    if (Math.abs(x - B_XS[i]) < 7.5){
+      /* no room before the first station: stand just past it instead */
+      return B_XS[i] - 7.5 >= 5 ? B_XS[i] - 7.5 : B_XS[i] + 7.5;
+    }
+  }
+  return Math.max(5, x);
+}
+function scRoadHTML(nowPos){
+  var pts = [], walked = [];
+  for (var x = -4; x <= 104; x += 2){
+    var pt = x.toFixed(0) + " " + (ROAD_H - roadY(x)).toFixed(1);
+    pts.push(pt);
+    if (x <= nowPos) walked.push(pt);
+  }
+  walked.push(nowPos.toFixed(1) + " " + (ROAD_H - roadY(nowPos)).toFixed(1));
+  var d = "M" + pts.join(" L"), dw = "M" + walked.join(" L");
+  return "<div class='sc-road' aria-hidden='true'><svg viewBox='0 0 100 " + ROAD_H
+    + "' preserveAspectRatio='none'>"
+    + "<path class='r0' d='" + d + "' vector-effect='non-scaling-stroke'/>"
+    + "<path class='r1' d='" + d + "' vector-effect='non-scaling-stroke'/>"
+    + "<path class='r2' d='" + d + "' vector-effect='non-scaling-stroke'/>"
+    + "<path class='rw' d='" + dw + "' vector-effect='non-scaling-stroke'/>"
+    + "</svg></div>";
+}
+/* The day's goal, in the corner where a game keeps it: the three pillars as
+   three coins, lit when done, a dashed ring when today does not ask for it. */
+function k0(){ return today(); }
+function scGoalHTML(k){
+  if (!S.onboarded) return "";
+  var owed = 0, got = 0, h = "<div class='sc-goal' aria-label='Today'>";
+  PILLARS.forEach(function(g){
+    var done = pDone(k, g[0]), req = required(g[0], k);
+    if (req) owed++;
+    if (done && req) got++;
+    h += "<i class='gc" + (done ? " on" : req ? "" : " rest") + "' style='--pil:" + g[4] + "'>"
+      + svg(g[2], 12) + "</i>";
+  });
+  var all = allThree(k);
+  h += "<span>" + (all ? "Day complete" : got + " of " + owed + " today") + "</span>";
+  return h + "</div>";
 }
 
 /* Where he woke up, as a silhouette against his own sky. Three places and a
@@ -339,7 +419,7 @@ function scGroundHTML(sit){
 /* One line of news, sitting in the sky rather than in a panel. It is the
    only sentence on the screen that is not attached to a thing he can touch,
    so it is written small and it is never more than one. */
-function scNewsHTML(){
+function scNewsHTML(nowPos){
   var rec = S.onboarded ? monthRecapDue() : null;
   var n0 = rec ? { head: monthName(rec.ym) + " is filed.", ym: rec.ym, month: 1 }
         : (NEWS && NEWS[0]);
@@ -349,7 +429,11 @@ function scNewsHTML(){
     n0 = { head: dsp, quiet: 1 };
   }
   var rest = (NEWS || []).length - (rec ? 0 : 1);
-  return "<button class='sc-news" + (n0.quiet ? " quiet" : "") + "' data-"
+  /* v75: said by him, in a bubble whose tail points at where he stands,
+     rather than a grey bar floating in the sky that read like an error */
+  var at = nowPos == null ? 50 : nowPos;
+  return "<button class='sc-news" + (n0.quiet ? " quiet" : "") + "' style='--x:" + at.toFixed(1)
+    + "vw' data-"
     + (n0.month ? "monthok='" + esc(n0.ym) : "news='1") + "'>"
     + esc(n0.head)
     + (n0.month ? "<em>Noted</em>" : rest > 0 ? "<em>+" + rest + "</em>" : "")
@@ -402,22 +486,35 @@ function bPlayHTML(sel, k, fwd, quiet){
   fwd = fwd || "";
   var up = nextUp(), pr = priority({ noPacks: 1 });
   var isUp = sel.kind === "pillar" && sel.key === up && !sel.done;
+  /* A card is a thing in Singapore he has collected, and "Rain tree." on
+     its own told him nothing. So it says what the thing is, which set it
+     is from, and what it asks of him - or what he did, once he has. */
+  var cd = sel.kind === "card" ? sel.card.card : null;
   var ask = isUp ? pr.ask
-          : sel.kind === "card" ? sel.card.card[0] + "."
+          : cd ? cd[0]
           : sel.kind === "todo" ? sel.todo[1] + "."
           : sel.label + ".";
-  var say = sel.done ? (sel.kind === "pillar" ? doneLine(sel.key) : "Done today.")
+  var say = cd ? (cd[3] || "")
+          : sel.done ? (sel.kind === "pillar" ? doneLine(sel.key) : "Done today.")
           : isUp ? (bSecond(pr.ask, pr.sub) || sel.why)
           : sel.kind === "care" ? careSay(sel.key, k)
           : sel.why;
   var state = bStateWord(sel);
+  var setNm = "";
+  if (cd) SETS.forEach(function(st){ if (st[0] === cd[2]) setNm = st[1]; });
+  var icon = cd ? "<i class='b-pl-ic art'>" + esc(CARD_ART[cd[0]] || "\u2728") + "</i>"
+           : "<i class='b-pl-ic'>" + svg(scPin(sel), 24) + "</i>";
 
-  var h = "<div class='b-pl " + sel.state + "' style='--pil:" + sel.col + "'>";
-  h += "<span class='b-pl-h'><span class='b-pl-n'>" + esc(sel.label) + "</span>"
+  var h = "<div class='b-pl " + sel.state + (cd ? " is-card" : "") + "' style='--pil:" + sel.col + "'>";
+  h += icon;
+  h += "<span class='b-pl-h'><span class='b-pl-n'>" + esc(cd ? "Card \u00b7 " + setNm : sel.label) + "</span>"
     + (sel.chip ? "<em class='b-pl-p'>+" + sel.chip + "</em>" : "")
     + "<em class='b-pl-c'>" + esc(state) + "</em></span>";
   h += "<b>" + esc(ask) + "</b>";
   h += "<span>" + esc(say) + "</span>";
+  if (cd && sel.card.text)
+    h += "<span class='b-pl-q'><em>" + (sel.done ? "You did it" : "The ask") + "</em>"
+      + esc(sel.card.text) + "</span>";
   if (quiet) return h + fwd + "</div>";
   h += "<span class='b-pl-a'>";
   if (sel.kind === "pillar"){
@@ -477,9 +574,10 @@ function boardTick(){
   if (card && html !== B_CARD){ card.outerHTML = html; B_CARD = html; }
   var me = document.querySelector("#screen .sc-me");
   if (me){
-    var x = Math.max(1.5, Math.min(98.5, sinceWake(nowMin()) / 1440 * 100)).toFixed(2);
+    var xn = meX(Math.max(1.5, Math.min(98.5, sinceWake(nowMin()) / 1440 * 100))), x = xn.toFixed(2);
     me.dataset.to = x;
     me.style.left = x + "%";
+    me.style.bottom = (roadY(xn) - 3).toFixed(1) + "px";
   }
   return false;
 }
@@ -503,12 +601,21 @@ function bSecond(ask, sub){
 function scSettle(){
   var me = document.querySelector("#screen .sc-me");
   if (!me || me.dataset.to == null) return;
-  var to = me.dataset.to;
+  var to = Number(me.dataset.to), from = Number(me.dataset.from || to);
   WALKED = true;
-  if (reduced()){ me.style.left = to + "%"; return; }
-  requestAnimationFrame(function(){
-    requestAnimationFrame(function(){ me.style.left = to + "%"; });
-  });
+  var put = function(x){ me.style.left = x.toFixed(2) + "%"; me.style.bottom = (roadY(x) - 3).toFixed(1) + "px"; };
+  if (reduced() || Math.abs(to - from) < 0.4){ put(to); return; }
+  /* the walk follows the curve of the road, a frame at a time, legs going */
+  var t0 = null, span = Math.min(2200, 700 + Math.abs(to - from) * 28);
+  me.classList.add("walk");
+  var step = function(ts){
+    if (!me.isConnected) return;
+    if (t0 === null) t0 = ts;
+    var u = Math.min(1, (ts - t0) / span), e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+    put(from + (to - from) * e);
+    if (u < 1) requestAnimationFrame(step); else me.classList.remove("walk");
+  };
+  requestAnimationFrame(step);
 }
 
 /* The rest of what happened, on request. */
