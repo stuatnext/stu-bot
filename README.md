@@ -86,6 +86,43 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v71: every tap can be taken back
+
+> *"Can't see a way to go back or reverse things"* - sent with a screenshot of Pull Day, move 2
+> of 3, on the live v67 build.
+
+v68 added a back arrow, but it has not reached his phone yet (see v68-v70: GitHub will not run
+the publish job). Even with it, a set could not be reversed once it was logged. The dots under the
+move were plain labels. A thumb that hit *Set 1 done* too early, or a 10 that was really an 8,
+stayed on the record. The only fix was on the Gym tab, inside a closed drawer, and it could
+change a move but never remove one.
+
+- **A labelled Back.** It reads "‹ Back" beside the close button, on every step after the
+  warm-up. It is a word, not a chevron in a circle.
+- **Tap a done set to fix it.** Its own weight and reps go back in the dials. The buttons then
+  read *Save set 1*, *Take set 1 off* and *Leave it*. A line under the sets says so the moment
+  one is logged: "Tap a done set to change it or take it off."
+- **Take a set off and it is gone from the record.** A move with no sets left is removed, and so
+  is a day with no moves and no finisher, so a mistaken tap never counts as a session.
+- **An added set can be removed.** A − appears next to + while the added set is not yet done.
+- **On the tab**, a logged move's sheet reads *Save* / *Leave it* and adds *Take today's … off*.
+
+Also: the rest clock's blue measured 2.97:1 against its dark wash. It is 10:1 at night now, and
+5.3:1 by day, up from 4.44.
+
+Verified with a Playwright walk at 390x844 (20 checks):
+- no Back on the warm-up; the labelled Back is 44 points tall and fits the top bar
+- logging a set makes it a button and shows the hint
+- the change mode shows the logged numbers; Save changes only that set; Leave it keeps the record
+- taking the only set off removes the move and the empty day
+- + then − puts the set count back
+- Back reaches the move before
+- fixing an earlier set keeps the later one
+- no tap target is under 44 points
+- the tab sheet clears a move
+
+The v68 and v69 walks and the v70 tick checks pass. 2,160 renders show no problems.
+
 #### v70: fixes
 
 > *"Fix fix fix"*
