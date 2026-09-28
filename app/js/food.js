@@ -32,10 +32,13 @@ function logFood(name, grams, slot){
   render({ keepScroll: true });
 }
 
-function undoFood(){
-  var k = today(), list = foodOn(k);
-  if (!list.length) return;
-  list.pop(); S.food[k] = list; save(); sfx("untick");
+/* With a slot, the last thing logged in that slot - the runner's undo on
+   lunch must not take off the snack he logged after it. */
+function undoFood(slot){
+  var k = today(), list = foodOn(k), at = list.length - 1;
+  if (slot) while (at >= 0 && list[at][2] !== slot) at--;
+  if (at < 0) return;
+  list.splice(at, 1); S.food[k] = list; save(); sfx("untick");
   render({ keepScroll: true });
 }
 

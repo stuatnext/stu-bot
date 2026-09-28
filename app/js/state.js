@@ -1239,6 +1239,16 @@ function doIt(id){
   S.doneDo = S.doneDo || {}; S.doneDo[id] = today();
   save(); return true;
 }
+/* v80: the runner's undo. Back in the hand, first, and off the record. */
+function undoDo(id){
+  var done = S.doneDo || {};
+  if (!done[id] || !actionById(id)) return false;
+  delete done[id];
+  S.hand = S.hand || { do: [], in: [] };
+  S.hand.do = S.hand.do || [];
+  if (S.hand.do.indexOf(id) < 0) S.hand.do.unshift(id);
+  save(); return true;
+}
 function keepIn(id){
   var h = (S.hand || {}).in || [], i = h.indexOf(id);
   if (i < 0 || !inspireById(id)) return false;

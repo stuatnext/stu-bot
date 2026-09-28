@@ -353,3 +353,47 @@ body:not([data-tab="today"]) #screen{padding-top:0 !important}
 body[data-tab="today"] #screen .sc-p.tight .sc-pk{width:42px; height:42px}
 body[data-tab="today"] #screen .sc-p.tight .sc-pk svg{width:19px; height:19px}
 body[data-tab="today"] #screen .sc-p.tight .sc-pn{font-size:10px; padding:3px 7px}
+
+/* ============================================================ the run, both ways
+   v80. "I can't go back and forward here." Back and forward sit under the
+   thumb on every step, the pips are buttons, and a step already done says
+   so with a stamp and an Undo rather than vanishing from the run. */
+#task .tk-pips{gap:4px; margin:2px 0 -10px}
+#task .tk-pips button{flex:1 1 0; min-width:0; display:block; margin:0; padding:12px 0;
+  border:0; background:none; cursor:pointer; -webkit-tap-highlight-color:transparent}
+#task .tk-pips button:disabled{cursor:default}
+#task .tk-pips button i{display:block; width:100%; transition:transform .18s ease}
+#task .tk-pips i[data-s="gone"]{opacity:.28}
+#task .tk-pips button[data-at] i{transform:scaleY(1.5)}
+#task .tk-pips button[data-at] i[data-s="did"]{box-shadow:0 0 0 2px rgba(255,255,255,.85), 0 0 10px rgba(70,201,125,.8)}
+#task .tk-nav{display:flex; gap:9px}
+#task .tk-nav .tk-skip{flex:1 1 0; min-width:0; min-height:50px; color:var(--ink2)}
+#task .tk-nav .tk-skip:disabled{opacity:.34; cursor:default}
+#task .tk-nav .tk-bk{text-align:left; padding-left:18px}
+#task .tk-nav .tk-fw{text-align:right; padding-right:18px}
+#task .tk-nav .tk-fw:only-child{flex:1 1 auto}
+/* a step already done */
+#task .tk-body.was h2{color:var(--ink2); opacity:.78}
+#task .tk-stamp{align-self:flex-start; display:inline-flex; align-items:center; gap:5px;
+  padding:7px 15px 7px 10px; border-radius:999px;
+  font-family:"Nunito",sans-serif; font-size:15px; font-weight:900; line-height:1; letter-spacing:.01em;
+  color:#06251A; background:linear-gradient(#8FF0B4,#46C97D);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 3px 0 #1F7A48;
+  transform:rotate(-4deg); animation:tkStamp .36s cubic-bezier(.2,1.6,.4,1) both}
+#task .tk-undo{min-height:56px; color:var(--ink) !important; font-size:16px !important;
+  border-color:color-mix(in srgb, var(--pil) 55%, var(--edge)) !important}
+/* the step slides in the way he went */
+#task .tk.go-f .tk-body{animation:tkInR .28s cubic-bezier(.2,.9,.3,1.08) both}
+#task .tk.go-b .tk-body{animation:tkInL .28s cubic-bezier(.2,.9,.3,1.08) both}
+#task .tk.go-0 .tk-body{animation:none}
+#task .tk.go-f .tk-acts,#task .tk.go-b .tk-acts,#task .tk.go-0 .tk-acts{animation:none}
+@keyframes tkInR{from{opacity:0; transform:translateX(44px)}}
+@keyframes tkInL{from{opacity:0; transform:translateX(-44px)}}
+@keyframes tkStamp{from{opacity:0; transform:rotate(-4deg) scale(1.7)}}
+@media (prefers-reduced-motion: reduce){
+  #task .tk .tk-body, #task .tk-stamp{animation:none !important}
+  #task .tk-pips button i{transition:none}
+}
+#task .tk-ch{display:inline-block; font-size:25px; font-weight:800; line-height:0; vertical-align:-2px}
+#task .tk-bk .tk-ch{margin-right:7px}
+#task .tk-fw .tk-ch{margin-left:7px}
