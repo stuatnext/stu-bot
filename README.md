@@ -86,6 +86,46 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v84: breakfast first, breakfast ideas, his own coffee places, and cleaning
+
+> *"I personally prefer to have breakfast before. Wake up, come round, hydrate, have a coffee, have
+> breakfast... it'd be nice to have suggestions... same with the coffee places... I basically just want a
+> new one to go to every day... I also need a block of time each week... to clean the house."*
+
+- **Mornings are in his order.** Come round (water first, then a coffee), breakfast (a 30-minute slot,
+  so it settles), then the gym, then the shower and the routine. *Mornings* in *Your week* switches
+  back to gym first. Either order is fine for a session this size, and the sheet says so.
+- **24 breakfast ideas.** Each has its protein, how long it takes, what it needs and how to make it.
+  - About half use the Greek yoghurt and frozen fruit already at home. The rest are things to want
+    another day: kaya toast with three eggs, chicken porridge, shakshuka, protein pancakes, beans on toast.
+  - The breakfast step shows the day's idea, and it's the first tap when logging breakfast.
+  - The Food tab lists them all under *Breakfast ideas*.
+  - The yoghurt he mentioned is marked as bought, once (`seedOnce`).
+- **His own coffee places.** *Coffee places* in *Your week* opens a box to paste a list, one per line
+  (*Name — area — note* if he likes). His places come first, a new one each coffee day, and the stock
+  list is only a fallback. Coffee somewhere new is now on every day except Sunday, and the pick changes
+  daily rather than weekly.
+- **Cleaning.** By default it's a room a day, 15–20 minutes at midday when the cafés are full anyway:
+  bathroom on Monday and Friday, kitchen on Tuesday, bedroom (fresh sheets) on Wednesday, living room
+  on Thursday, floors on Saturday, nothing on Sunday. *Cleaning* in *Your week* switches to one big
+  90-minute clean on Wednesday, or off. Each day in the week panel shows its room, and the step ticks
+  and untick like the rest.
+- **Fixed:** the app only keeps save keys it has a default for. The new settings (`bfFirst`,
+  `cleanMode`, `seed84`) are now in `load()`'s defaults, and the walk checks they survive a reload.
+
+Verified:
+- **New walk (24 checks):**
+  - the seed, and the order with breakfast before the gym
+  - the idea on the step, logged in one tap
+  - daily rotation, and the Food list
+  - pasting places: areas are read and duplicates dropped, and his places come first
+  - the week settings, gym first, the weekly clean, the clean ticked and taken back
+  - Sunday has no clean
+  - it all survives a reload
+- **Sweep:** 576 loads and 5,184 renders, with 0 problems. It caught a long breakfast name overflowing
+  the Food header on one day; the header now reads "24 ideas".
+- **Earlier walks:** they pass, with the Monday and breakfast expectations moved to the new order.
+
 #### v83: the home kit, and an ill day
 
 > *"I have bought at home an ab wheel, and we have a 10 kilogram kettlebell now... so even when I don't

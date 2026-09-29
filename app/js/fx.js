@@ -57,6 +57,7 @@ var ICONS = {
   cup:   "<path d='M4.4 8.4h11v5.2a4.6 4.6 0 0 1-4.6 4.6h-1.8a4.6 4.6 0 0 1-4.6-4.6z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M15.4 9.8h1.4a2.4 2.4 0 0 1 0 4.8h-1.6M8 3.6c-.6.9.6 1.5 0 2.4M11.2 3.6c-.6.9.6 1.5 0 2.4' stroke='currentColor' stroke-width='1.7' stroke-linecap='round'/>",
   zh:    "<text x='11' y='16.4' text-anchor='middle' fill='currentColor' style='font:900 14px \"Noto Sans SC\",\"PingFang SC\",sans-serif'>\u4e2d</text>",
   list:  "<path d='M8.4 6.2h9.8M8.4 11h9.8M8.4 15.8h9.8' stroke='currentColor' stroke-width='2' stroke-linecap='round'/><circle cx='4.4' cy='6.2' r='1.3' fill='currentColor'/><circle cx='4.4' cy='11' r='1.3' fill='currentColor'/><circle cx='4.4' cy='15.8' r='1.3' fill='currentColor'/>",
+  broom: "<path d='M16.8 3.4 11.6 9.8' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/><path d='M9.2 9.6l4.4 3.4-1.6 5.4c-3-.3-5.9-2.5-7.2-5.3z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M7.8 14.9l2.4-1.6M9.6 17.4l1.8-2.2' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'/>",
   bag:   "<path d='M4.6 7.6h12.8l-1.1 11.2H5.7z' stroke='currentColor' stroke-width='1.9' stroke-linejoin='round'/><path d='M8.1 9.8V6.4a2.9 2.9 0 0 1 5.8 0v3.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>",
   cards: "<rect x='2.9' y='4.6' width='11' height='14.2' rx='1.9' stroke='currentColor' stroke-width='1.9'/><path d='M7.7 3.1h8.4a1.9 1.9 0 0 1 1.9 1.9v10.4' stroke='currentColor' stroke-width='1.9' stroke-linecap='round'/>"
 };
@@ -102,7 +103,11 @@ function ask(opts){
     if (opts.field){
       var f = opts.field;
       if (f.label) h += "<label for='mkField'>" + esc(f.label) + "</label>";
-      h += "<input id='mkField' type='" + (f.type === "date" ? "date" : "text") + "'"
+      /* v84: a list pasted in - one place a line - wants more than one line */
+      if (f.type === "area")
+        h += "<textarea id='mkField' rows='7' placeholder='" + esc(f.placeholder || "") + "'"
+          + " autocomplete='off' autocapitalize='sentences'>" + esc(f.value == null ? "" : f.value) + "</textarea>";
+      else h += "<input id='mkField' type='" + (f.type === "date" ? "date" : "text") + "'"
         + (f.type === "number" ? " inputmode='decimal'" : "")
         + " value='" + esc(f.value == null ? "" : f.value) + "'"
         + " placeholder='" + esc(f.placeholder || "") + "'"
@@ -151,7 +156,8 @@ function ask(opts){
       close(id);
     };
     if (input) input.onkeydown = function(ev){
-      if (ev.key === "Enter"){ ev.preventDefault(); close(input.value.trim()); }
+      /* a pasted list needs its new lines: Enter only submits a one-line field */
+      if (ev.key === "Enter" && input.tagName !== "TEXTAREA"){ ev.preventDefault(); close(input.value.trim()); }
     };
   });
 }

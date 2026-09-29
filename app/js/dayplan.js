@@ -39,13 +39,15 @@ var DAY_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"
 
 /* The week he starts with, by getDay(): f the focus, c coffee somewhere new,
    a life admin. */
+/* v84: "I basically just want a new one to go to every day" - coffee
+   somewhere new on every day but Sunday; any day can be switched off. */
 var WEEK_DEFAULT = [
   { f: "veg",     c: 0, a: 0 },   /* Sunday: nothing to prove */
-  { f: "biz",     c: 0, a: 0 },   /* Monday: the business, first thing in the week */
+  { f: "biz",     c: 1, a: 0 },   /* Monday: the business, first thing in the week */
   { f: "zh",      c: 1, a: 1 },
-  { f: "friends", c: 0, a: 0 },
+  { f: "friends", c: 1, a: 0 },
   { f: "biz",     c: 1, a: 0 },
-  { f: "name",    c: 0, a: 1 },
+  { f: "name",    c: 1, a: 1 },
   { f: "friends", c: 1, a: 0 }    /* Saturday: out there */
 ];
 
@@ -154,6 +156,120 @@ var COFFEE = [
 ];
 /* The lunch crowd, which he hates: nothing social goes between these. */
 var LUNCH_A = 11 * 60 + 45, LUNCH_B = 14 * 60;
+
+/* ------------------------------------------------------------ breakfasts
+   v84: "It'd be nice to have suggestions... things that can keep me
+   inspired even if I don't buy it today." One idea a day on the breakfast
+   step, and all of them on the Food tab. Protein first, because the day's
+   target needs three meals and breakfast is the one that gets skipped.
+   [ what, grams of protein, minutes, what it needs, how, tags ]
+   yog = built on the Greek yoghurt and frozen fruit already at home. */
+var BREAKFASTS = [
+  ["Yoghurt and frozen berries", 20, 3, "Greek yoghurt, frozen fruit, honey",
+    "A big bowl of yoghurt and a handful of frozen berries straight from the freezer. They thaw as you eat.", "yog"],
+  ["Berry smoothie", 25, 5, "Frozen fruit, Greek yoghurt, milk",
+    "A cup of frozen fruit, three big spoons of yoghurt and a glass of milk. Thick enough to need a spoon.", "yog"],
+  ["Overnight oats", 20, 5, "Oats, Greek yoghurt, milk, fruit",
+    "Oats, yoghurt and milk in a jar the night before, fruit on top. Breakfast is waiting when you wake.", "yog"],
+  ["Yoghurt, banana and peanut butter", 22, 3, "Greek yoghurt, a banana, peanut butter",
+    "Sliced banana on the yoghurt, a spoon of peanut butter stirred through.", "yog"],
+  ["Yoghurt parfait with granola", 18, 3, "Greek yoghurt, granola, frozen fruit",
+    "Layered in a glass: yoghurt, fruit, granola, again. The crunch is the point.", "yog"],
+  ["Mango lassi", 15, 5, "Frozen mango, Greek yoghurt, milk",
+    "Blend frozen mango with yoghurt and milk, a pinch of cardamom if there is some.", "yog"],
+  ["Kaya toast and three soft-boiled eggs", 18, 15, "A kopitiam",
+    "The Singapore breakfast, with a third egg to make it count. Soy sauce and white pepper on the eggs.", ""],
+  ["Scrambled eggs on toast", 20, 10, "Three eggs, bread",
+    "Low heat, keep stirring, and take it off while it still looks a little wet.", ""],
+  ["Spinach and cheese omelette", 22, 10, "Three eggs, spinach, cheese",
+    "Wilt the spinach first, pour the eggs over, cheese in the middle, fold.", ""],
+  ["Chicken porridge with an egg", 20, 10, "A hawker stall",
+    "Ask for an egg stirred in. Gentle, filling, and very good when you are under the weather.", ""],
+  ["Cottage cheese and fruit", 20, 2, "Cottage cheese, fruit",
+    "Straight from the tub with whatever fruit is in. Cold Storage has it.", ""],
+  ["Smoked salmon on toast", 20, 5, "Smoked salmon, cream cheese, bread",
+    "Cream cheese, salmon, black pepper, a squeeze of lemon.", ""],
+  ["Protein pancakes", 25, 15, "A banana, two eggs, oats",
+    "Blend them, fry small ones, top with yoghurt and berries. A weekend one.", ""],
+  ["Tofu scramble", 18, 10, "Firm tofu, soy sauce, spring onion",
+    "Crumble the tofu into a hot pan, soy sauce and pepper, spring onion at the end.", ""],
+  ["Egg muffins, made on Sunday", 18, 2, "Eggs, peppers, spinach",
+    "Bake twelve in a muffin tin on Sunday; two in the microwave each morning.", ""],
+  ["Tuna on toast", 25, 5, "A tin of tuna, bread, a little mayo",
+    "Tuna, mayo, black pepper, on toast. Cheap and very high in protein.", ""],
+  ["Soy milk and a boiled-egg sandwich", 20, 10, "Unsweetened soy milk, eggs, bread",
+    "Two boiled eggs mashed with pepper in bread, and a glass of soy milk.", ""],
+  ["Chia pudding", 15, 5, "Chia seeds, milk, yoghurt, fruit",
+    "Chia and milk in a jar the night before; yoghurt and fruit on top in the morning.", ""],
+  ["A Japanese breakfast", 20, 10, "Rice, an egg, miso, a little salmon",
+    "Rice, an onsen egg, miso soup and a bit of salmon. Plenty of caf\u00e9s here do it as a set.", ""],
+  ["Breakfast burrito", 25, 15, "Eggs, a tortilla, cheese, beans",
+    "Scrambled eggs, beans and cheese rolled in a tortilla. Hot sauce if you like it.", ""],
+  ["Baked beans and eggs on toast", 22, 10, "A tin of beans, two eggs, bread",
+    "A taste of home. Beans, two eggs any way, toast.", ""],
+  ["Shakshuka", 20, 20, "Eggs, a tin of tomatoes, cumin, paprika",
+    "Eggs poached in a spiced tomato sauce, bread to mop it up. A slow Saturday one.", ""],
+  ["Peanut butter toast and a glass of milk", 15, 3, "Bread, peanut butter, milk",
+    "The two-minute one for the days nothing else will happen.", ""],
+  ["Greek yoghurt with honey and walnuts", 20, 2, "Greek yoghurt, honey, walnuts",
+    "Thick yoghurt, a drizzle of honey, a handful of walnuts. Tastes like a holiday.", "yog"]
+];
+/* The day's idea: every other day one built on what is already in the
+   fridge, the rest something new to want. Same all day, different
+   tomorrow. */
+function breakfastIdea(k){
+  k = k || today();
+  var have = typeof kitState === "function" && kitState("am") === "have";
+  if (have && hashOf("bfh" + k) % 2 === 0){
+    var y = BREAKFASTS.filter(function(b){ return b[5] === "yog"; });
+    return y[hashOf("bfy" + k) % y.length];
+  }
+  return BREAKFASTS[hashOf("bf" + k) % BREAKFASTS.length];
+}
+function breakfastLine(b){ return b[0] + " \u2014 " + b[1] + "g of protein, " + b[2] + " minutes."; }
+function breakfastListHTML(){
+  var t = breakfastIdea();
+  var h = "<div class='bf'>";
+  [t].concat(BREAKFASTS.filter(function(b){ return b !== t; })).forEach(function(b, i){
+    h += "<div class='bf-r" + (i === 0 ? " on" : "") + "'>"
+      + (i === 0 ? "<em>Today\u2019s idea</em>" : "")
+      + "<b>" + esc(b[0]) + "</b><span class='bf-n'>" + b[1] + "g \u00b7 " + b[2] + " min"
+      + (b[5] === "yog" ? " \u00b7 uses your yoghurt" : "") + "</span>"
+      + "<small>" + esc(b[4]) + "</small></div>";
+  });
+  return h + "</div>";
+}
+
+/* -------------------------------------------------------------- cleaning
+   v84: "I need blocks of time... one day a week doing a massive clean, or
+   each day I do a room." The approach that survives a job like his is the
+   small daily one - fifteen minutes on one room, the same room on the same
+   day, so the flat is never more than a week from clean and no day costs
+   more than a quarter of an hour. The big weekly clean is there for anyone
+   who would rather have one long block. Midday, when the cafés are full
+   anyway. [ room, what, minutes ] by getDay() */
+var CLEAN_ZONES = [
+  null,
+  ["Bathroom",    "Toilet, sink and mirror.", 15],
+  ["Kitchen",     "Surfaces, the hob and the sink. Anything old in the fridge goes.", 20],
+  ["Bedroom",     "Fresh sheets, and clear every surface.", 20],
+  ["Living room", "Clear it, dust it, straighten the cushions.", 15],
+  ["Bathroom",    "Toilet and shower. Towels in the wash.", 15],
+  ["Floors",      "Hoover and mop, every room.", 30]
+];
+var CLEAN_BIG = ["The big clean", "Bathroom, kitchen, fresh sheets, then the floors. Music on.", 90];
+function cleanMode(){ return S.cleanMode === "weekly" || S.cleanMode === "off" ? S.cleanMode : "daily"; }
+function cleanToday(k){
+  k = k || today();
+  if (vegOn(k) || !atHome(k)) return null;
+  var m = cleanMode(), d = dowOf(k);
+  if (m === "off") return null;
+  if (m === "weekly") return d === 3 ? CLEAN_BIG : null;     /* Wednesday */
+  return CLEAN_ZONES[d];
+}
+function cleanWord(z){ return z === CLEAN_BIG ? z[0] : "Clean the " + z[0].toLowerCase(); }
+/* Breakfast before the gym, or after - his call; before is how he likes it. */
+function bfFirst(){ return S.bfFirst !== 0; }
 
 /* ------------------------------------------------------------- the week */
 function dowOf(k){ return new Date(k + "T12:00:00").getDay(); }
@@ -303,15 +419,61 @@ function coffeePassport(){
   coffeeLog().forEach(function(c){ s[c[1]] = 1; });
   return Object.keys(s).length;
 }
-/* The week's pick: the first one he has not tried, starting somewhere the
-   week chooses, so it is the same all week and different next week. */
+/* v84: his own places, from his own area - "what you've recommended is a
+   very standard, typical coffee place". Added on the You tab, or sent as
+   screenshots and loaded in. They come first; the list above is only the
+   fallback once his run out. */
+function cafesOwn(){
+  return (Array.isArray(S.cafes) ? S.cafes : []).map(function(c){
+    return [c[0], c[1] || "", c[2] || "Somewhere new near you."];
+  });
+}
+function coffeeList(){ return cafesOwn().concat(COFFEE); }
+/* The day's pick: the first one he has not been to, his own before the
+   stock ones, starting somewhere the day chooses - the same all day, a
+   new one tomorrow. */
 function coffeePick(k){
-  var n = COFFEE.length, s = hashOf(weekKeyOf(k || today())) % n;
+  k = k || today();
+  var own = cafesOwn().filter(function(c){ return !coffeeTried(c[0]); });
+  if (own.length) return own[hashOf("cf" + k) % own.length];
+  var n = COFFEE.length, s = hashOf("cf" + k) % n;
   for (var i = 0; i < n; i++){
     var c = COFFEE[(s + i) % n];
     if (!coffeeTried(c[0])) return c;
   }
-  return COFFEE[s];
+  var all = coffeeList();
+  return all[s % all.length];
+}
+function addCafes(text){
+  var have = {}, added = 0;
+  S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
+  S.cafes.forEach(function(c){ have[c[0].toLowerCase()] = 1; });
+  String(text || "").split(/\n+/).forEach(function(line){
+    var parts = line.split(/\s+[\u2014\u2013-]\s+|\s*\|\s*|\t/).map(function(x){ return x.trim(); }).filter(Boolean);
+    var name = (parts[0] || "").replace(/^[\u2022*\d.)\s]+/, "").slice(0, 60);
+    if (!name || have[name.toLowerCase()]) return;
+    have[name.toLowerCase()] = 1;
+    S.cafes.push([name, (parts[1] || "").slice(0, 40), (parts[2] || "").slice(0, 120)]);
+    added++;
+  });
+  save();
+  return added;
+}
+function askCafes(){
+  return ask({
+    title: "Your coffee places",
+    say: "Paste the list, one place a line. <b>Name \u2014 area</b> if you like. Yours come first, "
+       + "a new one each coffee day, and the ones you have been to stay in your passport.",
+    field: { label: "Places", value: "", placeholder: "Kurasu \u2014 Tanjong Pagar", type: "area" },
+    confirm: "Add them", cancel: "Close"
+  }).then(function(v){
+    if (typeof v !== "string" || !v.trim()) return;
+    var n = addCafes(v);
+    sfx(n ? "done" : "tap"); buzz(10);
+    toast(n ? n + (n === 1 ? " place" : " places") + " added. " + cafesOwn().length + " of yours on the list."
+            : "Those are already on the list.");
+    render({ keepScroll: true });
+  });
 }
 /* The window: the morning, before the lunch crowd - or, once that has
    gone, the afternoon after it, if the shift leaves room. */
@@ -327,7 +489,7 @@ function askCoffee(){
   return ask({
     title: "Coffee somewhere new",
     html: "<div class='kit-c' style='--kt:#E0A15A'>"
-      + "<div class='kit-pick'><em>This week’s pick</em><b>" + esc(c[0]) + "</b>"
+      + "<div class='kit-pick'><em>Today’s pick</em><b>" + esc(c[0]) + "</b>"
       + "<span>" + esc(c[1]) + "</span></div>"
       + "<p class='kit-why'>" + esc(c[2]) + "</p>"
       + "<p class='kit-how'><em>When</em>" + (lunch ? "It is the lunch crowd now. After two is quieter."
@@ -336,11 +498,13 @@ function askCoffee(){
       + (coffeePassport() === 1 ? " place" : " places") + "</p></div>",
     options: [
       { id: "pick", label: "Went there", note: c[0], pri: true },
-      { id: "other", label: "Somewhere else new", note: "Type the name" }
+      { id: "other", label: "Somewhere else new", note: "Type the name" },
+      { id: "list", label: "Add places to your list", note: cafesOwn().length ? cafesOwn().length + " of yours so far" : "Your own, from your area" }
     ],
     cancel: "Not today"
   }).then(function(v){
     if (v === "pick"){ logCoffee(c[0]); return; }
+    if (v === "list"){ askCafes(); return; }
     if (v !== "other") return;
     return ask({ title: "Where did you go?",
       field: { label: "The place", value: "", placeholder: "Name of the café", type: "text" },
@@ -386,11 +550,14 @@ function dayPlan(k){
     return a;
   }
   put("wake", 15);
+  /* v84: "wake up, come round, hydrate, have a coffee, have breakfast" -
+     then the gym, then the shower and the routine */
+  if (bfFirst()) put("m:morning", 30);   /* half an hour, so it settles before the gym */
   if (by["p:train"] && lift)
     put("p:train", (typeof sessionMinutes === "function" ? Math.round(sessionMinutes(gp.key)) : 45) + 20);
   if (by["c:skin"]) put("c:skin", 5);
   if (by["c:sun"]) put("c:sun", 5);
-  put("m:morning", 20);
+  if (!bfFirst()) put("m:morning", 20);
 
   /* On a rest day the walk goes to the coffee: one trip, Trained on the way. */
   var walk = !!(by["p:train"] && !lift), cafe = !!by.coffee, kit = !!by.kit, later = false;
@@ -406,6 +573,8 @@ function dayPlan(k){
   ["life", "todo", "card"].forEach(function(id){ if (by[id]) put(id, 20); });
   if (zhDay(k)) put("zh", 15);
   if (adminDay(k)) put("admin", 30);
+  var cz = cleanToday(k);
+  if (cz) put("clean", cz[2]);
   if (kit) put("kit", 30);
   if (later){
     var a2 = Math.max(t, LUNCH_B);
@@ -445,7 +614,7 @@ function planTimes(wins, k){
 function planInfo(b, by, k, gp, lift){
   var w = by[b.id], id = b.id;
   b.station = !!w;
-  if (id === "wake"){ b.t = "Come round"; b.say = "Water, daylight, and ten minutes before the phone."; b.ic = "rise"; b.col = "#FFC857"; b.done = !!dayRec(k).wake; }
+  if (id === "wake"){ b.t = "Come round"; b.say = "Water first, then a coffee. Ten minutes before the phone."; b.ic = "rise"; b.col = "#FFC857"; b.done = !!dayRec(k).wake; }
   else if (id === "p:train"){
     var ga = typeof gymAsk === "function" ? gymAsk() : { ask: "Train.", sub: "" };
     b.t = lift ? ga.ask.replace(/\.$/, "") : (by.coffee ? "Rest day — walk to the coffee" : "Rest day — a walk");
@@ -459,7 +628,8 @@ function planInfo(b, by, k, gp, lift){
     var slot = id.slice(2), m = (typeof mealPlan === "function" ? mealPlan() : []).filter(function(x){ return x.slot === slot; })[0];
     var sug = typeof suggestOrder === "function" ? suggestOrder(slot) : null;
     b.t = slot === "morning" ? "Breakfast" : m ? m.label : "A meal";
-    b.say = sug ? sug[0] + " — " + num(sug[1]) + "g of protein." : "Protein first.";
+    b.say = slot === "morning" ? "Today’s idea: " + breakfastLine(breakfastIdea(k))
+      : sug ? sug[0] + " — " + num(sug[1]) + "g of protein." : "Protein first.";
     b.ic = "plate"; b.col = "#3FE0A0"; b.done = anchorDone(k, slot);
   }
   else if (id === "coffee"){
@@ -479,6 +649,11 @@ function planInfo(b, by, k, gp, lift){
     b.t = al ? "Life admin: " + al.charAt(0).toLowerCase() + al.slice(1) : "Life admin";
     b.say = al ? "Thirty minutes on it, then stop." : "Bills, bookings, the thing you keep moving. Thirty minutes.";
     b.ic = "pen"; b.col = "#CE82FF"; b.done = adminDone(k);
+  }
+  else if (id === "clean"){
+    var zc = cleanToday(k);
+    b.t = zc ? cleanWord(zc) : "Clean"; b.say = zc ? zc[1] + " " + zc[2] + " minutes, then stop." : "";
+    b.ic = "broom"; b.col = "#7FD4C1"; b.done = !!dayRec(k).clean;
   }
   else if (id === "week"){ b.t = "Look at the week"; b.say = "Ten minutes: what each day is for. Then back to the sofa."; b.ic = "list"; b.col = "#8FA3FF"; b.done = !!dayRec(k).week; }
   else if (id === "setup"){ b.mark = 1; b.t = "Set up for Malta"; b.say = "Water, food, the desk."; b.ic = "case"; b.col = "#8FA3FF"; }
@@ -619,10 +794,60 @@ function weekPanelHTML(){
       + "<span class='wkp-d'>" + DAY_SHORT[d] + "</span>"
       + "<i class='wkp-ic'>" + svg(fo[2], 16) + "</i>"
       + "<span class='wkp-t'><b>" + esc(fo[0]) + "</b><small>"
-      + esc([w.f === "veg" ? "Nothing to prove" : focusLineWord(w.f), w.c ? "coffee somewhere new" : "", w.a ? "life admin" : ""]
-          .filter(Boolean).join(" · ")) + "</small></span></button>";
+      + esc([w.f === "veg" ? "Nothing to prove" : focusLineWord(w.f), w.c ? "coffee somewhere new" : "", w.a ? "life admin" : "",
+             cleanOnDay(d)].filter(Boolean).join(" · ")) + "</small></span></button>";
   });
+  /* v84: the three things that shape every day, one tap each */
+  h += "<div class='wkp-set'>"
+    + "<button class='wkp-o' data-mornings='1'><b>Mornings</b><span>" + (bfFirst()
+        ? "Coffee and breakfast, then the gym" : "The gym, then breakfast") + "</span></button>"
+    + "<button class='wkp-o' data-cleanmode='1'><b>Cleaning</b><span>" + (cleanMode() === "weekly"
+        ? "One big clean on Wednesday" : cleanMode() === "off" ? "Not in the plan" : "A room a day, fifteen minutes") + "</span></button>"
+    + "<button class='wkp-o' data-cafes='1'><b>Coffee places</b><span>" + (cafesOwn().length
+        ? cafesOwn().length + " of yours \u00b7 " + coffeePassport() + " found" : "Add your own, from your area") + "</span></button>"
+    + "</div>";
   return h + "</div>";
+}
+function cleanOnDay(d){
+  var m = cleanMode();
+  if (m === "off") return "";
+  if (m === "weekly") return d === 3 ? "the big clean" : "";
+  var z = CLEAN_ZONES[d];
+  return z ? "clean: " + z[0].toLowerCase() : "";
+}
+function askMornings(){
+  return ask({
+    title: "Mornings",
+    say: "Either works for a session this size &mdash; what matters is the day&rsquo;s protein, not the order. "
+       + "Pick the one you will actually do.",
+    options: [
+      { id: "bf", label: "Coffee and breakfast, then the gym", note: "Water, a coffee, breakfast, then train", pri: bfFirst() },
+      { id: "gym", label: "The gym, then breakfast", note: "Straight out, and a proper breakfast after", pri: !bfFirst() }
+    ],
+    cancel: "Close"
+  }).then(function(v){
+    if (v !== "bf" && v !== "gym") return;
+    S.bfFirst = v === "bf" ? 1 : 0;
+    save(); sfx("tick"); render({ keepScroll: true });
+  });
+}
+function askCleanMode(){
+  var m = cleanMode();
+  return ask({
+    title: "Cleaning",
+    say: "The small daily one is the version that survives a busy week: one room, the same room on the same day, "
+       + "fifteen minutes at midday, and the flat is never more than a week from clean.",
+    options: [
+      { id: "daily", label: "A room a day", note: "Bathroom Mon and Fri, kitchen Tue, bedroom Wed, living room Thu, floors Sat", pri: m === "daily" },
+      { id: "weekly", label: "One big clean on Wednesday", note: "Ninety minutes, the whole flat", pri: m === "weekly" },
+      { id: "off", label: "Not in the plan", note: "Someone else has it covered", pri: m === "off" }
+    ],
+    cancel: "Close"
+  }).then(function(v){
+    if (v !== "daily" && v !== "weekly" && v !== "off") return;
+    S.cleanMode = v;
+    save(); sfx("tick"); render({ keepScroll: true });
+  });
 }
 function focusLineWord(f){
   if (f === "veg" || !FOCUS_LINES[f]) return "";
@@ -668,9 +893,19 @@ function planSteps(k, plan){
   plan.forEach(function(b){
     if (b.mark || b.station) return;
     var part = b.id.indexOf("m:") === 0 ? "Food" : b.id === "wake" ? "Morning" : b.id === "zh" ? "Mandarin"
-             : b.id === "admin" ? "Life admin" : b.id === "week" ? "Sunday" : "The day";
+             : b.id === "admin" ? "Life admin" : b.id === "week" ? "Sunday" : b.id === "clean" ? "Home" : "The day";
     out.push({ id: b.id, at: b.at, kicker: hhmm(b.at) + " · " + part, col: b.col,
       title: b.t + ".", say: b.say, op: b.id, done: !!b.done });
   });
   return out;
+}
+
+/* v84: things he told us, written into his phone once. "I've got some Greek
+   yogurt with some fruit, some frozen fruit" - so breakfast protein is in. */
+function seedOnce(){
+  if (S.seed84) return;
+  S.kit = S.kit || {};
+  if (!S.kit.am) S.kit.am = { s: "have", d: today() };
+  S.seed84 = 1;
+  save();
 }

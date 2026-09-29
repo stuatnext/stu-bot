@@ -163,17 +163,21 @@ function askAnchor(slot){
   var pool = all.filter(function(o){ return o[2] === "any" || o[2] === slot; });
   var m = mealPlan().filter(function(x){ return x.slot === slot; })[0];
   var sug = suggestOrder(slot);
+  /* v84: breakfast leads with the day's idea, one tap to log it */
+  var idea = slot === "morning" && typeof breakfastIdea === "function" ? breakfastIdea() : null;
   /* returns the promise so the runner can wait for it and move on */
   return ask({
     title: m ? m.label + " \u00b7 " + hhmm(m.at) : "Add food",
     say: "Tap what you had. The number is protein, roughly.",
-    options: pool.map(function(o){
-      return { id: o[0], label: o[0], note: o[1] + "g", pri: !!(sug && sug[0] === o[0]) };
-    }).concat([{ id: "__other", label: "Something else", note: "Type it" }]),
+    options: (idea ? [{ id: "__idea", label: idea[0], note: idea[1] + "g \u00b7 today\u2019s idea", pri: true }] : [])
+      .concat(pool.map(function(o){
+        return { id: o[0], label: o[0], note: o[1] + "g", pri: !idea && !!(sug && sug[0] === o[0]) };
+      })).concat([{ id: "__other", label: "Something else", note: "Type it" }]),
     cancel: "Cancel"
   }).then(function(v){
     if (v === null || v === "__no") return;
     if (v === "__other"){ askFoodOther(slot); return; }
+    if (v === "__idea" && idea){ logFood(idea[0], idea[1], slot); return; }
     var o = all.filter(function(x){ return x[0] === v; })[0];
     if (o) logFood(o[0], o[1], slot);
   });
@@ -267,6 +271,9 @@ function viewFood(){
     log ? fold("eaten", "What you have eaten", num(got) + "g today", log, false) : "",
     fold("orders", "What to order",
       (sit.home ? "" : esc(sit.city) + " \u00b7 ") + ordersNow().length + " " + ordersWord(), ordl, false),
+    /* v84: breakfast ideas - something to want, even on a day it is eggs */
+    typeof breakfastListHTML === "function"
+      ? fold("bfideas", "Breakfast ideas", BREAKFASTS.length + " ideas", breakfastListHTML(), false) : "",
     /* v81: breakfast protein is bought, not ordered - what to get, at home */
     sit.home && typeof kitPanelHTML === "function"
       ? fold("foodkit", "In the kitchen", kitWanted("food").length ? "breakfast to buy" : "stocked",

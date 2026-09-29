@@ -28,6 +28,9 @@ function load(){
             coffee:[], lines:{}, week:{}, veg:{}, dayp:{},
             /* v83: the kit he told us is at home, and the days he was ill */
             homeKit:{ kb:10, wheel:1 }, sick:{},
+            /* v84: his own coffee places, breakfast before the gym, how the
+               cleaning runs, and the one-off seed of what he told us */
+            cafes:[], bfFirst:1, cleanMode:"daily", seed84:0,
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,

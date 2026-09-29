@@ -67,7 +67,7 @@ function setBadge(tab, n, pulse){
 }
 
 
-var BUILD = "v83";
+var BUILD = "v84";
 
 /* The icon carries the day's debt while the app is closed: open pillars as
    the badge number, cleared the moment the day is in. Set on the way out,
@@ -237,6 +237,9 @@ document.addEventListener("click", function(ev){
   if (ds.dayplan){ askDay(); return; }
   if (ds.sick){ if (ds.sick === "0") setSick(0); else askSick(); return; }
   if (ds.homekit){ askHomeKit(); return; }
+  if (ds.mornings){ askMornings(); return; }
+  if (ds.cleanmode){ askCleanMode(); return; }
+  if (ds.cafes){ askCafes(); return; }
   if (ds.weekday){ askWeekDay(Number(ds.weekday)); return; }
   if (ds.runsmall){ closeRun(); askLowDay(); return; }
   if (ds.runclose){ closeRun(); return; }
@@ -427,6 +430,7 @@ noteWhere();
 paintSky();
 /* v79: his road, built in, loaded once */
 if (typeof seedPlan === "function" && S.onboarded) seedPlan();
+if (typeof seedOnce === "function" && S.onboarded) seedOnce();
 render({ first: true });
 paintHud();
 openGate();

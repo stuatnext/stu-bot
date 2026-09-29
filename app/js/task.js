@@ -381,7 +381,7 @@ function runCanUndo(s){
   if (s.op === "life") return !!s.skill && lifeEntries().some(function(e){
     return e[0] === k && e[1] === s.skill && e[2] === s.act; });
   if (s.op === "date") return typeof dateNightDone === "function" && dateNightDone(k);
-  if (s.op === "wake" || s.op === "week") return !!dayRec(k)[s.op];
+  if (s.op === "wake" || s.op === "week" || s.op === "clean") return !!dayRec(k)[s.op];
   if (s.op === "zh") return zhDone(k);
   if (s.op === "admin") return adminDone(k);
   if (s.op === "focus") return focusDoneOn(k);
@@ -401,7 +401,7 @@ function runUndo(){
   if (s.op === "card") questUndo();
   else if (s.op === "life") undoLife(s.skill, s.act);
   else if (s.op === "date") undoLife("us", "date");
-  else if (s.op === "wake" || s.op === "week") planUntick(s.op);
+  else if (s.op === "wake" || s.op === "week" || s.op === "clean") planUntick(s.op);
   else if (s.op === "zh") undoLife("zh", "study");
   else if (s.op === "admin") undoAdmin();
   else if (s.op === "focus") undoFocus();
@@ -436,6 +436,7 @@ function runOp(op){
   /* v82: the plan's own steps */
   if (op === "wake"){ planTick("wake"); return after(); }
   if (op === "week"){ planTick("week"); return after(); }
+  if (op === "clean"){ planTick("clean"); return after(); }
   if (op === "zh"){ logLife("zh", "study"); return after(); }
   if (op === "admin"){ doAdmin(); return after(); }
   if (op === "focus"){ doFocus(); return after(); }
