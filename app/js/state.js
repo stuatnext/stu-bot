@@ -26,6 +26,8 @@ function load(){
             cue:"", busy:{}, care:{},
             life:[], focus:[], goals:{}, trips:[], plans:[], todos:[], nights:null, planSeeded:0, kit:{},
             coffee:[], lines:{}, week:{}, veg:{}, dayp:{},
+            /* v83: the kit he told us is at home, and the days he was ill */
+            homeKit:{ kb:10, wheel:1 }, sick:{},
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
@@ -448,11 +450,15 @@ function dur(m){
    rule his Mandarin study already runs on: weekdays only, the weekend absorbed
    rather than counted as a failure. It only ever adds days; nothing he has
    already earned can go down. */
+function sickOn(k){ return !!(S.sick || {})[k || today()]; }
 function required(key, k){
   /* A holiday is a weekend that lasts longer: there is no Malta shift to
      finish, so Stopped is carried rather than owed. This only ever turns an
      owed day into a met one, so nothing he has already earned can go down. */
   if (key === "stop" && (isWeekend(k) || holidayOn(k))) return false;
+  /* v83: ill. Rest is the training on a day he is ill, so Train is carried
+     the way Stopped is at the weekend - Family and Stop still make the day. */
+  if (key === "train" && sickOn(k)) return false;
   return true;
 }
 function pDone(k, key){

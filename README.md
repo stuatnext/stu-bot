@@ -86,6 +86,60 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v83: the home kit, and an ill day
+
+> *"I have bought at home an ab wheel, and we have a 10 kilogram kettlebell now... so even when I don't
+> feel like going to the gym, I still do something. Unfortunately, today I have a cold... I'm pretty tired
+> as well."*
+
+**A home session built from what is at home.**
+- A day at home (*Not up to the gym today?* → *At home, with the kit*) is now a proper session: the same
+  day of the split as the gym, built from one kettlebell, the ab wheel and the floor, in about half an
+  hour. `HOME_BY` in `data.js` holds the moves for each day:
+
+  | Day | Moves |
+  |---|---|
+  | Push | push-up, kettlebell overhead press, ab wheel rollout, floor press, chair dip |
+  | Pull | one-arm kettlebell row, kettlebell deadlift, kettlebell curl, reverse snow angel, dead bug, halo |
+  | Legs | kettlebell goblet squat, kettlebell Romanian deadlift, ab wheel rollout, kettlebell reverse lunge, glute bridge |
+  | Arms & Abs | curl, dip, rollout, halo, side plank, dead bug |
+
+- **One bell means the weight never goes up.** A kettlebell move's target is the bell, and progress
+  comes from reps and then tempo: "one bell, so the next step is slower — three seconds down". It never
+  suggests a heavier bell you don't own.
+- **A ten-minute version:** *Ten minutes at home* runs the first two moves and still counts as Trained.
+- **Every new move has its how-to.** The ab wheel starts from the knees, and rolls only as far as your
+  lower back stays flat, with a wall as a stop.
+- **Home kit** on the Gym tab records what's there. If a move needs something you don't have, it
+  becomes its floor version: no bell turns the bell moves into floor moves, and no wheel turns the
+  rollout into a dead bug. Hotels still get the room session.
+- **In the living room**, the gym prompts "Taken?" and "Swap the machine" read "Too hard today?" and
+  "Swap the move".
+
+**Ill.**
+- *I'm ill* (under *Not up to the gym today?* or in *Your day*) explains the rule people use for
+  training with a cold. Above the neck (a blocked nose, a scratchy throat), a gentle walk is fine if you
+  feel up to it. Below the neck (your chest, a temperature, aches), rest, full stop.
+- An ill day treats Train the way the weekend treats Stop: it's not owed, so Family and Stop still make
+  the day and the run is safe.
+- The plan switches to vegetate, the bubble says "Rest is the training", and the Gym tab says so first,
+  with a *Feeling better* button to undo it.
+
+Verified:
+- **New walk (22 checks):**
+  - the kit is the first home answer
+  - a home session is built from the kit
+  - the bell target stays on the bell and moves on to tempo
+  - variants with no bell, no wheel and neither
+  - a hotel still gets the room session
+  - the kit editor
+  - every home move has a how-to
+  - the neck-rule sheet
+  - an ill day carries Train, removes the station, vegetates the plan and changes the bubble
+  - Family and Stop still make the day
+  - feeling better, and being ill again from *Your day*
+- **Other checks:** every earlier walk passes. The sweep now includes an ill save: 576 loads and 5,184 renders, with 0 problems.
+
 #### v82: the day in order, and a week that goes somewhere
 
 > *"Right now things aren't in order from when I wake up to when I start work... I'd first come round,

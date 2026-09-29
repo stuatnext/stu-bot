@@ -70,6 +70,10 @@ function viewGym(){
      The session is the tab, and a session is a ring of moves rather than a
      numeral: one segment per move, filling as they land. It was a big number
      over a paragraph, which is a poster about training. */
+  /* v83: ill - the tab says so first, and how to undo it */
+  if (typeof sickOn === "function" && sickOn(t))
+    h += "<div class='ill-b'><span><b>Ill today.</b> Rest is the training. Train is carried, not owed.</span>"
+      + "<button data-sick='0'>Feeling better</button></div>";
   h += "<div class='stage gym" + (pct === 100 ? " done" : "") + "'>";
   /* the plate carries the DAY, not the tab: PUSH DAY, LEG DAY, REST DAY */
   h += "<div class='gm-plate' style='--gm:" + gameHue("gym") + "'><b>"
@@ -233,6 +237,7 @@ function viewGym(){
       + wh, true) : "",
     due ? "" : fold("progress", "How it is going", waistMeta(ws, tr), prog, false),
     "<button class='drow' data-nerves='1'>Nervous about the gym?<i>" + svg("arrow", 16) + "</i></button>",
+    "<button class='drow' data-homekit='1'>Home kit \u00b7 " + esc(homeKitWords()) + "<i>" + svg("arrow", 16) + "</i></button>",
     "<button class='drow' data-cue='1'>" + (cueTxt
         ? "You go " + esc(cueTxt.charAt(0).toLowerCase() + cueTxt.slice(1))
         : "Pick your moment to go") + "<i>" + svg("arrow", 16) + "</i></button>",
@@ -290,11 +295,57 @@ function sessionFor(key){
   if (key === "T"){
     var th = travelTheme();
     var home = typeof situation === "function" && situation().home;
-    return ["T", TRAVEL_BY[th] || TRAVEL_BY.A,
+    /* v83: at home, with the kettlebell and the wheel, it is a home session;
+       in a hotel it is still the room */
+    return ["T", home ? homeList(th) : (TRAVEL_BY[th] || TRAVEL_BY.A),
       home ? sessionName(th) + " at home" : "Travel " + sessionName(th), sessionWhat(th), "ROOM"];
   }
   return SESSIONS.filter(function(s){ return s[0] === key; })[0];
 }
+/* ------------------------------------------------------------ the home kit
+   What he has at home - a bell's weight, and whether there is a wheel. The
+   home list is built from it; a move for something he has not got becomes
+   the floor version, so the session never asks for kit that is not there. */
+function homeKit(){
+  var k = S.homeKit || {};
+  return { kb: Number(k.kb) || 0, wheel: !!k.wheel };
+}
+function homeKitWords(){
+  var k = homeKit(), w = [];
+  if (k.kb) w.push("a " + k.kb + "kg kettlebell");
+  if (k.wheel) w.push("the ab wheel");
+  return w.length ? w.join(", ") : "nothing yet";
+}
+function homeList(th){
+  var kit = homeKit();
+  if (!kit.kb && !kit.wheel) return TRAVEL_BY[th] || TRAVEL_BY.A;
+  return (HOME_BY[th] || HOME_BY.A).map(function(ex){
+    var missing = (KB_MOVES[ex[0]] && !kit.kb) || (ex[0] === "Ab wheel rollout" && !kit.wheel);
+    if (!missing) return ex;
+    return [HOME_NEEDS[ex[0]], ex[1], ex[2], ex[3], "Without the kit: " + ex[4].charAt(0).toLowerCase() + ex[4].slice(1),
+            [], ex[6]];
+  });
+}
+function askHomeKit(){
+  var kit = homeKit();
+  return ask({
+    title: "Your home kit",
+    say: "What you have at home. The home session is built from it, and the floor stands in for anything you have not got.",
+    options: [0, 8, 10, 12, 16].map(function(w){
+      return { id: "kb" + w, label: w ? "A " + w + "kg kettlebell" : "No kettlebell", pri: kit.kb === w };
+    }).concat([{ id: "wheel", label: kit.wheel ? "Ab wheel: yes" : "Ab wheel: no", note: "Tap to switch" }]),
+    cancel: "Close"
+  }).then(function(v){
+    if (!v || v === "__no") return;
+    S.homeKit = S.homeKit || {};
+    if (v === "wheel") S.homeKit.wheel = kit.wheel ? 0 : 1;
+    else S.homeKit.kb = Number(String(v).slice(2)) || 0;
+    save(); sfx("tick"); buzz(8);
+    toast("Home kit: " + homeKitWords() + ".");
+    render({ keepScroll: true });
+  });
+}
+
 /* Which of the split a room session is standing in for. Worked out from
    the days BEFORE today: the room session's own first set is a session in
    the record, and counting it moved the theme on mid-workout - log one
@@ -638,6 +689,20 @@ function nextTarget(ex, name){
         say: "Every set at " + hi + ". Slow the lowering to three seconds, or take the harder version with the arrows." };
     return { w: 0, reps: null, tag: "add a rep",
       say: "Same again. Add a rep wherever you can \u2014 " + worst0 + " is the set to beat." };
+  }
+
+  /* v83: one kettlebell. The load is the bell, so the dial is reps and then
+     tempo - never a heavier weight he does not own. */
+  if (KB_MOVES[name]){
+    var bell = homeKit().kb || 10, lastK = H[0];
+    if (!lastK) return { first: true, w: bell, tag: bell + "kg",
+      say: "Your " + bell + "kg bell. Finish each set feeling you had two or three more in you." };
+    var worstK = lowRep(lastK);
+    if (lastK.r.length >= setsWant && worstK >= hi)
+      return { w: bell, reps: hi, tag: "slower",
+        say: "Every set at " + hi + ". One bell, so the next step is slower: three seconds down, a pause at the bottom." };
+    return { w: bell, reps: null, tag: "add a rep",
+      say: "Same bell. Add a rep wherever you can \u2014 " + worstK + " is the set to beat." };
   }
 
   if (!H.length){
@@ -1275,6 +1340,11 @@ function planB(sKey, i){
 function planBHTML(sKey, i){
   var alt = planB(sKey, i);
   if (!alt) return "";
+  /* v83: nothing is taken in your own living room - the other version is
+     offered as another way to do it, not as a way round a queue */
+  if (sKey === "T")
+    return "<button class='ssplanb' data-splanb='" + i + "'><span><b>Too hard today?</b> "
+      + esc(alt) + " does the same job.</span><i>Switch</i></button>";
   return "<button class='ssplanb' data-splanb='" + i + "'><span><b>Taken?</b> "
     + esc(alt) + " does the same job.</span><i>Switch</i></button>";
 }
@@ -1384,23 +1454,34 @@ function shortMinutes(key){
 function askLowDay(){
   var p = gymPlan(), key = p.key === "T" ? "T" : p.key;
   var nm = key === "T" ? sessionName(travelTheme()) : sessionName(key);
+  var kit = homeKit(), home = situation().home, hk = home && (kit.kb || kit.wheel);
   ask({
     title: "Not up to the gym today?",
     say: "That happens, and it is not the end of anything. Any of these is the day &mdash; "
        + "turning up is the thing being trained.",
     options: [
+      /* v83: the home kit is the first answer at home - the same day of
+         the split, a bell and a wheel, no gym, nobody watching */
+      hk ? { id: "home", label: "At home, with the kit",
+             note: sessionName(travelTheme()) + " at home: " + homeKitWords() + " and the floor. About "
+               + Math.round(sessionMinutes("T")) + " minutes." } : null,
+      hk ? { id: "home10", label: "Ten minutes at home",
+             note: "The first two moves, then done. Still Trained." } : null,
       { id: "short", label: "The short version",
         note: "The first two moves of " + nm + ", about " + shortMinutes(key) + " minutes, then go." },
-      { id: "home", label: "Do it at home",
+      hk ? null : { id: "home", label: "Do it at home",
         note: nm + " with your own weight, wherever you are. Nobody watching." },
-      { id: "walk", label: "A walk instead", note: "Twenty minutes counts." }
-    ],
+      { id: "walk", label: "A walk instead", note: "Twenty minutes counts." },
+      { id: "ill", label: "I\u2019m ill", note: "Rest is the training. Train is carried, not owed." }
+    ].filter(Boolean),
     cancel: "I\u2019ll go after all"
   }).then(function(v){
     if (!v || v === "__no") return;
     if (v === "short"){ sfx("tap"); startSession(key, SHORT_MOVES); return; }
     if (v === "home"){ sfx("tap"); startSession("T"); return; }
+    if (v === "home10"){ sfx("tap"); startSession("T", SHORT_MOVES); return; }
     if (v === "walk"){ askWalk(); return; }
+    if (v === "ill"){ askSick(); return; }
   });
 }
 
@@ -1558,7 +1639,8 @@ function paintSession(){
     + "<div class='ssacts'><button class='btn quiet' data-how='" + SESSION.key + ":" + SESSION.i + "'>"
     + (firstTimeOn(name) ? "First time? Set it up" : "How to do it") + "</button>"
     /* on a dumbbells-and-floor day there is no machine to swap */
-    + (SESSION.floor ? "" : "<button class='btn quiet' data-sswap='" + SESSION.i + "'>Swap the machine</button>")
+    + (SESSION.floor ? "" : "<button class='btn quiet' data-sswap='" + SESSION.i + "'>"
+        + (SESSION.key === "T" ? "Swap the move" : "Swap the machine") + "</button>")
     + "</div></div>";
 
   /* the sets so far, as pills. A logged one is a button: a thumb that hit

@@ -166,6 +166,7 @@ function weekDay(d){
 /* Vegetating: said today, or a day the week gives to it. */
 function vegOn(k){
   k = k || today();
+  if (typeof sickOn === "function" && sickOn(k)) return true;   /* v83: ill is resting */
   var v = (S.veg || {})[k];
   if (v === 1) return true;
   if (v === 0) return false;
@@ -513,7 +514,9 @@ function dayListHTML(k){
   k = k || today();
   var plan = dayPlan(k), now = planNow(plan), veg = vegOn(k), f = dayFocus(k);
   var h = "<div class='dp'>";
-  h += "<p class='dp-lead'>" + esc(veg ? "Vegetating. The three still count; nothing else is asked."
+  var ill = typeof sickOn === "function" && sickOn(k);
+  h += "<p class='dp-lead'>" + esc(ill ? "Ill today. Rest is the training: water, something hot, bed early. Family and Stop still make the day."
+      : veg ? "Vegetating. The three still count; nothing else is asked."
       : !atHome(k) ? "Away, so the plan is smaller. The three, and the routine."
       : f ? "Today is for " + FOCI[f][0] + ". Everything that moves your life goes before Malta; the evening is yours."
       : "Everything that moves your life goes before Malta; the evening is yours.") + "</p>";
@@ -533,8 +536,10 @@ function dayListHTML(k){
   });
   h += "</ol>";
   h += "<div class='dp-acts'>"
-    + (weekDay(dowOf(k)).f === "veg" ? ""
+    + (ill ? "<button class='btn' data-mk='__sick'>Feeling better</button>"
+       : weekDay(dowOf(k)).f === "veg" ? ""
        : "<button class='btn' data-mk='__veg'>" + (veg ? "Back on — plan the day" : "Vegetate today") + "</button>")
+    + (ill ? "" : "<button class='btn quiet' data-mk='__ill'>I’m ill</button>")
     + "<button class='btn quiet' data-mk='__week'>The week</button></div>";
   return h + "</div>";
 }
@@ -543,6 +548,8 @@ function askDay(){
   return ask({ title: dayName(k), html: dayListHTML(k), cancel: "Close" }).then(function(v){
     if (!v || v === "__no") return;
     if (v === "__veg"){ toggleVeg(); return; }
+    if (v === "__sick"){ setSick(0); return; }
+    if (v === "__ill"){ askSick(); return; }
     if (v === "__week"){ go("you"); setTimeout(function(){
       var el = document.querySelector("#screen .wkp"); if (el) el.scrollIntoView({ block: "start" }); }, 80); return; }
     startRun("day", v);
@@ -553,9 +560,48 @@ function toggleVeg(){
   S.veg = S.veg || {};
   var on = !vegOn(k);
   S.veg[k] = on ? 1 : 0;
+  if (S.notes) delete S.notes[k];        /* the bubble says the new day */
   save();
   sfx(on ? "tap" : "nav"); buzz(10);
   toast(on ? "Vegetating. The three still count; nothing else is asked." : "Back on. The plan is back.");
+  render({ keepScroll: true, animate: true });
+}
+
+/* --------------------------------------------------------------- ill
+   v83: "Today I have a cold. I'm really not feeling too well. I'm pretty
+   tired as well because I went to bed late after work."
+
+   The consistency he is building is turning up, and when he is ill the
+   thing that turns up is rest. So an ill day carries Train the way the
+   weekend carries Stop, the plan vegetates, and the words are the rule
+   everyone quotes for training with a cold - above the neck, gently if you
+   want to; below it, not at all. */
+function askSick(){
+  return ask({
+    title: "Ill today?",
+    say: "Rest is the training when you are ill. Train is carried, not owed, and nothing else is asked "
+       + "today &mdash; Family and Stop still make the day.<br><br><b>Above the neck</b> (a blocked nose, a "
+       + "scratchy throat) and you feel up to it: a gentle walk is fine. <b>Below the neck</b> (your chest, "
+       + "a temperature, aches): rest, full stop. Water, something hot, and bed early tonight.",
+    options: [
+      { id: "rest", label: "Rest today", note: "Train carried. The run is safe.", pri: true },
+      { id: "walk", label: "A gentle walk, then rest", note: "Only if it is above the neck. Twenty minutes, easy." }
+    ],
+    cancel: "I’m fine, actually"
+  }).then(function(v){
+    if (v === "rest") setSick(1);
+    else if (v === "walk"){ setSick(1, 1); if (typeof askWalk === "function") askWalk(); }
+  });
+}
+function setSick(on, quiet){
+  var k = today();
+  S.sick = S.sick || {};
+  if (on) S.sick[k] = 1; else delete S.sick[k];
+  if (S.notes) delete S.notes[k];
+  save();
+  sfx(on ? "tap" : "nav"); buzz(10);
+  if (!quiet) toast(on ? "Rest is the training today. Train is carried; the run is safe."
+                       : "Glad you are better. The day is back.");
   render({ keepScroll: true, animate: true });
 }
 

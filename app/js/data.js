@@ -1063,6 +1063,94 @@ var TRAVEL_BY = {
   ]
 };
 
+/* ----------------------------------------------------------- the home kit
+   v83. His words: "I have bought at home an ab wheel, and we have a 10
+   kilogram kettlebell now... so even when I don't feel like going to the
+   gym, I still do something."
+
+   The room session is bodyweight because a hotel has nothing in it. Home
+   has a bell and a wheel now, so a day at home is a proper session: the
+   same Push, Pull, Legs as the gym, built from one kettlebell, the ab wheel
+   and the floor, in about half an hour. The first moves are the ones that
+   count most, because the stage decides how many he does.
+
+   One bell means the weight never goes up. The progression is reps, then
+   tempo - three seconds down - which is exactly what a light bell is for. */
+var HOME_BY = {
+  A: [
+    ["Push-up",                   4,  8, 15, "Stop two short of failure",
+      ["Incline push-up, hands on the desk", "Kettlebell floor press"], 75],
+    ["Kettlebell overhead press", 3,  6, 10, "Each arm. Squeeze the glutes, press straight up",
+      ["Pike push-up", "Kettlebell floor press"], 75],
+    ["Ab wheel rollout",          3,  5, 10, "From your knees. Only as far as the back stays flat",
+      ["Dead bug", "Lying leg raise"], 75],
+    ["Kettlebell floor press",    3, 10, 15, "Each arm. Elbow touches the floor, then press",
+      ["Push-up", "Chair dip"], 60],
+    ["Chair dip",                 3,  8, 15, "Edge of the sofa or a chair, elbows back not out",
+      ["Bench dip"], 60],
+    ["Plank shoulder tap",        3, 16, 16, "Taps. Hips do not rock",
+      ["Plank", "Dead bug"], 60]
+  ],
+  B: [
+    ["One-arm kettlebell row",    4, 10, 15, "Each side. Hand on the sofa, pull to the hip",
+      ["Backpack row", "Table-edge row"], 75],
+    ["Kettlebell deadlift",       3, 12, 20, "Hips back, flat back, stand tall",
+      ["Kettlebell swing", "Kettlebell Romanian deadlift"], 75],
+    ["Kettlebell curl",           3, 10, 15, "By the horns. The elbows do not move",
+      ["Towel curl"], 60],
+    ["Reverse snow angel",        3, 12, 12, "Face down. The posture one",
+      ["Superman"], 60],
+    ["Dead bug",                  3, 12, 12, "Each side. Lower back stays flat",
+      ["Bird dog", "Ab wheel rollout"], 60],
+    ["Kettlebell halo",           3,  8,  8, "Each way. Ribs down, go slowly",
+      ["Side plank"], 45]
+  ],
+  C: [
+    ["Kettlebell goblet squat",   4, 12, 20, "Bell at the chest, elbows inside the knees",
+      ["Split squat", "Bodyweight squat"], 75],
+    ["Kettlebell Romanian deadlift", 3, 12, 15, "Soft knees, the bell slides down the thighs",
+      ["Kettlebell deadlift", "Single-leg Romanian deadlift"], 75],
+    ["Ab wheel rollout",          3,  5, 10, "From your knees. Only as far as the back stays flat",
+      ["Lying leg raise", "Dead bug"], 75],
+    ["Kettlebell reverse lunge",  3,  8, 12, "Each leg. Step back, not forward",
+      ["Split squat", "Step-up"], 75],
+    ["Glute bridge",              3, 15, 15, "Squeeze at the top, two seconds",
+      ["Single-leg glute bridge"], 60],
+    ["Calf raise",                3, 20, 20, "On a step if there is one",
+      ["Single-leg calf raise"], 45]
+  ],
+  D: [
+    ["Kettlebell curl",           3, 10, 15, "By the horns. The elbows do not move",
+      ["Towel curl"], 60],
+    ["Chair dip",                 3,  8, 15, "Edge of the sofa or a chair, elbows back not out",
+      ["Bench dip"], 60],
+    ["Ab wheel rollout",          3,  5, 10, "From your knees. Only as far as the back stays flat",
+      ["Dead bug", "Lying leg raise"], 75],
+    ["Kettlebell halo",           3,  8,  8, "Each way. Ribs down, go slowly",
+      ["Side plank"], 45],
+    ["Side plank",                3, 40, 40, "Seconds each side",
+      ["Plank"], 60],
+    ["Dead bug",                  3, 12, 12, "Each side. Lower back stays flat",
+      ["Bird dog", "Lying leg raise"], 60]
+  ]
+};
+/* The kettlebell moves: one bell, so the load is the bell and the dial is
+   reps and tempo. */
+var KB_MOVES = {
+  "Kettlebell overhead press": 1, "Kettlebell floor press": 1, "One-arm kettlebell row": 1,
+  "Kettlebell deadlift": 1, "Kettlebell swing": 1, "Kettlebell curl": 1, "Kettlebell halo": 1,
+  "Kettlebell goblet squat": 1, "Kettlebell Romanian deadlift": 1, "Kettlebell reverse lunge": 1
+};
+/* The moves that need the bell or the wheel, and what stands in without it. */
+var HOME_NEEDS = {
+  "Kettlebell overhead press": "Pike push-up", "Kettlebell floor press": "Push-up",
+  "One-arm kettlebell row": "Backpack row", "Kettlebell deadlift": "Single-leg Romanian deadlift",
+  "Kettlebell curl": "Towel curl", "Kettlebell halo": "Side plank",
+  "Kettlebell goblet squat": "Split squat", "Kettlebell Romanian deadlift": "Single-leg Romanian deadlift",
+  "Kettlebell reverse lunge": "Split squat", "Kettlebell swing": "Glute bridge",
+  "Ab wheel rollout": "Dead bug"
+};
+
 /* Movements with no weight to pick. The dial says "body" rather than a
    number, and the progression is reps, not kilos. */
 var BODYWEIGHT = {
@@ -1077,6 +1165,7 @@ var BODYWEIGHT = {
   "Superman": 1, "Back extension": 1, "Reverse snow angel": 1,
   "Band pull-apart": 1, "Wall sit": 1, "Single-leg glute bridge": 1,
   "Calf raise": 1, "Single-leg calf raise": 1, "Step-up": 1, "Ab wheel": 1,
+  "Ab wheel rollout": 1,
   /* hanging from a bar is your own weight too */
   "Hanging knee raise": 1, "Captain's chair knee raise": 1, "Dead bug with band": 1
 };
@@ -1738,6 +1827,103 @@ var HOW = {
     "Lift it diagonally across your body to above the other shoulder",
     "Turn from the middle and pivot the back foot; control it back down",
     "Wrong: throwing it. The same speed up and down"
+  ],
+  /* v83: the home kit - one kettlebell and an ab wheel */
+  "Ab wheel rollout": [
+    "Kneel on something soft, the wheel under your shoulders, arms straight",
+    "Brace as if someone is about to poke your stomach, and tuck your tailbone under",
+    "Roll forward only as far as your lower back stays flat, then pull back with your stomach, not your arms",
+    "Wrong: the hips sagging so the lower back arches. Put a wall a short roll in front of you as a stop to start"
+  ],
+  "Kettlebell goblet squat": [
+    "Hold the bell by the horns at your chest, feet a little wider than your hips",
+    "Sit down between your heels, elbows inside the knees, chest up",
+    "Go as low as your back stays flat, then stand through the whole foot",
+    "Wrong: the heels lifting or the knees caving in. Push the knees out over the toes"
+  ],
+  "Kettlebell deadlift": [
+    "Bell on the floor between your feet, feet hip-width apart",
+    "Push the hips back with soft knees and take the handle with a flat back",
+    "Stand up by driving the hips forward. Squeeze the glutes at the top",
+    "Wrong: rounding the back to reach it. Hips back, chest proud, the bell stays close"
+  ],
+  "Kettlebell Romanian deadlift": [
+    "Stand holding the bell by the horns in front of your thighs",
+    "Soft knees. Push the hips back so the bell slides down your thighs",
+    "Stop when the hamstrings pull, back flat, then drive the hips forward to stand",
+    "Wrong: squatting it down. The knees barely bend; it is a hinge"
+  ],
+  "One-arm kettlebell row": [
+    "One hand and knee on the sofa or a chair, back flat, the bell in the other hand",
+    "Pull the bell to your hip, elbow close to your side",
+    "Lower until the arm is straight. All the reps on one side, then the other",
+    "Wrong: twisting to heave it up. The chest stays square to the floor"
+  ],
+  "Kettlebell overhead press": [
+    "Bell in one hand at the shoulder, resting on the back of the forearm, wrist straight",
+    "Squeeze your glutes and stomach, then press straight up until the arm is locked",
+    "Lower slowly back to the shoulder. All the reps on one arm, then the other",
+    "Wrong: leaning back to get it up. If you lean, do fewer reps"
+  ],
+  "Kettlebell floor press": [
+    "On your back, knees bent, the bell in one hand, upper arm on the floor at about 45 degrees",
+    "Press straight up over the shoulder until the arm is straight",
+    "Lower until the elbow touches the floor, pause, press again. Each side",
+    "Wrong: the wrist bending back. Knuckles to the ceiling, wrist straight"
+  ],
+  "Kettlebell curl": [
+    "Hold the bell by the horns, arms straight, elbows at your sides",
+    "Curl it up to your chest without swinging",
+    "Lower it slowly all the way down",
+    "Wrong: rocking the back to lift it. Stand against a wall if it keeps happening"
+  ],
+  "Kettlebell reverse lunge": [
+    "The bell at your chest by the horns, feet together",
+    "Step one foot back and lower the back knee towards the floor",
+    "Push through the front heel to stand. All the reps on one leg, then the other",
+    "Wrong: the front knee shooting forward. Step back far enough that the shin stays upright"
+  ],
+  "Kettlebell swing": [
+    "Only once the deadlift feels natural. The bell a foot in front of you; hinge and take it",
+    "Hike it back between your legs, then snap the hips forward",
+    "The hips throw it to chest height and the arms are just ropes. Let it fall into the next hinge",
+    "Wrong: squatting it or lifting it with the arms. It is a hinge, and it is the hips"
+  ],
+  "Kettlebell halo": [
+    "Hold the bell upside down by the horns at your chest, feet planted",
+    "Circle it slowly round your head, close to the skull",
+    "Change direction every rep. Ribs down, stomach tight",
+    "Wrong: the back arching as it goes behind. Keep the ribs down and go slower"
+  ],
+  "Plank": [
+    "Forearms on the floor, elbows under the shoulders, body one straight line",
+    "Squeeze the glutes and brace the stomach",
+    "Hold without the hips sagging or piking up",
+    "Wrong: holding your breath. Breathe short and steady"
+  ],
+  "Bodyweight squat": [
+    "Feet a little wider than your hips, arms out in front for balance",
+    "Sit down between your heels, chest up",
+    "Stand through the whole foot",
+    "Wrong: the knees caving in. Push them out over the toes"
+  ],
+  "Single-leg glute bridge": [
+    "On your back, one knee bent, the other leg straight in the air",
+    "Drive through the planted heel until the hips are level",
+    "Squeeze at the top, lower without touching down. Each side",
+    "Wrong: the hips tilting. Keep them level, like a tray"
+  ],
+  "Single-leg calf raise": [
+    "Stand on one foot on the edge of a step, a hand on the wall for balance",
+    "Let the heel drop below the step, then rise as high as you can",
+    "Pause at the top, lower slowly. All the reps on one foot, then the other",
+    "Wrong: bouncing. Slow on the way down is where it works"
+  ],
+  "Bench dip": [
+    "Hands on the edge of a bench or the sofa behind you, legs out in front",
+    "Lower by bending the elbows straight back, not out",
+    "Press back up until the arms are straight",
+    "Wrong: shrugging the shoulders to the ears. Keep them down and back"
   ],
   /* the travel session - a hotel room, no kit */
   "Push-up": [
