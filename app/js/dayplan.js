@@ -1210,6 +1210,21 @@ var MY_CAFES_10 = [
   ["Local Coffee People Capital Square", "Capital Square, 1.2km", "Coffee stand with tables outside, try the gula Melaka coffee, shuts 16:45 · 4.2"],
   ["Aunty fatso coffee and toast (肥嫂)", "About 1.3km away", "Kopi and kaya toast. The sign says féi sǎo, Aunty Fatso, shuts 18:00 · 4.0"]
 ];
+/* v96: the eleventh batch, Guoco Tower and the Shenton side, all within
+   400m. Eight. Left out: Starbucks, luckin and Huggs (chains), nana's green
+   tea (a matcha chain), and Local Coffee People's International Plaza
+   branch (the Capital Square one is in). Alchemist was in. September opens
+   at 11:30, so its days go after two. */
+var MY_CAFES_11 = [
+  ["Kahve", "350m away", "Small café where the owner makes the coffee, shuts 17:00. Kahve is Turkish for coffee · 4.9"],
+  ["Double Shot Coffee Shenton", "Shenton Way, 350m", "Coffee shop, shuts 17:00 · 4.9 from 243 reviews"],
+  ["Coffee & Dough", "350m away", "Café and bakery, scones with homemade jam, shuts 17:00 · 4.9"],
+  ["abseil", "350m away", "Roastery, for serious coffee, shuts 16:30 · 4.5 from 213 reviews"],
+  ["SJR THAI Coffee & Tea", "350m away", "Thai coffee and tea, and a friendly owner, shuts 19:00 · 4.8"],
+  ["Frumpy", "350m away", "Café with proper food, and coffee people rate, shuts 18:00 · 4.1"],
+  ["Hi coffee | Guoco Tower", "Guoco Tower, 400m", "Tea and coffee, try the houjicha latte, shuts 19:25 · 4.4 from 320 reviews"],
+  ["September Coffee", "400m away", "Brunch café, tiramisu coffee, $20-30, opens 11:30 · 4.2 from 702 reviews"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1240,6 +1255,7 @@ function seedOnce(){
   if (!S.seed93){ mergeCafes(MY_CAFES_8); S.seed93 = 1; changed = true; }
   if (!S.seed94){ mergeCafes(MY_CAFES_9); S.seed94 = 1; changed = true; }
   if (!S.seed95){ mergeCafes(MY_CAFES_10); S.seed95 = 1; changed = true; }
+  if (!S.seed96){ mergeCafes(MY_CAFES_11); S.seed96 = 1; changed = true; }
   if (fixCafeNames()) changed = true;
   if (changed) save();
 }

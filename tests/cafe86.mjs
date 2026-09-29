@@ -162,5 +162,18 @@ ok(b10.new10.every(t => !t), 'all five count as near');
 ok(b10.gt.shut === 990 && b10.gt.open === 0 && b10.ct.shut === 0, 'their hours read: Group Therapy shuts 16:30; open-till-late says nothing to worry about');
 console.log('   near ' + b10.near + ' (weekdays) · trips ' + b10.trip + ' (weekends)');
 await ctx.close();
+// v96: the eleventh batch, Guoco Tower and the Shenton side
+const s13 = saveWith({ y:2026, m:10, d:10, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, seed90: 0, seed91: 0, seed92: 0, seed93: 0, seed94: 0, seed95: 0, seed96: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:10, hour:9, min:0, tz:'Asia/Singapore', save: s13 }));
+const b11 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed96, names: S.cafes.map(c => c[0]),
+  near: S.cafes.filter(c => !cafeTrip(c)).length, trip: S.cafes.filter(c => cafeTrip(c)).length,
+  new11: MY_CAFES_11.map(c => cafeTrip(c)),
+  sept: coffeeLate(cafeHours(MY_CAFES_11.find(c => c[0] === 'September Coffee'))), abseil: cafeHours(MY_CAFES_11.find(c => c[0] === 'abseil')).shut }));
+ok(b11.seed === 1 && b11.n === 106 && ['Kahve', 'Double Shot Coffee Shenton', 'Coffee & Dough', 'abseil', 'SJR THAI Coffee & Tea', 'Frumpy', 'Hi coffee | Guoco Tower', 'September Coffee'].every(n => b11.names.includes(n)), 'the eleventh batch: eight in, 106 in all (' + b11.n + ')');
+ok(!b11.names.some(n => /Starbucks|luckin|Huggs|nana/i.test(n)) && b11.names.filter(n => /^Local Coffee People/.test(n)).length === 1 && b11.names.filter(n => /^Alchemist/.test(n)).length === 1, 'chains and a second Local Coffee People left out; nothing doubled');
+ok(b11.new11.every(t => !t), 'all eight count as near');
+ok(b11.sept === true && b11.abseil === 990, 'September opens at 11:30, so its days go after two; abseil shuts 16:30');
+console.log('   near ' + b11.near + ' (weekdays) · trips ' + b11.trip + ' (weekends)');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');
