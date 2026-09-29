@@ -959,10 +959,77 @@ function planSteps(k, plan){
 
 /* v84: things he told us, written into his phone once. "I've got some Greek
    yogurt with some fruit, some frozen fruit" - so breakfast protein is in. */
+/* v86: his coffee places, read off the five Google Maps screenshots he sent -
+   the east, Geylang and Kallang, up to Balestier and across to Bugis. The
+   food courts, the low ratings and the places that are not really coffee are
+   left out. The rating is Google's on the day he sent them. Areas are the
+   neighbourhood each pin sits in, give or take a street.
+   [ name, area, what it is ] */
+var MY_CAFES = [
+  /* specialty and cafés */
+  ["Compound Coffee Co.", "Kaki Bukit", "Specialty coffee \u00b7 4.9 on Google"],
+  ["Bolder Brews Coffeehouse", "Joo Chiat", "Specialty coffee \u00b7 4.9"],
+  ["Analogue Anonymous", "Geylang", "Specialty coffee \u00b7 4.9"],
+  ["Optional Coffee", "Boon Keng", "Specialty coffee \u00b7 5.0"],
+  ["No. 36 Coffee", "Kembangan", "Coffee \u00b7 5.0"],
+  ["Nami by Kyuukei Coffee", "Katong", "Japanese-style coffee \u00b7 4.7"],
+  ["Common Man Coffee Roasters", "Joo Chiat", "A roaster, and loud in a good way \u00b7 4.3"],
+  ["Dutch Colony Coffee Co.", "Upper East Coast", "Roaster \u00b7 4.3"],
+  ["V Coffee", "Aljunied", "Coffee \u00b7 4.6"],
+  ["Sec.cond Coffee", "Geylang Bahru", "Coffee, pick-up style \u00b7 4.9"],
+  ["Fluid", "Bendemeer", "Coffee \u00b7 4.7"],
+  ["Zerah Coffee Roasters", "Lavender", "Roaster \u00b7 4.8"],
+  ["Genista Ln (Robusta)", "Jalan Besar", "Coffee, kopi and toast \u00b7 4.8"],
+  ["Evan\u2019s Kitch", "Lavender", "Brunch caf\u00e9, big breakfasts \u00b7 4.9"],
+  ["Symmetry", "Kampong Glam", "Caf\u00e9 \u00b7 4.3"],
+  ["Coffee Donkee", "Bugis", "Coffee \u00b7 4.6"],
+  ["Kurasu Singapore", "Rochor", "Japanese specialty coffee \u00b7 4.4"],
+  ["am coffee co. @ The Secret Haven", "Rochor", "Coffee \u00b7 4.8"],
+  ["Hideout Coffee Bar", "Little India", "Coffee bar \u00b7 4.3"],
+  ["KerYi Coffee", "Farrer Park", "Coffee"],
+  ["Madras Coffee House", "Race Course Road", "South Indian filter coffee \u00b7 4.8"],
+  ["NCT Cafe", "Whampoa", "Caf\u00e9 \u00b7 4.8"],
+  ["Now and then coffee @CHI", "Novena", "Coffee \u00b7 5.0"],
+  ["MT Coffee", "Balestier", "Coffee \u00b7 4.7"],
+  ["Han\u2019s craft coffee", "Marymount", "Craft coffee \u00b7 4.9"],
+  ["Guerilla Coffee @ Suntec", "Suntec", "Coffee \u00b7 4.0"],
+  ["Bacha Coffee", "Takashimaya, Orchard", "The fancy Moroccan one. A treat, not a habit \u00b7 3.8"],
+  /* kopi, the local way */
+  ["Lau Ka Kopitiam", "Bedok North", "Kopitiam \u00b7 4.7"],
+  ["Soon Hong Coffee Stall", "MacPherson", "Kopi stall \u00b7 4.9"],
+  ["148 Hot & Cold Drinks", "Guillemard", "Kopi stall \u00b7 4.8"],
+  ["Marine Parade Coffee & Drinks", "Marine Parade", "Kopi stall \u00b7 5.0"],
+  ["Chop Hua Heng", "MacPherson", "Kopi \u00b7 4.7"],
+  ["Wang Coffee Town", "Ubi", "Kopitiam \u00b7 4.5"],
+  ["Kang Siang Coffee Stall", "Mountbatten", "Kopi stall \u00b7 4.3"],
+  ["Tong Bee Coffee Shop", "Bedok North", "Kopitiam \u00b7 4.3"],
+  ["Tok Kong Coffee Shop", "Tanjong Katong", "Kopitiam \u00b7 4.3"],
+  ["Jofa Coffee Shop", "Bedok North", "Kopitiam \u00b7 4.2"],
+  ["Kedai Kopi @ Haig Road", "Haig Road", "Kopi \u00b7 4.1"],
+  ["Sing Hiap Huat Coffee Shop", "Balestier", "Kopitiam \u00b7 4.1"],
+  ["121 Brew Kopi", "Geylang", "Kopi \u00b7 4.0"],
+  ["Coffee Queen", "Marine Parade", "Coffee \u00b7 4.0"],
+  ["Wang Coffee Shop", "Balestier", "Kopitiam \u00b7 4.0"]
+];
 function seedOnce(){
-  if (S.seed84) return;
-  S.kit = S.kit || {};
-  if (!S.kit.am) S.kit.am = { s: "have", d: today() };
-  S.seed84 = 1;
-  save();
+  var changed = false;
+  if (!S.seed84){
+    S.kit = S.kit || {};
+    if (!S.kit.am) S.kit.am = { s: "have", d: today() };
+    S.seed84 = 1; changed = true;
+  }
+  /* v86: his places join his list once; anything he has added stays, and
+     a place already there is not added twice */
+  if (!S.seed86){
+    S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
+    var have = {};
+    S.cafes.forEach(function(c){ have[String(c[0]).toLowerCase()] = 1; });
+    MY_CAFES.forEach(function(c){
+      if (have[c[0].toLowerCase()]) return;
+      have[c[0].toLowerCase()] = 1;
+      S.cafes.push(c.slice());
+    });
+    S.seed86 = 1; changed = true;
+  }
+  if (changed) save();
 }
