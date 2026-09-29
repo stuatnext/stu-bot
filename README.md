@@ -86,6 +86,27 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v92: the seventh batch, by distance from his door
+
+This time the list was sorted by distance. 22 Grams is 41m from his door, so it's practically downstairs.
+`MY_CAFES_7` adds six, landing once via `seed92`:
+- Kafey Haus (Tanjong Pagar MRT)
+- Han N Han Nanyang Coffeehouse 韩韩南洋咖啡馆, for Nanyang kopi and a curry puff. The note gives the
+  sign in pinyin, for the Mandarin.
+- Alchemist International Plaza
+- Ton Coffee (Guoco Tower)
+- Flamingo Coffee & Wine
+- The Wired Monkey SG (The Hole), about 1.2km away, 4.7 from 645 reviews. It shuts at 15:30.
+
+Left out:
+- Tiong Hoe's Tanjong Pagar stand, since Tiong Hoe is already in
+- luckin, a chain
+- Awake, a shop selling drip bags rather than somewhere to sit
+- Hill Street, rated 2.0
+
+22 Grams and Vietgo were already in. That makes 83 of his: 49 near for weekdays and 34 trips for the
+weekend.
+
 #### v91: the sixth batch, his doorstep
 
 This batch is the map zoomed right in on Tanjong Pagar Plaza, Kee Seng Street and Enggor Street.
