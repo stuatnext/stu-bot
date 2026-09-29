@@ -175,5 +175,16 @@ ok(b11.new11.every(t => !t), 'all eight count as near');
 ok(b11.sept === true && b11.abseil === 990, 'September opens at 11:30, so its days go after two; abseil shuts 16:30');
 console.log('   near ' + b11.near + ' (weekdays) · trips ' + b11.trip + ' (weekends)');
 await ctx.close();
+// v97: the twelfth batch, Keong Saik and Robinson Road
+const s14 = saveWith({ y:2026, m:10, d:10, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, seed90: 0, seed91: 0, seed92: 0, seed93: 0, seed94: 0, seed95: 0, seed96: 0, seed97: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:10, hour:9, min:0, tz:'Asia/Singapore', save: s14 }));
+const b12 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed97, names: S.cafes.map(c => c[0]),
+  near: S.cafes.filter(c => !cafeTrip(c)).length, trip: S.cafes.filter(c => cafeTrip(c)).length,
+  new12: MY_CAFES_12.map(c => cafeTrip(c)), hl: cafeHours(MY_CAFES_12.find(c => /^Highlander/.test(c[0]))).shut }));
+ok(b12.seed === 1 && b12.n === 114 && ['Baristart Coffee Singapore (Keong Saik)', 'Coffee-Licious 101', 'Highlander Coffee Espresso Bar', 'Beigelhaus', 'The Food Peeps', 'Cupping Room Coffee - Robinson Centre', 'Neighborhood Coffee Bar', 'Hellu Coffee'].every(n => b12.names.includes(n)), 'the twelfth batch: eight in, 114 in all (' + b12.n + ')');
+ok(!b12.names.some(n => /Seletar Coffee Stall|Specialty Coffee Singapore|JiuMao|Huggs|120 Robinson/i.test(n)) && ['Local Coffee People', 'Flamingo', 'Muyun'].every(b => b12.names.filter(n => n.startsWith(b)).length === 1), 'the barely-reviewed, a chain and a third Local Coffee People left out; nothing doubled');
+ok(b12.new12.every(t => !t) && b12.hl === 960, 'all eight count as near (1.1km and 1.2km too); Highlander shuts 16:00');
+console.log('   near ' + b12.near + ' (weekdays) · trips ' + b12.trip + ' (weekends)');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');
