@@ -31,6 +31,8 @@ function load(){
             /* v84: his own coffee places, breakfast before the gym, how the
                cleaning runs, and the one-off seed of what he told us */
             cafes:[], bfFirst:1, cleanMode:"daily", seed84:0,
+            /* v85: the milk he puts in the shake */
+            shakeMilk:"",
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
@@ -108,6 +110,19 @@ function mirrorState(){
                               who: w.who || "" };
                    } catch(e){ return null; }
                  })(),
+                 /* v85: the day's plan, in order, so a ping can give a heads-up
+                    for the thing that is actually next - "At 10:45: Strait Up
+                    Growth" - half an hour to an hour before it */
+                 plan: (function(){
+                   if (!S.onboarded || typeof dayPlan !== "function") return null;
+                   try {
+                     return dayPlan(t).filter(function(b){ return !b.mark || b.id === "work" || b.id === "bed"; })
+                       .map(function(b){ return { id: b.id, at: b.at, t: b.t, s: b.say || "", d: b.done ? 1 : 0 }; });
+                   } catch(e){ return null; }
+                 })(),
+                 name: typeof dayName === "function" && S.onboarded ? dayName(t) : "",
+                 ill: typeof sickOn === "function" && sickOn(t) ? 1 : 0,
+                 veg: typeof vegOn === "function" && vegOn(t) ? 1 : 0,
                  badgeOn: S.badge ? 1 : 0 };
     caches.open("daylight-state").then(function(c){
       return c.put("state", new Response(JSON.stringify(body),

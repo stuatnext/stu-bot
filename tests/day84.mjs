@@ -32,10 +32,10 @@ ok(await p.evaluate(n => foodOn(today()).some(f => f[0] === n && f[2] === 'morni
 await p.evaluate(() => closeRun());
 // ideas rotate daily, some built on what is in the fridge
 const ideas = await p.evaluate(() => { const out = []; for (let i = 0; i < 14; i++){ const d = new Date(2026, 9, 1 + i); out.push(breakfastIdea(iso(d))[5]); } return out; });
-ok(new Set(await p.evaluate(() => { const o = []; for (let i = 0; i < 7; i++) o.push(breakfastIdea(iso(new Date(2026, 9, 1 + i)))[0]); return o; })).size >= 4 && ideas.filter(x => x === 'yog').length >= 4, 'a different idea most days, about half from the fridge');
+ok(new Set(await p.evaluate(() => { const o = []; for (let i = 0; i < 7; i++) o.push(breakfastIdea(iso(new Date(2026, 9, 1 + i)))[0]); return o; })).size >= 4 && ideas.filter(x => x === 'home').length >= 4, 'a different idea most days, about half from the fridge');
 // the Food tab list
 await p.evaluate(() => { S.folds = { bfideas: 1 }; go('food'); }); await p.waitForTimeout(500);
-ok((await p.$$('.bf-r')).length === 24 && /Today’s idea/.test(await text(p, '.bf-r.on')), 'Food: all 24 ideas, today’s on top');
+ok((await p.$$('.bf-r')).length === 25 && /Today’s idea/.test(await text(p, '.bf-r.on')), 'Food: all 25 ideas, today’s on top');
 await p.evaluate(() => document.querySelector('.bf').scrollIntoView()); await p.waitForTimeout(200);
 await p.screenshot({ path: 'v84-bf-list.png' });
 // his own coffee places

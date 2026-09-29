@@ -1,0 +1,10 @@
+{
+  "_comment": "What the nudge sender needs to know to decide WHETHER to ping. The words are written on the phone. Trips mute every ping (the crons are on Singapore time); date nights get their own heads-up.",
+  "trips": [
+    ["2026-10-10", "2026-10-16", "Cannes"],
+    ["2026-10-17", "2026-10-19", "Sheffield"],
+    ["2026-10-20", "2026-10-23", "New York"],
+    ["2026-10-23", "2026-10-24", "Doha"]
+  ],
+  "nights": { "w": [1, 5], "from": "2026-11-02" }
+}

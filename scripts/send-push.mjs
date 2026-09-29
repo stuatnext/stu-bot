@@ -20,6 +20,9 @@
 // keys are set without a red cross every night.
 
 import webpush from "web-push";
+import { readFileSync } from "node:fs";
+
+import { SCHEDULE, decide } from "./push-schedule.mjs";
 
 // One secret, made by the phone: { subscription, vapidPublic, vapidPrivate }.
 // The app generates the key pair itself now, so nothing about push lives in
@@ -60,12 +63,13 @@ const { subscription, pub: VAPID_PUBLIC, priv } = cfg;
 webpush.setVapidDetails("https://github.com/stuatnext/stu-bot", VAPID_PUBLIC, priv);
 
 try {
-  // One word from a fixed list; anything unrecognised falls back to the
-  // check-in, which is the one that is safe to send at any hour.
-  const KINDS = ["morning", "midday", "shift", "evening", "bed"];
-  // trimmed, because the workflow builds KIND from a folded YAML expression
-  const want = String(process.env.KIND || "").trim();
-  const kind = KINDS.indexOf(want) === -1 ? "evening" : want;
+  // The cron line that fired decides the heads-up; a manual run names it.
+  const kindIn = String(process.env.KIND || "").trim() || SCHEDULE[String(process.env.SCHEDULE || "").trim()] || "midday";
+  let cfgPush = {};
+  try { cfgPush = JSON.parse(readFileSync(new URL("../bot/push.json", import.meta.url), "utf8")); } catch (e){}
+  const d = decide(kindIn, new Date(), cfgPush);
+  if (!d.send){ console.log("No heads-up (" + kindIn + "): " + d.why + "."); process.exit(0); }
+  const kind = d.word;
   // A slot is worthless once its hour has passed, so these expire rather than
   // piling up behind a phone that was off: roughly until the next one.
   await webpush.sendNotification(subscription, JSON.stringify({ t: kind }), { TTL: 7200 });
