@@ -516,8 +516,23 @@ function coffeePick(k){
   var all = coffeeList();
   return all[h % all.length];
 }
-/* what the pick says about when to go */
-function coffeeWhen(c){
+/* v94: opening hours, read off the note - "opens 11:30", "shuts 15:00" -
+   so it works for the places already on his phone. 0 is not known. */
+function cafeHours(c){
+  var n = String(c[2] || ""), o = n.match(/\bopens(?: at)? (\d{1,2})(?::(\d\d))?/i),
+      s = n.match(/\bshuts (\d{1,2}):(\d\d)/i);
+  return { open: o ? +o[1] * 60 + (+o[2] || 0) : 0, shut: s ? +s[1] * 60 + +s[2] : 0 };
+}
+/* opens too late for a coffee before the lunch crowd: an after-two place */
+function coffeeLate(h){ return h.open > LUNCH_A - 45; }
+/* what the pick says about when to go - at the minute it is planned for,
+   when there is one, so an afternoon coffee never says "before twelve" */
+function coffeeWhen(c, at){
+  var h = cafeHours(c);
+  if (coffeeLate(h)) return "Opens " + hhmm(h.open) + ", so after two, once the lunch crowd has gone.";
+  if (at != null && at >= LUNCH_B)
+    return "After two, once the lunch crowd has gone." + (h.shut ? " It shuts at " + hhmm(h.shut) + "." : "");
+  if (h.open) return "Opens " + hhmm(h.open) + ": go at opening, before the lunch crowd.";
   return cafeTrip(c) ? "Make a morning of it, before the lunch crowd." : "Before the lunch crowd at twelve.";
 }
 function addCafes(text){
@@ -552,24 +567,30 @@ function askCafes(){
   });
 }
 /* The window: the morning, before the lunch crowd - or, once that has
-   gone, the afternoon after it, if the shift leaves room. */
-function coffeeWindow(){
+   gone, the afternoon after it, if the shift leaves room. (v94) A pick
+   that opens too late for the morning only has the afternoon. */
+function coffeeWindow(k){
   var now = nowMin(), sh = shape();
-  if (now < LUNCH_A) return [wakeMin(), LUNCH_A];
+  if (now < LUNCH_A && !coffeeLate(cafeHours(coffeePick(k)))) return [wakeMin(), LUNCH_A];
   if (sh.noShift) return [LUNCH_B, bedMin() - 120];
   return [LUNCH_B, Math.max(LUNCH_B + 30, sh.start - 30)];
 }
 function askCoffee(){
-  var k = today(), c = coffeePick(k), now = nowMin();
+  var k = today(), c = coffeePick(k), now = nowMin(), h = cafeHours(c);
   var lunch = now >= LUNCH_A && now < LUNCH_B;
+  var shuts = h.shut ? " It shuts at " + hhmm(h.shut) + "." : "";
   return ask({
     title: "Coffee somewhere new",
     html: "<div class='kit-c' style='--kt:#E0A15A'>"
       + "<div class='kit-pick'><em>Today’s pick</em><b>" + esc(c[0]) + "</b>"
       + "<span>" + esc(cafeWhere(c)) + "</span></div>"
       + "<p class='kit-why'>" + esc(c[2]) + "</p>"
-      + "<p class='kit-how'><em>When</em>" + (lunch ? "It is the lunch crowd now. After two is quieter."
+      + "<p class='kit-how'><em>When</em>" + (lunch ? "It is the lunch crowd now. After two is quieter." + shuts
+          : now >= LUNCH_B && h.shut && now > h.shut - 30 ? "It shuts at " + hhmm(h.shut) + ", so not today. Somewhere else new, or tomorrow’s pick."
+          : now >= LUNCH_B ? "The lunch crowd has gone, so now is good." + shuts
+          : coffeeLate(h) ? "Opens " + hhmm(h.open) + ", and the lunch crowd follows at twelve. Go after two." + shuts
           : cafeTrip(c) ? "Make a morning of it: there by ten, away before the lunch crowd."
+          : h.open ? "Opens " + hhmm(h.open) + ": go at opening, before the lunch crowd at twelve."
           : "Before 11:45. The lunch crowd arrives at twelve.") + "</p>"
       + "<p class='kit-where'>" + svg("cup", 13) + "Coffee passport: " + coffeePassport()
       + (coffeePassport() === 1 ? " place" : " places") + "</p></div>",
@@ -641,8 +662,13 @@ function dayPlan(k){
 
   /* On a rest day the walk goes to the coffee: one trip, Trained on the way. */
   var walk = !!(by["p:train"] && !lift), cafe = !!by.coffee, kit = !!by.kit, later = false;
+  /* v94: not before the place opens, and after two if it opens too late */
+  var ch = cafe ? cafeHours(coffeePick(k)) : { open: 0, shut: 0 };
   if (cafe){
-    if (t + (walk ? 60 : 45) <= LUNCH_A){
+    if (!coffeeLate(ch) && Math.max(t + (walk ? 15 : 0), ch.open) + 45 <= LUNCH_A){
+      /* set off so it is open when he gets there: the walk is the walk there */
+      var lead = (walk ? 15 : 0) + (kit ? 15 : 0);
+      if (ch.open > t + lead) t = ch.open - lead;
       if (walk){ put("p:train", 15); walk = false; }
       if (kit){ put("kit", 15); kit = false; }
       put("coffee", 45);
@@ -659,7 +685,7 @@ function dayPlan(k){
   if (cz) put("clean", cz[2]);
   if (kit) put("kit", 30);
   if (later){
-    var a2 = Math.max(t, LUNCH_B);
+    var a2 = Math.max(t, LUNCH_B, ch.open);
     if (walk){ put("p:train", 15, a2); a2 += 15; walk = false; }
     put("coffee", 45, a2);
   }
@@ -716,7 +742,7 @@ function planInfo(b, by, k, gp, lift){
   }
   else if (id === "coffee"){
     var c = coffeePick(k);
-    b.t = "Coffee somewhere new"; b.say = c[0] + ", " + cafeWhere(c) + ". " + coffeeWhen(c);
+    b.t = "Coffee somewhere new"; b.say = c[0] + ", " + cafeWhere(c) + ". " + coffeeWhen(c, b.at);
     b.ic = "cup"; b.col = "#E0A15A"; b.done = coffeeOn(k);
   }
   else if (id === "focus"){
@@ -1158,6 +1184,19 @@ function fixCafeNames(){
   });
   return changed;
 }
+/* v94: the ninth batch, the rest of the street. Seven. Left out: Shun Li
+   (3 reviews), Coffee To Go Cafe (3.8) and A Ye Coffee & Toast (3.0);
+   Koffee Kollective and Sojourner were in. Generation opens at 11:30, the
+   first place whose hours move the coffee to the afternoon. */
+var MY_CAFES_9 = [
+  ["Muyun 茶舍", "240m away", "Calm café, try the coconut americano. The sign says chá shè, tea house · 4.1"],
+  ["Generation Coffee Roasters (Tanjong Pagar)", "Tanjong Pagar, 280m", "The roaster's own stall, opens 11:30 · 4.5 from 99 reviews"],
+  ["Vpro Coffee", "280m away", "Kaya toast, soft eggs and kopi, shuts 15:00 · 4.6"],
+  ["Sumo Coffee Express @ Shenton", "Shenton Way, 350m", "Coffee shop, shuts 17:30 · 4.8"],
+  ["Calligraph Coffee International Plaza", "International Plaza, 350m", "Roasts its own; people rate the strawberry matcha latte, shuts 16:30 · 4.5"],
+  ["Trung Nguyen Coffee Singapore", "350m away", "Vietnamese café, get the coconut coffee · 4.1 from 243 reviews"],
+  ["VISITORS", "350m away", "Café, open till 22:00 · 4.1"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1186,6 +1225,7 @@ function seedOnce(){
   if (!S.seed91){ mergeCafes(MY_CAFES_6); S.seed91 = 1; changed = true; }
   if (!S.seed92){ mergeCafes(MY_CAFES_7); S.seed92 = 1; changed = true; }
   if (!S.seed93){ mergeCafes(MY_CAFES_8); S.seed93 = 1; changed = true; }
+  if (!S.seed94){ mergeCafes(MY_CAFES_9); S.seed94 = 1; changed = true; }
   if (fixCafeNames()) changed = true;
   if (changed) save();
 }

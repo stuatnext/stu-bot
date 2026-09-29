@@ -139,5 +139,16 @@ const s10 = saveWith({ y:2026, m:10, d:10, fullBack:3, extra: { planSeeded: 0,
 const r10 = await p.evaluate(() => S.cafes.map(c => c[0] + '/' + c[1]));
 ok(r10.join('|') === 'Coffee Hive (Altez)/his own', 'both names there: one Hive left, his own kept (' + r10.join('|') + ')');
 await ctx.close();
+// v94: the ninth batch, the rest of the street
+const s11 = saveWith({ y:2026, m:10, d:10, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, seed90: 0, seed91: 0, seed92: 0, seed93: 0, seed94: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:10, hour:9, min:0, tz:'Asia/Singapore', save: s11 }));
+const b9 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed94, names: S.cafes.map(c => c[0]),
+  near: S.cafes.filter(c => !cafeTrip(c)).length, trip: S.cafes.filter(c => cafeTrip(c)).length,
+  new9: MY_CAFES_9.map(c => cafeTrip(c)) }));
+ok(b9.seed === 1 && b9.n === 93 && ['Generation Coffee Roasters (Tanjong Pagar)', 'Vpro Coffee', 'Sumo Coffee Express @ Shenton', 'Calligraph Coffee International Plaza', 'Trung Nguyen Coffee Singapore', 'VISITORS'].every(n => b9.names.includes(n)) && b9.names.some(n => /^Muyun/.test(n)), 'the ninth batch: seven in, 93 in all (' + b9.n + ')');
+ok(!b9.names.some(n => /Shun Li|Coffee To Go|A Ye/i.test(n)) && b9.names.filter(n => /^Koffee Kollective|^Sojourner/.test(n)).length === 2, 'a 3-review stall, a 3.8 and a 3.0 left out; nothing doubled');
+ok(b9.new9.every(t => !t), 'all seven count as near');
+console.log('   near ' + b9.near + ' (weekdays) · trips ' + b9.trip + ' (weekends)');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');

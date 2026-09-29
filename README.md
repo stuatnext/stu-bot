@@ -86,6 +86,38 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v94: the ninth batch, and opening hours
+
+This batch finished off the street. `MY_CAFES_9` adds seven, landing once via `seed94`:
+- Muyun 茶舍, 240m away. Try the coconut americano, and the note gives the sign in pinyin.
+- Generation Coffee Roasters (Tanjong Pagar), 280m away. It opens at 11:30.
+- Vpro Coffee, 280m away, for kaya toast, soft eggs and kopi. It shuts at 15:00.
+- Sumo Coffee Express @ Shenton
+- Calligraph Coffee International Plaza
+- Trung Nguyen Coffee Singapore, the Vietnamese one. Get the coconut coffee.
+- VISITORS
+
+Left out: Shun Li (only 3 reviews), Coffee To Go Cafe (3.8) and A Ye Coffee & Toast (3.0). Koffee
+Kollective and Sojourner were already in. That makes 93 of his: 59 near for weekdays and 34 trips for
+the weekend.
+
+**Opening hours.** Generation opens at 11:30, 15 minutes before the lunch crowd, so a morning coffee there
+is impossible. `cafeHours` reads "opens 11:30" and "shuts 15:00" off a place's note. That means it also
+works for the places already on his phone, like Kopi MORE's "opens at 11".
+- `coffeeLate` is true for anywhere opening after 11:00. On a day whose pick opens that late, the plan puts
+  the coffee after two, using the same path a full morning already took. `coffeeWindow` starts at two for
+  it too, and the plan step, the road and the sheet all say "Opens 11:30, so after two".
+- A place opening at 11 is planned at 11:00 on the dot, never before. A rest-day walk sets off at 10:45, so
+  it is still the walk there.
+- The plan step's words now follow the minute it is planned for. Before, a coffee pushed past lunch by a
+  long morning still said "before the lunch crowd at twelve".
+- After two, the sheet says "The lunch crowd has gone, so now is good" (it used to say "Before 11:45").
+  When the place's closing time is known, the sheet adds it: "It shuts at 15:00." From half an hour before
+  closing, it says "not today" instead.
+- A place with no hours in its note behaves exactly as before.
+
+A new walk, `tests/hours94.mjs`, covers this.
+
 #### v93: the eighth batch, and the Hive's full name
 
 The list, sorted by distance, was mostly places he already had. That means the block round home is
