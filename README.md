@@ -86,6 +86,23 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v96: the eleventh batch, Guoco Tower and the Shenton side
+
+All eight places in this batch are within 400m. `MY_CAFES_11` adds them, landing once via `seed96`:
+- Kahve, where the owner makes the coffee (4.9)
+- Double Shot Coffee Shenton (4.9 from 243 reviews)
+- Coffee & Dough, for scones with homemade jam (4.9)
+- abseil, a roastery (4.5 from 213 reviews)
+- SJR THAI Coffee & Tea
+- Frumpy
+- Hi coffee | Guoco Tower, for the houjicha latte
+- September Coffee, a brunch café that opens at 11:30. v94's hours logic moves its days to after two.
+
+Left out: Starbucks, luckin and Huggs (chains), nana's green tea (a matcha chain), and Local Coffee
+People's International Plaza branch, since the Capital Square one is already in. Alchemist was already in.
+
+That makes 106 of his: 72 near for weekdays and 34 trips for the weekend.
+
 #### v95: the tenth batch, out to a kilometre or so
 
 This batch covers Chinatown, Cross Street and Capital Square. `MY_CAFES_10` adds five, landing once via
