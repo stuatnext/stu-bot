@@ -980,7 +980,8 @@ function planInfo(b, by, k, gp, lift){
   else if (id === "p:train"){
     var ga = typeof gymAsk === "function" ? gymAsk() : { ask: "Train.", sub: "" };
     b.t = lift ? ga.ask.replace(/\.$/, "") : (by.coffee ? "Rest day — walk to the coffee" : "Rest day — a walk");
-    b.say = lift ? ga.sub : "A walk is Trained on a rest day.";
+    var nw = !lift && !by.coffee && typeof walkPick === "function" ? walkPick(k) : null;
+    b.say = lift ? ga.sub : "A walk is Trained on a rest day." + (nw ? " Somewhere new: " + nw.n + "." : "");
     b.ic = "run"; b.col = "#5AC8F5"; b.done = !!w.done;
   }
   else if (id === "c:skin" || id === "c:sun" || id === "c:cleanse" || id === "c:night" || id === "c:bed"){

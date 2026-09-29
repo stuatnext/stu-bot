@@ -33,6 +33,8 @@ function load(){
             cafes:[], bfFirst:1, cleanMode:"daily", seed84:0, seed86:0, seed87:0, seed88:0, seed89:0, seed90:0, seed91:0, seed92:0, seed93:0, seed94:0, seed95:0, seed96:0, seed97:0, seed98:0,
             /* v85: the milk he puts in the shake */
             shakeMilk:"",
+            /* v100: the walks he has done somewhere new, id: the day */
+            walked:{},
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
