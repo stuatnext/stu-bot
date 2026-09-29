@@ -110,5 +110,34 @@ ok(!b7.names.some(n => /Tiong Hoe Specialty Coffee \(|luckin|^Awake$|Hill Street
 ok(b7.new7.every(t => !t), 'all six count as near');
 console.log('   near ' + b7.near + ' (weekdays) · trips ' + b7.trip + ' (weekends)');
 await ctx.close();
+// v93: the eighth batch, and the Hive's full name put right
+const s8 = saveWith({ y:2026, m:10, d:10, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, seed90: 0, seed91: 0, seed92: 0, seed93: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:10, hour:9, min:0, tz:'Asia/Singapore', save: s8 }));
+const b8 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed93, names: S.cafes.map(c => c[0]),
+  near: S.cafes.filter(c => !cafeTrip(c)).length, trip: S.cafes.filter(c => cafeTrip(c)).length,
+  new8: MY_CAFES_8.map(c => cafeTrip(c)) }));
+ok(b8.seed === 1 && b8.n === 86 && ['Takagi Coffee 100 AM', 'Coffee and Chill', 'Koffee Kollective (Tanjong Pagar)', 'Coffee Hive (Altez)'].every(n => b8.names.includes(n)) && !b8.names.includes('Hive (Altez)'), 'the eighth batch: three in, 86 in all, the Hive by its full name (' + b8.n + ')');
+ok(!b8.names.some(n => /luckin|JiuMao|no\. 7|Old Chang Kee/i.test(n)) && b8.names.filter(n => /^Foreground|^brewth|^Daily Milestone/.test(n)).length === 3, 'a chain, a 3.1 and two with no reviews left out; nothing doubled');
+ok(b8.new8.every(t => !t), 'all three count as near');
+console.log('   near ' + b8.near + ' (weekdays) · trips ' + b8.trip + ' (weekends)');
+await ctx.close();
+// his phone already has "Hive (Altez)", maybe with a visit logged: renamed, visit kept
+const s9 = saveWith({ y:2026, m:10, d:10, fullBack:3, extra: { planSeeded: 0,
+  cafes: [['Hive (Altez)', 'Enggor Street', 'Coffee and food, a wide range'], ['Sojourner Coffee', 'Round the corner, 300m', '']],
+  coffee: [['2026-10-08', 'Hive (Altez)']] } });
+({ p, ctx } = await open({ y:2026, m:10, d:10, hour:9, min:0, tz:'Asia/Singapore', save: s9 }));
+const r9 = await p.evaluate(() => ({ names: S.cafes.map(c => c[0]), row: S.cafes.find(c => c[0] === 'Coffee Hive (Altez)'),
+  log: S.coffee.map(c => c[1]), tried: coffeeTried('Coffee Hive (Altez)'), pass: coffeePassport(),
+  saved: JSON.parse(localStorage.getItem('daylight.v4')).cafes.map(c => c[0]) }));
+ok(r9.names.join('|') === 'Coffee Hive (Altez)|Sojourner Coffee' && /208 reviews/.test(r9.row[2]) && r9.saved.includes('Coffee Hive (Altez)'), 'the Hive already on his phone takes its full name, in place, and it is saved');
+ok(r9.log.join('|') === 'Coffee Hive (Altez)' && r9.tried && r9.pass === 1, 'a visit already logged still counts: passport ' + r9.pass);
+await ctx.close();
+// both names there somehow: one Hive left
+const s10 = saveWith({ y:2026, m:10, d:10, fullBack:3, extra: { planSeeded: 0,
+  cafes: [['Hive (Altez)', 'Enggor Street', ''], ['Coffee Hive (Altez)', 'his own', 'typed in']], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:10, hour:9, min:0, tz:'Asia/Singapore', save: s10 }));
+const r10 = await p.evaluate(() => S.cafes.map(c => c[0] + '/' + c[1]));
+ok(r10.join('|') === 'Coffee Hive (Altez)/his own', 'both names there: one Hive left, his own kept (' + r10.join('|') + ')');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');

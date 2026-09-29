@@ -1109,7 +1109,7 @@ var MY_CAFES_6 = [
   ["Vietgo coffee", "Tanjong Pagar Plaza", "Vietnamese coffee · 5.0"],
   ["22 Grams Coffee (KSC)", "Tanjong Pagar Plaza", "Coffee and matcha · 4.9"],
   ["Daily Milestone Coffee", "Onze, Kee Seng Street", "Coffee · 5.0"],
-  ["Hive (Altez)", "Enggor Street", "Coffee and food, a wide range · 4.9"],
+  ["Coffee Hive (Altez)", "Altez, Enggor Street, 150m", "Traditional local coffee and local food, shuts 19:00 · 4.9 from 208 reviews"],
   ["brewth coffee", "Enggor Street", "Coffee · 4.8"],
   ["Kyuukei Coffee | Maxwell", "Maxwell, 750m", "Japanese-style café, pour-overs and pastries, shuts 17:00 · 4.5"]
 ];
@@ -1125,6 +1125,39 @@ var MY_CAFES_7 = [
   ["Flamingo Coffee & Wine", "750m away", "Café, shuts 16:30 · 4.8"],
   ["The Wired Monkey SG (The Hole)", "About 1.2km away", "Hole-in-the-wall specialty coffee, shuts 15:30 · 4.7 from 645 reviews"]
 ];
+/* v93: the eighth batch, the last of the block - the list, by distance,
+   was mostly places already in. Three new. Left out: luckin (chain), Old
+   Chang Kee Coffee House (3.1), and JiuMao and no. 7 (no reviews). */
+var MY_CAFES_8 = [
+  ["Takagi Coffee 100 AM", "100 AM, 71m", "Japanese coffee house, since 1958 · 4.4 from 708 reviews"],
+  ["Coffee and Chill", "Tanjong Pagar, 260m", "Set meals with kopi or teh, and nasi lemak, shuts 18:00 · 4.4"],
+  ["Koffee Kollective (Tanjong Pagar)", "Tanjong Pagar, 270m", "Coffee stall, shuts 15:00 · 4.4 from 69 reviews"]
+];
+/* Names that turned out wrong, put right wherever they are - the list and
+   the passport - so a visit already logged still counts. v93: the Hive's
+   name was cut off in batch six; batch eight had it in full. */
+var CAFE_RENAMES = {
+  "Hive (Altez)": MY_CAFES_6.filter(function(c){ return c[0] === "Coffee Hive (Altez)"; })[0]
+};
+function fixCafeNames(){
+  var changed = false, have = {};
+  S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
+  S.cafes.forEach(function(c){ have[String(c[0]).toLowerCase()] = 1; });
+  S.cafes = S.cafes.filter(function(c){
+    var f = CAFE_RENAMES[c[0]];
+    if (!f) return true;
+    changed = true;
+    if (have[f[0].toLowerCase()]) return false;   /* the right one is already there */
+    have[f[0].toLowerCase()] = 1;
+    c[0] = f[0]; c[1] = f[1]; c[2] = f[2];
+    return true;
+  });
+  coffeeLog().forEach(function(v){
+    var f = CAFE_RENAMES[v[1]];
+    if (f){ v[1] = f[0]; changed = true; }
+  });
+  return changed;
+}
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1152,5 +1185,7 @@ function seedOnce(){
   if (!S.seed90){ mergeCafes(MY_CAFES_5); S.seed90 = 1; changed = true; }
   if (!S.seed91){ mergeCafes(MY_CAFES_6); S.seed91 = 1; changed = true; }
   if (!S.seed92){ mergeCafes(MY_CAFES_7); S.seed92 = 1; changed = true; }
+  if (!S.seed93){ mergeCafes(MY_CAFES_8); S.seed93 = 1; changed = true; }
+  if (fixCafeNames()) changed = true;
   if (changed) save();
 }
