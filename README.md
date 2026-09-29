@@ -86,6 +86,26 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v88: the third batch, and near on weekdays, trips at the weekend
+
+The third set of screenshots was mostly lists, and mostly suppliers. `MY_CAFES_3` adds the three real
+cafés: Cowpresso Coffee Roasters (about 11km, 4.7 from 1,291 reviews), The Coffee Roaster Cafe (about
+8km) and Homebody Café (about 15km, homemade matcha). Left out: machine and bean suppliers (BrewRatio,
+Alliance, Speedy3dcreations), a powder wholesaler, Coffee Bean (a chain, 3.5), Yue Hwa (a department
+store) and three places with only a handful of reviews. Yahava and Compound were already in. It lands
+once, via `seed88`.
+
+The distances in the screenshots (Yue Hwa Chinatown 1.2km, Plaza Singapura 2.9km) put him around
+Chinatown and Tanjong Pagar. So `coffeePick` now splits the list:
+- **Weekdays** pick somewhere near: Bugis, Rochor, Kampong Glam, Little India, Jalan Besar, Lavender,
+  Balestier, Novena, Geylang and so on.
+- **Weekends**, with no shift after, pick a trip out: the east coast, the north-east, and anything
+  marked km or trip (`COFFEE_TRIP`, `cafeTrip`).
+
+The pools go in this order: his places that fit the day, then stock places that fit, then any of his,
+then any stock. The card, the road and the plan step add "· a trip out" and "Make a morning of it" to a
+trip pick (`cafeWhere`, `coffeeWhen`).
+
 #### v87: the north-east batch
 
 He sent five more screenshots, covering Hougang, Kovan, Serangoon Gardens, Seletar Hills and Buangkok,

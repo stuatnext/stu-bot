@@ -30,7 +30,7 @@ function load(){
             homeKit:{ kb:10, wheel:1 }, sick:{},
             /* v84: his own coffee places, breakfast before the gym, how the
                cleaning runs, and the one-off seed of what he told us */
-            cafes:[], bfFirst:1, cleanMode:"daily", seed84:0, seed86:0, seed87:0,
+            cafes:[], bfFirst:1, cleanMode:"daily", seed84:0, seed86:0, seed87:0, seed88:0,
             /* v85: the milk he puts in the shake */
             shakeMilk:"",
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
