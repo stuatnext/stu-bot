@@ -388,6 +388,7 @@ function runCanUndo(s){
   if (s.op === "focus") return focusDoneOn(k);
   if (s.op === "coffee") return coffeeOn(k);
   if (o.kind === "focusc") return !!(dayRec(k).focusc || {})[o.val];
+  if (o.kind === "ap") return apptDone(k, o.val);
   if (o.kind === "cleanc") return dayRec(k).cleanc === "z" + o.val;
   if (o.kind === "t") return !!(S.doneDo || {})[o.val];
   if (o.kind === "p") return pDone(k, o.val);
@@ -411,6 +412,7 @@ function runUndo(){
   else if (s.op === "focus") undoFocus();
   else if (s.op === "coffee") undoCoffee();
   else if (o.kind === "focusc") undoFocusCarry(o.val);
+  else if (o.kind === "ap") apptUntick(o.val);
   else if (o.kind === "cleanc") undoCleanCarry();
   else if (o.kind === "t") undoDoUI(o.val);
   else if (o.kind === "p") tapPillar(o.val);
@@ -454,6 +456,7 @@ function runOp(op){
   if (op === "date"){ if (typeof logLife === "function" && !dateNightDone(today())) logLife("us", "date"); return after(); }
   /* v101: carried over from another day */
   if (kind === "focusc"){ doFocusCarry(val); return after(); }
+  if (kind === "ap"){ apptTick(val); return after(); }
   if (kind === "cleanc"){ doCleanCarry(val); return after(); }
   if (kind === "t"){ if (typeof doItUI === "function") doItUI(val); return after(); }
   if (kind === "p"){

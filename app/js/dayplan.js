@@ -546,6 +546,140 @@ function carryWords(list){
   return w.length < 2 ? w.join("") : w.slice(0, -1).join(", ") + " and " + w[w.length - 1];
 }
 
+/* ---------------------------------------------------------- at a time
+   v102: "At 10 a.m. I have to take the dog to the grooming parlor. So
+   obviously by 10 a.m. I need to be there. It's like a 15-minute walk."
+
+   Something that happens at a time, on a day: the plan leaves for it when
+   he has to leave, keeps everything else out of the way there and back, and
+   the morning ping names it. { id, d day, at be-there-by, t what, go minutes
+   to get there (each way), len minutes there, how "walk" or "" } */
+function apptsAll(){ return Array.isArray(S.appts) ? S.appts : []; }
+function apptsOn(k){ return apptsAll().filter(function(a){ return a.d === k; }).sort(function(a, b){ return a.at - b.at; }); }
+function apptById(id){ return apptsAll().filter(function(a){ return a.id === id; })[0] || null; }
+function apptLen(a){ return a.len == null ? 30 : a.len; }
+/* [leave, back] */
+function apptSpan(a){ return [a.at - (a.go || 0), a.at + apptLen(a) + (a.go || 0)]; }
+function apptSay(a){
+  var sp = apptSpan(a), go = a.go || 0;
+  return (go ? "Leave at " + hhmm(sp[0]) + (a.how === "walk" ? ", a " + go + "-minute walk" : ", " + go + " minutes to get there") + ". " : "")
+    + "There by " + hhmm(a.at) + (go ? "; back about " + hhmm(sp[1]) : "") + ".";
+}
+function apptDone(k, id){ return !!(dayRec(k).ap || {})[id]; }
+function apptTick(id){ var r = dayRec(today(), 1); r.ap = r.ap || {}; r.ap[id] = 1; save(); render({ keepScroll: true }); }
+function apptUntick(id){
+  var r = dayRec(today());
+  if (!r.ap || !r.ap[id]) return;
+  delete r.ap[id];
+  save(); sfx("untick"); render({ keepScroll: true });
+}
+function addAppt(a){
+  S.appts = apptsAll();
+  a.id = a.id || "a" + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
+  S.appts.push(a);
+  /* a fortnight back is plenty to keep */
+  var old = keyShift(today(), -14);
+  S.appts = S.appts.filter(function(x){ return x.d >= old; });
+  return a;
+}
+/* the ones still to come, for the Day list and the phone */
+function apptsAhead(){
+  var k = today();
+  return apptsAll().filter(function(a){ return a.d >= k; })
+    .sort(function(a, b){ return a.d < b.d ? -1 : a.d > b.d ? 1 : a.at - b.at; });
+}
+function apptWhen(a){
+  var k = today(), t = keyShift(k, 1);
+  return (a.d === k ? "Today" : a.d === t ? "Tomorrow" : DAY_SHORT[dowOf(a.d)] + " " + dayNice(a.d)) + " " + hhmm(apptSpan(a)[0]);
+}
+/* v102: on the day, the Today screen says when to go - from three hours
+   before leaving until he is back, or it is ticked */
+function apptNow(k){
+  var n = nowMin();
+  return apptsOn(k).filter(function(a){
+    var sp = apptSpan(a);
+    return !apptDone(k, a.id) && n >= sp[0] - 180 && n < sp[1];
+  })[0] || null;
+}
+function apptBannerHTML(k){
+  if (k !== today()) return "";
+  var a = apptNow(k);
+  if (!a) return "";
+  var sp = apptSpan(a), n = nowMin(), go = a.go || 0, left = sp[0] - n, w;
+  if (left > 0)
+    w = "<b>" + esc(a.t) + ".</b> Leave " + (left <= 60 ? "in " + left + (left === 1 ? " minute" : " minutes") + ", at " : "at ") + hhmm(sp[0])
+      + (go ? (a.how === "walk" ? ": a " + go + "-minute walk" : ": " + go + " minutes to get there") : "") + ". There by " + hhmm(a.at) + ".";
+  else if (n < a.at) w = "<b>Time to go.</b> " + esc(a.t) + ", there by " + hhmm(a.at) + ".";
+  else w = "<b>" + esc(a.t) + ".</b> " + (go ? "Back about " + hhmm(sp[1]) + "." : "Until " + hhmm(sp[1]) + ".");
+  return "<div class='late-b ap-b'><span>" + w + "</span>"
+    + (left <= 0 ? "<button data-apdone='" + esc(a.id) + "'>Done</button>" : "") + "</div>";
+}
+function askAddAppt(){
+  var a = { how: "" };
+  return ask({ title: "Something at a time", say: "The plan leaves for it on time and keeps the rest out of the way.",
+               field: { label: "What is it?", placeholder: "Dog to the groomer" }, confirm: "Next", cancel: "Cancel" })
+  .then(function(v){
+    if (typeof v !== "string" || !v.trim()) return null;
+    a.t = v.trim().slice(0, 60);
+    var k = today();
+    return ask({ title: a.t, say: "Which day?", options: [
+      { id: keyShift(k, 1), label: "Tomorrow", note: DAY_LONG[dowOf(keyShift(k, 1))], pri: true },
+      { id: k, label: "Today" },
+      { id: "__other", label: "Another day" }], cancel: "Cancel" });
+  }).then(function(d){
+    if (!d || d === "__no") return null;
+    if (d !== "__other") return d;
+    return ask({ title: a.t, field: { label: "The day", type: "date", value: keyShift(today(), 2) }, confirm: "Next", cancel: "Cancel" });
+  }).then(function(d){
+    if (typeof d !== "string" || !/^\d{4}-\d\d-\d\d$/.test(d)) return null;
+    a.d = d;
+    return ask({ title: a.t, field: { label: "Be there by", type: "time", value: "10:00" }, confirm: "Next", cancel: "Cancel" });
+  }).then(function(tm){
+    var m = typeof tm === "string" && tm.match(/^(\d{1,2}):(\d\d)/);
+    if (!m) return null;
+    a.at = +m[1] * 60 + +m[2];
+    return ask({ title: a.t, say: "How long to get there?", options: [
+      { id: "0", label: "It's at home" }, { id: "w10", label: "A 10-minute walk" }, { id: "w15", label: "A 15-minute walk", pri: true },
+      { id: "20", label: "20 minutes" }, { id: "30", label: "Half an hour" }, { id: "45", label: "45 minutes" }, { id: "60", label: "An hour" }],
+      cancel: "Cancel" });
+  }).then(function(g){
+    if (!g || g === "__no") return null;
+    a.go = Number(String(g).replace("w", "")) || 0;
+    if (String(g).charAt(0) === "w") a.how = "walk";
+    return ask({ title: a.t, say: "And how long there?", options: [
+      { id: "5", label: "Just dropping off" }, { id: "30", label: "Half an hour", pri: true },
+      { id: "60", label: "An hour" }, { id: "120", label: "Two hours" }], cancel: "Cancel" });
+  }).then(function(l){
+    if (!l || l === "__no") return;
+    a.len = Number(l);
+    addAppt(a);
+    if (S.notes) delete S.notes[a.d];
+    save(); sfx("done"); buzz(10);
+    toast(apptWhen(a).replace(/ (\d\d:\d\d)$/, ": leave at $1") + " for " + a.t + ".");
+    render({ keepScroll: true });
+  });
+}
+function askAppts(){
+  var list = apptsAhead();
+  var h = "<div class='wk-list'>" + (list.length ? list.map(function(a){
+    return "<button class='wk-r' data-mk='" + esc(a.id) + "'><i>" + svg("clock", 15) + "</i><span><b>" + esc(a.t) + "</b><small>"
+      + esc(apptWhen(a) + " · " + apptSay(a)) + "</small></span></button>";
+  }).join("") : "<p class='dp-lead'>Nothing at a time yet.</p>") + "</div>";
+  return ask({ title: "At a time", html: h, options: [{ id: "__add", label: "Add something", pri: true }], cancel: "Close" })
+  .then(function(v){
+    if (v === "__add") return askAddAppt();
+    var a = v && apptById(v);
+    if (!a) return;
+    return ask({ title: a.t, say: esc(apptWhen(a) + ". " + apptSay(a)), options: [{ id: "rm", label: "Take it off" }], cancel: "Keep it" })
+      .then(function(r){
+        if (r !== "rm") return;
+        S.appts = apptsAll().filter(function(x){ return x.id !== a.id; });
+        save(); sfx("untick"); toast(a.t + ": off the plan.");
+        render({ keepScroll: true });
+      });
+  });
+}
+
 /* --------------------------------------------------------- the small ones */
 function zhDone(k){
   return lifeEntries().some(function(e){ return e[0] === k && e[1] === "zh" && e[2] === "study"; });
@@ -763,8 +897,19 @@ function dayPlan(k, opt){
   var gp = typeof gymPlan === "function" ? gymPlan() : { mode: "rest" };
   var lift = gp.mode === "session" || gp.mode === "travel" || gp.mode === "done";
   var out = [], t = W;
+  /* v102: the times he has to be somewhere; nothing else goes there */
+  var aps = apptsOn(k).map(function(a){ var sp = apptSpan(a); return { a: a, s: sp[0], e: sp[1] }; });
+  function hop(a0, dur){
+    for (var g = 0; g < 12; g++){
+      var hit = null;
+      aps.forEach(function(x){ if (a0 < x.e && a0 + dur > x.s) hit = x; });
+      if (!hit) return a0;
+      a0 = hit.e;
+    }
+    return a0;
+  }
   function put(id, dur, at){
-    var a = at == null ? t : at;
+    var a = at == null ? hop(t, dur) : at;
     out.push({ id: id, at: a, dur: dur });
     if (at == null || a >= t) t = Math.max(t, a + dur);
     return a;
@@ -787,10 +932,12 @@ function dayPlan(k, opt){
   /* v94: not before the place opens, and after two if it opens too late */
   var ch = cafe ? cafeHours(coffeePick(k)) : { open: 0, shut: 0 };
   if (cafe){
-    if (!coffeeLate(ch) && Math.max(t + (walk ? 15 : 0), ch.open) + 45 <= LUNCH_A){
-      /* set off so it is open when he gets there: the walk is the walk there */
-      var lead = (walk ? 15 : 0) + (kit ? 15 : 0);
-      if (ch.open > t + lead) t = ch.open - lead;
+    /* set off so it is open when he gets there: the walk is the walk there,
+       and (v102) the walk and the coffee stay in one piece, clear of
+       anything at a time */
+    var lead = (walk ? 15 : 0) + (kit ? 15 : 0), tc = hop(Math.max(t, ch.open - lead), lead + 45);
+    if (!coffeeLate(ch) && Math.max(tc + (walk ? 15 : 0), ch.open) + 45 <= LUNCH_A){
+      t = tc;
       if (walk){ put("p:train", 15); out[out.length - 1].lead = 1; walk = false; }
       if (kit){ put("kit", 15); out[out.length - 1].lead = 1; kit = false; }
       put("coffee", 45);
@@ -819,11 +966,12 @@ function dayPlan(k, opt){
   });
   if (kit) put("kit", 30);
   if (later){
-    var a2 = Math.max(t, LUNCH_B, ch.open);
+    var a2 = hop(Math.max(t, LUNCH_B, ch.open), (walk ? 15 : 0) + 45);
     if (walk){ put("p:train", 15, a2); out[out.length - 1].lead = 1; a2 += 15; walk = false; }
     put("coffee", 45, a2);
   }
   if (walk) put("p:train", 40);
+  aps.forEach(function(x){ put("ap:" + x.a.id, x.e - x.s, x.s); });
   if (by["p:family"]) put("p:family", 20, Math.max(t, by["p:family"].open));
   if (typeof mealPlan === "function")
     mealPlan().forEach(function(m){ if (m.slot !== "morning") put("m:" + m.slot, 30, m.at); });
@@ -863,7 +1011,7 @@ function dayPlan(k, opt){
    not a debt. */
 var PINNED = { "p:family": 1, setup: 1, work: 1, date: 1, "p:stop": 1, week: 1,
                "c:cleanse": 1, "c:night": 1, "c:bed": 1, bed: 1 };
-function planPinned(b){ return !!(b.mark || (PINNED[b.id] && !b.carried) || (b.id.indexOf("m:") === 0 && b.id !== "m:morning")); }
+function planPinned(b){ return !!(b.mark || (PINNED[b.id] && !b.carried) || b.id.indexOf("ap:") === 0 || (b.id.indexOf("m:") === 0 && b.id !== "m:morning")); }
 /* When the rest of the day will not all fit, what gives way first: the
    clean and the kit check, then the extras, then coffee and admin. Eating,
    the gym and the day's one focus are the last to go. */
@@ -1161,6 +1309,11 @@ function planInfo(b, by, k, gp, lift){
     b.t = zc ? cleanWord(zc) : "Clean"; b.say = zc ? zc[1] + " " + zc[2] + " minutes, then stop." : "";
     b.ic = "broom"; b.col = "#7FD4C1"; b.done = !!dayRec(k).clean;
   }
+  else if (id.indexOf("ap:") === 0){
+    var apx = apptById(id.slice(3));
+    b.t = apx ? apx.t : "At a time"; b.say = apx ? apptSay(apx) : "";
+    b.ic = "clock"; b.col = "#FF8FA3"; b.done = apx ? apptDone(k, apx.id) : false;
+  }
   else if (id.indexOf("focusc:") === 0){
     var fsk = id.slice(7), frc = (dayRec(k).focusc || {})[fsk], stc = frc ? focusAt(fsk, frc.i) : focusStep(fsk);
     b.t = stc.t; b.say = focusWord(stc) + ". " + stc.how;
@@ -1242,6 +1395,12 @@ function dayListHTML(k){
   if (plan.dropped && plan.dropped.length)
     h += "<p class='dp-tm'><b>For tomorrow</b> " + plan.dropped.map(function(b){ return esc(b.t); }).join(" · ") + "</p>";
   if (moved) h += "<button class='btn quiet dp-undo' data-mk='__unplan'>Back to the first plan</button>";
+  /* v102: things at a time - what is coming, and one more */
+  var ahead = apptsAhead().filter(function(a){ return a.d !== k || !apptDone(k, a.id); }).slice(0, 3);
+  h += "<button class='dp-appt' data-mk='" + (ahead.length ? "__appts" : "__appt") + "'>" + svg("clock", 15)
+    + "<span><b>" + (ahead.length ? "Coming up" : "Something at a time?") + "</b><small>"
+    + (ahead.length ? esc(ahead.map(function(a){ return apptWhen(a) + " " + a.t; }).join(" · ")) : "An appointment: the plan leaves for it on time")
+    + "</small></span></button>";
   h += "<div class='dp-acts'>"
     + (ill ? "<button class='btn' data-mk='__sick'>Feeling better</button>"
        : weekDay(dowOf(k)).f === "veg" ? ""
@@ -1259,6 +1418,8 @@ function askDay(){
     if (v === "__ill"){ askSick(); return; }
     if (v === "__late"){ askCatchUp(); return; }
     if (v === "__unplan"){ unplanDay(); return; }
+    if (v === "__appt"){ askAddAppt(); return; }
+    if (v === "__appts"){ askAppts(); return; }
     if (v === "__week"){ go("you"); setTimeout(function(){
       var el = document.querySelector("#screen .wkp"); if (el) el.scrollIntoView({ block: "start" }); }, 80); return; }
     startRun("day", v);
@@ -1429,7 +1590,7 @@ function planSteps(k, plan){
     var part = b.id.indexOf("m:") === 0 || b.id === "shake" ? "Food" : b.id === "wake" ? "Morning" : b.id === "zh" ? "Mandarin"
              : b.id === "admin" ? "Life admin" : b.id === "week" ? (b.carried ? "Carried over" : "Sunday")
              : b.id === "clean" || b.id.indexOf("cleanc:") === 0 ? "Home"
-             : b.id.indexOf("focusc:") === 0 ? "Carried over" : "The day";
+             : b.id.indexOf("focusc:") === 0 ? "Carried over" : b.id.indexOf("ap:") === 0 ? "At a time" : "The day";
     out.push({ id: b.id, at: b.at, kicker: hhmm(b.at) + " · " + part, col: b.col,
       title: b.t + ".", say: b.say, op: b.id, done: !!b.done });
   });
@@ -1711,5 +1872,10 @@ function seedOnce(){
   if (fixCafeNames()) changed = true;
   /* v101: carrying over starts today - nothing from before it is dug up */
   if (!S.carryFrom){ S.carryFrom = today(); changed = true; }
+  /* v102: what he told us - the dog to the groomer, 10:00 on Wednesday 30 September, a 15-minute walk */
+  if (!S.seed102){
+    if (today() <= "2026-09-30") addAppt({ id: "groomer930", d: "2026-09-30", at: 600, t: "Dog to the groomer", go: 15, len: 5, how: "walk" });
+    S.seed102 = 1; changed = true;
+  }
   if (changed) save();
 }

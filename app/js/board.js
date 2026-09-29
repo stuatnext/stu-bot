@@ -128,6 +128,8 @@ function viewBoard(){
   }
   /* v99: behind, and one tap re-plans the rest of the day from now */
   var late = typeof lateBannerHTML === "function" && S.onboarded ? lateBannerHTML(k) : "";
+  /* v102: somewhere to be - when to leave, above the rest */
+  if (typeof apptBannerHTML === "function" && S.onboarded) late = apptBannerHTML(k) + late;
   return "<div class='b-t'>" + scWorldHTML(wins, sel) + B_CARD
     + late + start + TODAY_MORE + "</div>";
 }

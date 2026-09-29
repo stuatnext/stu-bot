@@ -37,6 +37,8 @@ function load(){
             walked:{},
             /* v101: what came over to each day, from when, and the day it was said */
             carry:{}, carryFrom:"", carrySaid:"",
+            /* v102: things at a time, and the one he told us */
+            appts:[], seed102:0,
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,
@@ -124,6 +126,10 @@ function mirrorState(){
                        .map(function(b){ return { id: b.id, at: b.at, t: b.t, s: b.say || "", d: b.done ? 1 : 0 }; });
                    } catch(e){ return null; }
                  })(),
+                 /* v102: things at a time, today and ahead, so the morning ping can
+                    name one even before the app is opened */
+                 appts: typeof apptsAhead === "function" ? apptsAhead().slice(0, 6).map(function(a){
+                   return { d: a.d, at: a.at, t: a.t, go: a.go || 0, how: a.how || "", done: apptDone(a.d, a.id) ? 1 : 0 }; }) : [],
                  name: typeof dayName === "function" && S.onboarded ? dayName(t) : "",
                  ill: typeof sickOn === "function" && sickOn(t) ? 1 : 0,
                  veg: typeof vegOn === "function" && vegOn(t) ? 1 : 0,

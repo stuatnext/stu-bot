@@ -86,6 +86,43 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v102: something at a time
+
+His words: "At 10 a.m. I have to take the dog to the grooming parlor. So obviously by 10 a.m. I need to
+be there. It's like a 15-minute walk."
+
+**Tomorrow's is already in.** Wednesday 30 September has "Dog to the groomer": leave at 09:45 (a
+15-minute walk), there by 10:00, back about 10:20. It was seeded once (`seed102`), and only on a phone
+that starts on or before that day.
+
+**How the plan uses one.** Each appointment is stored in `S.appts` as `{ d, at, t, go, len, how }`.
+- `at` is the be-there-by minute.
+- `go` is the travel time each way.
+- `len` is the time there.
+
+The block (`ap:<id>`) runs from `at − go` to `at + len + go` and has its own clock, like the meals and
+Malta. Flexible blocks hop over it, and the walk to the coffee and the coffee move together, so the walk
+isn't left before it and the coffee after. A re-plan (v99) keeps it where it is.
+
+**Adding one.** The Day list has "Something at a time?", which becomes "Coming up" once there's one ahead.
+It asks five things:
+- what it is
+- which day: tomorrow, today or another date
+- the be-there-by time
+- how far: a 10- or 15-minute walk, or 20 to 60 minutes
+- how long there
+
+"Coming up" lists them, and a tap takes one off. They're tidied away a fortnight after their day.
+
+**On the day.** Today shows a pink banner above Start from three hours before leaving: "Dog to the
+groomer. Leave in 13 minutes, at 09:45: a 15-minute walk. There by 10:00." At the leave time it changes
+to "Time to go." with a Done button. It goes away once ticked or once he's back.
+
+**The phone.** The mirror carries the next six. The morning ping opens with "Leave at 09:45 for Dog to
+the groomer (a 15-minute walk, there by 10:00).", even if the app hasn't been opened that day. It stops
+once the leave time has passed or the block is ticked. Pushes run on fixed crons, so the morning ping is
+the heads-up rather than a ping at 09:40.
+
 #### v101: what isn't done carries over
 
 His words: "Critically, if I don't mark something as done, it should probably carry over. At least the

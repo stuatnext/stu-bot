@@ -108,7 +108,7 @@ function ask(opts){
       if (f.type === "area")
         h += "<textarea id='mkField' rows='7' placeholder='" + esc(f.placeholder || "") + "'"
           + " autocomplete='off' autocapitalize='sentences'>" + esc(f.value == null ? "" : f.value) + "</textarea>";
-      else h += "<input id='mkField' type='" + (f.type === "date" ? "date" : "text") + "'"
+      else h += "<input id='mkField' type='" + (f.type === "date" ? "date" : f.type === "time" ? "time" : "text") + "'"
         + (f.type === "number" ? " inputmode='decimal'" : "")
         + " value='" + esc(f.value == null ? "" : f.value) + "'"
         + " placeholder='" + esc(f.placeholder || "") + "'"

@@ -11,7 +11,7 @@
      files: freshness wins.
    - VERSION changes with every release, and the build number is painted on
      the title card and the You screen so what the phone runs is visible. */
-var VERSION = "daylight-v101";
+var VERSION = "daylight-v102";
 /* Written by the app on every save; read here when a push lands, because a
    service worker cannot see localStorage. Never versioned, never deleted. */
 var STATE_CACHE = "daylight-state";
@@ -241,6 +241,14 @@ function composeHeadsUp(kind, st, now){
   return out;
 }
 
+/* v102: the first thing at a time today that he has not left for yet */
+function apptLine(st, day, nowM){
+  var a = ((st && st.appts) || []).filter(function(x){ return x.d === day && !x.done && x.at - (x.go || 0) >= nowM; })
+    .sort(function(x, y){ return x.at - y.at; })[0];
+  if (!a) return "";
+  return "Leave at " + hm(a.at - (a.go || 0)) + " for " + a.t
+    + (a.go ? " (" + (a.how === "walk" ? "a " + a.go + "-minute walk" : a.go + " minutes") + ", there by " + hm(a.at) + ")" : "") + ". ";
+}
 function composeNudge(kind, st, nowISO, dow, hour, minute){
   var fresh = !!(st && st.day === nowISO);
   /* v85: the heads-ups, when there is a plan from today to read */
@@ -279,26 +287,27 @@ function composeNudge(kind, st, nowISO, dow, hour, minute){
       var nowM = hour * 60 + (minute || 0), ahead = [];
       for (var q = 0; q < st.plan.length && ahead.length < 3; q++){
         var pb = st.plan[q];
-        if (pb.d || pb.at < nowM || MINOR.indexOf(pb.id) >= 0) continue;
+        if (pb.d || pb.at < nowM || MINOR.indexOf(pb.id) >= 0 || String(pb.id).indexOf("ap:") === 0) continue;
         ahead.push(pb.t.replace(/\.\s.*$/, "").replace(/\.$/, "") + " " + hm(pb.at));
       }
       out.title = st.name || (brief ? brief.head : DAY_NAMES[dow]);
-      out.body = (st.veg ? "A quiet one. " : "Water, a coffee, breakfast. ")
+      out.body = apptLine(st, nowISO, nowM) + (st.veg ? "A quiet one. " : "Water, a coffee, breakfast. ")
         + (ahead.length ? "Then: " + ahead.join(" \u00b7 ") + "." : "The rest of the day is yours.");
       var cl9 = chipLine(st);
       if (cl9) out.body += " " + cl9;
       out.badge = badgeOn ? (open.length || 0) : 0;
       return out;
     }
+    var apl = apptLine(st, nowISO, hour * 60 + (minute || 0));
     if (brief){
       out.title = brief.head;
-      var parts = [brief.first];
+      var parts = apl ? [apl.trim(), brief.first] : [brief.first];
       if (brief.gym) parts.push(brief.gym + ".");
       if (brief.card) parts.push(brief.card);
       out.body = parts.join(" ");
     } else {
       out.title = DAY_NAMES[dow] + (st && st.where ? " · " + st.where.c : "") + ".";
-      out.body = "Three things make a day. Train before Malta wakes.";
+      out.body = apl + "Three things make a day. Train before Malta wakes.";
     }
     /* one extra sentence at most: the chip if one is close, otherwise the level */
     var cl = chipLine(st);
