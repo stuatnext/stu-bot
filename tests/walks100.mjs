@@ -4,16 +4,16 @@ import { launch, open, close, saveWith, text, ERRS } from './harness.mjs';
 await launch();
 const ok = (c, m) => console.log((c ? 'PASS ' : 'FAIL ') + m);
 const mk = (extra) => saveWith({ y:2026, m:9, d:29, fullBack: 3, lifts: [[1, 'B']], extra: Object.assign({ planSeeded: 0 }, extra || {}) });
-const at = (d, hour, save) => open({ y:2026, m:9, d, hour, min: 0, tz:'Asia/Singapore', save: save || mk() });
+const at = (d, hour, save, m) => open({ y:2026, m: m || 9, d, hour, min: 0, tz:'Asia/Singapore', save: save || mk() });
 
 // the data: every walk complete, sourced, and split near / further out
 let { p, ctx } = await at(29, 9);
 const data = await p.evaluate(() => WALKS.map(w => ({ id: w.id, g: w.g, ok: !!(w.id && w.n && w.area && w.start && w.end && w.get && w.km > 0 && w.min > 0
-  && (w.bug === 0 || w.bug === 1) && w.bugWhy && (w.haze === 0 || w.haze === 1) && w.cafe && w.cafe.length === 3 && w.lunch && w.lunch.length === 3
+  && (w.bug === 0 || w.bug === 1) && w.bugWhy && (w.haze === 0 || w.haze === 1) && (w.cafe === null || w.cafe.length === 3) && w.lunch && w.lunch.length === 3 && ['north','south','east','west','central'].includes(w.r)
   && w.src && w.src.length), min: w.min, bug: w.bug })));
 const near = data.filter(w => w.g === 'near'), trip = data.filter(w => w.g === 'trip');
 console.log('   walks:', data.length, '· near', near.length, '· further out', trip.length, '· repellent on', data.filter(w => w.bug).length);
-ok(data.length >= 20 && data.every(w => w.ok), 'twenty-plus walks, each with start, finish, how to get there, repellent, haze, coffee, lunch and a source');
+ok(data.length >= 20 && data.every(w => w.ok), 'twenty-plus walks, each with start, finish, how to get there, repellent, haze, its air region, lunch and a source');
 ok(near.length >= 8 && trip.length >= 8, 'enough of each: near home and further out');
 ok(new Set(data.map(w => w.id)).size === data.length, 'no walk twice');
 ok(near.every(w => w.min <= 90), 'the near ones fit a weekday morning (90 minutes or less)');
@@ -52,7 +52,7 @@ ok(after.count === 1 && after.next !== pick.id, 'one walked, and the next pick i
 await ctx.close();
 
 // a Saturday: further out
-({ p, ctx } = await at(3, 9));
+({ p, ctx } = await at(26, 9));
 const sat = await p.evaluate(() => { const w = walkPick(today()); return [w.g, w.n]; });
 ok(sat[0] === 'trip', 'Saturday: a trip further out (' + sat[1] + ')');
 await ctx.close();
@@ -67,7 +67,8 @@ ok(second[0] !== first && second[1] === 'near' && second[2].includes(await p.eva
 await ctx.close();
 
 // on You: the passport and today's walk; the list of them all
-({ p, ctx } = await open({ y:2026, m:9, d:29, hour:9, min:0, tz:'Asia/Singapore', save: mk(), tab: 'you' }));
+({ p, ctx } = await at(29, 9));
+await p.evaluate(() => go('you')); await p.waitForTimeout(600);
 const you = await text(p, '#screen .wkx');
 ok(/Walks/.test(you) && /of \d+ walked/.test(you) && /Today: /.test(you), 'You: the walks panel, the passport and today’s walk');
 await p.click('#screen [data-walks]'); await p.waitForTimeout(400);
@@ -83,6 +84,47 @@ await ctx.close();
 ({ p, ctx } = await at(29, 9, mk({ week: { 2: { c: 0 } } })));
 const rest = await p.evaluate(() => { const b = dayPlan(today()).find(b => b.id === 'p:train'); return b ? b.say : ''; });
 ok(/Somewhere new: /.test(rest), 'the rest-day walk says where: ' + rest);
+await ctx.close();
+
+// live air (as NEA served it at 15:00 on 29 Sep 2026): take it easy, and a sheltered swap
+({ p, ctx } = await at(29, 9));
+const air = await p.evaluate(() => {
+  AIR = { psi: { north: 108, south: 127, west: 148, east: 138, central: 164 }, pm: { north: 40, south: 61, west: 61, east: 58, central: 43 } };
+  const open = WALKS.find(w => w.g === 'near' && !w.haze), shel = WALKS.find(w => w.g === 'near' && w.haze);
+  return { lvl: airLevel(open), line: hazeLine(open), shel: hazeLine(shel), id: open.id };
+});
+ok(air.lvl === 1 && /^Haze now in the south: PSI 127, PM2\.5 61 this hour\. NEA says keep outdoor exertion down: short and easy, or a sheltered one\.$/.test(air.line), 'hazy: the reading for the walk’s region, and NEA’s advice: ' + air.line);
+ok(/this one has shelter and indoor stops/.test(air.shel), 'a sheltered walk says so');
+await p.evaluate((id) => { walkSheet(id); }, air.id); await p.waitForTimeout(350);
+ok(/A sheltered one instead/.test(await text(p, '#modal')), 'the sheet offers a sheltered one instead');
+await (await p.$('#modal button:has-text("A sheltered one instead")')).click(); await p.waitForTimeout(400);
+const swapped = await p.evaluate(() => { const b = document.querySelector('#modal .kit-pick b'); return b ? b.textContent : ''; });
+ok(await p.evaluate((n) => WALKS.some(w => w.n === n && w.haze), swapped), 'and shows one with shelter: ' + swapped);
+const worst = await p.evaluate(() => { AIR = { psi: { south: 230 }, pm: { south: 170 } }; const w = WALKS.find(w => w.r === 'south'); return [airLevel(w), hazeLine(w)]; });
+ok(worst[0] === 2 && /not a day for this one/.test(worst[1]), 'very unhealthy: not a day for it');
+const fine = await p.evaluate(() => { AIR = { psi: { south: 42 }, pm: { south: 12 } }; return hazeLine(WALKS.find(w => w.r === 'south')); });
+ok(/Fine for a walk\.$/.test(fine), 'clear air: fine for a walk');
+await ctx.close();
+
+// lunch, open or not: NEA's closure list (Changi Village, repairs 1-15 Oct 2026)
+({ p, ctx } = await at(3, 9, null, 10));
+const shut = await p.evaluate(() => {
+  HC = { 'Changi Village Blk 2 and 3': { name: 'Changi Village Blk 2 and 3', q1_cleaningstartdate: 'NA', q1_cleaningenddate: 'NA', q2_cleaningstartdate: 'NA', q2_cleaningenddate: 'NA',
+    q3_cleaningstartdate: 'NA', q3_cleaningenddate: 'NA', q4_cleaningstartdate: 'TBC', q4_cleaningenddate: 'TBC',
+    other_works_startdate: '1/10/2026', other_works_enddate: '15/10/2026', remarks_other_works: 'Repairs and Redecoration' } };
+  const w = walkById('changi');
+  return { today: hcClosed(w, '2026-10-03'), before: hcClosed(w, '2026-09-29'), after: hcClosed(w, '2026-10-16'), html: walkHTML(w) };
+});
+ok(shut.today && shut.today.why === 'repairs and redecoration' && shut.today.until === '2026-10-15' && !shut.before && !shut.after, 'closed 1 to 15 October, open either side');
+ok(/Closed today for repairs and redecoration, until 15 Oct\./.test(shut.html), 'the sheet says so before he walks there');
+await ctx.close();
+
+// no café worth the trip: says so, and no coffee to log
+({ p, ctx } = await at(26, 9));
+await p.evaluate(() => { walkSheet('chestnut'); }); await p.waitForTimeout(350);
+const nocafe = await text(p, '#modal');
+ok(/Nothing worth the trip out here: bring water\./.test(nocafe) && !/had the coffee/.test(nocafe), 'no café out there: bring water, and no coffee to log');
+ok(/DEET, picaridin or IR3535/.test(nocafe), 'repellent: what kind, and sunscreen first');
 await ctx.close();
 
 // the saved passport survives a reload

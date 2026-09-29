@@ -86,6 +86,60 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v100: walks somewhere new, with coffee and lunch at the end
+
+His words: "I do really like to go for walks... but I generally stick to the Tanjong Pagar area. And I
+want to expand my horizons... If it requires me to wear mosquito patches... tell me... whilst I venture
+out and have these walks, I can also go to a nearby coffee place... or a nearby place for lunch."
+
+`walks.js` holds 24 researched walks (research date: 29 Sep 2026), in two groups:
+- **Near home, weekday mornings (11 walks, 45 to 75 minutes):** Duxton and Ann Siang, Everton Park,
+  Chinatown and Pearl's Hill, Tiong Bahru, Kampong Gelam, the Singapore River, Marina Bay, the Civic
+  District and Fort Canning, Gardens by the Bay, Mount Faber and Henderson Waves, and the Botanic Gardens.
+- **Further out, weekends (13 walks):** the Southern Ridges, the TreeTop Walk, Bukit Timah, the Rail
+  Corridor, East Coast Park, Coney Island, Jurong Lake Gardens, Bishan-Ang Mo Kio Park, Lower Peirce,
+  Chestnut, Sungei Buloh, Pulau Ubin and the Changi Point boardwalk.
+
+Each walk carries:
+- the start, and how to get there from Tanjong Pagar
+- the finish, distance and time
+- whether it needs repellent, and why. This is habitat first; dengue clusters and high-Aedes areas carry
+  their NEA date.
+- whether it still works on a moderate-haze day
+- the best time to go
+- an independent café and a lunch spot near the end, each opening in Google Maps
+- a caveat, where there is one, and numbered source links
+
+Where two walks had no café worth the trip (Sungei Buloh, Chestnut), the sheet says to bring water and
+doesn't offer to log a coffee.
+
+How it works:
+- **The day's pick** works like the coffee: `walkPick` chooses near on weekdays and a trip at the weekend,
+  untried first. **Another one** moves the pick on for the day.
+- **Where it shows:** it's the first option in the walk sheet, the rest-day walk step names it, and the You
+  tab has a **Walks** panel with the passport and the full list.
+- **Walked it** logs the walk (`S.walked`) and the minutes, and marks Trained. **Walked it, and had the
+  coffee** also adds the café to the coffee passport.
+- **Live air:** from data.gov.sg (both endpoints answer a browser; checked). It uses NEA's 1-hour PM2.5 for
+  "go now?" and the 24-hour PSI for the day, both read for the walk's own region. It follows NEA's advice
+  for healthy people: at PSI over 100 or PM2.5 over 55, keep it short and easy; over 200 or 150, not today.
+  On a hazy day, a walk without shelter offers **A sheltered one instead**.
+- **Hawker closures:** read live from NEA's closure list on data.gov.sg (also browser-readable). The lunch
+  line says "Closed today for cleaning, until …" before he walks there.
+- **Repellent advice** is NEA's and HealthHub's: DEET, picaridin or IR3535; sunscreen first; patches go on
+  clothes, and plant-oil ones (citronella) wear off sooner.
+- **When it fetches:** only when the app is on the web (never from a file), at most every half hour, and
+  it never waits more than a moment.
+
+**Data sources for later:**
+- data.gov.sg datasets: NParks Park Connector Loop, Tracks, Parks and Nature Reserves; NEA Hawker Centres;
+  Dengue Clusters; High-Aedes Areas. Their files are signed S3 links a browser can't read, so any use would
+  go through CI.
+- NParks' own ArcGIS "Park_Connector_Trails_WFL1", which is CORS-open, for route geometry.
+- OpenStreetMap routes via Overpass.
+
+New walk: `tests/walks100.mjs`.
+
 #### v99: running behind, and re-planning from now
 
 His words: "It's 11:45 already... I should have already done the gym at 9:15, which I haven't done yet...
