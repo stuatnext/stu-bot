@@ -1197,6 +1197,19 @@ var MY_CAFES_9 = [
   ["Trung Nguyen Coffee Singapore", "350m away", "Vietnamese café, get the coconut coffee · 4.1 from 243 reviews"],
   ["VISITORS", "350m away", "Café, open till 22:00 · 4.1"]
 ];
+/* v95: the tenth batch, a ring out to a kilometre or so - Chinatown, Cross
+   Street, Capital Square. Five. Left out: two luckins (chain), Soon Li
+   (3.2), Nanyang Old Coffee (3.0), Huggs (3.9), Kampong Days (3.0), Hao Jing
+   and Niu Che Shui (a handful of reviews; the second is a dried-goods shop),
+   and second branches of Generation (Hong Lim) and Tanamera (Capital
+   Square) - one of each is enough. */
+var MY_CAFES_10 = [
+  ["Tanamera Coffee SGX Centre 2", "SGX Centre 2, 900m", "Indonesian specialty coffee, try the caramel latte, shuts 17:00 · 4.2 from 159 reviews"],
+  ["Chinatown Coffee Shop", "Chinatown, 1km", "Kopi C and kaya butter toast, open till 23:00 · 4.1"],
+  ["Group Therapy Coffee - Cross Street Exchange", "Cross Street Exchange, 1.2km", "Brunch café, pancakes and flat whites, $20-30, shuts 16:30 · 4.2 from 957 reviews"],
+  ["Local Coffee People Capital Square", "Capital Square, 1.2km", "Coffee stand with tables outside, try the gula Melaka coffee, shuts 16:45 · 4.2"],
+  ["Aunty fatso coffee and toast (肥嫂)", "About 1.3km away", "Kopi and kaya toast. The sign says féi sǎo, Aunty Fatso, shuts 18:00 · 4.0"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1226,6 +1239,7 @@ function seedOnce(){
   if (!S.seed92){ mergeCafes(MY_CAFES_7); S.seed92 = 1; changed = true; }
   if (!S.seed93){ mergeCafes(MY_CAFES_8); S.seed93 = 1; changed = true; }
   if (!S.seed94){ mergeCafes(MY_CAFES_9); S.seed94 = 1; changed = true; }
+  if (!S.seed95){ mergeCafes(MY_CAFES_10); S.seed95 = 1; changed = true; }
   if (fixCafeNames()) changed = true;
   if (changed) save();
 }

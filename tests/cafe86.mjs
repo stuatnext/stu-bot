@@ -150,5 +150,17 @@ ok(!b9.names.some(n => /Shun Li|Coffee To Go|A Ye/i.test(n)) && b9.names.filter(
 ok(b9.new9.every(t => !t), 'all seven count as near');
 console.log('   near ' + b9.near + ' (weekdays) · trips ' + b9.trip + ' (weekends)');
 await ctx.close();
+// v95: the tenth batch, out to a kilometre or so
+const s12 = saveWith({ y:2026, m:10, d:10, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, seed90: 0, seed91: 0, seed92: 0, seed93: 0, seed94: 0, seed95: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:10, hour:9, min:0, tz:'Asia/Singapore', save: s12 }));
+const b10 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed95, names: S.cafes.map(c => c[0]),
+  near: S.cafes.filter(c => !cafeTrip(c)).length, trip: S.cafes.filter(c => cafeTrip(c)).length,
+  new10: MY_CAFES_10.map(c => cafeTrip(c)), gt: cafeHours(MY_CAFES_10[2]), ct: cafeHours(MY_CAFES_10[1]) }));
+ok(b10.seed === 1 && b10.n === 98 && ['Tanamera Coffee SGX Centre 2', 'Chinatown Coffee Shop', 'Group Therapy Coffee - Cross Street Exchange', 'Local Coffee People Capital Square'].every(n => b10.names.includes(n)) && b10.names.some(n => /^Aunty fatso/.test(n)), 'the tenth batch: five in, 98 in all (' + b10.n + ')');
+ok(!b10.names.some(n => /luckin|Soon Li|Nanyang Old|Huggs|Kampong Days|Hao jing|Niu Che Shui|Hong Lim|Tanamera Coffee Capital/i.test(n)) && b10.names.filter(n => /^Generation Coffee/.test(n)).length === 1, 'chains, low ratings, a dried-goods shop and second branches left out; one Generation');
+ok(b10.new10.every(t => !t), 'all five count as near');
+ok(b10.gt.shut === 990 && b10.gt.open === 0 && b10.ct.shut === 0, 'their hours read: Group Therapy shuts 16:30; open-till-late says nothing to worry about');
+console.log('   near ' + b10.near + ' (weekdays) · trips ' + b10.trip + ' (weekends)');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');
