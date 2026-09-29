@@ -86,6 +86,25 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v89: the fourth batch, round home
+
+A list taken from home (Maxwell Chambers on the map). `MY_CAFES_4` adds eight:
+- Honest Cup Specialty Coffee, 550m away, good tables for work
+- Kopi MORE, a hawker kopi stall about 4km away that opens at 11
+- Italian Coffee Lab Pasir Panjang
+- Homeground Coffee Roasters, about 9km
+- PÖONSTI / Old Hen Coffee at NUS, about 8km
+- Heritage Cafe, about 8km
+- Chye Seng Huat Hardware and Tiong Hoe Specialty Coffee, which were already on the stock list. He picked
+  them himself, so they now come up as his (`coffeeStock` drops a stock place he has on his own list, so
+  it shows once).
+
+Left out: three Coffee Beans and Kenangan (chains), Detian (3.8, a 24-hour kopitiam), Beanstro (3.4,
+$20–70) and Coffee Near Me (a takeaway stand 11km away). It lands once, via `seed89`. That makes 63 of his.
+
+`cafeTrip` now reads distances. A place marked 7km or more is a trip and anything closer is near, so
+"about 4km" goes on weekdays and "about 8km" goes at the weekend.
+
 #### v88: the third batch, and near on weekdays, trips at the weekend
 
 The third set of screenshots was mostly lists, and mostly suppliers. `MY_CAFES_3` adds the three real
