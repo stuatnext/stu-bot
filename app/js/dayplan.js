@@ -1239,6 +1239,20 @@ var MY_CAFES_12 = [
   ["Neighborhood Coffee Bar", "About 1.1km away", "Café, coffee and pastries, shuts 20:30 · 4.1"],
   ["Hellu Coffee", "About 1.2km away", "Café, shuts 17:00 · 4.4 from 449 reviews"]
 ];
+/* v98: the thirteenth batch, Amoy Street, Telok Ayer and Ann Siang Hill.
+   Eight (one screenshot was a repeat). Left out: 118 Coffee Stall (1
+   review), Pinhole (3.8 from 9) and Double Shot's Kampong Bahru branch (the
+   Shenton one is in). Kyuukei Maxwell was in. */
+var MY_CAFES_13 = [
+  ["Ho Peng Coffee Stall", "700m away", "Hawker kopi stall, a kopi-c for $1.50, shuts 15:00. The cup says 和平, hé píng, peace · 4.7"],
+  ["1950's Coffee", "700m away", "Old-school kopi at a dollar or two, shuts 16:00. The sign says 五十年代, wǔ shí nián dài, the fifties · 4.4"],
+  ["3 Mins Coffee OUE Downtown", "OUE Downtown, 750m", "Café, lots of coffee and tea, shuts 18:30 · 4.3 from 123 reviews"],
+  ["Traditional Coffee and Bread", "750m away", "Kopi and toast, open till 22:00 · 4.2"],
+  ["Grey Area Coffee Roasters", "800m away", "Roaster, good coffee and better service, shuts 16:30 · 4.7 from 284 reviews"],
+  ["All Hands Cafe (Telok Ayer)", "Telok Ayer, 850m", "Café: shokupan toast, desserts, coffee and matcha, $20-30, open till 21:00 · 4.8 from 342 reviews"],
+  ["Maxi Coffee Bar", "Ann Siang Hill, 850m", "Coffee bar, shuts 16:00 · 4.7 from 798 reviews"],
+  ["Aifokato (Amoy St)", "Amoy Street, 950m", "Affogato: gelato with the coffee poured over, open till 21:00 · 4.8"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1271,6 +1285,7 @@ function seedOnce(){
   if (!S.seed95){ mergeCafes(MY_CAFES_10); S.seed95 = 1; changed = true; }
   if (!S.seed96){ mergeCafes(MY_CAFES_11); S.seed96 = 1; changed = true; }
   if (!S.seed97){ mergeCafes(MY_CAFES_12); S.seed97 = 1; changed = true; }
+  if (!S.seed98){ mergeCafes(MY_CAFES_13); S.seed98 = 1; changed = true; }
   if (fixCafeNames()) changed = true;
   if (changed) save();
 }

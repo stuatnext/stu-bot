@@ -186,5 +186,17 @@ ok(!b12.names.some(n => /Seletar Coffee Stall|Specialty Coffee Singapore|JiuMao|
 ok(b12.new12.every(t => !t) && b12.hl === 960, 'all eight count as near (1.1km and 1.2km too); Highlander shuts 16:00');
 console.log('   near ' + b12.near + ' (weekdays) · trips ' + b12.trip + ' (weekends)');
 await ctx.close();
+// v98: the thirteenth batch, Amoy Street, Telok Ayer, Ann Siang Hill
+const s15 = saveWith({ y:2026, m:10, d:10, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, seed90: 0, seed91: 0, seed92: 0, seed93: 0, seed94: 0, seed95: 0, seed96: 0, seed97: 0, seed98: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:10, hour:9, min:0, tz:'Asia/Singapore', save: s15 }));
+const b13 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed98, names: S.cafes.map(c => c[0]),
+  near: S.cafes.filter(c => !cafeTrip(c)).length, trip: S.cafes.filter(c => cafeTrip(c)).length,
+  new13: MY_CAFES_13.map(c => cafeTrip(c)), maxi: cafeHours(MY_CAFES_13.find(c => c[0] === 'Maxi Coffee Bar')).shut,
+  hp: cafeHours(MY_CAFES_13.find(c => c[0] === 'Ho Peng Coffee Stall')) }));
+ok(b13.seed === 1 && b13.n === 122 && ['Ho Peng Coffee Stall', "1950's Coffee", '3 Mins Coffee OUE Downtown', 'Traditional Coffee and Bread', 'Grey Area Coffee Roasters', 'All Hands Cafe (Telok Ayer)', 'Maxi Coffee Bar', 'Aifokato (Amoy St)'].every(n => b13.names.includes(n)), 'the thirteenth batch: eight in, 122 in all (' + b13.n + ')');
+ok(!b13.names.some(n => /^118 Coffee|Pinhole|Kampong Bahru/i.test(n)) && b13.names.filter(n => /^Double Shot/.test(n)).length === 1 && b13.names.filter(n => /^Kyuukei Coffee/.test(n)).length === 1, 'a 1-review stall, a 3.8 and a second Double Shot left out; nothing doubled');
+ok(b13.new13.every(t => !t) && b13.maxi === 960 && b13.hp.shut === 900 && b13.hp.open === 0, 'all eight count as near; Maxi shuts 16:00, Ho Peng 15:00');
+console.log('   near ' + b13.near + ' (weekdays) · trips ' + b13.trip + ' (weekends)');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');
