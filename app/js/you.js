@@ -47,6 +47,7 @@ function viewYou(){
   /* v78: what is coming, and what to sort before it */
   if (typeof roadAheadHTML === "function") h += roadAheadHTML();
   if (typeof weekPanelHTML === "function" && S.onboarded) h += weekPanelHTML();
+  if (typeof walksPanelHTML === "function" && S.onboarded) h += walksPanelHTML();
 
   h += soFarHTML();
 

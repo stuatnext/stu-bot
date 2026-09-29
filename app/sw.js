@@ -24,7 +24,7 @@ var SHELL = [
   "./js/world.js", "./js/fx.js", "./js/art.js", "./js/cardui.js", "./js/scene.js", "./js/board.js",
   "./js/collection.js", "./js/quest.js", "./js/gym.js", "./js/machines.js", "./js/life.js", "./js/plan.js", "./js/food.js",
   "./js/week.js", "./js/dispatch.js",
-  "./js/basics.js", "./js/care.js", "./js/kit.js", "./js/dayplan.js", "./js/skin.js", "./js/games.js", "./js/people.js",
+  "./js/basics.js", "./js/care.js", "./js/kit.js", "./js/dayplan.js", "./js/walks.js", "./js/skin.js", "./js/games.js", "./js/people.js",
   "./js/jokers.js", "./js/run.js", "./js/task.js", "./js/opening.js",
   "./js/work.js", "./js/vault.js", "./js/you.js",
   "./js/coach.js", "./js/app.js",

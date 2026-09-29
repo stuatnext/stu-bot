@@ -486,15 +486,19 @@ function gymWords(k, key){
 /* A walk is Trained and always has been; before v39 there was nowhere to say
    so, so a rest day looked like a day the app had nothing for. */
 function askWalk(btn){
+  /* v100: somewhere new first - near home on a weekday, further out at the weekend */
+  var nw = typeof walkPick === "function" ? walkPick(today()) : null;
   ask({
     title: "A walk",
     say: "Twenty minutes is a tick. Forty is the walk. It has always counted.",
-    options: [{ id: "20", label: "20 minutes", note: "a tick" },
+    options: [nw ? { id: "new", label: "Somewhere new: " + nw.n, note: nw.area + " · about " + nw.min + " min" + (nw.bug ? " · bring repellent" : "") } : null,
+              { id: "20", label: "20 minutes", note: "a tick" },
               { id: "40", label: "40 minutes", note: "the walk", pri: true },
-              { id: "60", label: "An hour or more", note: "the long one" }],
+              { id: "60", label: "An hour or more", note: "the long one" }].filter(Boolean),
     cancel: "Not today"
   }).then(function(v){
     if (!v || v === "__no") return;
+    if (v === "new"){ askWalkNew(); return; }
     S.walks = S.walks || {};
     S.walks[today()] = Number(v);
     save();
