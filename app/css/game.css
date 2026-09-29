@@ -554,11 +554,22 @@ body[data-tab="today"] #screen .sc-p.tight .sc-pn{font-size:10px; padding:3px 7p
   font:inherit; font-weight:900; font-size:13px; color:#2A1A00; border:0;
   background:linear-gradient(#FFD27A, #F5B042); box-shadow:0 3px 0 #B97A14}
 #screen .late-b button:active{transform:translateY(2px); box-shadow:0 1px 0 #B97A14}
+#screen .ap-b{background:rgba(255,143,163,.12); box-shadow:inset 0 0 0 1.5px rgba(255,143,163,.5)}
+#screen .ap-b button{color:#3A0A14; background:linear-gradient(#FFB3C1, #FF8FA3); box-shadow:0 3px 0 #C2566B}
+#screen .ap-b button:active{box-shadow:0 1px 0 #C2566B}
 #modal .dp-late{display:flex; flex-direction:column; align-items:flex-start; gap:2px; width:100%; margin:0 0 12px;
   padding:10px 12px; border-radius:14px; cursor:pointer; text-align:left; font:inherit; color:var(--ink);
   border:0; background:rgba(255,184,77,.12); box-shadow:inset 0 0 0 1.5px rgba(255,184,77,.5)}
 #modal .dp-late b{font-size:14px; font-weight:900}
 #modal .dp-late span{font-size:12.5px; line-height:1.35; color:var(--ink2)}
+#modal .dp-appt{display:flex; align-items:center; gap:10px; width:100%; margin:12px 0 0; padding:10px 12px; border-radius:14px;
+  cursor:pointer; text-align:left; font:inherit; color:#FF8FA3; border:0;
+  background:rgba(255,143,163,.08); box-shadow:inset 0 0 0 1.5px rgba(255,143,163,.35)}
+#modal .dp-appt:active{transform:translateY(1px)}
+#modal .dp-appt svg{flex:none}
+#modal .dp-appt span{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px}
+#modal .dp-appt b{font-size:14px; font-weight:900; color:var(--ink)}
+#modal .dp-appt small{font-size:12.5px; line-height:1.35; color:var(--ink2); overflow-wrap:anywhere}
 #modal .dp-tm{margin:12px 0 0; font-size:13px; line-height:1.45; color:var(--ink2)}
 #modal .dp-tm b{display:block; font-size:11px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; color:var(--ink3)}
 #modal .dp-undo{width:100%; margin-top:12px}
