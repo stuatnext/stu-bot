@@ -86,6 +86,25 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v93: the eighth batch, and the Hive's full name
+
+The list, sorted by distance, was mostly places he already had. That means the block round home is
+covered. `MY_CAFES_8` adds three, landing once via `seed93`:
+- Takagi Coffee 100 AM, 71m away: a Japanese coffee house going since 1958, 4.4 from 708 reviews
+- Coffee and Chill, 260m away: set meals with kopi or teh
+- Koffee Kollective (Tanjong Pagar), 270m away, which shuts at 15:00
+
+Left out: luckin (chain), Old Chang Kee Coffee House (3.1), and JiuMao and no. 7 (no reviews).
+
+This batch also had the full name of the place loaded in v91 as "Hive (Altez)": it's **Coffee Hive
+(Altez)**, traditional local coffee and food, 4.9 from 208 reviews. `CAFE_RENAMES` and `fixCafeNames` fix
+it wherever it appears, both in the list and in the passport:
+- A visit already logged keeps counting.
+- If both names are somehow there, only one is kept, and his own entry wins.
+- `MY_CAFES_6` now carries the full name, so a fresh install gets it right.
+
+That makes 86 of his: 52 near for weekdays and 34 trips for the weekend.
+
 #### v92: the seventh batch, by distance from his door
 
 This time the list was sorted by distance. 22 Grams is 41m from his door, so it's practically downstairs.
