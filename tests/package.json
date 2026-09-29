@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Playwright walks and the render sweep for the Daylight app. Not shipped; the app stays buildless.",
   "scripts": {
-    "walks": "node run80.mjs && node life77.mjs && node kit81.mjs && node day82.mjs && node home83.mjs && node day84.mjs && node push85.mjs && node shake85.mjs && node cafe86.mjs && node hours94.mjs && node late99.mjs && node walks100.mjs",
+    "walks": "node run80.mjs && node life77.mjs && node kit81.mjs && node day82.mjs && node home83.mjs && node day84.mjs && node push85.mjs && node shake85.mjs && node cafe86.mjs && node hours94.mjs && node late99.mjs && node walks100.mjs && node carry101.mjs",
     "sweep": "node sweep.mjs"
   },
   "dependencies": { "playwright-core": "^1.50.0" }

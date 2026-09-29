@@ -387,6 +387,8 @@ function runCanUndo(s){
   if (s.op === "admin") return adminDone(k);
   if (s.op === "focus") return focusDoneOn(k);
   if (s.op === "coffee") return coffeeOn(k);
+  if (o.kind === "focusc") return !!(dayRec(k).focusc || {})[o.val];
+  if (o.kind === "cleanc") return dayRec(k).cleanc === "z" + o.val;
   if (o.kind === "t") return !!(S.doneDo || {})[o.val];
   if (o.kind === "p") return pDone(k, o.val);
   if (o.kind === "c") return careOn(k, o.val);
@@ -408,6 +410,8 @@ function runUndo(){
   else if (s.op === "admin") undoAdmin();
   else if (s.op === "focus") undoFocus();
   else if (s.op === "coffee") undoCoffee();
+  else if (o.kind === "focusc") undoFocusCarry(o.val);
+  else if (o.kind === "cleanc") undoCleanCarry();
   else if (o.kind === "t") undoDoUI(o.val);
   else if (o.kind === "p") tapPillar(o.val);
   else if (o.kind === "c") tapCare(o.val);
@@ -448,6 +452,9 @@ function runOp(op){
   if (op === "kit") return askKit().then(function(){ settled(!kitWanted().length); });
   if (op === "life"){ if (typeof lifeDoStep === "function") lifeDoStep(); return after(); }
   if (op === "date"){ if (typeof logLife === "function" && !dateNightDone(today())) logLife("us", "date"); return after(); }
+  /* v101: carried over from another day */
+  if (kind === "focusc"){ doFocusCarry(val); return after(); }
+  if (kind === "cleanc"){ doCleanCarry(val); return after(); }
   if (kind === "t"){ if (typeof doItUI === "function") doItUI(val); return after(); }
   if (kind === "p"){
     if (val === "family" && typeof askPeople === "function"

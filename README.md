@@ -86,6 +86,50 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v101: what isn't done carries over
+
+His words: "Critically, if I don't mark something as done, it should probably carry over. At least the
+things that need to be carried over, which is probably everything to be fair."
+
+It also makes v99's "For tomorrow" true. Before this, that list was only a label.
+
+**What carries.** Anything a day asks that another day can still do goes with the next day until it's
+done:
+- the focus step
+- Mandarin
+- life admin
+- the day's room
+- Sunday's look at the week
+- the café he didn't get to, which stays the pick on the next day of the same kind (near or trip)
+
+**What doesn't need to.** Things that come round every day don't pile up, because tomorrow has its own:
+breakfast, the routine, the shake and the meals. The gym session, the kit and the to-dos already wait
+for him by themselves.
+
+**How it's worked out.** `carryIn(day)` is computed the first time a day is looked at, from the day
+before. If the app wasn't opened on the days before that, it looks back up to three of them. The result
+is stored in `S.carry[day]`, so the day doesn't change under him. `carryOwn` reads what a day was meant
+to ask from the week itself:
+- Being ill on Tuesday puts Tuesday's Mandarin on Wednesday.
+- A day off at home (ill, or vegetating) doesn't show carried things. It holds them and hands them on.
+- Away on a trip, the trip is the day, so nothing piles up for the return.
+- Nothing older than six days carries, because by then its own day has come round again.
+- Carrying starts on the day this ships (`carryFrom`), so nothing from before it is dug up.
+
+**In the plan.** Carried blocks sit alongside the day's own (one carried room a day), and each says
+"From Tuesday." A carried focus step is its own step, `focusc:<line>`, which moves that line on; a
+carried room is `cleanc:<zone>`. Both work in the run with undo.
+
+**Other screens.**
+- The first look of the day toasts "Carried over: Mandarin, life admin, the kitchen and Apartment
+  Coffee."
+- The Day list says the same.
+- Re-planning ranks carried blocks: a carried focus sits just below the day's own. A carried week review
+  isn't pinned to 18:00, which would land in the shift.
+- Heads-ups cover carried blocks too.
+
+New walk: `tests/carry101.mjs`.
+
 #### v100: walks somewhere new, with coffee and lunch at the end
 
 His words: "I do really like to go for walks... but I generally stick to the Tanjong Pagar area. And I

@@ -35,6 +35,8 @@ function load(){
             shakeMilk:"",
             /* v100: the walks he has done somewhere new, id: the day */
             walked:{},
+            /* v101: what came over to each day, from when, and the day it was said */
+            carry:{}, carryFrom:"", carrySaid:"",
             people:[], spoke:{}, peopleSeeded:0, lastOpen:"", lastSeen:0,
             jokers:{}, jokerSlots:[], slotsBought:0, anteSeen:"",
             lifts:{}, food:{}, waist:[], kg:0,

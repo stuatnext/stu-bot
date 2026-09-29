@@ -118,6 +118,14 @@ function viewBoard(){
       + "</div>"
     : (typeof askDay === "function" && S.onboarded ? "<div class='tk-row'><button class='tk-start quiet' data-dayplan='1'>Your day"
         + svg("list", 18) + "</button></div>" : "");
+  /* v101: the first look of the day says what came over from yesterday */
+  if (S.onboarded && typeof carryIn === "function" && S.carrySaid !== k){
+    var cin = carryIn(k).filter(function(c){ return !carryDoneOn(c, k); });
+    if (cin.length && !vegOn(k)){
+      S.carrySaid = k;
+      setTimeout(function(){ toast("Carried over: " + carryWords(cin) + "."); save(); }, 900);
+    }
+  }
   /* v99: behind, and one tap re-plans the rest of the day from now */
   var late = typeof lateBannerHTML === "function" && S.onboarded ? lateBannerHTML(k) : "";
   return "<div class='b-t'>" + scWorldHTML(wins, sel) + B_CARD
