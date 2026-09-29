@@ -86,6 +86,22 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v91: the sixth batch, his doorstep
+
+This batch is the map zoomed right in on Tanjong Pagar Plaza, Kee Seng Street and Enggor Street.
+`MY_CAFES_6` adds ten places, all within walking distance, landing once via `seed91`:
+- Sojourner Coffee, 300m away
+- Foreground Coffee, Bill's 8 Cafe, Equate Coffee, Vietgo coffee (Vietnamese) and 22 Grams Coffee (KSC),
+  all round the plaza
+- Daily Milestone Coffee at Onze
+- Hive (Altez) and brewth coffee, on Enggor Street
+- Kyuukei Coffee | Maxwell. The Katong Nami by Kyuukei stays as a separate place.
+
+Left out: luckin 100AM (chain), Hill Street Coffee Shop (2.0), Old Chang Kee Coffee House (3.1), Chagee (a
+tea chain) and a Viet iced coffee whose name was off the edge of the map.
+
+That makes 77 of his: 43 near for weekdays and 34 trips for the weekend.
+
 #### v90: the fifth batch, the streets round home
 
 `MY_CAFES_5` adds four places near home, which lands once via `seed90`:

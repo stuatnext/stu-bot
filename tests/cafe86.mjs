@@ -88,5 +88,16 @@ ok(!b5.names.some(n => /luckin|Coffee Bean|Dimbulah Coffee @ RP|VivoCity|Three H
 ok(b5.new5.every(t => !t), 'all four count as near');
 console.log('   near ' + b5.near + ' (weekdays) · trips ' + b5.trip + ' (weekends)');
 await ctx.close();
+// v91: the sixth batch, his doorstep
+const s6 = saveWith({ y:2026, m:10, d:8, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, seed90: 0, seed91: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:8, hour:9, min:0, tz:'Asia/Singapore', save: s6 }));
+const b6 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed91, names: S.cafes.map(c => c[0]),
+  near: S.cafes.filter(c => !cafeTrip(c)).length, trip: S.cafes.filter(c => cafeTrip(c)).length,
+  new6: MY_CAFES_6.map(c => cafeTrip(c)) }));
+ok(b6.seed === 1 && b6.n === 77 && ['Sojourner Coffee', 'Foreground Coffee', 'Bill’s 8 Cafe', '22 Grams Coffee (KSC)', 'brewth coffee', 'Kyuukei Coffee | Maxwell'].every(n => b6.names.includes(n)), 'the doorstep batch: ten in, 77 in all (' + b6.n + ')');
+ok(!b6.names.some(n => /luckin|Hill Street|Old Chang Kee|Chagee/i.test(n)) && b6.names.includes('Nami by Kyuukei Coffee'), 'chains and low ratings left out; the Katong Kyuukei kept separate');
+ok(b6.new6.every(t => !t), 'all ten count as near');
+console.log('   near ' + b6.near + ' (weekdays) · trips ' + b6.trip + ' (weekends)');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');
