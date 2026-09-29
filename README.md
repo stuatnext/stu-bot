@@ -86,6 +86,20 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v90: the fifth batch, the streets round home
+
+`MY_CAFES_5` adds four places near home, which lands once via `seed90`:
+- Jewel Coffee (Tanjong Pagar Centre), 400m away
+- Dimbulah Coffee @ 137 Market Street, 1.2km away
+- Oasis Bistro & Cafe, about 3.8km away
+- The Community Coffee - Hamilton, about 4.6km away, rated 4.9
+
+Left out: two luckins and two Coffee Beans (chains, and one of them is a head office), a second Dimbulah,
+Tiong Hoe's VivoCity stand (the Queenstown one is already in), Coffee Donkee (already in), and anything
+under 4 or with no reviews (Three Hands, 89 Coffee Stall, Five Oars, Ho Zheng).
+
+That makes 67 of his: 33 near for weekdays and 34 trips for the weekend.
+
 #### v89: the fourth batch, round home
 
 A list taken from home (Maxwell Chambers on the map). `MY_CAFES_4` adds eight:

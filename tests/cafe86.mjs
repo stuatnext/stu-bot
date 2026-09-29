@@ -77,5 +77,16 @@ ok(b4.list.filter(n => n === 'Chye Seng Huat Hardware').length === 1 && !b4.stoc
 const wk4 = await p.evaluate(() => { const o = []; for (let i = 0; i < 42; i++){ const k = iso(new Date(2026, 9, 5 + i)); o.push([dowOf(k), cafeTrip(coffeePick(k)), coffeePick(k)[0]]); } return o; });
 ok(wk4.every(x => (x[0] === 0 || x[0] === 6) === x[1]), 'six weeks: every weekday near, every weekend a trip');
 await ctx.close();
+// v90: the fifth batch, the streets round home
+const s5 = saveWith({ y:2026, m:10, d:7, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, seed90: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:7, hour:9, min:0, tz:'Asia/Singapore', save: s5 }));
+const b5 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed90, names: S.cafes.map(c => c[0]),
+  near: S.cafes.filter(c => !cafeTrip(c)).length, trip: S.cafes.filter(c => cafeTrip(c)).length,
+  new5: MY_CAFES_5.map(c => cafeTrip(c)) }));
+ok(b5.seed === 1 && b5.n === 67 && ['Jewel Coffee (Tanjong Pagar Centre)', 'Dimbulah Coffee @ 137 Market Street', 'Oasis Bistro & Cafe', 'The Community Coffee - Hamilton'].every(n => b5.names.includes(n)), 'the fifth batch: four in, 67 in all (' + b5.n + ')');
+ok(!b5.names.some(n => /luckin|Coffee Bean|Dimbulah Coffee @ RP|VivoCity|Three Hands|89 Coffee|Five Oars|Ho Zheng/i.test(n)) && b5.names.filter(n => n === 'Coffee Donkee').length === 1, 'chains, a head office, repeats and low ratings left out');
+ok(b5.new5.every(t => !t), 'all four count as near');
+console.log('   near ' + b5.near + ' (weekdays) · trips ' + b5.trip + ' (weekends)');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');
