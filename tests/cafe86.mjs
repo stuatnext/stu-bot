@@ -99,5 +99,16 @@ ok(!b6.names.some(n => /luckin|Hill Street|Old Chang Kee|Chagee/i.test(n)) && b6
 ok(b6.new6.every(t => !t), 'all ten count as near');
 console.log('   near ' + b6.near + ' (weekdays) · trips ' + b6.trip + ' (weekends)');
 await ctx.close();
+// v92: the seventh batch, by distance from his door
+const s7 = saveWith({ y:2026, m:10, d:9, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, seed90: 0, seed91: 0, seed92: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:9, hour:9, min:0, tz:'Asia/Singapore', save: s7 }));
+const b7 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed92, names: S.cafes.map(c => c[0]),
+  near: S.cafes.filter(c => !cafeTrip(c)).length, trip: S.cafes.filter(c => cafeTrip(c)).length,
+  new7: MY_CAFES_7.map(c => cafeTrip(c)) }));
+ok(b7.seed === 1 && b7.n === 83 && ['Kafey Haus (Tanjong Pagar MRT)', 'Alchemist International Plaza', 'Flamingo Coffee & Wine', 'The Wired Monkey SG (The Hole)'].every(n => b7.names.includes(n)) && b7.names.some(n => /^Han N Han/.test(n)), 'the seventh batch: six in, 83 in all (' + b7.n + ')');
+ok(!b7.names.some(n => /Tiong Hoe Specialty Coffee \(|luckin|^Awake$|Hill Street/i.test(n)) && b7.names.filter(n => /^22 Grams|^Vietgo/.test(n)).length === 2, 'a second Tiong Hoe, a chain, a drip-bag shop and a 2.0 left out; nothing doubled');
+ok(b7.new7.every(t => !t), 'all six count as near');
+console.log('   near ' + b7.near + ' (weekdays) · trips ' + b7.trip + ' (weekends)');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');

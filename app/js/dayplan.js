@@ -1113,6 +1113,18 @@ var MY_CAFES_6 = [
   ["brewth coffee", "Enggor Street", "Coffee · 4.8"],
   ["Kyuukei Coffee | Maxwell", "Maxwell, 750m", "Japanese-style café, pour-overs and pastries, shuts 17:00 · 4.5"]
 ];
+/* v92: the seventh batch, sorted by distance from his door (22 Grams is
+   41m away). Six go in. Left out: Tiong Hoe's Tanjong Pagar stand (Tiong
+   Hoe is already in), luckin (chain), Awake (a shop selling drip bags, not
+   somewhere to sit) and Hill Street (2.0). 22 Grams and Vietgo were in. */
+var MY_CAFES_7 = [
+  ["Kafey Haus (Tanjong Pagar MRT)", "Tanjong Pagar MRT, 400m", "Coffee shop, try the oat salted caramel latte, shuts 16:00 · 4.6"],
+  ["Han N Han Nanyang Coffeehouse 韩韩南洋咖啡馆", "400m away", "Nanyang kopi with a curry puff or pancake. The sign says nán yáng kā fēi guǎn · 4.7"],
+  ["Alchemist International Plaza", "International Plaza, 400m", "Specialty coffee, Dark Matter beans, shuts 17:00 · 4.5 from 177 reviews"],
+  ["Ton Coffee (Guoco Tower)", "Guoco Tower, 400m", "Tea and coffee, dark and bold · 4.1"],
+  ["Flamingo Coffee & Wine", "750m away", "Café, shuts 16:30 · 4.8"],
+  ["The Wired Monkey SG (The Hole)", "About 1.2km away", "Hole-in-the-wall specialty coffee, shuts 15:30 · 4.7 from 645 reviews"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1139,5 +1151,6 @@ function seedOnce(){
   if (!S.seed89){ mergeCafes(MY_CAFES_4); S.seed89 = 1; changed = true; }
   if (!S.seed90){ mergeCafes(MY_CAFES_5); S.seed90 = 1; changed = true; }
   if (!S.seed91){ mergeCafes(MY_CAFES_6); S.seed91 = 1; changed = true; }
+  if (!S.seed92){ mergeCafes(MY_CAFES_7); S.seed92 = 1; changed = true; }
   if (changed) save();
 }
