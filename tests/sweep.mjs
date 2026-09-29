@@ -7,6 +7,7 @@ const HAVE = { s: 'have', d: '2026-09-01' };
 const SAVES = {
   fresh:   o => saveWith({ ...o, fullBack: 2, extra: { planSeeded: 0, kit: {} } }),
   stocked: o => saveWith({ ...o, fullBack: 6, lifts: [[1,'B'],[3,'A']], extra: { planSeeded: 0, kit: { moist: HAVE, spf: HAVE, wash: HAVE, am: HAVE } } }),
+  ill:     o => { const s = saveWith({ ...o, fullBack: 3, lifts: [[1,'A']], extra: { planSeeded: 0, kit: {} } }); s.sick = {}; s.sick[`${o.y}-${String(o.m).padStart(2,'0')}-${String(o.d).padStart(2,'0')}`] = 1; return s; },
   veg:     o => { const s = saveWith({ ...o, fullBack: 4, lifts: [[2,'A']], extra: { planSeeded: 0, kit: { moist: HAVE } } }); s.veg = {}; s.veg[`${o.y}-${String(o.m).padStart(2,'0')}-${String(o.d).padStart(2,'0')}`] = 1; return s; }
 };
 const DATES = [[2026,9,27],[2026,9,29],[2026,10,1],[2026,10,3],[2026,10,21],[2026,11,2]];

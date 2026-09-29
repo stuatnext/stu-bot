@@ -65,6 +65,9 @@ var DISPATCHES = [
     function(c){ return "Date night tonight. The laptop shuts at " + hhmm(nightMin()) + "."; }],
   ["t-last", 90, function(c){ var t = tripOn(c.k); return !!(t && t.b === c.k && t.a !== c.k); },
     function(c){ return "Last day in " + tripOn(c.k).c + ". Tomorrow the road moves on."; }],
+  /* v83: ill - said first, because it changes the whole day */
+  ["d-sick", 99, function(c){ return c.k === today() && typeof sickOn === "function" && sickOn(c.k); },
+    function(c){ return "Ill today. Rest is the training: water, something hot, bed early. Train is carried."; }],
   /* v82: what the day is for, and when */
   ["d-focus", 86, function(c){ return c.k === today() && typeof dayFocus === "function" && !!dayFocus(c.k) && !focusDoneOn(c.k); },
     function(c){

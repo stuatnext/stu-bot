@@ -87,7 +87,8 @@ function winList(k){
   /* Trained - before the shift if there is one, otherwise all day. A window
      that is only ever "today" is not a window, so this one is honest about
      the fact that his mornings are the only free hours he has. */
-  out.push({ id: "p:train", kind: "pillar", key: "train", label: "Train",
+  /* v83: ill - rest is the training, and there is no station to fail */
+  if (!sickOn(k)) out.push({ id: "p:train", kind: "pillar", key: "train", label: "Train",
     col: "#5AC8F5", chip: CHIP.pillar, rank: 0, short: "Train",
     done: pDone(k, "train"),
     /* On a posting where Malta starts before his alarm there is no free
