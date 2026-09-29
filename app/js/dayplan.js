@@ -1011,6 +1011,32 @@ var MY_CAFES = [
   ["Coffee Queen", "Marine Parade", "Coffee \u00b7 4.0"],
   ["Wang Coffee Shop", "Balestier", "Kopitiam \u00b7 4.0"]
 ];
+/* v87: the second batch - five more screenshots, north-east this time:
+   Hougang, Kovan, Serangoon Gardens, Seletar Hills, Buangkok, and one trip
+   out. Chains (Cotti, Luckin), food courts, groceries, low ratings and a
+   drinks shop with four reviews left out; the Bendemeer map was a repeat. */
+var MY_CAFES_2 = [
+  ["TheDuckCoffee", "Buangkok", "Coffee \u00b7 5.0 on Google"],
+  ["Saba\u2019 Coffee Co.", "Kovan", "Coffee \u00b7 5.0"],
+  ["301 brews", "Hougang", "Home-based coffee, so message ahead \u00b7 4.9"],
+  ["Cafe 2BL", "Seletar Hills", "Caf\u00e9 \u00b7 5.0"],
+  ["Prox Coffee", "Seletar Hills", "Coffee \u00b7 4.5"],
+  ["48 Richards Place Coffee", "Serangoon Gardens", "Coffee \u00b7 5.0"],
+  ["Coffee Deli", "Serangoon Gardens", "Coffee \u00b7 4.7"],
+  ["Coffee Room", "Serangoon", "Coffee \u00b7 4.9"],
+  ["The Joy Kopi \u9f0e\u60a6\u8336\u5ba4", "Hougang", "Kopi \u00b7 4.8"],
+  ["Yahava KoffeeWorks", "A trip out, about 12km", "Australian roaster: big mugs and cake \u00b7 4.5 from over a thousand reviews"]
+];
+function mergeCafes(rows){
+  S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
+  var have = {};
+  S.cafes.forEach(function(c){ have[String(c[0]).toLowerCase()] = 1; });
+  rows.forEach(function(c){
+    if (have[c[0].toLowerCase()]) return;
+    have[c[0].toLowerCase()] = 1;
+    S.cafes.push(c.slice());
+  });
+}
 function seedOnce(){
   var changed = false;
   if (!S.seed84){
@@ -1020,16 +1046,8 @@ function seedOnce(){
   }
   /* v86: his places join his list once; anything he has added stays, and
      a place already there is not added twice */
-  if (!S.seed86){
-    S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
-    var have = {};
-    S.cafes.forEach(function(c){ have[String(c[0]).toLowerCase()] = 1; });
-    MY_CAFES.forEach(function(c){
-      if (have[c[0].toLowerCase()]) return;
-      have[c[0].toLowerCase()] = 1;
-      S.cafes.push(c.slice());
-    });
-    S.seed86 = 1; changed = true;
-  }
+  if (!S.seed86){ mergeCafes(MY_CAFES); S.seed86 = 1; changed = true; }
+  /* each batch lands once, so a place he took off the list stays off */
+  if (!S.seed87){ mergeCafes(MY_CAFES_2); S.seed87 = 1; changed = true; }
   if (changed) save();
 }

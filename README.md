@@ -86,6 +86,25 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v87: the north-east batch
+
+He sent five more screenshots, covering Hougang, Kovan, Serangoon Gardens, Seletar Hills and Buangkok,
+plus one place further away. `MY_CAFES_2` adds ten:
+- TheDuckCoffee (Buangkok)
+- Saba' Coffee Co. (Kovan)
+- 301 brews (Hougang). It's home-based, so message ahead.
+- Cafe 2BL and Prox Coffee (Seletar Hills)
+- 48 Richards Place Coffee and Coffee Deli (Serangoon Gardens)
+- Coffee Room (Serangoon)
+- The Joy Kopi 鼎悦茶室 (Hougang)
+- Yahava KoffeeWorks, about 12km away
+
+Left out: chains (Cotti, Luckin), food courts, a grocery, anything rated 3.9 or lower, and a drinks shop
+with four reviews. The Bendemeer map was a repeat of the first batch.
+
+Each batch lands once (`seed87`), through the shared `mergeCafes`. A list he's trimmed isn't refilled,
+and a place he already had isn't added twice.
+
 #### v86: his coffee places
 
 He sent five Google Maps screenshots of coffee places. They cover the east (Bedok, Chai Chee, Marine
