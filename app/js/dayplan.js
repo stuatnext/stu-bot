@@ -1084,6 +1084,17 @@ var MY_CAFES_4 = [
   ["P\u00d6ONSTI / Old Hen Coffee (NUS)", "NUS, about 8km", "Coffee and matcha, shuts 16:00 \u00b7 4.5"],
   ["Heritage Cafe", "A trip out, about 8km", "Caf\u00e9 with pastries, shuts 17:00 \u00b7 5.0 from 23 reviews"]
 ];
+/* v90: the fifth batch, the streets round home. Four go in. Left out: two
+   luckins and two Coffee Beans (chains, and one is a head office), a second
+   Dimbulah, Tiong Hoe's VivoCity stand (the Queenstown one is in), Coffee
+   Donkee (already in), and anything under 4 or with no reviews (Three
+   Hands, 89 Coffee Stall, Five Oars, Ho Zheng). */
+var MY_CAFES_5 = [
+  ["Jewel Coffee (Tanjong Pagar Centre)", "Tanjong Pagar Centre, 400m", "Coffee \u00b7 4.0 from 197 reviews"],
+  ["Dimbulah Coffee @ 137 Market Street", "Market Street, 1.2km", "Caf\u00e9, good desserts, shuts 18:00 \u00b7 4.0"],
+  ["Oasis Bistro & Cafe", "About 3.8km away", "Bistro and caf\u00e9, more of a sit-down \u00b7 4.7 from 391 reviews"],
+  ["The Community Coffee - Hamilton", "About 4.6km away", "Coffee shop, shuts 18:00 \u00b7 4.9 from 109 reviews"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1108,5 +1119,6 @@ function seedOnce(){
   if (!S.seed87){ mergeCafes(MY_CAFES_2); S.seed87 = 1; changed = true; }
   if (!S.seed88){ mergeCafes(MY_CAFES_3); S.seed88 = 1; changed = true; }
   if (!S.seed89){ mergeCafes(MY_CAFES_4); S.seed89 = 1; changed = true; }
+  if (!S.seed90){ mergeCafes(MY_CAFES_5); S.seed90 = 1; changed = true; }
   if (changed) save();
 }
