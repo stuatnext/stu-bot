@@ -86,6 +86,23 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v98: the thirteenth batch, Amoy Street, Telok Ayer and Ann Siang Hill
+
+`MY_CAFES_13` adds eight places, landing once via `seed98`. One screenshot was a repeat.
+- Ho Peng Coffee Stall: a kopi-c for $1.50. The cup says 和平, hé píng, peace.
+- 1950's Coffee: old-school kopi. The sign says 五十年代, wǔ shí nián dài, the fifties.
+- 3 Mins Coffee OUE Downtown
+- Traditional Coffee and Bread
+- Grey Area Coffee Roasters
+- All Hands Cafe (Telok Ayer)
+- Maxi Coffee Bar on Ann Siang Hill, 4.7 from 798 reviews
+- Aifokato (Amoy St), for affogato
+
+Left out: 118 Coffee Stall (1 review), Pinhole (3.8 from 9), and Double Shot's Kampong Bahru branch,
+since the Shenton one is already in. Kyuukei Maxwell was already in.
+
+That makes 122 of his: 88 near for weekdays and 34 trips for the weekend.
+
 #### v97: the twelfth batch, Keong Saik and Robinson Road
 
 `MY_CAFES_12` adds eight more, all within 1.2km. It lands once, via `seed97`:
