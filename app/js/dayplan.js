@@ -1095,6 +1095,24 @@ var MY_CAFES_5 = [
   ["Oasis Bistro & Cafe", "About 3.8km away", "Bistro and caf\u00e9, more of a sit-down \u00b7 4.7 from 391 reviews"],
   ["The Community Coffee - Hamilton", "About 4.6km away", "Coffee shop, shuts 18:00 \u00b7 4.9 from 109 reviews"]
 ];
+/* v91: the sixth batch, his own doorstep - the map zoomed right in on
+   Tanjong Pagar Plaza, Kee Seng Street and Enggor Street. Ten, all within a
+   walk. Left out: luckin 100AM (chain), Hill Street Coffee Shop (2.0), Old
+   Chang Kee Coffee House (3.1), Chagee (tea chain), and a Viet iced coffee
+   whose name was off the edge of the map. The Hive at Altez had its name
+   cut off too; it is the 4.9 on Enggor Street. */
+var MY_CAFES_6 = [
+  ["Sojourner Coffee", "Round the corner, 300m", "Café, a good-looking room, shuts 18:00 · 4.7"],
+  ["Foreground Coffee", "Tanjong Pagar Plaza", "Coffee, fair prices · 4.7"],
+  ["Bill’s 8 Cafe", "Tanjong Pagar Plaza", "Café · 4.7"],
+  ["Equate Coffee", "Tanjong Pagar Plaza", "Coffee · 4.6"],
+  ["Vietgo coffee", "Tanjong Pagar Plaza", "Vietnamese coffee · 5.0"],
+  ["22 Grams Coffee (KSC)", "Tanjong Pagar Plaza", "Coffee and matcha · 4.9"],
+  ["Daily Milestone Coffee", "Onze, Kee Seng Street", "Coffee · 5.0"],
+  ["Hive (Altez)", "Enggor Street", "Coffee and food, a wide range · 4.9"],
+  ["brewth coffee", "Enggor Street", "Coffee · 4.8"],
+  ["Kyuukei Coffee | Maxwell", "Maxwell, 750m", "Japanese-style café, pour-overs and pastries, shuts 17:00 · 4.5"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1120,5 +1138,6 @@ function seedOnce(){
   if (!S.seed88){ mergeCafes(MY_CAFES_3); S.seed88 = 1; changed = true; }
   if (!S.seed89){ mergeCafes(MY_CAFES_4); S.seed89 = 1; changed = true; }
   if (!S.seed90){ mergeCafes(MY_CAFES_5); S.seed90 = 1; changed = true; }
+  if (!S.seed91){ mergeCafes(MY_CAFES_6); S.seed91 = 1; changed = true; }
   if (changed) save();
 }
