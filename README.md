@@ -86,6 +86,27 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v95: the tenth batch, out to a kilometre or so
+
+This batch covers Chinatown, Cross Street and Capital Square. `MY_CAFES_10` adds five, landing once via
+`seed95`:
+- Tanamera Coffee SGX Centre 2, 900m away. It's Indonesian specialty coffee, and the caramel latte is the one
+  to try.
+- Chinatown Coffee Shop, 1km away, for kopi C and kaya butter toast. Open until 23:00.
+- Group Therapy Coffee at Cross Street Exchange, 1.2km away, a brunch café rated 4.2 from 957 reviews.
+- Local Coffee People at Capital Square, 1.2km away, for the gula Melaka coffee.
+- Aunty fatso coffee and toast (肥嫂), about 1.3km away. The note gives the sign in pinyin.
+
+Their closing times are in the notes, so v94's hours logic reads them.
+
+Left out:
+- two luckins, a chain
+- Soon Li (3.2), Nanyang Old Coffee (3.0), Huggs (3.9) and Kampong Days (3.0)
+- Hao Jing and Niu Che Shui, which have a handful of reviews (the second is a dried-goods shop)
+- second branches of Generation (Hong Lim) and Tanamera (Capital Square)
+
+That makes 98 of his: 64 near for weekdays and 34 trips for the weekend.
+
 #### v94: the ninth batch, and opening hours
 
 This batch finished off the street. `MY_CAFES_9` adds seven, landing once via `seed94`:
