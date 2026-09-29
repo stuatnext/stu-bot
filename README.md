@@ -86,6 +86,27 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v97: the twelfth batch, Keong Saik and Robinson Road
+
+`MY_CAFES_12` adds eight more, all within 1.2km. It lands once, via `seed97`:
+- Baristart Coffee Singapore (Keong Saik), for coffee, cream puffs and sandos
+- Coffee-Licious 101, for Vietnamese coffee and bánh mì
+- Highlander Coffee Espresso Bar, rated 4.7 from 279 reviews. It shuts at 16:00.
+- Beigelhaus, for bagels and coffee
+- The Food Peeps, a brunch café rated 4.6 from 857 reviews
+- Cupping Room Coffee - Robinson Centre
+- Neighborhood Coffee Bar
+- Hellu Coffee, rated 4.4 from 449 reviews
+
+Left out:
+- Seletar Coffee Stall, with 1 review
+- Specialty Coffee Singapore and JiuMao, with no reviews
+- Huggs, a chain
+- Local Coffee People's 120 Robinson branch, because the Capital Square one is already in
+
+Muyun and Flamingo were already in. That makes 114 of his: 80 near for weekdays and 34 trips for the
+weekend.
+
 #### v96: the eleventh batch, Guoco Tower and the Shenton side
 
 All eight places in this batch are within 400m. `MY_CAFES_11` adds them, landing once via `seed96`:

@@ -1225,6 +1225,20 @@ var MY_CAFES_11 = [
   ["Hi coffee | Guoco Tower", "Guoco Tower, 400m", "Tea and coffee, try the houjicha latte, shuts 19:25 · 4.4 from 320 reviews"],
   ["September Coffee", "400m away", "Brunch café, tiramisu coffee, $20-30, opens 11:30 · 4.2 from 702 reviews"]
 ];
+/* v97: the twelfth batch, Keong Saik and Robinson Road, out to 1.2km.
+   Eight. Left out: Seletar Coffee Stall (1 review), Specialty Coffee
+   Singapore and JiuMao (no reviews), Huggs (chain) and Local Coffee People's
+   120 Robinson branch (Capital Square is in). Muyun and Flamingo were in. */
+var MY_CAFES_12 = [
+  ["Baristart Coffee Singapore (Keong Saik)", "Keong Saik, 550m", "Coffee, cream puffs, sandos and tiramisu, shuts 18:00 · 4.1"],
+  ["Coffee-Licious 101", "700m away", "Vietnamese coffee, cheap and gao (strong), and bánh mì · 4.1"],
+  ["Highlander Coffee Espresso Bar", "800m away", "Espresso bar, shuts 16:00 · 4.7 from 279 reviews"],
+  ["Beigelhaus", "800m away", "Bagels, coffee and milkshakes, halal-friendly, shuts 18:00 · 4.5 from 297 reviews"],
+  ["The Food Peeps", "850m away", "Brunch café, coffee and proper food, $20-30, shuts 17:00 · 4.6 from 857 reviews"],
+  ["Cupping Room Coffee - Robinson Centre", "Robinson Centre, 900m", "Small and cosy, specialty coffee, shuts 16:30 · 4.5"],
+  ["Neighborhood Coffee Bar", "About 1.1km away", "Café, coffee and pastries, shuts 20:30 · 4.1"],
+  ["Hellu Coffee", "About 1.2km away", "Café, shuts 17:00 · 4.4 from 449 reviews"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1256,6 +1270,7 @@ function seedOnce(){
   if (!S.seed94){ mergeCafes(MY_CAFES_9); S.seed94 = 1; changed = true; }
   if (!S.seed95){ mergeCafes(MY_CAFES_10); S.seed95 = 1; changed = true; }
   if (!S.seed96){ mergeCafes(MY_CAFES_11); S.seed96 = 1; changed = true; }
+  if (!S.seed97){ mergeCafes(MY_CAFES_12); S.seed97 = 1; changed = true; }
   if (fixCafeNames()) changed = true;
   if (changed) save();
 }
