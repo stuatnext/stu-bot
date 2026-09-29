@@ -86,6 +86,30 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v86: his coffee places
+
+He sent five Google Maps screenshots of coffee places. They cover the east (Bedok, Chai Chee, Marine
+Parade, Katong, Joo Chiat), Geylang and Kallang, and up to Balestier, Novena and across to Bugis.
+
+`MY_CAFES` in `dayplan.js` holds the 42 worth going to, each with its area and what it is. Google's
+rating on the day is kept in the note.
+- **27 specialty places and cafés,** for example Compound Coffee Co., Bolder Brews, Analogue
+  Anonymous, Optional Coffee, No. 36, Nami by Kyuukei, Common Man, Dutch Colony, Zerah, Symmetry,
+  Kurasu, Madras Coffee House, and Bacha as a treat.
+- **15 kopitiams and kopi stalls,** for example Lau Ka Kopitiam, Soon Hong Coffee Stall, 148 Hot &
+  Cold Drinks, Marine Parade Coffee & Drinks and Chop Hua Heng.
+- **Left out:** food courts, anything rated 3.7 or lower, and places that aren't really coffee (a
+  seafood restaurant, a pork noodle stall, a hotel).
+
+They join his list once (`seed86`). Anything he'd already added stays, and nothing is added twice. The
+coffee step picks one he hasn't been to each day, from these first.
+
+Verified:
+- **New walk:** the 42 are in and his own entry is kept, the left-outs aren't there, picks come from
+  his places and skip one he's been to, a different place most days, the road and the sheet show place
+  and area, and the seed runs once.
+- **Every earlier walk passes.**
+
 #### v85: the protein shake, and heads-ups instead of weird-time pings
 
 > *"I also have a Ninja blender. I do enjoy a protein shake... frozen fruit, some milk, usually oat
