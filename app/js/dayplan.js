@@ -475,20 +475,41 @@ function cafesOwn(){
   });
 }
 function coffeeList(){ return cafesOwn().concat(COFFEE); }
-/* The day's pick: the first one he has not been to, his own before the
-   stock ones, starting somewhere the day chooses - the same all day, a
-   new one tomorrow. */
+/* v88: which ones are a trip. His third batch of screenshots put him round
+   Chinatown and Tanjong Pagar (Yue Hwa 1.2km, Plaza Singapura 2.9km), so the
+   east coast and the north-east are an outing, not a coffee before work.
+   Anything he adds himself counts as near unless it says km or trip. */
+var COFFEE_TRIP = ["kaki bukit", "joo chiat", "kembangan", "katong", "tanjong katong",
+  "upper east coast", "bedok north", "macpherson", "marine parade", "ubi", "mountbatten",
+  "haig road", "marymount", "buangkok", "kovan", "hougang", "seletar hills",
+  "serangoon gardens", "serangoon"];
+function cafeTrip(c){
+  var a = String(c[1] || "").toLowerCase();
+  return /\dkm|trip/.test(a) || COFFEE_TRIP.indexOf(a) >= 0;
+}
+/* the weekend has no shift after it, so that is when the trips go */
+function coffeeTripDay(k){ var d = dowOf(k || today()); return d === 0 || d === 6; }
+function cafeWhere(c){
+  var a = c[1] || "";
+  return cafeTrip(c) && !/trip/i.test(a) ? a + " \u00b7 a trip out" : a;
+}
+/* The day's pick: one he has not been to, the same all day, a new one
+   tomorrow. His own before the stock ones; near ones on weekdays and the
+   trips at the weekend, each falling back on the other once it runs out. */
 function coffeePick(k){
   k = k || today();
-  var own = cafesOwn().filter(function(c){ return !coffeeTried(c[0]); });
-  if (own.length) return own[hashOf("cf" + k) % own.length];
-  var n = COFFEE.length, s = hashOf("cf" + k) % n;
-  for (var i = 0; i < n; i++){
-    var c = COFFEE[(s + i) % n];
-    if (!coffeeTried(c[0])) return c;
-  }
+  var h = hashOf("cf" + k), trip = coffeeTripDay(k);
+  var fresh = function(c){ return !coffeeTried(c[0]); };
+  var fits = function(c){ return cafeTrip(c) === trip; };
+  var own = cafesOwn().filter(fresh), stock = COFFEE.filter(fresh);
+  var pools = [own.filter(fits), stock.filter(fits), own, stock];
+  for (var i = 0; i < pools.length; i++) if (pools[i].length) return pools[i][h % pools[i].length];
   var all = coffeeList();
-  return all[s % all.length];
+  return all[h % all.length];
+}
+/* what the pick says about when to go */
+function coffeeWhen(c){
+  return cafeTrip(c) ? "Make a morning of it, before the lunch crowd." : "Before the lunch crowd at twelve.";
 }
 function addCafes(text){
   var have = {}, added = 0;
@@ -536,9 +557,10 @@ function askCoffee(){
     title: "Coffee somewhere new",
     html: "<div class='kit-c' style='--kt:#E0A15A'>"
       + "<div class='kit-pick'><em>Today’s pick</em><b>" + esc(c[0]) + "</b>"
-      + "<span>" + esc(c[1]) + "</span></div>"
+      + "<span>" + esc(cafeWhere(c)) + "</span></div>"
       + "<p class='kit-why'>" + esc(c[2]) + "</p>"
       + "<p class='kit-how'><em>When</em>" + (lunch ? "It is the lunch crowd now. After two is quieter."
+          : cafeTrip(c) ? "Make a morning of it: there by ten, away before the lunch crowd."
           : "Before 11:45. The lunch crowd arrives at twelve.") + "</p>"
       + "<p class='kit-where'>" + svg("cup", 13) + "Coffee passport: " + coffeePassport()
       + (coffeePassport() === 1 ? " place" : " places") + "</p></div>",
@@ -685,7 +707,7 @@ function planInfo(b, by, k, gp, lift){
   }
   else if (id === "coffee"){
     var c = coffeePick(k);
-    b.t = "Coffee somewhere new"; b.say = c[0] + ", " + c[1] + ". Before the lunch crowd.";
+    b.t = "Coffee somewhere new"; b.say = c[0] + ", " + cafeWhere(c) + ". " + coffeeWhen(c);
     b.ic = "cup"; b.col = "#E0A15A"; b.done = coffeeOn(k);
   }
   else if (id === "focus"){
@@ -1027,6 +1049,17 @@ var MY_CAFES_2 = [
   ["The Joy Kopi \u9f0e\u60a6\u8336\u5ba4", "Hougang", "Kopi \u00b7 4.8"],
   ["Yahava KoffeeWorks", "A trip out, about 12km", "Australian roaster: big mugs and cake \u00b7 4.5 from over a thousand reviews"]
 ];
+/* v88: the third batch - lists, mostly suppliers this time. Three are real
+   cafés and go in; left out: machine and bean suppliers (BrewRatio,
+   Alliance, Speedy3dcreations), a powder wholesaler, Coffee Bean (a chain,
+   3.5), Yue Hwa (a department store), and three places with a handful of
+   reviews. Yahava and Compound were already in. Distances are from where the
+   screenshots were taken. */
+var MY_CAFES_3 = [
+  ["Cowpresso Coffee Roasters", "A trip out, about 11km", "Roaster, about $5 a coffee \u00b7 4.7 from 1,291 reviews"],
+  ["The Coffee Roaster Cafe", "A trip out, about 8km", "Caf\u00e9 \u00b7 4.5 from 277 reviews"],
+  ["Homebody Caf\u00e9", "A trip out, about 15km", "Homemade matcha and coffee \u00b7 4.6"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1049,5 +1082,6 @@ function seedOnce(){
   if (!S.seed86){ mergeCafes(MY_CAFES); S.seed86 = 1; changed = true; }
   /* each batch lands once, so a place he took off the list stays off */
   if (!S.seed87){ mergeCafes(MY_CAFES_2); S.seed87 = 1; changed = true; }
+  if (!S.seed88){ mergeCafes(MY_CAFES_3); S.seed88 = 1; changed = true; }
   if (changed) save();
 }

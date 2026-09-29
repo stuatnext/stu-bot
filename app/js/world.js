@@ -200,7 +200,7 @@ function winList(k){
     out.push({ id: "coffee", kind: "coffee", label: "Coffee somewhere new", short: "Coffee",
       col: "#E0A15A", chip: 0, rank: 2, done: coffeeOn(k) ? 1 : 0, open: cw[0], shut: cw[1],
       why: coffeeOn(k) ? "Found one. Coffee passport: " + coffeePassport() + "."
-         : cp[0] + ", " + cp[1] + ". Before the lunch crowd at twelve." });
+         : cp[0] + ", " + cafeWhere(cp) + ". " + coffeeWhen(cp) });
   }
   if (dfc){
     var fst = focusToday(k), fo = FOCI[dfc];

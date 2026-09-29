@@ -37,5 +37,32 @@ const b2 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed87, names: S
 ok(b2.seed === 1 && b2.n === 12 && b2.deli === 1 && ['TheDuckCoffee', 'Saba\u2019 Coffee Co.', '48 Richards Place Coffee', 'Yahava KoffeeWorks'].every(n => b2.names.includes(n)), 'the north-east batch: nine new, the one he had kept once, the trimmed list not refilled (' + b2.n + ')');
 ok(!b2.names.some(n => /Cotti|luckin|Komalas|Siva|218|Broadway|BK@212/i.test(n)), 'chains, groceries and low ratings left out');
 await ctx.close();
+// v88: the third batch, and near ones on weekdays, the trips at the weekend
+const s3 = saveWith({ y:2026, m:10, d:2, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:2, hour:9, min:0, tz:'Asia/Singapore', save: s3 }));
+const b3 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed88, names: S.cafes.map(c => c[0]) }));
+ok(b3.seed === 1 && b3.n === 55 && ['Cowpresso Coffee Roasters', 'The Coffee Roaster Cafe', 'Homebody Caf\u00e9'].every(n => b3.names.includes(n)), 'the third batch: three cafés in, 55 in all (' + b3.n + ')');
+ok(!b3.names.some(n => /BrewRatio|Alliance|Gold Beverage|MEOW|Speedy|Coffee Bean|Yue Hwa|Siva|218/i.test(n)), 'suppliers, a chain, a department store and the barely-reviewed left out');
+ok(await p.evaluate(() => S.cafes.filter(c => /Yahava|Compound/.test(c[0])).length) === 2, 'Yahava and Compound not doubled');
+const wk = await p.evaluate(() => { const o = []; for (let i = 0; i < 28; i++){ const k = iso(new Date(2026, 9, 1 + i)); o.push([k, dowOf(k), coffeePick(k)]); } return o; });
+const wd = wk.filter(x => x[1] > 0 && x[1] < 6), we = wk.filter(x => x[1] === 0 || x[1] === 6);
+const tripOf = c => /\dkm|trip/i.test(c[1]) || ['Kaki Bukit','Joo Chiat','Kembangan','Katong','Tanjong Katong','Upper East Coast','Bedok North','MacPherson','Marine Parade','Ubi','Mountbatten','Haig Road','Marymount','Buangkok','Kovan','Hougang','Seletar Hills','Serangoon Gardens','Serangoon'].includes(c[1]);
+console.log('   weekdays:', wd.slice(0, 5).map(x => x[2][0] + ' (' + x[2][1] + ')').join(' | '));
+console.log('   weekends:', we.slice(0, 4).map(x => x[2][0] + ' (' + x[2][1] + ')').join(' | '));
+ok(wd.every(x => !tripOf(x[2])), 'weekdays: somewhere near, all ' + wd.length);
+ok(we.every(x => tripOf(x[2])), 'weekends: a trip out, all ' + we.length);
+const why = await p.evaluate(() => { const k = iso(new Date(2026, 9, 3)); const c = coffeePick(k); return [cafeWhere(c), coffeeWhen(c)]; });
+ok(/trip out/i.test(why[0]) && /Make a morning of it/.test(why[1]) && (why[0].match(/trip/gi) || []).length === 1, 'a Saturday pick says it is a trip, once: ' + why.join(' '));
+// all the near ones gone: a weekday falls back on the stock near ones, then the trips
+const fb = await p.evaluate(() => {
+  const k = iso(new Date(2026, 9, 5));
+  S.coffee = S.cafes.filter(c => !cafeTrip(c)).map(c => ['2026-09-01', c[0]]);
+  const a = coffeePick(k);
+  S.coffee = S.coffee.concat(COFFEE.map(c => ['2026-09-01', c[0]]));
+  const b = coffeePick(k);
+  return [a, b, COFFEE.some(c => c[0] === a[0])];
+});
+ok(fb[2] && tripOf(fb[1]), 'near ones all been to: the stock near list, then a trip (' + fb[0][0] + ', then ' + fb[1][0] + ')');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');
