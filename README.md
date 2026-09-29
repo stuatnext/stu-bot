@@ -86,6 +86,55 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v99: running behind, and re-planning from now
+
+His words: "It's 11:45 already... I should have already done the gym at 9:15, which I haven't done yet...
+I'm behind schedule and it really just doesn't feel like there's any functionality in the app yet to
+address that."
+
+**Detection.** `planBehind` finds what was planned before now and isn't done:
+- It counts a block once it ended more than 15 minutes ago.
+- It ignores coming round, and anything on its own clock: meals, the call home, Malta and the evening.
+- It only runs while something can still be done: from getting up until Malta setup, or until the last
+  hour before bed on a day without Malta. Nothing shows during the shift or in the evening.
+
+**The banner.** With two or more slipped, Today shows a line above Start, for example "Running behind.
+Breakfast, the gym and 4 more were planned before now." It has a **Re-plan** button. The Day list shows
+the same prompt.
+
+**The sheet.** It says "It is 11:45", lists what was missed, previews the rest of the day from now, and
+names what waits for tomorrow. It has two actions:
+- **Re-plan from 11:45**, which stores `dayp[day].from`.
+- **I'm not well**, which opens the existing ill choices (rest, or a gentle walk). It only re-plans if he
+  takes one of them; backing out changes nothing.
+
+**How `replanFrom` lays the day out.** From that minute, everything not done and not pinned moves up.
+- Pinned blocks keep their times, and the moved blocks go around them.
+- If it all fits, the day keeps its own order.
+- Coffee still stays out of the lunch crowd, with the walk there and the kit run just before it. The things
+  after it fill the gap.
+- Anything that no longer fits before Malta setup goes to tomorrow.
+
+**When it doesn't all fit.** The morning keeps its own order: breakfast, the gym, the routine after the
+shower, then the shake. The rest goes in by `LATE_RANK`:
+- the day's focus, then Mandarin
+- then coffee and admin
+- then the extras, the kit check and the cleaning, which give way first
+
+Each block goes into the first gap it fits. Anything dropped that still fits a gap is put back.
+
+**Afterwards.**
+- The Day list says "Re-planned from 11:45", lists "For tomorrow", and has **Back to the first plan**.
+- Heads-up notifications follow the new times, because the phone mirror reads the same `dayPlan`.
+
+On his actual morning, re-planned at 11:45:
+- Breakfast at 11:45 and the gym at 12:15, then the routine, the shake and the kit check.
+- The call home at 13:30, Mandarin at 13:50, and the kitchen at 14:35.
+- The pre-shift meal at 15:00.
+- Coffee and life admin wait for tomorrow.
+
+New walk: `tests/late99.mjs`.
+
 #### v98: the thirteenth batch, Amoy Street, Telok Ayer and Ann Siang Hill
 
 `MY_CAFES_13` adds eight places, landing once via `seed98`. One screenshot was a repeat.
