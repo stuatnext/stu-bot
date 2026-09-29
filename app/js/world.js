@@ -196,11 +196,11 @@ function winList(k){
   var dfc = (typeof dayFocus === "function" && S.onboarded) ? dayFocus(k) : "";
   var veg = (typeof vegOn === "function" && S.onboarded) ? vegOn(k) : false;
   if (typeof coffeeDay === "function" && S.onboarded && coffeeDay(k)){
-    var cw = coffeeWindow(), cp = coffeePick(k);
+    var cw = coffeeWindow(k), cp = coffeePick(k);
     out.push({ id: "coffee", kind: "coffee", label: "Coffee somewhere new", short: "Coffee",
       col: "#E0A15A", chip: 0, rank: 2, done: coffeeOn(k) ? 1 : 0, open: cw[0], shut: cw[1],
       why: coffeeOn(k) ? "Found one. Coffee passport: " + coffeePassport() + "."
-         : cp[0] + ", " + cafeWhere(cp) + ". " + coffeeWhen(cp) });
+         : cp[0] + ", " + cafeWhere(cp) + ". " + coffeeWhen(cp, cw[0]) });
   }
   if (dfc){
     var fst = focusToday(k), fo = FOCI[dfc];
