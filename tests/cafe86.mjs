@@ -29,5 +29,13 @@ const s1 = saveWith({ y:2026, m:9, d:30, fullBack:3, extra: { planSeeded: 0, see
 ({ p, ctx } = await open({ y:2026, m:9, d:30, hour:9, min:0, tz:'Asia/Singapore', save: s1 }));
 ok(await p.evaluate(() => S.cafes.length) === 1, 'the seed runs once - a list he trims stays trimmed');
 await ctx.close();
+// v87: the second batch lands once, on top of a list he has already trimmed
+const s2 = saveWith({ y:2026, m:10, d:1, fullBack:3, extra: { planSeeded: 0, seed86: 1, seed87: 0,
+  cafes: [['Compound Coffee Co.', 'Kaki Bukit', ''], ['Lau Ka Kopitiam', 'Bedok North', ''], ['Coffee Deli', 'Serangoon Gardens', 'his own']] } });
+({ p, ctx } = await open({ y:2026, m:10, d:1, hour:9, min:0, tz:'Asia/Singapore', save: s2 }));
+const b2 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed87, names: S.cafes.map(c => c[0]), deli: S.cafes.filter(c => c[0] === 'Coffee Deli').length }));
+ok(b2.seed === 1 && b2.n === 12 && b2.deli === 1 && ['TheDuckCoffee', 'Saba\u2019 Coffee Co.', '48 Richards Place Coffee', 'Yahava KoffeeWorks'].every(n => b2.names.includes(n)), 'the north-east batch: nine new, the one he had kept once, the trimmed list not refilled (' + b2.n + ')');
+ok(!b2.names.some(n => /Cotti|luckin|Komalas|Siva|218|Broadway|BK@212/i.test(n)), 'chains, groceries and low ratings left out');
+await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');

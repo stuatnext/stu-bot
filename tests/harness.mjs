@@ -37,7 +37,7 @@ export function saveWith(o){
   const waist = (o.waist || []).map(([n, cm]) => [back(n), cm]);
   return Object.assign({ days, lifts, waist, rate: 5, mute: true, booted: 9, onboarded: 1, cardsWhy: 1,
     openedDay: o.fullBack || 0, openedStreak: Math.floor((o.fullBack || 0) / 7), cards: { 'Chilli crab': 1 },
-    kg: 71.5, look: 'sky', badge: 1, lastOpen: iso(base), planSeeded: 1, seed84: 1, seed86: 1 }, o.extra || {});
+    kg: 71.5, look: 'sky', badge: 1, lastOpen: iso(base), planSeeded: 1, seed84: 1, seed86: 1, seed87: 1 }, o.extra || {});
 }
 
 // cfg: { y,m,d,hour,min, tz, geo:{latitude,longitude}, save, tab }
