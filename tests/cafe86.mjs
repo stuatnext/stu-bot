@@ -46,7 +46,7 @@ ok(!b3.names.some(n => /BrewRatio|Alliance|Gold Beverage|MEOW|Speedy|Coffee Bean
 ok(await p.evaluate(() => S.cafes.filter(c => /Yahava|Compound/.test(c[0])).length) === 2, 'Yahava and Compound not doubled');
 const wk = await p.evaluate(() => { const o = []; for (let i = 0; i < 28; i++){ const k = iso(new Date(2026, 9, 1 + i)); o.push([k, dowOf(k), coffeePick(k)]); } return o; });
 const wd = wk.filter(x => x[1] > 0 && x[1] < 6), we = wk.filter(x => x[1] === 0 || x[1] === 6);
-const tripOf = c => /\dkm|trip/i.test(c[1]) || ['Kaki Bukit','Joo Chiat','Kembangan','Katong','Tanjong Katong','Upper East Coast','Bedok North','MacPherson','Marine Parade','Ubi','Mountbatten','Haig Road','Marymount','Buangkok','Kovan','Hougang','Seletar Hills','Serangoon Gardens','Serangoon'].includes(c[1]);
+const tripOf = c => /trip/i.test(c[1]) || (/(\d+(?:\.\d+)?)\s*km/i.test(c[1]) ? +c[1].match(/(\d+(?:\.\d+)?)\s*km/i)[1] >= 7 : false) || ['Kaki Bukit','Joo Chiat','Kembangan','Katong','Tanjong Katong','Upper East Coast','Bedok North','MacPherson','Marine Parade','Ubi','Mountbatten','Haig Road','Marymount','Buangkok','Kovan','Hougang','Seletar Hills','Serangoon Gardens','Serangoon'].includes(c[1]);
 console.log('   weekdays:', wd.slice(0, 5).map(x => x[2][0] + ' (' + x[2][1] + ')').join(' | '));
 console.log('   weekends:', we.slice(0, 4).map(x => x[2][0] + ' (' + x[2][1] + ')').join(' | '));
 ok(wd.every(x => !tripOf(x[2])), 'weekdays: somewhere near, all ' + wd.length);
@@ -63,6 +63,19 @@ const fb = await p.evaluate(() => {
   return [a, b, COFFEE.some(c => c[0] === a[0])];
 });
 ok(fb[2] && tripOf(fb[1]), 'near ones all been to: the stock near list, then a trip (' + fb[0][0] + ', then ' + fb[1][0] + ')');
+await ctx.close();
+// v89: the fourth batch - round home, a distance rule, and no stock doubles
+const s4 = saveWith({ y:2026, m:10, d:6, fullBack:3, extra: { planSeeded: 0, seed86: 0, seed87: 0, seed88: 0, seed89: 0, cafes: [], coffee: [] } });
+({ p, ctx } = await open({ y:2026, m:10, d:6, hour:9, min:0, tz:'Asia/Singapore', save: s4 }));
+const b4 = await p.evaluate(() => ({ n: S.cafes.length, seed: S.seed89, names: S.cafes.map(c => c[0]),
+  trip: Object.fromEntries(S.cafes.map(c => [c[0], cafeTrip(c)])),
+  list: coffeeList().map(c => c[0]), stock: coffeeStock().map(c => c[0]) }));
+ok(b4.seed === 1 && b4.n === 63 && ['Honest Cup Specialty Coffee', 'Kopi MORE', 'Homeground Coffee Roasters', 'Italian Coffee Lab Pasir Panjang', 'P\u00d6ONSTI / Old Hen Coffee (NUS)', 'Heritage Cafe'].every(n => b4.names.includes(n)), 'the fourth batch: eight in, 63 in all (' + b4.n + ')');
+ok(!b4.names.some(n => /Coffee Bean|Kenangan|Detian|Beanstro|Coffee Near Me/i.test(n)), 'chains, low ratings and a far-off takeaway stand left out');
+ok(!b4.trip['Honest Cup Specialty Coffee'] && !b4.trip['Kopi MORE'] && !b4.trip['Italian Coffee Lab Pasir Panjang'] && b4.trip['Homeground Coffee Roasters'] && b4.trip['P\u00d6ONSTI / Old Hen Coffee (NUS)'] && b4.trip['Yahava KoffeeWorks'], '550m and 4km are near; 8km, 9km and 12km are trips');
+ok(b4.list.filter(n => n === 'Chye Seng Huat Hardware').length === 1 && !b4.stock.includes('Tiong Hoe Specialty Coffee') && b4.stock.length === 7, 'the two he picked from the stock list (and Common Man) show up once, as his (' + b4.stock.length + ' stock left)');
+const wk4 = await p.evaluate(() => { const o = []; for (let i = 0; i < 42; i++){ const k = iso(new Date(2026, 9, 5 + i)); o.push([dowOf(k), cafeTrip(coffeePick(k)), coffeePick(k)[0]]); } return o; });
+ok(wk4.every(x => (x[0] === 0 || x[0] === 6) === x[1]), 'six weeks: every weekday near, every weekend a trip');
 await ctx.close();
 await close();
 console.log('ERRS:', ERRS.length ? ERRS : 'none');

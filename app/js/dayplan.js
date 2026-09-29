@@ -474,18 +474,27 @@ function cafesOwn(){
     return [c[0], c[1] || "", c[2] || "Somewhere new near you."];
   });
 }
-function coffeeList(){ return cafesOwn().concat(COFFEE); }
+/* v89: a stock place he has put on his own list shows up once, as his */
+function coffeeStock(){
+  var have = {};
+  cafesOwn().forEach(function(c){ have[c[0].toLowerCase()] = 1; });
+  return COFFEE.filter(function(c){ return !have[c[0].toLowerCase()]; });
+}
+function coffeeList(){ return cafesOwn().concat(coffeeStock()); }
 /* v88: which ones are a trip. His third batch of screenshots put him round
    Chinatown and Tanjong Pagar (Yue Hwa 1.2km, Plaza Singapura 2.9km), so the
    east coast and the north-east are an outing, not a coffee before work.
-   Anything he adds himself counts as near unless it says km or trip. */
+   Anything he adds himself counts as near unless it says trip, or (v89) a
+   distance of 7km or more: "about 4km" is near, "about 9km" is a trip. */
 var COFFEE_TRIP = ["kaki bukit", "joo chiat", "kembangan", "katong", "tanjong katong",
   "upper east coast", "bedok north", "macpherson", "marine parade", "ubi", "mountbatten",
   "haig road", "marymount", "buangkok", "kovan", "hougang", "seletar hills",
   "serangoon gardens", "serangoon"];
 function cafeTrip(c){
-  var a = String(c[1] || "").toLowerCase();
-  return /\dkm|trip/.test(a) || COFFEE_TRIP.indexOf(a) >= 0;
+  var a = String(c[1] || "").toLowerCase(), km = a.match(/(\d+(?:\.\d+)?)\s*km/);
+  if (/trip/.test(a)) return true;
+  if (km) return +km[1] >= 7;
+  return COFFEE_TRIP.indexOf(a) >= 0;
 }
 /* the weekend has no shift after it, so that is when the trips go */
 function coffeeTripDay(k){ var d = dowOf(k || today()); return d === 0 || d === 6; }
@@ -501,7 +510,7 @@ function coffeePick(k){
   var h = hashOf("cf" + k), trip = coffeeTripDay(k);
   var fresh = function(c){ return !coffeeTried(c[0]); };
   var fits = function(c){ return cafeTrip(c) === trip; };
-  var own = cafesOwn().filter(fresh), stock = COFFEE.filter(fresh);
+  var own = cafesOwn().filter(fresh), stock = coffeeStock().filter(fresh);
   var pools = [own.filter(fits), stock.filter(fits), own, stock];
   for (var i = 0; i < pools.length; i++) if (pools[i].length) return pools[i][h % pools[i].length];
   var all = coffeeList();
@@ -1060,6 +1069,21 @@ var MY_CAFES_3 = [
   ["The Coffee Roaster Cafe", "A trip out, about 8km", "Caf\u00e9 \u00b7 4.5 from 277 reviews"],
   ["Homebody Caf\u00e9", "A trip out, about 15km", "Homemade matcha and coffee \u00b7 4.6"]
 ];
+/* v89: the fourth batch, a list round home. Eight go in, including two
+   from the stock list he picked for himself (Chye Seng Huat, Tiong Hoe),
+   which now come up as his. Left out: three Coffee Beans and Kenangan
+   (chains), Detian (3.8, a 24-hour kopitiam), Beanstro (3.4, $20-70) and
+   Coffee Near Me (a takeaway stand 11km away). */
+var MY_CAFES_4 = [
+  ["Honest Cup Specialty Coffee", "Round the corner, 550m", "Specialty coffee, good tables for work \u00b7 4.8"],
+  ["Kopi MORE", "About 4km away", "Kopi stall. Opens at 11: go at opening, before the hawker lunch \u00b7 4.4"],
+  ["Chye Seng Huat Hardware", "Jalan Besar", "A roaster in an old hardware shop. Sit at the bar \u00b7 4.3 from 2,917 reviews"],
+  ["Tiong Hoe Specialty Coffee", "Queenstown", "Neighbourhood roaster, shuts 16:45 \u00b7 4.6"],
+  ["Italian Coffee Lab Pasir Panjang", "Pasir Panjang", "Coffee shop, shuts 17:00 \u00b7 4.7"],
+  ["Homeground Coffee Roasters", "A trip out, about 9km", "Roastery, shuts 16:30 \u00b7 4.4 from 965 reviews"],
+  ["P\u00d6ONSTI / Old Hen Coffee (NUS)", "NUS, about 8km", "Coffee and matcha, shuts 16:00 \u00b7 4.5"],
+  ["Heritage Cafe", "A trip out, about 8km", "Caf\u00e9 with pastries, shuts 17:00 \u00b7 5.0 from 23 reviews"]
+];
 function mergeCafes(rows){
   S.cafes = Array.isArray(S.cafes) ? S.cafes : [];
   var have = {};
@@ -1083,5 +1107,6 @@ function seedOnce(){
   /* each batch lands once, so a place he took off the list stays off */
   if (!S.seed87){ mergeCafes(MY_CAFES_2); S.seed87 = 1; changed = true; }
   if (!S.seed88){ mergeCafes(MY_CAFES_3); S.seed88 = 1; changed = true; }
+  if (!S.seed89){ mergeCafes(MY_CAFES_4); S.seed89 = 1; changed = true; }
   if (changed) save();
 }
