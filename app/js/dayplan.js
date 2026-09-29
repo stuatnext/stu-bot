@@ -430,6 +430,122 @@ function undoFocus(){
   undoLife(r.s, r.a);                 /* saves and repaints */
 }
 
+/* ------------------------------------------------------------ carry over
+   v101: "Critically, if I don't mark something as done, it should probably
+   carry over. At least the things that need to be carried over, which is
+   probably everything to be fair."
+
+   Everything a day asks that another day can still do comes with the next
+   day until it is done: the focus step, Mandarin, life admin, the room, the
+   week's ten minutes, and the café he did not get to (it stays the pick).
+   What comes round every day anyway - breakfast, the routine, the shake,
+   the meals - does not pile up: tomorrow has its own. The gym, the kit and
+   the to-dos already wait for him by themselves.
+
+   Worked out the first time a day is looked at, from the day before (and
+   the days before that, if he did not open the app), then kept, so the day
+   does not change under him. A day off - vegetating, ill, away - holds them
+   and hands them on. Nothing older than six days: by then its own day has
+   come round again. */
+function carryKey(c){ return c.c === "focus" ? "focus:" + c.f : c.c === "clean" ? "clean:" + c.z : c.c; }
+function carryZone(c){ return c.z === "big" ? CLEAN_BIG : CLEAN_ZONES[c.z]; }
+function keyShift(k, n){ var d = new Date(k + "T12:00:00"); d.setDate(d.getDate() + n); return iso(d); }
+/* What day d was meant to ask, by the week: an ill day or a day off at
+   home hands its own things on too, so being ill on Tuesday puts Tuesday's
+   Mandarin on Wednesday. Away, the trip is the day, and nothing piles up
+   for the return. */
+function carryOwn(d){
+  if (!atHome(d)) return [];
+  var dw = dowOf(d), w = weekDay(dw), out = [], m = cleanMode();
+  var f = FOCI[w.f] && w.f !== "veg" && FOCUS_LINES[w.f] ? w.f : "";
+  var z = m === "off" ? null : m === "weekly" ? (dw === 3 ? CLEAN_BIG : null) : CLEAN_ZONES[dw];
+  if (f) out.push({ c: "focus", f: f });
+  if (dw >= 1 && dw <= 5 && w.f !== "zh") out.push({ c: "zh" });
+  if (w.a) out.push({ c: "admin" });
+  if (z) out.push({ c: "clean", z: z === CLEAN_BIG ? "big" : dw });
+  if (weekReviewDay(d)) out.push({ c: "week" });
+  if (w.c) out.push({ c: "cafe", n: coffeePick(d)[0] });
+  return out;
+}
+function carryDoneOn(c, d){
+  var r = dayRec(d), z;
+  if (c.c === "focus") return dayFocus(d) === c.f ? focusDoneOn(d) : !!(r.focusc || {})[c.f];
+  if (c.c === "zh") return zhDone(d);
+  if (c.c === "admin") return adminDone(d);
+  if (c.c === "clean"){
+    z = cleanToday(d);
+    return z && carryZone(c) && z[0] === carryZone(c)[0] ? !!r.clean || r.cleanc === "z" + c.z : r.cleanc === "z" + c.z;
+  }
+  if (c.c === "week") return !!r.week;
+  if (c.c === "cafe") return coffeeOn(d);
+  return true;
+}
+function carryCompute(k, depth){
+  var d = keyShift(k, -1);
+  if (!S.carryFrom || d < S.carryFrom) return [];
+  var prev = (S.carry || {})[d] || (depth > 0 ? carryCompute(d, depth - 1) : []);
+  var old = keyShift(k, -6), seen = {}, out = [];
+  /* the older one first, so "from Monday" stays true while it waits */
+  prev.concat(carryOwn(d).map(function(c){ c.from = d; return c; })).forEach(function(c){
+    var key = carryKey(c);
+    if (seen[key] || !c.from || c.from < old || carryDoneOn(c, d)) return;
+    seen[key] = 1;
+    out.push(c);
+  });
+  return out;
+}
+/* what came with day k: kept once worked out, for today only */
+function carryIn(k){
+  k = k || today();
+  S.carry = S.carry && typeof S.carry === "object" ? S.carry : {};
+  if (S.carry[k]) return S.carry[k];
+  if (k !== today()) return [];
+  var got = carryCompute(k, 3), old = keyShift(k, -14);
+  S.carry[k] = got;
+  Object.keys(S.carry).forEach(function(x){ if (x < old) delete S.carry[x]; });
+  return got;
+}
+/* the focus step of a line on a day it is not the focus */
+function focusAt(skill, i){
+  var line = FOCUS_LINES[skill], n = line.steps.length;
+  var row = i < n ? line.steps[i] : line.again[(i - n) % line.again.length];
+  return { skill: skill, i: i, n: n, t: row[0], how: row[1], act: row[2], first: i < n };
+}
+function doFocusCarry(f){
+  var k = today(), r = dayRec(k, 1), st = focusStep(f);
+  r.focusc = r.focusc || {};
+  if (!st || r.focusc[f]){ sfx("no"); return false; }
+  r.focusc[f] = { a: st.act, i: st.i };
+  S.lines = S.lines || {};
+  S.lines[f] = st.i + 1;
+  logLife(f, st.act);
+  return true;
+}
+function undoFocusCarry(f){
+  var r = dayRec(today()).focusc, x = r && r[f];
+  if (!x) return;
+  delete r[f];
+  S.lines = S.lines || {};
+  S.lines[f] = x.i;
+  undoLife(f, x.a);
+}
+function doCleanCarry(z){ dayRec(today(), 1).cleanc = "z" + z; save(); render({ keepScroll: true }); }
+function undoCleanCarry(){
+  var r = dayRec(today());
+  if (!r.cleanc) return;
+  delete r.cleanc;
+  save(); sfx("untick"); render({ keepScroll: true });
+}
+/* "Mandarin and life admin" - for the day's first look */
+function carryWords(list){
+  var w = list.map(function(c){
+    return c.c === "focus" ? FOCI[c.f][0] : c.c === "zh" ? "Mandarin" : c.c === "admin" ? "life admin"
+      : c.c === "clean" ? cleanWord(carryZone(c)).replace(/^Clean the /, "the ") : c.c === "week" ? "the week's ten minutes"
+      : c.c === "cafe" ? c.n : "";
+  }).filter(Boolean);
+  return w.length < 2 ? w.join("") : w.slice(0, -1).join(", ") + " and " + w[w.length - 1];
+}
+
 /* --------------------------------------------------------- the small ones */
 function zhDone(k){
   return lifeEntries().some(function(e){ return e[0] === k && e[1] === "zh" && e[2] === "study"; });
@@ -508,6 +624,12 @@ function cafeWhere(c){
 function coffeePick(k){
   k = k || today();
   var h = hashOf("cf" + k), trip = coffeeTripDay(k);
+  /* v101: the café he did not get to stays the pick, on a day of the same kind */
+  var cc = carryIn(k).filter(function(c){ return c.c === "cafe"; })[0];
+  if (cc){
+    var row = coffeeList().filter(function(c){ return c[0] === cc.n; })[0];
+    if (row && !coffeeTried(row[0]) && cafeTrip(row) === trip) return row;
+  }
   var fresh = function(c){ return !coffeeTried(c[0]); };
   var fits = function(c){ return cafeTrip(c) === trip; };
   var own = cafesOwn().filter(fresh), stock = coffeeStock().filter(fresh);
@@ -683,6 +805,18 @@ function dayPlan(k, opt){
   if (adminDay(k)) put("admin", 30);
   var cz = cleanToday(k);
   if (cz) put("clean", cz[2]);
+  /* v101: what an earlier day left undone comes with this one - not on a
+     day off, which holds it for the next */
+  var cin = !vegOn(k) && atHome(k) ? carryIn(k) : [], cleaned = false;
+  cin.forEach(function(c){
+    var n = out.length;
+    if (c.c === "focus" && FOCI[c.f] && FOCUS_LINES[c.f] && c.f !== dayFocus(k)) put("focusc:" + c.f, FOCI[c.f][4]);
+    else if (c.c === "zh" && !zhDay(k) && dayFocus(k) !== "zh") put("zh", 15);
+    else if (c.c === "admin" && !adminDay(k)) put("admin", 30);
+    else if (c.c === "clean" && !cleaned && carryZone(c) && !(cz && cz[0] === carryZone(c)[0])){ put("cleanc:" + c.z, carryZone(c)[2]); cleaned = true; }
+    else if (c.c === "week" && !weekReviewDay(k)) put("week", 10);
+    if (out.length > n) out[n].carried = c.from;
+  });
   if (kit) put("kit", 30);
   if (later){
     var a2 = Math.max(t, LUNCH_B, ch.open);
@@ -729,7 +863,7 @@ function dayPlan(k, opt){
    not a debt. */
 var PINNED = { "p:family": 1, setup: 1, work: 1, date: 1, "p:stop": 1, week: 1,
                "c:cleanse": 1, "c:night": 1, "c:bed": 1, bed: 1 };
-function planPinned(b){ return !!(b.mark || PINNED[b.id] || (b.id.indexOf("m:") === 0 && b.id !== "m:morning")); }
+function planPinned(b){ return !!(b.mark || (PINNED[b.id] && !b.carried) || (b.id.indexOf("m:") === 0 && b.id !== "m:morning")); }
 /* When the rest of the day will not all fit, what gives way first: the
    clean and the kit check, then the extras, then coffee and admin. Eating,
    the gym and the day's one focus are the last to go. */
@@ -738,7 +872,9 @@ var LATE_RANK = { "m:morning": 9, "p:train": 9, "c:skin": 8, "c:sun": 8, focus: 
 /* the morning in its own order: breakfast, the gym, the routine after the
    shower, the shake after the gym */
 var LATE_CHAIN = { "m:morning": 1, "p:train": 1, "c:skin": 1, "c:sun": 1, shake: 1 };
-function lateRank(b){ return LATE_RANK[b.id] || 4; }
+function lateRank(b){
+  return b.id.indexOf("focusc:") === 0 ? 7 : b.id.indexOf("cleanc:") === 0 ? 2 : LATE_RANK[b.id] || 4;
+}
 function replanFrom(plan, F, L, k){
   var keep = [], flow = [], pins = [], dropped = [];
   plan.forEach(function(b){
@@ -854,7 +990,8 @@ function lateWords(list){
     var id = b.id, w = id === "p:train" ? (/^Rest day/.test(b.t) ? "the walk" : "the gym")
       : id === "m:morning" ? "breakfast" : id === "shake" ? "the shake" : id === "coffee" ? "coffee"
       : id === "kit" ? "the kit check" : id === "zh" ? "Mandarin" : id === "admin" ? "life admin"
-      : id === "clean" ? "the cleaning" : id === "c:skin" || id === "c:sun" ? "the routine"
+      : id === "clean" || id.indexOf("cleanc:") === 0 ? "the cleaning" : id === "c:skin" || id === "c:sun" ? "the routine"
+      : id.indexOf("focusc:") === 0 ? FOCI[id.slice(7)][0] : id === "week" ? "the week's ten minutes"
       : id === "focus" ? (dayFocus(today()) ? FOCI[dayFocus(today())][0] : "the focus")
       : b.t.charAt(0).toLowerCase() + b.t.slice(1);
     if (!seen[w]){ seen[w] = 1; out.push(w); }
@@ -1024,6 +1161,16 @@ function planInfo(b, by, k, gp, lift){
     b.t = zc ? cleanWord(zc) : "Clean"; b.say = zc ? zc[1] + " " + zc[2] + " minutes, then stop." : "";
     b.ic = "broom"; b.col = "#7FD4C1"; b.done = !!dayRec(k).clean;
   }
+  else if (id.indexOf("focusc:") === 0){
+    var fsk = id.slice(7), frc = (dayRec(k).focusc || {})[fsk], stc = frc ? focusAt(fsk, frc.i) : focusStep(fsk);
+    b.t = stc.t; b.say = focusWord(stc) + ". " + stc.how;
+    b.ic = FOCI[fsk][2]; b.col = FOCI[fsk][3]; b.done = !!frc;
+  }
+  else if (id.indexOf("cleanc:") === 0){
+    var czk = id.slice(7), zcc = carryZone({ z: czk === "big" ? "big" : Number(czk) });
+    b.t = cleanWord(zcc); b.say = zcc[1] + " " + zcc[2] + " minutes, then stop.";
+    b.ic = "broom"; b.col = "#7FD4C1"; b.done = dayRec(k).cleanc === "z" + czk;
+  }
   else if (id === "week"){ b.t = "Look at the week"; b.say = "Ten minutes: what each day is for. Then back to the sofa."; b.ic = "list"; b.col = "#8FA3FF"; b.done = !!dayRec(k).week; }
   else if (id === "setup"){ b.mark = 1; b.t = "Set up for Malta"; b.say = "Water, food, the desk."; b.ic = "case"; b.col = "#8FA3FF"; }
   else if (id === "work"){ b.mark = 1; b.t = "Malta"; b.say = "Until " + hhmm(b.at + b.dur) + ". Nothing else is asked of this part of the day."; b.ic = "case"; b.col = "#8FA3FF"; }
@@ -1033,6 +1180,8 @@ function planInfo(b, by, k, gp, lift){
         : w.kind === "life" && w.life ? w.life.act[1] : w.kind === "todo" && w.todo ? w.todo[1] : w.label;
     b.say = w.why || ""; b.ic = typeof scPin === "function" ? scPin(w) : "star"; b.col = w.col; b.done = !!w.done;
   }
+  /* v101: said where it came from */
+  if (b.carried) b.say = "From " + DAY_LONG[dowOf(b.carried)] + ". " + (b.say || "");
   return b;
 }
 
@@ -1065,7 +1214,13 @@ function dayListHTML(k){
       : !atHome(k) ? "Away, so the plan is smaller. The three, and the routine."
       : f ? "Today is for " + FOCI[f][0] + ". Everything that moves your life goes before Malta; the evening is yours."
       : "Everything that moves your life goes before Malta; the evening is yours.")
-    + (moved ? " Re-planned from " + hhmm(plan.from) + "." : "") + "</p>";
+    + (moved ? " Re-planned from " + hhmm(plan.from) + "." : "")
+    + (function(){
+        var cw = lateWords(plan.filter(function(b){ return b.carried && !b.done; }));
+        if (!cw.length) return "";
+        var s = cw.length < 2 ? cw[0] : cw.slice(0, -1).join(", ") + " and " + cw[cw.length - 1];
+        return " Carried over: " + s + ".";
+      })() + "</p>";
   if (late.length >= 2)
     h += "<button class='dp-late' data-mk='__late'><b>Running behind</b><span>" + esc(lateSentence(late))
       + " Re-plan the rest from now.</span></button>";
@@ -1272,7 +1427,9 @@ function planSteps(k, plan){
   plan.forEach(function(b){
     if (b.mark || b.station) return;
     var part = b.id.indexOf("m:") === 0 || b.id === "shake" ? "Food" : b.id === "wake" ? "Morning" : b.id === "zh" ? "Mandarin"
-             : b.id === "admin" ? "Life admin" : b.id === "week" ? "Sunday" : b.id === "clean" ? "Home" : "The day";
+             : b.id === "admin" ? "Life admin" : b.id === "week" ? (b.carried ? "Carried over" : "Sunday")
+             : b.id === "clean" || b.id.indexOf("cleanc:") === 0 ? "Home"
+             : b.id.indexOf("focusc:") === 0 ? "Carried over" : "The day";
     out.push({ id: b.id, at: b.at, kicker: hhmm(b.at) + " · " + part, col: b.col,
       title: b.t + ".", say: b.say, op: b.id, done: !!b.done });
   });
@@ -1552,5 +1709,7 @@ function seedOnce(){
   if (!S.seed97){ mergeCafes(MY_CAFES_12); S.seed97 = 1; changed = true; }
   if (!S.seed98){ mergeCafes(MY_CAFES_13); S.seed98 = 1; changed = true; }
   if (fixCafeNames()) changed = true;
+  /* v101: carrying over starts today - nothing from before it is dug up */
+  if (!S.carryFrom){ S.carryFrom = today(); changed = true; }
   if (changed) save();
 }
