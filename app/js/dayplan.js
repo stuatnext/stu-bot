@@ -631,7 +631,7 @@ function undoCoffee(){
    the things with their own clock - a meal plan, a family window, the
    shift, a date night, bed - sit at their own times. Station blocks share
    the station's id, so the road and the run can both read their minute. */
-function dayPlan(k){
+function dayPlan(k, opt){
   k = k || today();
   var wins = winList(k), by = {};
   wins.forEach(function(w){ if (w.kind !== "pack") by[w.id] = w; });
@@ -669,8 +669,8 @@ function dayPlan(k){
       /* set off so it is open when he gets there: the walk is the walk there */
       var lead = (walk ? 15 : 0) + (kit ? 15 : 0);
       if (ch.open > t + lead) t = ch.open - lead;
-      if (walk){ put("p:train", 15); walk = false; }
-      if (kit){ put("kit", 15); kit = false; }
+      if (walk){ put("p:train", 15); out[out.length - 1].lead = 1; walk = false; }
+      if (kit){ put("kit", 15); out[out.length - 1].lead = 1; kit = false; }
       put("coffee", 45);
     } else later = true;
   }
@@ -686,7 +686,7 @@ function dayPlan(k){
   if (kit) put("kit", 30);
   if (later){
     var a2 = Math.max(t, LUNCH_B, ch.open);
-    if (walk){ put("p:train", 15, a2); a2 += 15; walk = false; }
+    if (walk){ put("p:train", 15, a2); out[out.length - 1].lead = 1; a2 += 15; walk = false; }
     put("coffee", 45, a2);
   }
   if (walk) put("p:train", 40);
@@ -706,7 +706,261 @@ function dayPlan(k){
   out.forEach(function(b, i){ b.n = i; });
   out.sort(function(a, b){ return a.at - b.at || a.n - b.n; });
   out.forEach(function(b){ planInfo(b, by, k, gp, lift); });
+  /* v99: re-planned from a minute - the rest of the day moves up to it */
+  var F = opt && opt.raw ? null : opt && opt.from != null ? opt.from : dayRec(k).from;
+  if (typeof F === "number" && F > W){
+    out = replanFrom(out, F, S0 !== null ? S0 - 15 : n0, k);
+    out.forEach(function(b){ planInfo(b, by, k, gp, lift); });   /* the words follow the new minutes */
+  }
   return out;
+}
+
+/* ------------------------------------------------------------ running late
+   v99: "It's 11:45 already... I should have already done the gym at 9:15,
+   which I haven't done yet... I'm behind schedule and it really just
+   doesn't feel like there's any functionality in the app yet to address
+   that."
+
+   Re-planning keeps the day's order and moves it. From the minute he taps,
+   everything not done and not on its own clock starts again, one after the
+   other, around the things that are: the meals, the call home, Malta and
+   the evening. Coffee still stays out of the lunch crowd, with the walk
+   there just before it. What no longer fits before Malta is for tomorrow,
+   not a debt. */
+var PINNED = { "p:family": 1, setup: 1, work: 1, date: 1, "p:stop": 1, week: 1,
+               "c:cleanse": 1, "c:night": 1, "c:bed": 1, bed: 1 };
+function planPinned(b){ return !!(b.mark || PINNED[b.id] || (b.id.indexOf("m:") === 0 && b.id !== "m:morning")); }
+/* When the rest of the day will not all fit, what gives way first: the
+   clean and the kit check, then the extras, then coffee and admin. Eating,
+   the gym and the day's one focus are the last to go. */
+var LATE_RANK = { "m:morning": 9, "p:train": 9, "c:skin": 8, "c:sun": 8, focus: 8, zh: 7, shake: 6,
+                  coffee: 5, admin: 5, life: 4, todo: 4, card: 4, kit: 3, clean: 2 };
+/* the morning in its own order: breakfast, the gym, the routine after the
+   shower, the shake after the gym */
+var LATE_CHAIN = { "m:morning": 1, "p:train": 1, "c:skin": 1, "c:sun": 1, shake: 1 };
+function lateRank(b){ return LATE_RANK[b.id] || 4; }
+function replanFrom(plan, F, L, k){
+  var keep = [], flow = [], pins = [], dropped = [];
+  plan.forEach(function(b){
+    if (planPinned(b)){
+      keep.push(b);
+      if (!b.done && b.dur > 0 && b.at + b.dur > F) pins.push([b.at, b.at + b.dur]);
+    }
+    else if (b.done) keep.push(b);
+    else if (b.id !== "wake"){ b.was = b.at; b.dur0 = b.dur; flow.push(b); }   /* he is up: coming round is moot */
+  });
+  var ch = typeof cafeHours === "function" && flow.some(function(b){ return b.id === "coffee"; })
+    ? cafeHours(coffeePick(k)) : { open: 0 };
+  var busy;
+  function clash(s, e){
+    for (var i = 0; i < busy.length; i++) if (s < busy[i][1] && e > busy[i][0]) return busy[i][1];
+    return 0;
+  }
+  /* the first start from s that clashes with nothing; for a coffee group
+     (lead minutes of walking there, then the coffee) the coffee part also
+     waits for the place to open and for the lunch crowd to go */
+  function fit(s, dur, lead){
+    for (var g = 0; g < 40; g++){
+      if (lead >= 0){
+        var c0 = s + lead;
+        if (ch.open && c0 < ch.open){ s = ch.open - lead; continue; }
+        if (c0 < LUNCH_B && c0 + 45 > LUNCH_A){ s = LUNCH_B - lead; continue; }
+      }
+      var e = clash(s, s + dur);
+      if (!e) return s;
+      s = e;
+    }
+    return null;
+  }
+  /* the day in pieces: each block alone, except the walk there and the kit
+     run, which go with the coffee - or, with no coffee, alone (the walk as
+     the whole walk again) */
+  function units(pool){
+    var out = [], leads = [], hasCafe = pool.some(function(b){ return b.id === "coffee"; });
+    pool.forEach(function(b){
+      b.dur = b.dur0;
+      if (b.lead && hasCafe){ leads.push(b); return; }
+      if (b.lead && b.id === "p:train") b.dur = 40;
+      if (b.id === "coffee"){ out.push({ bs: leads.concat([b]), lead: leads.reduce(function(m, x){ return m + x.dur; }, 0), cafe: 1, r: lateRank(b), w: b.was }); leads = []; return; }
+      out.push({ bs: [b], lead: -1, r: lateRank(b), w: b.was, chain: !!LATE_CHAIN[b.id] && !b.lead });
+    });
+    return out;
+  }
+  function put(u, s){
+    var a = s;
+    u.bs.forEach(function(x){ x.at = a; busy.push([a, a + x.dur]); a += x.dur; });
+    return a;
+  }
+  function len(u){ return u.bs.reduce(function(m, x){ return m + x.dur; }, 0); }
+  /* first, the day in its own order from now; a coffee that waits for the
+     lunch crowd to go leaves the gap for what comes after it */
+  function ordered(pool){
+    busy = pins.slice();
+    var cur = F, bad = 0;
+    units(pool).forEach(function(u){
+      var n = len(u), s = fit(cur, n, u.cafe ? u.lead : -1);
+      if (s === null || s + n > L){ bad++; return; }
+      var end = put(u, s);
+      if (!u.cafe || s === fit(cur, n, -1)) cur = end;
+    });
+    return bad;
+  }
+  /* and if that does not all fit: the morning chain first, then the rest by
+     what matters most, each into the first gap it fits */
+  function ranked(pool){
+    busy = pins.slice();
+    var cur = F, bad = 0, us = units(pool);
+    us.filter(function(u){ return u.chain; }).forEach(function(u){
+      var n = len(u), s = fit(cur, n, -1);
+      if (s === null || s + n > L){ bad++; return; }
+      cur = put(u, s);
+    });
+    us.filter(function(u){ return !u.chain; })
+      .sort(function(a, b){ return b.r - a.r || a.w - b.w; })
+      .forEach(function(u){
+        var n = len(u), s = fit(F, n, u.cafe ? u.lead : -1);
+        if (s === null || s + n > L){ bad++; return; }
+        put(u, s);
+      });
+    return bad;
+  }
+  var pool = flow.slice();
+  if (ordered(pool)){
+    while (pool.length && ranked(pool)){
+      var v = pool.slice().sort(function(a, b){ return lateRank(a) - lateRank(b) || b.was - a.was; })[0];
+      pool.splice(pool.indexOf(v), 1);
+      dropped.push(v);
+    }
+    /* anything that gave way but still fits a gap goes back in */
+    dropped.slice().sort(function(a, b){ return lateRank(b) - lateRank(a) || a.was - b.was; }).forEach(function(b){
+      var trial = pool.concat([b]);
+      if (!ranked(trial)){ pool = trial; dropped.splice(dropped.indexOf(b), 1); }
+    });
+    ranked(pool);
+  }
+  dropped.forEach(function(b){ b.at = b.was; b.dur = b.dur0; });
+  var out = keep.concat(pool);
+  out.forEach(function(b){ if (b.was != null && b.was !== b.at) b.moved = 1; });
+  out.sort(function(a, b){ return a.at - b.at || a.n - b.n; });
+  dropped.sort(function(a, b){ return a.was - b.was; });
+  out.dropped = dropped;
+  out.from = F;
+  return out;
+}
+/* The slipped things in words, for a sentence. */
+function lateWords(list){
+  var seen = {}, out = [];
+  list.forEach(function(b){
+    var id = b.id, w = id === "p:train" ? (/^Rest day/.test(b.t) ? "the walk" : "the gym")
+      : id === "m:morning" ? "breakfast" : id === "shake" ? "the shake" : id === "coffee" ? "coffee"
+      : id === "kit" ? "the kit check" : id === "zh" ? "Mandarin" : id === "admin" ? "life admin"
+      : id === "clean" ? "the cleaning" : id === "c:skin" || id === "c:sun" ? "the routine"
+      : id === "focus" ? (dayFocus(today()) ? FOCI[dayFocus(today())][0] : "the focus")
+      : b.t.charAt(0).toLowerCase() + b.t.slice(1);
+    if (!seen[w]){ seen[w] = 1; out.push(w); }
+  });
+  return out;
+}
+function lateSentence(list){
+  var w = lateWords(list);
+  if (!w.length) return "";
+  var cap = function(x){ return x.charAt(0).toUpperCase() + x.slice(1); };
+  if (w.length === 1) return cap(w[0]) + " was planned before now.";
+  if (w.length === 2) return cap(w[0]) + " and " + w[1] + " were planned before now.";
+  return cap(w[0]) + ", " + w[1] + " and " + (w.length - 2) + " more were planned before now.";
+}
+/* What was planned before now and not done - the things he is behind on.
+   Only while there is still time to do something about it: from getting up
+   until Malta setup (or the last hour before bed, on a day without Malta).
+   Not during the shift, not in the evening that is his. Coming round does
+   not count. */
+function planBehind(k, plan){
+  k = k || today();
+  if (!S.onboarded || k !== today()) return [];
+  var W = wakeMin(), rel = function(m){ return ((m - W) % 1440 + 1440) % 1440; };
+  var n = rel(nowMin()), sh = shape();
+  if (n >= rel(sh.noShift ? bedMin() - 60 : sh.start - 15)) return [];
+  plan = plan || dayPlan(k);
+  return plan.filter(function(b){
+    return !b.done && !planPinned(b) && b.id !== "wake" && rel(b.at) + b.dur + 15 < n;
+  });
+}
+/* The minute a re-plan starts: now, to the next five, on the day's axis. */
+function replanMinute(){
+  var W = wakeMin(), rel = ((nowMin() - W) % 1440 + 1440) % 1440;
+  return W + Math.ceil(rel / 5) * 5;
+}
+function lateBannerHTML(k){
+  var late = planBehind(k);
+  if (late.length < 2) return "";
+  return "<div class='late-b'><span><b>Running behind.</b> " + esc(lateSentence(late))
+    + "</span><button data-late='1'>Re-plan</button></div>";
+}
+function catchUpHTML(k, F){
+  var before = dayPlan(k, { raw: 1 }), late = planBehind(k, before);
+  var after = dayPlan(k, { from: F }), drop = after.dropped || [];
+  var row = function(b, cls){
+    return "<li" + (cls ? " class='" + cls + "'" : "") + "><time>" + hhmm(b.at) + "</time><span>" + esc(b.t)
+      + (b.id === "coffee" && b.at >= LUNCH_B ? "<small>after the lunch crowd</small>" : "") + "</span></li>";
+  };
+  var h = "<div class='cu'><p class='dp-lead'>It is " + hhmm(nowMin()) + ". "
+    + (late.length ? (late.length === 1 ? "One thing was" : late.length + " things were") + " planned before now. "
+      + "The day moves; it does not end." : "Nothing is late, but the rest of the day can start now.") + "</p>";
+  if (late.length)
+    h += "<h4 class='cu-h'>Missed so far</h4><p class='cu-tm was'>" + late.map(function(b){ return esc(b.t); }).join(" · ") + "</p>";
+  /* the rest of the day up to Malta (or the evening, on a day without it) */
+  var sh = shape(), lim = sh.noShift ? bedMin() - 60 : sh.start;
+  if (lim < wakeMin()) lim += 1440;
+  var next = after.filter(function(b){ return !b.done && b.at >= F && b.at < lim && b.id !== "work" && b.id !== "bed"; });
+  h += "<h4 class='cu-h'>From " + hhmm(F) + "</h4><ol class='cu-list'>"
+    + (next.length ? next.map(function(b){ return row(b, planPinned(b) ? "pin" : ""); }).join("")
+       : "<li class='pin'><span>Nothing else before Malta.</span></li>") + "</ol>";
+  if (drop.length)
+    h += "<h4 class='cu-h'>For tomorrow</h4><p class='cu-tm'>" + drop.map(function(b){ return esc(b.t); }).join(" · ")
+      + "</p>";
+  return h + "</div>";
+}
+function askCatchUp(){
+  var k = today(), F = replanMinute();
+  var gym = dayPlan(k, { raw: 1 }).some(function(b){ return b.id === "p:train" && !b.done; });
+  var ill = typeof sickOn === "function" && sickOn(k);
+  var waits = (dayPlan(k, { from: F }).dropped || []).length;
+  return ask({
+    title: "Running behind",
+    html: catchUpHTML(k, F),
+    options: [
+      { id: "go", label: "Re-plan from " + hhmm(F), pri: true,
+        note: waits ? "What matters most first; the rest is tomorrow’s" : "Same order, starting now" },
+      gym && !ill ? { id: "ill", label: "I’m not well", note: "Rest instead of the gym, then re-plan" } : null
+    ].filter(Boolean),
+    cancel: "Leave it"
+  }).then(function(v){
+    if (v === "go") replanDay(F);
+    /* the ill choices first; re-planned only if he does take the rest */
+    else if (v === "ill") askSick().then(function(){
+      if (!sickOn(k)) return;
+      dayRec(k, 1).from = F;
+      save(); render({ keepScroll: true });
+    });
+  });
+}
+function replanDay(F){
+  var k = today();
+  dayRec(k, 1).from = F;
+  if (S.notes) delete S.notes[k];
+  save();
+  var first = dayPlan(k).filter(function(b){ return !b.done && !b.mark && b.at >= F; })[0];
+  sfx("done"); buzz(10);
+  toast("Re-planned from " + hhmm(F) + "." + (first ? " First: " + first.t.replace(/\.$/, "") + "." : ""));
+  render({ keepScroll: true, animate: true });
+}
+function unplanDay(){
+  var r = dayRec(today());
+  if (r.from == null) return;
+  delete r.from;
+  save(); sfx("untick");
+  toast("Back to the first plan.");
+  render({ keepScroll: true, animate: true });
 }
 /* The minute each station is planned for, laid on the stations themselves,
    so the road draws them in order and the card picks the one that is now. */
@@ -804,11 +1058,16 @@ function dayListHTML(k){
   var plan = dayPlan(k), now = planNow(plan), veg = vegOn(k), f = dayFocus(k);
   var h = "<div class='dp'>";
   var ill = typeof sickOn === "function" && sickOn(k);
+  var late = planBehind(k, plan), moved = plan.from != null;
   h += "<p class='dp-lead'>" + esc(ill ? "Ill today. Rest is the training: water, something hot, bed early. Family and Stop still make the day."
       : veg ? "Vegetating. The three still count; nothing else is asked."
       : !atHome(k) ? "Away, so the plan is smaller. The three, and the routine."
       : f ? "Today is for " + FOCI[f][0] + ". Everything that moves your life goes before Malta; the evening is yours."
-      : "Everything that moves your life goes before Malta; the evening is yours.") + "</p>";
+      : "Everything that moves your life goes before Malta; the evening is yours.")
+    + (moved ? " Re-planned from " + hhmm(plan.from) + "." : "") + "</p>";
+  if (late.length >= 2)
+    h += "<button class='dp-late' data-mk='__late'><b>Running behind</b><span>" + esc(lateSentence(late))
+      + " Re-plan the rest from now.</span></button>";
   h += "<ol class='dp-list'>";
   plan.forEach(function(b){
     if (b.mark){
@@ -824,6 +1083,9 @@ function dayListHTML(k){
       + (cls === "now" ? "<em>Now</em>" : "") + "</button></li>";
   });
   h += "</ol>";
+  if (plan.dropped && plan.dropped.length)
+    h += "<p class='dp-tm'><b>For tomorrow</b> " + plan.dropped.map(function(b){ return esc(b.t); }).join(" · ") + "</p>";
+  if (moved) h += "<button class='btn quiet dp-undo' data-mk='__unplan'>Back to the first plan</button>";
   h += "<div class='dp-acts'>"
     + (ill ? "<button class='btn' data-mk='__sick'>Feeling better</button>"
        : weekDay(dowOf(k)).f === "veg" ? ""
@@ -839,6 +1101,8 @@ function askDay(){
     if (v === "__veg"){ toggleVeg(); return; }
     if (v === "__sick"){ setSick(0); return; }
     if (v === "__ill"){ askSick(); return; }
+    if (v === "__late"){ askCatchUp(); return; }
+    if (v === "__unplan"){ unplanDay(); return; }
     if (v === "__week"){ go("you"); setTimeout(function(){
       var el = document.querySelector("#screen .wkp"); if (el) el.scrollIntoView({ block: "start" }); }, 80); return; }
     startRun("day", v);
