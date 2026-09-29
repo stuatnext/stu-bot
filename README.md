@@ -86,6 +86,67 @@ the shift finishes). Building a presence came fourth when he ranked them, so it 
 **Trips** — the schedule to January and the UK day count against the Statutory Residence Test.
 **Say** — the phrasebook. **Log** — the day record and the district collection.
 
+#### v85: the protein shake, and heads-ups instead of weird-time pings
+
+> *"I also have a Ninja blender. I do enjoy a protein shake... frozen fruit, some milk, usually oat
+> milk... Don't know when I should do that in the day. Also, the phone notifications are popping up at
+> weird times... I would rather get a notification half an hour or an hour before I need to do
+> something."*
+
+**The shake.**
+- It has its own step in the day. On a gym day it comes straight after the gym and the shower; on
+  other days it goes in the long gap between the focus block and the next meal.
+- *Did it* asks which milk and logs the real protein: a 24g scoop plus cow's milk (about 34g), soy
+  (about 33g) or oat (about 27g). The note is honest: oat milk isn't unhealthy, it's just low in
+  protein (about 1g per 100ml against about 3.4g for cow's), and brands often add sugar and oil.
+- The last milk is remembered. The shake is logged as a snack, so it adds to the day's protein, and
+  undo takes it off.
+- The Ninja shake is a breakfast idea too. The "uses what's at home" tag now covers the shake as well
+  as the yoghurt.
+
+**Heads-ups.**
+- **Before:** five fixed pings, at 08:07 (before he was up), 12:20, 15:40, 22:15 and 23:40.
+- **Now:** `nudge.yml` fires 30–60 minutes before real blocks of his day:
+
+  | When | What |
+  |---|---|
+  | 08:35 | the day's shape |
+  | 09:50 | the coffee or the focus block |
+  | 12:35 | the clean, Mandarin or the call home |
+  | 45 minutes before Malta | 15:15, or 16:15 in the European winter |
+  | 19:02 | date nights |
+  | 30 minutes before stopping | 22:30, or 23:30 in winter |
+  | 23:05 | wind-down, weekends only |
+
+- `scripts/push-schedule.mjs` decides whether each one goes today:
+  - workdays only for the shift and stop pings, and weekends only for the wind-down
+  - only the right half of each summer/winter pair (Malta keeps European daylight saving, and the
+    Singapore times move on 25 October)
+  - Mondays and Fridays from 2 November for date nights
+  - nothing at all on the trip days in `bot/push.json`
+- The app mirrors today's plan to the service worker, which writes the words from it. For example:
+  - "At 10:20: Coffee somewhere new — In 30 minutes. Chye Seng Huat Hardware…"
+  - "Malta at 16:00 — In 45 minutes. Eat first: …"
+  - "Wrap up at 23:00 — Half an hour left. Then wash it off, night moisturiser and wind down. Bed at
+    23:45."
+- Small routine steps are never the subject of a heads-up.
+- The morning ping lists the next three things with their times.
+- An ill day is quiet: "Rest today".
+- If the app hasn't been opened that day, the ping falls back to the old words rather than yesterday's
+  plan.
+- The nudge sheet in You describes the new times.
+
+Verified:
+- **`push85` (13 checks):** the schedule rules for summer and winter workdays, weekends, Sunday, the
+  trip days and date nights.
+- **`shake85` (15 checks):**
+  - the shake's place in the plan on gym and rest days
+  - the milk sheet and the logged grams, and undo
+  - the plan in the mirror
+  - the service worker's own `composeNudge`, run on that real mirrored plan in Node: the focus, shift,
+    stop, morning and date-night wording, ill, and a day the app wasn't opened
+- **Other checks:** every earlier walk passes. The sweep is clean: 576 loads and 5,184 renders, with 0 problems.
+
 #### v84: breakfast first, breakfast ideas, his own coffee places, and cleaning
 
 > *"I personally prefer to have breakfast before. Wake up, come round, hydrate, have a coffee, have

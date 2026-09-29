@@ -1,29 +1,42 @@
-# The nudges: five pushes a day, scheduled in Singapore time (UTC+8, no DST,
-# so the offsets never move). In Singapore they land at 08:07, 12:20, 15:40,
-# 22:15 and 23:40 - the day's shape, the open hours before the Malta shift,
-# the hour it starts, the check-in while it runs, and last call after it ends.
+# The nudges: heads-ups, 30-60 minutes before the real blocks of his day.
+# v85, his words: "The phone notifications are popping up at weird times...
+# I would rather get a notification alerting me half an hour or an hour
+# before I need to do something."
 #
-# Each payload is one word and nothing else. app/sw.js on the phone reads the
-# mirrored day-state and writes the actual words - and it picks WHICH words
-# from the hour the ping actually arrives at on that phone, not from the word
-# in the payload, because he travels constantly and these crons do not.
+# Cron is UTC; Singapore is UTC+8 with no daylight saving. Each line below is
+# one heads-up (scripts/push-schedule.mjs maps it and decides whether today
+# is a day for it: workdays, weekends, date nights, and nothing at all on the
+# trip days in bot/push.json). The shift and stop lines come in pairs because
+# Malta keeps European daylight saving - only the right one of each pair
+# sends. Minutes are off the :00 slot, which is where GitHub delays runs most.
 #
+#   08:35 the day's shape       09:50 coffee or the focus block
+#   12:35 clean / Mandarin / the call home
+#   15:15 or 16:15 Malta in 45  19:02 date night (Mon & Fri from 2 Nov)
+#   22:30 or 23:30 wrap up      23:05 wind down (weekends)
+#
+# Each payload is one word. app/sw.js on the phone writes the words from the
+# day's own plan, mirrored from the app: "At 10:45: Strait Up Growth".
 # No-ops cleanly until the PUSH_BUNDLE secret exists (see scripts/send-push.mjs).
 name: nudge
 
 on:
   schedule:
-    - cron: "7 0 * * *"     # 08:07 Singapore - the day's shape (off the :00 slot GitHub delays most)
-    - cron: "20 4 * * *"    # 12:20 Singapore - the open hours before the shift
-    - cron: "40 7 * * *"    # 15:40 Singapore - Malta is about to wake
-    - cron: "15 14 * * *"   # 22:15 Singapore - the check-in, mid-shift
-    - cron: "40 15 * * *"   # 23:40 Singapore - last call, after the shift ends
+    - cron: "35 0 * * *"
+    - cron: "50 1 * * *"
+    - cron: "35 4 * * *"
+    - cron: "15 7 * * *"
+    - cron: "15 8 * * *"
+    - cron: "2 11 * * *"
+    - cron: "30 14 * * *"
+    - cron: "30 15 * * *"
+    - cron: "5 15 * * *"
   workflow_dispatch:
     inputs:
       kind:
-        description: "morning, midday, shift, evening or bed"
+        description: "morning, focus, midday, shift, date, stop or bed"
         required: false
-        default: "evening"
+        default: "midday"
 
 permissions: {}
 
@@ -39,13 +52,8 @@ jobs:
       - run: npm install web-push@3 --no-audit --no-fund
       - run: node scripts/send-push.mjs
         env:
-          KIND: >-
-            ${{ github.event_name == 'workflow_dispatch' && inputs.kind
-             || (github.event.schedule == '7 0 * * *'  && 'morning')
-             || (github.event.schedule == '20 4 * * *' && 'midday')
-             || (github.event.schedule == '40 7 * * *' && 'shift')
-             || (github.event.schedule == '15 14 * * *' && 'evening')
-             || 'bed' }}
+          KIND: ${{ github.event_name == 'workflow_dispatch' && inputs.kind || '' }}
+          SCHEDULE: ${{ github.event.schedule }}
           PUSH_BUNDLE: ${{ secrets.PUSH_BUNDLE }}
           PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}

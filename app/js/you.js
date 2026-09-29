@@ -314,11 +314,11 @@ async function askPush(){
   if (S.pushOn){
     var v = await ask({
       title: "The nudges",
-      say: "On since " + esc(nice(S.pushMade || today())) + ". Five a day, on Singapore hours: "
-         + "08:00 the day\u2019s shape, 12:20 the open window before the shift, 15:40 as Malta wakes, "
-         + "22:15 what is still open, 23:40 last call and the wind-down. Each one is written on this "
-         + "phone from this phone\u2019s own record \u2014 and by the hour it lands at, so they still "
-         + "make sense on a week in Sheffield."
+      say: "On since " + esc(nice(S.pushMade || today())) + ". Heads-ups, half an hour to an hour before "
+         + "the thing: 08:35 the day\u2019s shape, 09:50 the coffee or the focus block, 12:35 the clean, "
+         + "Mandarin or the call home, 45 minutes before Malta, 30 minutes before you stop, and the "
+         + "wind-down at weekends. Date nights get their own. Each one names the next thing in your plan "
+         + "and its time, written on this phone. Nothing on trip days. GitHub can run them a few minutes late."
          + (S.pushBundle ? "<br><br>If the paste never happened, or GitHub lost it, show it again." : ""),
       options: S.pushBundle ? [{ id: "again", label: "Show the paste again" }] : [],
       confirm: "Turn it off", cancel: "Keep it"

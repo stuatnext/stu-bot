@@ -163,20 +163,21 @@ var LUNCH_A = 11 * 60 + 45, LUNCH_B = 14 * 60;
    step, and all of them on the Food tab. Protein first, because the day's
    target needs three meals and breakfast is the one that gets skipped.
    [ what, grams of protein, minutes, what it needs, how, tags ]
-   yog = built on the Greek yoghurt and frozen fruit already at home. */
+   home = built on what is already at home: the Greek yoghurt, the frozen
+   fruit, and (v85) the Ninja and the protein. */
 var BREAKFASTS = [
   ["Yoghurt and frozen berries", 20, 3, "Greek yoghurt, frozen fruit, honey",
-    "A big bowl of yoghurt and a handful of frozen berries straight from the freezer. They thaw as you eat.", "yog"],
+    "A big bowl of yoghurt and a handful of frozen berries straight from the freezer. They thaw as you eat.", "home"],
   ["Berry smoothie", 25, 5, "Frozen fruit, Greek yoghurt, milk",
-    "A cup of frozen fruit, three big spoons of yoghurt and a glass of milk. Thick enough to need a spoon.", "yog"],
+    "A cup of frozen fruit, three big spoons of yoghurt and a glass of milk. Thick enough to need a spoon.", "home"],
   ["Overnight oats", 20, 5, "Oats, Greek yoghurt, milk, fruit",
-    "Oats, yoghurt and milk in a jar the night before, fruit on top. Breakfast is waiting when you wake.", "yog"],
+    "Oats, yoghurt and milk in a jar the night before, fruit on top. Breakfast is waiting when you wake.", "home"],
   ["Yoghurt, banana and peanut butter", 22, 3, "Greek yoghurt, a banana, peanut butter",
-    "Sliced banana on the yoghurt, a spoon of peanut butter stirred through.", "yog"],
+    "Sliced banana on the yoghurt, a spoon of peanut butter stirred through.", "home"],
   ["Yoghurt parfait with granola", 18, 3, "Greek yoghurt, granola, frozen fruit",
-    "Layered in a glass: yoghurt, fruit, granola, again. The crunch is the point.", "yog"],
+    "Layered in a glass: yoghurt, fruit, granola, again. The crunch is the point.", "home"],
   ["Mango lassi", 15, 5, "Frozen mango, Greek yoghurt, milk",
-    "Blend frozen mango with yoghurt and milk, a pinch of cardamom if there is some.", "yog"],
+    "Blend frozen mango with yoghurt and milk, a pinch of cardamom if there is some.", "home"],
   ["Kaya toast and three soft-boiled eggs", 18, 15, "A kopitiam",
     "The Singapore breakfast, with a third egg to make it count. Soy sauce and white pepper on the eggs.", ""],
   ["Scrambled eggs on toast", 20, 10, "Three eggs, bread",
@@ -211,8 +212,11 @@ var BREAKFASTS = [
     "Eggs poached in a spiced tomato sauce, bread to mop it up. A slow Saturday one.", ""],
   ["Peanut butter toast and a glass of milk", 15, 3, "Bread, peanut butter, milk",
     "The two-minute one for the days nothing else will happen.", ""],
+  /* v85: "I also have a Ninja blender. I do enjoy a protein shake." */
+  ["Protein shake, the Ninja way", 34, 3, "Frozen fruit, a scoop of protein, milk",
+    "Frozen fruit, a scoop and a glass of cow\u2019s or soy milk, blended thick. The one you already love.", "home"],
   ["Greek yoghurt with honey and walnuts", 20, 2, "Greek yoghurt, honey, walnuts",
-    "Thick yoghurt, a drizzle of honey, a handful of walnuts. Tastes like a holiday.", "yog"]
+    "Thick yoghurt, a drizzle of honey, a handful of walnuts. Tastes like a holiday.", "home"]
 ];
 /* The day's idea: every other day one built on what is already in the
    fridge, the rest something new to want. Same all day, different
@@ -221,7 +225,7 @@ function breakfastIdea(k){
   k = k || today();
   var have = typeof kitState === "function" && kitState("am") === "have";
   if (have && hashOf("bfh" + k) % 2 === 0){
-    var y = BREAKFASTS.filter(function(b){ return b[5] === "yog"; });
+    var y = BREAKFASTS.filter(function(b){ return b[5] === "home"; });
     return y[hashOf("bfy" + k) % y.length];
   }
   return BREAKFASTS[hashOf("bf" + k) % BREAKFASTS.length];
@@ -234,10 +238,52 @@ function breakfastListHTML(){
     h += "<div class='bf-r" + (i === 0 ? " on" : "") + "'>"
       + (i === 0 ? "<em>Today\u2019s idea</em>" : "")
       + "<b>" + esc(b[0]) + "</b><span class='bf-n'>" + b[1] + "g \u00b7 " + b[2] + " min"
-      + (b[5] === "yog" ? " \u00b7 uses your yoghurt" : "") + "</span>"
+      + (b[5] === "home" ? " \u00b7 from what\u2019s at home" : "") + "</span>"
       + "<small>" + esc(b[4]) + "</small></div>";
   });
   return h + "</div>";
+}
+
+/* ---------------------------------------------------------------- shake
+   v85: "I also have a Ninja blender. I do enjoy a protein shake... frozen
+   fruit, some milk, usually oat milk... Don't know when I should do that
+   in the day."
+
+   When: straight after the gym on a gym day - it is the easiest time to
+   remember and it fills the gap to the next meal - and on other days in
+   the long stretch between breakfast and the meal before the shift. Either
+   way it is one of the three or four protein moments his target needs; the
+   hour matters far less than doing it.
+
+   The milk is where the protein differs. Oat milk is not unhealthy, it is
+   just not much protein (about 1g in 100ml against about 3.4g for cow's),
+   and many brands add sugar and oil. [ name, grams in a 300ml glass, why ] */
+var SHAKE_SCOOP = 24;
+var SHAKE_MILK = {
+  cow: ["Cow\u2019s milk", 10, "The most protein in the glass"],
+  soy: ["Soy milk, unsweetened", 9, "Nearly as much, and no dairy"],
+  oat: ["Oat milk", 3, "Fine for the taste, but little protein and often added sugar"]
+};
+function shakeOn(k){
+  return typeof foodOn === "function" && foodOn(k || today()).some(function(f){
+    return f[2] === "snack" && /^Protein shake/.test(f[0]); });
+}
+function askShake(){
+  var pick = SHAKE_MILK[S.shakeMilk] ? S.shakeMilk : "cow";
+  return ask({
+    title: "Protein shake",
+    say: "Frozen fruit, a scoop of protein, a glass of milk, the Ninja. Which milk? The scoop is about "
+       + SHAKE_SCOOP + "g of protein; the milk is the rest.",
+    options: ["cow", "soy", "oat"].map(function(m){
+      var d = SHAKE_MILK[m];
+      return { id: m, label: d[0], note: "About " + (SHAKE_SCOOP + d[1]) + "g in total \u00b7 " + d[2], pri: m === pick };
+    }),
+    cancel: "Not yet"
+  }).then(function(v){
+    if (!SHAKE_MILK[v]) return;
+    S.shakeMilk = v;
+    logFood("Protein shake, " + SHAKE_MILK[v][0].toLowerCase(), SHAKE_SCOOP + SHAKE_MILK[v][1], "snack");
+  });
 }
 
 /* -------------------------------------------------------------- cleaning
@@ -558,6 +604,9 @@ function dayPlan(k){
   if (by["c:skin"]) put("c:skin", 5);
   if (by["c:sun"]) put("c:sun", 5);
   if (!bfFirst()) put("m:morning", 20);
+  /* v85: the shake straight after the gym, with the shower */
+  var shake = atHome(k);
+  if (shake && lift){ put("shake", 10); shake = false; }
 
   /* On a rest day the walk goes to the coffee: one trip, Trained on the way. */
   var walk = !!(by["p:train"] && !lift), cafe = !!by.coffee, kit = !!by.kit, later = false;
@@ -570,6 +619,8 @@ function dayPlan(k){
   }
   if (walk && !cafe){ put("p:train", 40); walk = false; }
   if (by.focus) put("focus", focusMins(k));
+  /* ...or, on a day without the gym, in the long gap before the next meal */
+  if (shake){ put("shake", 10); shake = false; }
   ["life", "todo", "card"].forEach(function(id){ if (by[id]) put(id, 20); });
   if (zhDay(k)) put("zh", 15);
   if (adminDay(k)) put("admin", 30);
@@ -649,6 +700,12 @@ function planInfo(b, by, k, gp, lift){
     b.t = al ? "Life admin: " + al.charAt(0).toLowerCase() + al.slice(1) : "Life admin";
     b.say = al ? "Thirty minutes on it, then stop." : "Bills, bookings, the thing you keep moving. Thirty minutes.";
     b.ic = "pen"; b.col = "#CE82FF"; b.done = adminDone(k);
+  }
+  else if (id === "shake"){
+    b.t = "Protein shake";
+    b.say = (lift ? "Straight after the gym" : "For the long gap before the next meal")
+      + ": frozen fruit, a scoop, milk. About " + (SHAKE_SCOOP + (SHAKE_MILK[S.shakeMilk] || SHAKE_MILK.cow)[1]) + "g of protein.";
+    b.ic = "blend"; b.col = "#3FE0A0"; b.done = shakeOn(k);
   }
   else if (id === "clean"){
     var zc = cleanToday(k);
@@ -892,7 +949,7 @@ function planSteps(k, plan){
   var out = [];
   plan.forEach(function(b){
     if (b.mark || b.station) return;
-    var part = b.id.indexOf("m:") === 0 ? "Food" : b.id === "wake" ? "Morning" : b.id === "zh" ? "Mandarin"
+    var part = b.id.indexOf("m:") === 0 || b.id === "shake" ? "Food" : b.id === "wake" ? "Morning" : b.id === "zh" ? "Mandarin"
              : b.id === "admin" ? "Life admin" : b.id === "week" ? "Sunday" : b.id === "clean" ? "Home" : "The day";
     out.push({ id: b.id, at: b.at, kicker: hhmm(b.at) + " · " + part, col: b.col,
       title: b.t + ".", say: b.say, op: b.id, done: !!b.done });

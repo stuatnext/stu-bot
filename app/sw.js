@@ -11,7 +11,7 @@
      files: freshness wins.
    - VERSION changes with every release, and the build number is painted on
      the title card and the You screen so what the phone runs is visible. */
-var VERSION = "daylight-v84";
+var VERSION = "daylight-v85";
 /* Written by the app on every save; read here when a push lands, because a
    service worker cannot see localStorage. Never versioned, never deleted. */
 var STATE_CACHE = "daylight-state";
@@ -157,8 +157,98 @@ function careWord(st, part, label){
   var c = st && st.care && st.care[part];
   return !!(c && c.indexOf(label) !== -1);
 }
-function composeNudge(kind, st, nowISO, dow, hour){
+/* ============================================================ heads-ups
+   v85: "The phone notifications are popping up at weird times... I would
+   rather get a notification alerting me half an hour or an hour before I
+   need to do something."
+
+   The pings are now sent 30-60 minutes before the day's real blocks (see
+   .github/workflows/nudge.yml), and when the app has been opened today the
+   words come from the day's own plan, mirrored from the phone: the next
+   thing, its time, and how long until it. */
+function hm(m){ m = ((m % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0"); }
+/* The next thing still to do in the plan, starting at least `lead` minutes
+   from now - the one worth a heads-up. */
+function nextBlock(plan, now, lead, skip){
+  for (var i = 0; i < plan.length; i++){
+    var b = plan[i];
+    if (b.d || (skip && skip.indexOf(b.id) >= 0)) continue;
+    if (b.at >= now + lead) return b;
+  }
+  return null;
+}
+function findBlock(plan, id){
+  for (var i = 0; i < plan.length; i++) if (plan[i].id === id) return plan[i];
+  return null;
+}
+/* The steps too small to interrupt anyone for: the routine's own steps, the
+   meals that have their own clock, the shake, and the marks of the day. */
+var MINOR = ["wake", "m:morning", "c:skin", "c:sun", "c:cleanse", "c:night", "c:bed", "shake",
+             "bed", "setup", "work", "m:dinner", "p:stop"];
+function inWords(m){ return m < 60 ? m + " minutes" : m < 90 ? "an hour" : Math.round(m / 60) + " hours"; }
+function composeHeadsUp(kind, st, now){
+  var plan = st.plan || [];
+  var out = { title: "Daylight", body: "", badge: 0, slot: kind, silent: false };
+  if (st.ill){
+    out.silent = true; out.title = "Rest today";
+    out.body = "Nothing needed. Water, something hot, and bed early.";
+    return out;
+  }
+  var bed = findBlock(plan, "bed");
+  if (kind === "shift"){
+    var work = findBlock(plan, "work"), meal = findBlock(plan, "m:midday");
+    var at = work ? work.at : null;
+    out.title = at != null ? "Malta at " + hm(at) : "Malta soon";
+    var bits = [];
+    if (at != null && at > now) bits.push("In " + inWords(at - now) + ".");
+    if (meal && !meal.d) bits.push("Eat first: " + meal.s.replace(/\.$/, "") + ".");
+    var live = openNow(st);
+    if (live.length) bits.push(andList(live) + (live.length === 1 ? " is" : " are") + " still open.");
+    out.body = bits.join(" ") || "Everything before the shift is done.";
+    return out;
+  }
+  if (kind === "stop"){
+    var stop = findBlock(plan, "p:stop");
+    out.title = stop ? "Wrap up at " + hm(stop.at) : "Wrap up soon";
+    var night = plan.filter(function(b){ return /^c:/.test(b.id) && !b.d && (!stop || b.at >= stop.at); })
+      .map(function(b){ return b.t.toLowerCase(); });
+    out.body = (stop && stop.at > now ? "Half an hour left. " : "")
+      + (night.length ? "Then " + andList(night) + ". " : "")
+      + (bed ? "Bed at " + hm(bed.at) + "." : "");
+    return out;
+  }
+  if (kind === "bed"){
+    var wind = findBlock(plan, "c:bed");
+    out.title = wind && !wind.d ? "Wind down at " + hm(wind.at) : "Bed soon";
+    out.body = "Phone on the side, water poured." + (bed ? " Bed at " + hm(bed.at) + "." : "");
+    return out;
+  }
+  if (kind === "date"){
+    var dn = findBlock(plan, "date");
+    if (dn && !dn.d){
+      out.title = "Date night at " + hm(dn.at);
+      out.body = "Laptop shut in " + inWords(Math.max(5, dn.at - now)) + ". Yours and Tim\u2019s.";
+      return out;
+    }
+    return null;
+  }
+  /* focus, midday: the next thing, whatever it is */
+  var nb = nextBlock(plan, now, 20, MINOR);
+  if (!nb) return null;
+  out.title = "At " + hm(nb.at) + ": " + nb.t;
+  out.body = (nb.at - now <= 90 ? "In " + inWords(nb.at - now) + ". " : "") + (nb.s || "");
+  if (st.veg) out.silent = true;
+  return out;
+}
+
+function composeNudge(kind, st, nowISO, dow, hour, minute){
   var fresh = !!(st && st.day === nowISO);
+  /* v85: the heads-ups, when there is a plan from today to read */
+  if (fresh && st.plan && st.plan.length && hour >= 6
+      && ["focus", "midday", "shift", "stop", "bed", "date"].indexOf(kind) >= 0){
+    var hu = composeHeadsUp(kind, st, hour * 60 + (minute || 0));
+    if (hu) return hu;
+  }
   var stale1 = !!(st && st.day === dayBefore(nowISO));
   var brief = st && st.briefs && st.briefs[nowISO];
   var badgeOn = !st || st.badgeOn !== 0;
@@ -183,6 +273,23 @@ function composeNudge(kind, st, nowISO, dow, hour){
   /* ---------------------------------------------------------- morning
      The shape of the day, in his own words from the brief. */
   if (slot === "morning"){
+    /* v85: with today's plan, the morning is the day's shape in times -
+       breakfast, then the next three things - and one extra line at most */
+    if (fresh && st.plan && st.plan.length && !st.ill){
+      var nowM = hour * 60 + (minute || 0), ahead = [];
+      for (var q = 0; q < st.plan.length && ahead.length < 3; q++){
+        var pb = st.plan[q];
+        if (pb.d || pb.at < nowM || MINOR.indexOf(pb.id) >= 0) continue;
+        ahead.push(pb.t.replace(/\.\s.*$/, "").replace(/\.$/, "") + " " + hm(pb.at));
+      }
+      out.title = st.name || (brief ? brief.head : DAY_NAMES[dow]);
+      out.body = (st.veg ? "A quiet one. " : "Water, a coffee, breakfast. ")
+        + (ahead.length ? "Then: " + ahead.join(" \u00b7 ") + "." : "The rest of the day is yours.");
+      var cl9 = chipLine(st);
+      if (cl9) out.body += " " + cl9;
+      out.badge = badgeOn ? (open.length || 0) : 0;
+      return out;
+    }
     if (brief){
       out.title = brief.head;
       var parts = [brief.first];
@@ -343,7 +450,7 @@ self.addEventListener("push", function(e){
       if (r) state = await r.json();
     } catch(err){}
     var now = new Date();
-    var n = composeNudge(kind, state, localISO(now), now.getDay(), now.getHours());
+    var n = composeNudge(kind, state, localISO(now), now.getDay(), now.getHours(), now.getMinutes());
     try {
       if (navigator.setAppBadge){
         if (n.badge) await navigator.setAppBadge(n.badge);
